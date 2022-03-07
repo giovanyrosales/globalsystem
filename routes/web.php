@@ -1,0 +1,161 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Frontend\Login\LoginController;
+use App\Http\Controllers\Controles\ControlController;
+use App\Http\Controllers\Backend\Roles\RolesController;
+use App\Http\Controllers\Backend\Roles\PermisoController;
+use App\Http\Controllers\Backend\Perfil\PerfilController;
+use App\Http\Controllers\Backend\Proyecto\ProyectoController;
+use App\Http\Controllers\Backend\Configuraciones\CodigoEspecifController;
+use App\Http\Controllers\Backend\Configuraciones\UnidadMedidaController;
+use App\Http\Controllers\Backend\Configuraciones\ClasificacionesController;
+use App\Http\Controllers\Backend\Configuraciones\MaterialesController;
+use App\Http\Controllers\Backend\Configuraciones\LineaTrabajoController;
+use App\Http\Controllers\Backend\Configuraciones\FuenteFinanciamientoController;
+use App\Http\Controllers\Backend\Configuraciones\FuenteRecursosController;
+use App\Http\Controllers\Backend\Configuraciones\AreaGestionController;
+use App\Http\Controllers\Backend\Configuraciones\ProveedoresController;
+use App\Http\Controllers\Backend\Configuraciones\AdministradoresController;
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', [LoginController::class,'index'])->name('login');
+
+Route::post('admin/login', [LoginController::class, 'login']);
+Route::post('admin/logout', [LoginController::class, 'logout'])->name('admin.logout');
+
+// --- CONTROL WEB ---
+Route::get('/panel', [ControlController::class,'indexRedireccionamiento'])->name('admin.panel');
+
+// --- ROLES ---
+Route::get('/admin/roles/index', [RolesController::class,'index'])->name('admin.roles.index');
+Route::get('/admin/roles/tabla', [RolesController::class,'tablaRoles']);
+Route::get('/admin/roles/lista/permisos/{id}', [RolesController::class,'vistaPermisos']);
+Route::get('/admin/roles/permisos/tabla/{id}', [RolesController::class,'tablaRolesPermisos']);
+Route::post('/admin/roles/permiso/borrar', [RolesController::class, 'borrarPermiso']);
+Route::post('/admin/roles/permiso/agregar', [RolesController::class, 'agregarPermiso']);
+Route::get('/admin/roles/permisos/lista', [RolesController::class,'listaTodosPermisos']);
+Route::get('/admin/roles/permisos-todos/tabla', [RolesController::class,'tablaTodosPermisos']);
+Route::post('/admin/roles/borrar-global', [RolesController::class, 'borrarRolGlobal']);
+
+// --- PERMISOS ---
+Route::get('/admin/permisos/index', [PermisoController::class,'index'])->name('admin.permisos.index');
+Route::get('/admin/permisos/tabla', [PermisoController::class,'tablaUsuarios']);
+Route::post('/admin/permisos/nuevo-usuario', [PermisoController::class, 'nuevoUsuario']);
+Route::post('/admin/permisos/info-usuario', [PermisoController::class, 'infoUsuario']);
+Route::post('/admin/permisos/editar-usuario', [PermisoController::class, 'editarUsuario']);
+Route::post('/admin/permisos/nuevo-rol', [PermisoController::class, 'nuevoRol']);
+Route::post('/admin/permisos/extra-nuevo', [PermisoController::class, 'nuevoPermisoExtra']);
+Route::post('/admin/permisos/extra-borrar', [PermisoController::class, 'borrarPermisoGlobal']);
+
+// --- PERFIL ---
+Route::get('/admin/editar-perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('admin.perfil');
+Route::post('/admin/editar-perfil/actualizar', [PerfilController::class, 'editarUsuario']);
+
+// --- SIN PERMISOS VISTA 403 ---
+Route::get('sin-permisos', [ControlController::class,'indexSinPermiso'])->name('no.permisos.index');
+
+// --- PROYECTO ---
+Route::get('/admin/proyecto/nuevo/index', [ProyectoController::class,'index'])->name('admin.nuevo.proyecto.index');
+Route::post('/admin/proyecto/nuevo', [ProyectoController::class, 'nuevoProyecto']);
+
+// --- LISTA DE PROYECTOS ---
+Route::get('/admin/proyecto/lista/index', [ProyectoController::class,'indexProyectoLista'])->name('admin.lista.proyectos.index');
+Route::get('/admin/proyecto/lista/tabla/index', [ProyectoController::class,'tablaProyectoLista']);
+Route::post('/admin/proyecto/lista/informacion', [ProyectoController::class, 'informacionProyecto']);
+Route::post('/admin/proyecto/lista/editar', [ProyectoController::class, 'editarProyecto']);
+
+// vista de proyecto
+Route::get('/admin/proyecto/vista/index/{id}', [ProyectoController::class,'indexProyectoVista']);
+Route::get('/admin/proyecto/vista/bitacora/{id}', [ProyectoController::class,'tablaProyectoListaBitacora']);
+Route::post('/admin/proyecto/vista/bitacora/registrar', [ProyectoController::class, 'registrarBitacora']);
+Route::post('/admin/proyecto/vista/bitacora/borrar', [ProyectoController::class, 'borrarBitacora']);
+Route::post('/admin/proyecto/vista/bitacora/informacion', [ProyectoController::class, 'informacionBitacora']);
+Route::post('/admin/proyecto/vista/bitacora/editar', [ProyectoController::class, 'editarBitacora']);
+Route::get('/admin/proyecto/vista/bitacora-detalle/{id}', [ProyectoController::class,'vistaBitacoraDetalle']);
+Route::get('/admin/proyecto/vista/tabla/bitacora-detalle/{id}', [ProyectoController::class,'tablaBitacoraDetalle']);
+Route::get('/admin/proyecto/vista/bitacora-detalle-doc/{file}' , [ProyectoController::class, 'descargarBitacoraDoc']);
+
+
+// --- CODIGO ESPECIFICO ---
+Route::get('/admin/cuenta/index', [CodigoEspecifController::class,'index'])->name('admin.cuenta.index');
+Route::get('/admin/cuenta/tabla/index', [CodigoEspecifController::class,'tabla']);
+Route::post('/admin/cuenta/nuevo', [CodigoEspecifController::class, 'nuevaCuenta']);
+Route::post('/admin/cuenta/informacion', [CodigoEspecifController::class, 'informacionCuenta']);
+Route::post('/admin/cuenta/editar', [CodigoEspecifController::class, 'editarCuenta']);
+
+// --- UNIDAD MEDIDA ---
+Route::get('/admin/unidadmedida/index', [UnidadMedidaController::class,'index'])->name('admin.unidadmedida.index');
+Route::get('/admin/unidadmedida/tabla/index', [UnidadMedidaController::class,'tabla']);
+Route::post('/admin/unidadmedida/nuevo', [UnidadMedidaController::class, 'nuevaUnidadMedida']);
+Route::post('/admin/unidadmedida/informacion', [UnidadMedidaController::class, 'informacionUnidadMedida']);
+Route::post('/admin/unidadmedida/editar', [UnidadMedidaController::class, 'editarUnidadMedida']);
+
+// --- CLASIFICACIONES ---
+Route::get('/admin/clasificaciones/index', [ClasificacionesController::class,'index'])->name('admin.clasificaciones.index');
+Route::get('/admin/clasificaciones/tabla/index', [ClasificacionesController::class,'tabla']);
+Route::post('/admin/clasificaciones/nuevo', [ClasificacionesController::class, 'nuevaClasificacion']);
+Route::post('/admin/clasificaciones/informacion', [ClasificacionesController::class, 'informacionClasificacion']);
+Route::post('/admin/clasificaciones/editar', [ClasificacionesController::class, 'editarClasificacion']);
+
+// --- CATALOGO DE MATERIALES ---
+Route::get('/admin/catalogo/materiales/index', [MaterialesController::class,'index'])->name('admin.catalogo.materiales.index');
+Route::get('/admin/catalogo/materiales/tabla/index', [MaterialesController::class,'tabla']);
+Route::post('/admin/catalogo/materiales/nuevo', [MaterialesController::class, 'nuevoMaterial']);
+Route::post('/admin/catalogo/materiales/informacion', [MaterialesController::class, 'informacion']);
+Route::post('/admin/catalogo/materiales/editar', [MaterialesController::class, 'editarMaterial']);
+
+// --- LÍNEA DE TRABAJO ---
+Route::get('/admin/linea/trabajo/index', [LineaTrabajoController::class,'index'])->name('admin.linea.de.trabajo.index');
+Route::get('/admin/linea/trabajo/tabla/index', [LineaTrabajoController::class,'tabla']);
+Route::post('/admin/linea/trabajo/nuevo', [LineaTrabajoController::class, 'nuevaLinea']);
+Route::post('/admin/linea/trabajo/informacion', [LineaTrabajoController::class, 'informacionLinea']);
+Route::post('/admin/linea/trabajo/editar', [LineaTrabajoController::class, 'editarLinea']);
+
+// --- FUENTE DE FINANCIAMIENTO ---
+Route::get('/admin/fuentef/index', [FuenteFinanciamientoController::class,'index'])->name('admin.fuente.financiamiento.index');
+Route::get('/admin/fuentef/tabla/index', [FuenteFinanciamientoController::class,'tabla']);
+Route::post('/admin/fuentef/nuevo', [FuenteFinanciamientoController::class, 'nuevaFuente']);
+Route::post('/admin/fuentef/informacion', [FuenteFinanciamientoController::class, 'informacionFuente']);
+Route::post('/admin/fuentef/editar', [FuenteFinanciamientoController::class, 'editarFuente']);
+
+// --- FUENTE DE RECURSOS ---
+Route::get('/admin/fuenter/index', [FuenteRecursosController::class,'index'])->name('admin.fuente.recurso.index');
+Route::get('/admin/fuenter/tabla/index', [FuenteRecursosController::class,'tabla']);
+Route::post('/admin/fuenter/nuevo', [FuenteRecursosController::class, 'nuevaFuente']);
+Route::post('/admin/fuenter/informacion', [FuenteRecursosController::class, 'informacionFuente']);
+Route::post('/admin/fuenter/editar', [FuenteRecursosController::class, 'editarFuente']);
+
+// --- ÁREA DE GESTIÓN ---
+Route::get('/admin/areagestion/index', [AreaGestionController::class,'index'])->name('admin.area.gestion.index');
+Route::get('/admin/areagestion/tabla/index', [AreaGestionController::class,'tabla']);
+Route::post('/admin/areagestion/nuevo', [AreaGestionController::class, 'nuevaAreaGestion']);
+Route::post('/admin/areagestion/informacion', [AreaGestionController::class, 'informacionArea']);
+Route::post('/admin/areagestion/editar', [AreaGestionController::class, 'editarArea']);
+
+// --- PROVEEDORES ---
+Route::get('/admin/proveedores/index', [ProveedoresController::class,'index'])->name('admin.proveedores.index');
+Route::get('/admin/proveedores/tabla/index', [ProveedoresController::class,'tabla']);
+Route::post('/admin/proveedores/nuevo', [ProveedoresController::class, 'nuevoProveedor']);
+Route::post('/admin/proveedores/informacion', [ProveedoresController::class, 'informacionProveedor']);
+Route::post('/admin/proveedores/editar', [ProveedoresController::class, 'editarProveedor']);
+
+// --- ADMINISTRADORES DE PROYECTO ---
+Route::get('/admin/administradores/index', [AdministradoresController::class,'index'])->name('admin.administradores.index');
+Route::get('/admin/administradores/tabla/index', [AdministradoresController::class,'tabla']);
+Route::post('/admin/administradores/nuevo', [AdministradoresController::class, 'nuevoAdministrador']);
+Route::post('/admin/administradores/informacion', [AdministradoresController::class, 'informacionAdministrador']);
+Route::post('/admin/administradores/editar', [AdministradoresController::class, 'editarAdministrador']);
+
+
+
+
