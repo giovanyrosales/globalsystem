@@ -13,6 +13,7 @@ use App\Models\FuenteRecursos;
 use App\Models\LineaTrabajo;
 use App\Models\Naturaleza;
 use App\Models\Proyecto;
+use App\Models\Requisicion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -27,6 +28,7 @@ class ProyectoController extends Controller
         $this->middleware('auth');
     }
 
+    // vista para agregar nuevo proyecto
     public function index(){
 
         $arrayNaturaleza = Naturaleza::orderBy('nombre')->get();
@@ -116,7 +118,6 @@ class ProyectoController extends Controller
     }
 
     public function indexProyectoLista(){
-
         return view('backend.admin.proyectos.listaproyecto');
     }
 
@@ -279,6 +280,7 @@ class ProyectoController extends Controller
 
     public function indexProyectoVista($id){
         $proyecto = Proyecto::where('id', $id)->first();
+
         return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id'));
     }
 
@@ -288,9 +290,17 @@ class ProyectoController extends Controller
             ->orderBy('fecha')
             ->get();
 
+        $numero = 0;
+        foreach ($listaBitacora as $ll){
+            $numero += 1;
+            $ll->numero = $numero;
+        }
+
         return view('backend.admin.proyectos.bitacoras.tablabitacoras', compact('listaBitacora'));
     }
 
+
+    // registrar nueva bitacora
     public function registrarBitacora(Request $request){
 
         $regla = array(
@@ -304,11 +314,6 @@ class ProyectoController extends Controller
         DB::beginTransaction();
 
         try {
-
-            $numero = Bitacora::where('id_proyecto', $request->id)->count();
-            if($numero == null){
-                $numero = 0;
-            }
 
             if ($request->hasFile('documento')) {
 
@@ -326,7 +331,6 @@ class ProyectoController extends Controller
 
                    $b = new Bitacora();
                    $b->id_proyecto = $request->id;
-                   $b->numero = $numero + 1;
                    $b->fecha = $request->fecha;
                    $b->observaciones = $request->observaciones;
                    $b->save();
@@ -346,17 +350,9 @@ class ProyectoController extends Controller
             else{
                 $b = new Bitacora();
                 $b->id_proyecto = $request->id;
-                $b->numero = $numero + 1;
                 $b->fecha = $request->fecha;
                 $b->observaciones = $request->observaciones;
                 $b->save();
-
-                if($request->nombredocumento != null){
-                    $d = new BitacoraDetalle();
-                    $d->id_bitacora = $b->id;
-                    $d->nombre = $request->nombredocumento;
-                    $d->save();
-                }
 
                 DB::commit();
                 return ['success' => 1];
@@ -370,7 +366,7 @@ class ProyectoController extends Controller
 
     public function borrarBitacora(Request $request){
         $regla = array(
-            'id' => 'required', // id de proyecto
+            'id' => 'required', // id bitacora
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -451,6 +447,7 @@ class ProyectoController extends Controller
         return view('backend.admin.proyectos.bitacoras.tablabitacoradetalle', compact('lista'));
     }
 
+    // descargar imagen de bitacora detalle
     public function descargarBitacoraDoc($id){ // id de bitacora
 
         $url = BitacoraDetalle::where('id', $id)->pluck('documento')->first();
@@ -462,6 +459,85 @@ class ProyectoController extends Controller
         $nombre = "Doc." . $extension;
 
         return response()->download($pathToFile, $nombre);
+    }
+
+    // borrar una bitacora detalle
+    public function borrarBitacoraDetalle(Request $request){
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($info = BitacoraDetalle::where('id', $request->id)->first()){
+
+            $doc = $info->documento;
+
+            BitacoraDetalle::where('id', $request->id)->delete();
+
+          if (Storage::disk('archivos')->exists($doc)) {
+              Storage::disk('archivos')->delete($doc);
+          }
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    // agregar nueva bitacora detalle
+    public function nuevoBitacoraDetalle(Request $request){
+        $regla = array(
+            'id' => 'required', // id de proyecto
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        $numero = Bitacora::where('id_proyecto', $request->id)->count();
+        if($numero == null){
+            $numero = 0;
+        }
+
+        $cadena = Str::random(15);
+        $tiempo = microtime();
+        $union = $cadena . $tiempo;
+        $nombre = str_replace(' ', '_', $union);
+
+        $extension = '.' . $request->documento->getClientOriginalExtension();
+        $nomDocumento = $nombre . strtolower($extension);
+        $avatar = $request->file('documento');
+        $archivo = Storage::disk('archivos')->put($nomDocumento, \File::get($avatar));
+
+        if($archivo){
+            $d = new BitacoraDetalle();
+            $d->id_bitacora = $request->id;
+            $d->nombre = $request->nombredocumento;
+            $d->documento = $nomDocumento;
+            $d->save();
+
+            DB::commit();
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    public function tablaProyectoListaRequisicion($id){
+        $listaRequisicion = Requisicion::where('id_proyecto', $id)
+            ->orderBy('fecha', 'ASC')
+            ->get();
+
+        $numero = 0;
+        foreach ($listaRequisicion as $ll){
+            $numero += 1;
+            $ll->numero = $numero;
+        }
+
+        return view('backend.admin.proyectos.requisicion.tablarequisicion', compact('listaRequisicion'));
     }
 
 }

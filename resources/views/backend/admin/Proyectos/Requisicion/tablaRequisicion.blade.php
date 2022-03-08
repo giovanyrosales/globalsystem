@@ -4,7 +4,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <table id="tabla-bitabora" class="table table-bordered table-striped">
+                        <table id="tabla-requisicion" class="table table-bordered table-striped">
                             <thead>
                             <tr>
                                 <th style="width: 10%">Número</th>
@@ -14,21 +14,18 @@
                             </thead>
                             <tbody>
 
-                            @foreach($listaBitacora as $dato)
+                            @foreach($listaRequisicion as $dato)
                                 <tr>
-                                    <td>{{ $dato->numero }}</td>
-                                    <td>{{ $dato->fecha }}</td>
+                                    <td style="width: 10%">{{ $dato->numero }}</td>
+                                    <td style="width: 10%">{{ $dato->fecha }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-info btn-xs" onclick="vistaBitacora({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Ver"></i>&nbsp; Fotos
+
+                                        <button type="button" class="btn btn-warning btn-xs" onclick="vistaCotizarRequisicion({{ $dato->id }})">
+                                            <i class="fas fa-pen" title="Cotizar"></i>&nbsp; Cotizar
                                         </button>
 
-                                        <button type="button" class="btn btn-success btn-xs" onclick="vistaEditarBitacora({{ $dato->id }})">
-                                            <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar
-                                        </button>
-
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="preguntaBorrarBitacora({{ $dato->id }})">
-                                            <i class="fas fa-trash-alt" title="Borrar"></i>&nbsp; Borrar
+                                        <button type="button" class="btn btn-info btn-xs" onclick="editarRequisicion({{ $dato->id }})">
+                                            <i class="fas fa-trash-alt" title="Editar"></i>&nbsp; Editar
                                         </button>
                                     </td>
                                 </tr>
@@ -45,7 +42,7 @@
 
 <script>
     $(function () {
-        $("#tabla-bitabora").DataTable({
+        $("#tabla-requisicion").DataTable({
             "paging": true,
             "lengthChange": true,
             "searching": true,

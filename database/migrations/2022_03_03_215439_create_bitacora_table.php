@@ -17,7 +17,6 @@ class CreateBitacoraTable extends Migration
             $table->id();
             $table->bigInteger('id_proyecto')->nullable()->unsigned();
 
-            $table->integer('numero');
             $table->date('fecha');
             $table->text('observaciones')->nullable();
 

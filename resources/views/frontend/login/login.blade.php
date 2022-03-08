@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/login/bootstrap.min.css') }}">
 
     <!-- icono del sistema -->
-    <link href="{{ asset('images/icono-sistema.png') }}" rel="icon">
+    <link href="{{ asset('images/logo.png') }}" rel="icon">
     <!-- libreria -->
     <link href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}" type="text/css" rel="stylesheet" />
     <!-- comprimido de librerias -->

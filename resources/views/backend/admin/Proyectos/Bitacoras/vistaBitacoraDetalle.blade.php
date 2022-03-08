@@ -68,21 +68,13 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Código</label>
-                                        <input type="text" maxlength="100" class="form-control" id="codigo-nuevo" autocomplete="off">
+                                        <label>Documento</label>
+                                        <input type="file" id="documento-bitacora" class="form-control" accept="image/jpeg, image/jpg, image/png"/>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Nombre</label>
-                                        <input type="text" maxlength="300" class="form-control" id="nombre-nuevo" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Línea de Trabajo</label>
-                                        <select class="form-control" id="select-fuente-l-nuevo">
-                                            <option value="" disabled selected>Seleccione una opción...</option>
-
-                                        </select>
+                                        <label>Nombre para Imagen</label>
+                                        <input type="text" maxlength="300" class="form-control" id="nombre-bitacora-doc-nuevo">
                                     </div>
 
                                 </div>
@@ -92,57 +84,13 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="nuevo()">Guardar</button>
+                    <button type="button" class="btn btn-primary" onclick="nuevoRegistro()">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- modal editar -->
-    <div class="modal fade" id="modalEditar">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Editar Área de Gestión</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="formulario-editar">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
 
-                                    <div class="form-group">
-                                        <label>Código</label>
-                                        <input type="hidden" id="id-editar">
-                                        <input type="text" maxlength="100" class="form-control" id="codigo-editar" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Nombre</label>
-                                        <input type="text" maxlength="300" class="form-control" id="nombre-editar" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Línea de Trabajo</label>
-                                        <select class="form-control" id="select-fuente-l-editar">
-                                        </select>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 
@@ -164,7 +112,6 @@
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
-
         });
     </script>
 
@@ -176,43 +123,82 @@
             $('#tablaDatatable').load(ruta);
         }
 
+        function modalBorrar(id){
+            Swal.fire({
+                title: 'Borrar Imagen',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    borrarImagen(id);
+                }
+            })
+        }
+
+        function borrarImagen(id){
+
+            openLoading();
+            axios.post(url+'/proyecto/vista/bitacora-detalle/borrar', {
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Borrado correctamente');
+                        $('#modalAgregar').modal('hide');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al borrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al borrar');
+                    closeLoading();
+                });
+        }
+
+
+
         function modalAgregar(){
             document.getElementById("formulario-nuevo").reset();
             $('#modalAgregar').modal('show');
         }
 
-        function nuevo(){
-            var codigo = document.getElementById('codigo-nuevo').value;
-            var nombre = document.getElementById('nombre-nuevo').value;
-            var fuente = document.getElementById('select-fuente-l-nuevo').value;
+        function nuevoRegistro(){
+            var documento = document.getElementById('documento-bitacora'); // null file
+            var nombreDocumento = document.getElementById('nombre-bitacora-doc-nuevo').value;
 
-            if(codigo === ''){
-                toastr.error('Código es requerido');
+            if(documento.files && documento.files[0]){ // si trae doc
+                if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png')){
+                    toastr.error('formato para Imagen permitido: .png .jpg .jpeg');
+                    return;
+                }
+            }else{
+                toastr.error('Imagen es requerida');
                 return;
             }
 
-            if(codigo.length > 100){
-                toastr.error('Código máximo 100 caracteres');
+            if(nombreDocumento.length > 300){
+                toastr.error('Nombre para Imagen máximo 300 caracteres');
                 return;
             }
 
-            if(nombre.length > 300){
-                toastr.error('Nombre máximo 300 caracteres');
-                return;
-            }
-
-            if(fuente === ''){
-                toastr.error('Seleccionar Línea de Trabajo');
-                return;
-            }
+            // id del proyecto
+            var id = {{ $id }};
 
             openLoading();
             var formData = new FormData();
-            formData.append('codigo', codigo);
-            formData.append('nombre', nombre);
-            formData.append('fuente', fuente);
+            formData.append('id', id);
+            formData.append('documento', documento.files[0]);
+            formData.append('nombredocumento', nombreDocumento);
 
-            axios.post(url+'/areagestion/nuevo', formData, {
+            axios.post(url+'/proyecto/vista/bitacora-detalle/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -230,91 +216,6 @@
                     closeLoading();
                 });
         }
-
-        function informacion(id){
-            openLoading();
-            document.getElementById("formulario-editar").reset();
-
-            axios.post(url+'/areagestion/informacion',{
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        $('#modalEditar').modal('show');
-                        $('#id-editar').val(response.data.fuente.id);
-                        $('#codigo-editar').val(response.data.fuente.codigo);
-                        $('#nombre-editar').val(response.data.fuente.nombre);
-
-                        document.getElementById("select-fuente-l-editar").options.length = 0;
-
-                        $.each(response.data.arrayfuente, function( key, val ){
-                            if(response.data.idfuente == val.id){
-                                $('#select-fuente-l-editar').append('<option value="' +val.id +'" selected="selected">'+val.codigo + ' ' + val.nombre +'</option>');
-                            }else{
-                                $('#select-fuente-l-editar').append('<option value="' +val.id +'">'+val.codigo + ' ' + val.nombre +'</option>');
-                            }
-                        });
-
-                    }else{
-                        toastr.error('Información no encontrada');
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Información no encontrada');
-                });
-        }
-
-        function editar(){
-            var id = document.getElementById('id-editar').value;
-            var nombre = document.getElementById('nombre-editar').value;
-            var codigo = document.getElementById('codigo-editar').value;
-            var fuente = document.getElementById('select-fuente-l-editar').value;
-
-            if(codigo === ''){
-                toastr.error('Código es requerido');
-                return;
-            }
-
-            if(codigo.length > 100){
-                toastr.error('Código máximo 100 caracteres');
-                return;
-            }
-
-            if(nombre.length > 300){
-                toastr.error('Nombre máximo 300 caracteres');
-                return;
-            }
-
-            openLoading();
-            var formData = new FormData();
-            formData.append('id', id);
-            formData.append('codigo', codigo);
-            formData.append('nombre', nombre);
-            formData.append('fuente', fuente);
-
-            axios.post(url+'/areagestion/editar', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        toastr.success('Actualizado correctamente');
-                        $('#modalEditar').modal('hide');
-                        recargar();
-                    }
-                    else {
-                        toastr.error('Error al actualizar');
-                    }
-
-                })
-                .catch((error) => {
-                    toastr.error('Error al actualizar');
-                    closeLoading();
-                });
-        }
-
 
     </script>
 

@@ -7,9 +7,9 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>Documento</th>
-                                <th>Opciones</th>
+                                <th style="width: 15%">Nombre</th>
+                                <th style="width: 20%">Imagen</th>
+                                <th style="width: 15%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -19,14 +19,23 @@
                                     <td>{{ $dato->nombre }}</td>
                                     <td>
                                         @if($dato->documento != null)
-                                            <a class="btn btn-primary btn-xs" href="{{ url('/admin/proyecto/vista/bitacora-detalle-doc/'.$dato->id) }}">
-                                                <i class="fas fa-file" title="Documento"></i> Documento </a>
+                                           <center> <img src="{{ asset('storage/archivos/'.$dato->documento) }}"
+                                                 style="width: 120px; height: 120px; margin: auto;"></center>
                                         @endif
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
+
+                                        @if($dato->documento != null)
+                                            <a href="{{ url('/admin/proyecto/vista/bitacora-detalle-doc/'.$dato->id) }}">
+                                                <button class="btn btn-success btn-xs"><i class="fa fa-download"></i> Descargar</button>
+                                            </a>
+                                        @endif
+
+                                        <button type="button" class="btn btn-danger btn-xs" onclick="modalBorrar({{ $dato->id }})">
+                                            <i class="fas fa-eye" title="Borrar"></i>&nbsp; Borrar
                                         </button>
+
+
                                     </td>
                                 </tr>
                             @endforeach

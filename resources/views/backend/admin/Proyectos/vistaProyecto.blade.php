@@ -21,76 +21,56 @@
             <div class="col-sm-6" style="margin-right: 10px;">
                 <h1>Control Individual de Proyecto</h1>
             </div>
-            <div class="col-sm-2">
-                <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
-                    <i class="fas fa-pencil-alt"></i>
-                    Requisición
-                </button>
-            </div>
         </div>
     </section>
 
-    <!------------------ INFORMACIÓN DE UN PROYECTO ESPECIFICO ---------------->
+    <!------------------ INFORMACION DE UN PROYECTO ESPECIFICO ---------------->
     <section class="content">
-        <div class="row">
-            <div class="col-sm-6 float-left">
-                <div class="container-fluid">
-                    <div class="card card-success">
-                        <div class="card-header">
-                            <h3 class="card-title" style="color: white">Datos del Proyecto</h3>
-                        </div>
+        <div class="col-sm-6 float-left">
+            <div class="container-fluid">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Datos del Proyecto</h3>
+                    </div>
 
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-10">
-                                    <table>
-                                        <tr>
-                                            <td style="font-weight: bold">Código: </td>
-                                            <td>{{ $proyecto->codigo }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="font-weight: bold">Nombre: </td>
-                                            <td>{{ $proyecto->nombre }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="font-weight: bold">Dirección: </td>
-                                            <td>{{ $proyecto->ubicacion }}</td>
-                                        </tr>
-                                    </table>
-                                </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <table>
+                                    <tr>
+                                        <td style="font-weight: bold">Código: </td>
+                                        <td>{{ $proyecto->codigo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold">Nombre: </td>
+                                        <td>{{ $proyecto->nombre }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold">Dirección: </td>
+                                        <td>{{ $proyecto->ubicacion }}</td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!------------------ PRESUPUESTO ---------------->
-            <div class="col-sm-6 float-right">
-                <div class="container-fluid">
-                    <div class="card card-danger">
-                        <div class="card-header">
-                            <h3 class="card-title">Requerimientos de Proyecto</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                                <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-remove"></i></button>
-                            </div>
-                        </div>
+        </div>
+        <!------------------ PRESUPUESTO DEL PROYECTO INDIVIDUAL ---------------->
+        <div class="col-sm-6 float-right">
+            <div class="container-fluid">
+                <div class="card card-default">
+                    <div class="card-header">
+                        <h3 class="card-title"><strong>Presupuesto de Proyecto</strong></h3>
+                        <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="modalAgregarRequisicion()" class="btn btn-secondary btn-sm">
+                            Agregar Requisición
+                        </button>
+                    </div>
 
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <table id="example1" class="table table-bordered table-hover">
-                                        <thead>
-                                        <tr>
-                                            <th style="width: 10%;">Num.</th>
-                                            <th style="width: 15%;">Fecha</th>
-                                            <th style="width: 40%;">Opciones</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-
-
-                                        </tbody>
-                                    </table>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="tablaDatatableRequisicion">
                                 </div>
                             </div>
                         </div>
@@ -98,20 +78,16 @@
                 </div>
             </div>
         </div>
-
-
-        <!------------------ BITACORA ---------------->
+        <!------------------ CONTROL DE BITACORAS ---------------->
         <div class="col-sm-6 float-left">
             <div class="container-fluid">
-                <div class="card card-danger">
+                <div class="card card-default">
                     <div class="card-header">
-                        <h3 class="card-title" style="margin-top: 5px">BITACORA</h3>
-                        <button style="margin-left: 15px; margin-bottom: 10px" type="button" onclick="modalAgregarBitacora()" class="btn btn-success btn-sm">
-                            <i class="fas fa-pencil-alt"></i>
+                        <h3 class="card-title"><strong>Control de Bitácoras</strong></h3>
+                        <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="modalAgregarBitacora()" class="btn btn-secondary btn-sm">
                             Agregar Bitacora
                         </button>
                     </div>
-
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
@@ -124,9 +100,10 @@
             </div>
         </div>
 
-
     </section>
+
 </div>
+
 
 <!-- Modal Agregar Requisicion -->
 <div class="modal fade" id="modalAgregar" tabindex="-1">
@@ -339,7 +316,6 @@
 </div>
 
 
-
 <!-- modal agregar bitacora -->
 <div class="modal fade" id="modalAgregarBitacora">
     <div class="modal-dialog">
@@ -372,7 +348,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Nombre para Documento</label>
+                                    <label>Nombre para Imagen</label>
                                     <input type="text" maxlength="300" class="form-control" id="nombre-bitacora-doc-nuevo">
                                 </div>
 
@@ -450,17 +426,27 @@
             var ruta = "{{ URL::to('/admin/proyecto/vista/bitacora') }}/" + id;
             $('#tablaDatatableBitacora').load(ruta);
 
+            var rutaR = "{{ URL::to('/admin/proyecto/vista/requisicion') }}/" + id;
+            $('#tablaDatatableRequisicion').load(rutaR);
         });
     </script>
 
     <script>
 
+        // recargar tabla solo para bitacoras
         function recargarBitacora(){
             var id = {{ $id }};
             var ruta = "{{ URL::to('/admin/proyecto/vista/bitacora') }}/" + id;
             $('#tablaDatatableBitacora').load(ruta);
         }
 
+        function recargarRequisicion(){
+            var id = {{ $id }};
+            var rutaR = "{{ URL::to('/admin/proyecto/vista/requisicion') }}/" + id;
+            $('#tablaDatatableRequisicion').load(rutaR);
+        }
+
+        // modal agregar bitacora
         function modalAgregarBitacora(){
             document.getElementById("formulario-bitacora-nuevo").reset();
 
@@ -489,7 +475,13 @@
 
             if(documento.files && documento.files[0]){ // si trae doc
                 if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png')){
-                    toastr.error('formato para Documento permitido: .png .jpg .jpeg');
+                    toastr.error('formato para Imagen permitido: .png .jpg .jpeg');
+                    return;
+                }
+            }else{
+                // si imagen viene vacio, verificar texto
+                if(nombreDocumento.length > 0){
+                    toastr.error('Imagen es requerida si ingresa Nombre para Imagen');
                     return;
                 }
             }
@@ -498,6 +490,7 @@
                 toastr.error('Nombre para Documento máximo 300 caracteres');
                 return;
             }
+
 
             // id del proyecto
             var id = {{ $id }};
