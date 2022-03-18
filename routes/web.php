@@ -89,6 +89,8 @@ Route::post('/admin/proyecto/vista/bitacora-detalle/nuevo' , [ProyectoController
 
 // vista requisicion
 Route::get('/admin/proyecto/vista/requisicion/{id}', [ProyectoController::class,'tablaProyectoListaRequisicion']);
+Route::post('/admin/proyecto/vista/requisicion/nuevo', [ProyectoController::class, 'nuevoRequisicion']);
+
 
 // --- CODIGO ESPECIFICO ---
 Route::get('/admin/cuenta/index', [CodigoEspecifController::class,'index'])->name('admin.cuenta.index');

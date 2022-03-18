@@ -62,7 +62,7 @@
                 <div class="card card-default">
                     <div class="card-header">
                         <h3 class="card-title"><strong>Presupuesto de Proyecto</strong></h3>
-                        <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="modalAgregarRequisicion()" class="btn btn-secondary btn-sm">
+                        <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-secondary btn-sm">
                             Agregar Requisición
                         </button>
                     </div>
@@ -105,65 +105,66 @@
 </div>
 
 
-<!-- Modal Agregar Requisicion -->
-<div class="modal fade" id="modalAgregar" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+<div class="modal fade" id="modalAgregarRequisicion" tabindex="-1">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Agregar Requisicion de Proyecto</h4>
+                <h4 class="modal-title">Agregar Requisición de Proyecto</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="formularion2">
+
+                <form id="formulario-requisicion-nuevo">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>Fecha:</label>
-                                    <input style="width:50%;" type="date" class="form-control" id="fechan" name="fechan">
+                                    <label>Fecha *:</label>
+                                    <input style="width:50%;" type="date" class="form-control" id="fecha-requisicion-nuevo">
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label>Item:</label>
-                                    <input  type="text" class="form-control" id="itemn" name="itemn" value="5555" readonly>
-                                    <input type="hidden" class="form-control" id="proyecto_idn" name="proyecto_idn" value="{{ $proyecto->id }}">
+                                    <input  type="text" class="form-control" id="conteo-requisicion" value="{{ $conteo }}" readonly>
                                 </div>
                             </div>
+
                             <div class="col-md-8">
                                 <div class="form-group">
                                     <label>Destino:</label>
-                                    <input  type="text" class="form-control" id="destinon" name="destinon">
+                                    <input  type="text" class="form-control" id="destino-requisicion-nuevo">
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-10">
                                 <div class="form-group">
                                     <label>Necesidad:</label>
-                                    <textarea class="form-control" id="necesidadn" name="necesidadn" rows="2"></textarea>
+                                    <textarea class="form-control" id="necesidad-requisicion-nuevo" maxlength="10000" rows="2"></textarea>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <br>
-                                    <button type="button" onclick="abrirModalAgregarDet_Req(1)" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
-                                        <i class="fas fa-plus" title="Add"></i>&nbsp; Agregar</button>
+                                    <button type="button" onclick="verModalDetalleRequisicion()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                        <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <table  class="table" id="matriz"  data-toggle="table">
+                            <table class="table" id="matriz-requisicion"  data-toggle="table">
                                 <thead>
                                 <tr>
-                                    <th scope="col">Cantidad</th>
-                                    <th scope="col">Descripci&oacute;n</th>
-                                    <th scope="col">Unidad Medida</th>
-                                    <th scope="col">Opciones</th>
+                                    <th style="width: 3%">Cantidad</th>
+                                    <th style="width: 15%">Descripción</th>
+                                    <th style="width: 5%">Opciones</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -173,134 +174,56 @@
                         </div>
                     </div>
                 </form>
+
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="btnGuardarU" onclick="enviarModalAgregarReq()">Guardar</button>
+                <button type="button" class="btn btn-primary" onclick="preguntaGuardarRequisicion()">Guardar</button>
             </div>
         </div>
     </div>
 </div>
-<!-- Modal Editar Requisicion -->
-<div class="modal fade" id="modalEditar">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Editar Requisicion</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formularioU2">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Fecha:</label>
-                                    <input style="width:50%;" type="date" class="form-control" id="fechap" name="fechap">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Num. Req.:</label>
-                                    <input  type="text" class="form-control" id="nump" name="nump" readonly>
-                                    <input type="hidden" class="form-control" id="idU2" name="idU2">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Destino:</label>
-                                    <input style="width:50%;" type="text" class="form-control" id="destinop" name="destinop">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-10">
-                                <div class="form-group">
-                                    <label>Necesidad:</label>
-                                    <textarea class="form-control" id="necesidadp" name="necesidadp" rows="2"></textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <br><br>
-                                    <button type="button" onclick="abrirModalAgregarDet_Req(2)" class="btn btn-primary btn-xs float-right">
-                                        <i class="fas fa-plus" title="Add"></i>&nbsp; Agregar</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <table  class="table" id="matrizpar"  data-toggle="table">
-                                <thead>
-                                <tr>
-                                    <th scope="col">Cantidad</th>
-                                    <th scope="col">Descripci&oacute;n</th>
-                                    <th scope="col">Unidad Medida</th>
-                                    <th scope="col">Opciones</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="btnGuardarU" onclick="enviarModalEditarReq()">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
+
+
+
+
 <!-- Modal agregar detalle de Req -->
-<div class="modal fade" id="modalAgregarReq" style="margin-top:3%;">
+<div class="modal fade" id="modalAgregarRequisicionDeta" style="margin-top:3%;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Agregar Detalle de Requisicion</h4>
+                <h4 class="modal-title">Agregar Detalle de Requisición</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="formularion3">
+                <form id="formulario-requisicion-deta-nuevo">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Cantidad:</label>
-                                    <input type="number" step="any" class="form-control" id="mcantidad" name="mcantidad">
+                                    <label>Cantidad *:</label>
+                                    <input type="number" maxlength="10" class="form-control" id="cantidad-deta-requi-nuevo">
                                 </div>
                             </div>
                             <div class="col-md-8">
                                 <div class="form-group">
-                                    <label>Unidad de Medida:</label>
-                                    <select class="form-control" id="munidadmedida" name="munidadmedida">
-                                        <option value="" >Seleccione una opción</option>
-                                        <option value="unidad" >C/U</option>
-                                        <option value="mts." >mts.</option>
-                                        <option value="mts." >plg</option>
-                                        <option value="mts." >gal</option>
-                                        <option value="mts." >m2</option>
-                                        <option value="mts." >m3</option>
-                                        <option value="mts." >yds</option>
-                                        <option value="mts." >lb</option>
-                                        <option value="mts." >Oz</option>
-                                        <option value="mts." >Kg</option>
-                                        <option value="mts." >cm3</option>
+                                    <label>Unidad de Medida *:</label>
+                                    <select class="form-control" id="select-unidad-requi-deta-nuevo">
+                                        @foreach($unidad as $sel)
+                                            <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
+
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Descripci&oacute;n:</label>
-                                    <input type="text" class="form-control" id="mdescripcion" name="mdescripcion" >
+                                    <label>Descripción *:</label>
+                                    <input type="text" maxlength="400" class="form-control" id="descrip-requi-deta-nuevo">
                                 </div>
                             </div>
                         </div>
@@ -309,7 +232,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="add" value="" >Agregar</button>
+                <button type="button" class="btn btn-primary" id="add">Agregar</button>
             </div>
         </div>
     </div>
@@ -431,6 +354,76 @@
         });
     </script>
 
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#add").on("click", function () {
+
+                var cantidad = document.getElementById('cantidad-deta-requi-nuevo').value;
+                var unidadmedida = document.getElementById('select-unidad-requi-deta-nuevo').value;
+                var descripcion = document.getElementById('descrip-requi-deta-nuevo').value;
+
+                var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+                if(cantidad === ''){
+                    toastr.error('Cantidad es requerida');
+                    return;
+                }
+
+                if(!cantidad.match(reglaNumeroDecimal)) {
+                    toastr.error('Cantidad debe ser decimal y no negativo');
+                    return;
+                }
+
+                if(cantidad <= 0){
+                    toastr.error('Cantidad no debe ser negativo');
+                    return;
+                }
+
+                if(cantidad.length > 10){
+                    toastr.error('Cantidad máximo 10 caracteres');
+                    return;
+                }
+
+                if(descripcion === ''){
+                    toastr.error('Descripción es requerida');
+                    return;
+                }
+
+                if(descripcion.length > 400){
+                    toastr.error('Descripción máximo 400 caracteres');
+                    return;
+                }
+
+                var markup = "<tr>"+
+
+                    "<td>"+
+                    "<input name='cantidadarray[]' value='"+cantidad+"' maxlength='10' class='form-control' type='number'>"+
+                    "</td>"+
+
+                    "<td>"+
+                    "<input name='descripcionarray[]' value='"+descripcion+"' maxlength='400' class='form-control' type='text'>"+
+                    "<input name='unidadmedidaarray[]' value='"+unidadmedida+"' class='form-control' type='hidden'>"+
+                    "</td>"+
+
+                    "<td>"+
+                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiDetalle(this)'>Borrar</button>"+
+                    "</td>"+
+
+                    "</tr>";
+
+                $("#matriz-requisicion tbody").append(markup);
+
+                $('#modalAgregarRequisicionDeta').modal('hide');
+            });
+        });
+
+        function borrarFilaRequiDetalle(elemento){
+            var tabla = elemento.parentNode.parentNode;
+            tabla.parentNode.removeChild(tabla);
+        }
+
+    </script>
+
     <script>
 
         // recargar tabla solo para bitacoras
@@ -454,6 +447,17 @@
             document.getElementById('fecha-bitacora-nuevo').value = fecha.toJSON().slice(0,10);
 
             $('#modalAgregarBitacora').modal('show');
+        }
+
+        function verModalRequisicion(){
+            document.getElementById("formulario-requisicion-nuevo").reset();
+            $('#modalAgregarRequisicion').css('overflow-y', 'auto');
+            $('#modalAgregarRequisicion').modal({backdrop: 'static', keyboard: false})
+        }
+
+        function verModalDetalleRequisicion(){
+            document.getElementById("formulario-requisicion-deta-nuevo").reset();
+            $('#modalAgregarRequisicionDeta').modal('show');
         }
 
         function guardarBitacora(){
@@ -490,7 +494,6 @@
                 toastr.error('Nombre para Documento máximo 300 caracteres');
                 return;
             }
-
 
             // id del proyecto
             var id = {{ $id }};
@@ -537,6 +540,23 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     borrarBitacora(id);
+                }
+            })
+        }
+
+        function preguntaGuardarRequisicion(){
+            Swal.fire({
+                title: 'Guardar Requisición',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    verificarRequisicion();
                 }
             })
         }
@@ -636,6 +656,127 @@
         // vista para bitacora detalle
         function vistaBitacora(id){
             window.location.href="{{ url('/admin/proyecto/vista/bitacora-detalle') }}/" + id;
+        }
+
+        function verificarRequisicion(){
+
+            var fecha = document.getElementById('fecha-requisicion-nuevo').value;
+            var destino = document.getElementById('destino-requisicion-nuevo').value; // null
+            var necesidad = document.getElementById('necesidad-requisicion-nuevo').value; // text
+
+            if(fecha === ''){
+                toastr.error('Fecha requisición es requerido');
+                return;
+            }
+
+            if(destino.length > 300){
+                toastr.error('Destino, máximo 300 caracteres');
+                return;
+            }
+
+            if(necesidad.length > 15000){
+                toastr.error('Necesidad debe tener máximo 15,000 caracteres');
+                return;
+            }
+
+            var hayRegistro = 0;
+            var nRegistro = $('#matriz-requisicion >tbody >tr').length;
+            let formData = new FormData();
+            var id = {{ $id }};
+
+            if (nRegistro > 0){
+
+                var cantidad = $("input[name='cantidadarray[]']").map(function(){return $(this).val();}).get();
+                var descripcion = $("input[name='descripcionarray[]']").map(function(){return $(this).val();}).get();
+                var medida = $("input[name='unidadmedidaarray[]']").map(function(){return $(this).val();}).get();
+
+                var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+                for(var a = 0; a < cantidad.length; a++){
+
+                    var datoCantidad = cantidad[a];
+
+                    if(datoCantidad === ''){
+                        toastr.error('Cantidad es requerida');
+                        return;
+                    }
+
+                    if(!datoCantidad.match(reglaNumeroDecimal)) {
+                        toastr.error('Cantidad debe ser decimal y no negativo');
+                        return;
+                    }
+
+                    if(datoCantidad <= 0){
+                        toastr.error('Cantidad no debe ser negativo');
+                        return;
+                    }
+
+                    if(datoCantidad.length > 10){
+                        toastr.error('Cantidad máximo 10 caracteres');
+                        return;
+                    }
+                }
+
+                for(var b = 0; b < descripcion.length; b++){
+
+                    var datoDescripcion = descripcion[b];
+
+                    if(datoDescripcion === ''){
+                        toastr.error('Descripción es requerida');
+                        return;
+                    }
+
+                    if(datoDescripcion.length > 400){
+                        toastr.error('Una descripción tiene más de 400 caracteres');
+                    }
+                }
+
+                // como tienen la misma cantidad de filas, podemos recorrer
+                // todas las filas de una vez
+                for(var p = 0; p < cantidad.length; p++){
+                    formData.append('cantidad[]', cantidad[p]);
+                    formData.append('descripcion[]', descripcion[p]);
+                    formData.append('unidadmedidaarray[]', medida[p]);
+                }
+
+                hayRegistro = 1;
+            }
+
+            openLoading();
+            formData.append('hayregistro', hayRegistro);
+            formData.append('fecha', fecha);
+            formData.append('destino', destino);
+            formData.append('necesidad', necesidad);
+            formData.append('id', id);
+
+            axios.post(url+'/proyecto/vista/requisicion/nuevo', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        $('#modalAgregarRequisicion').modal('hide');
+                        toastr.success('Registrado correctamente');
+                        recargarRequisicion();
+                        limpiarRequisicion(response.data.contador);
+                    }
+                    else{
+                        toastr.error('error al crear requisición');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('error al crear requisición');
+                    closeLoading();
+                });
+        }
+
+        function limpiarRequisicion(contador){
+            document.getElementById('conteo-requisicion').value = contador;
+            document.getElementById('fecha-requisicion-nuevo').value = '';
+            document.getElementById('destino-requisicion-nuevo').value = '';
+            document.getElementById('necesidad-requisicion-nuevo').value = '';
+
+            $("#matriz-requisicion tbody tr").remove();
         }
 
 

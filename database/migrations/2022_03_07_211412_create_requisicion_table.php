@@ -8,7 +8,11 @@ class CreateRequisicionTable extends Migration
 {
     /**
      *  peticion que hace el encargado del proyecto y en base a eso se hace la requisicion
+     * estados
      *
+     * los estados son
+     * autorizado / no autorizado
+
      * @return void
      */
     public function up()
@@ -16,14 +20,13 @@ class CreateRequisicionTable extends Migration
         Schema::create('requisicion', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_proyecto')->unsigned();
-            $table->bigInteger('id_estado')->nullable()->unsigned();
 
             $table->string('destino', 300)->nullable();
             $table->date('fecha')->nullable();
-            $table->string('necesidad', 300)->nullable();
+            $table->text('necesidad')->nullable();
+            $table->integer('estado');
 
             $table->foreign('id_proyecto')->references('id')->on('proyectos');
-            $table->foreign('id_estado')->references('id')->on('estado_proyecto');
         });
     }
 

@@ -14,6 +14,8 @@ use App\Models\LineaTrabajo;
 use App\Models\Naturaleza;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
+use App\Models\RequisicionDetalle;
+use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -281,7 +283,17 @@ class ProyectoController extends Controller
     public function indexProyectoVista($id){
         $proyecto = Proyecto::where('id', $id)->first();
 
-        return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id'));
+        $conteo = Requisicion::where('id_proyecto', $id)->count();
+        if($conteo == null){
+            $conteo = 1;
+        }else{
+            $conteo += 1;
+        }
+
+        $unidad = UnidadMedida::orderBy('nombre')->get();
+
+
+        return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id', 'conteo', 'unidad'));
     }
 
     public function tablaProyectoListaBitacora($id){
@@ -538,6 +550,64 @@ class ProyectoController extends Controller
         }
 
         return view('backend.admin.proyectos.requisicion.tablarequisicion', compact('listaRequisicion'));
+    }
+
+
+    public function nuevoRequisicion(Request $request){
+
+        $rules = array(
+            'fecha' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            $r = new Requisicion();
+            $r->id_proyecto = $request->id;
+            $r->destino = $request->destino;
+            $r->fecha = $request->fecha;
+            $r->necesidad = $request->necesidad;
+            $r->estado = 0; // 0- no autorizado 1- autorizado
+            $r->save();
+
+            $contador = $request->contador = 1;
+            if($request->hayregistro == 1){
+
+                if($request->cantidad != null) {
+                    for ($i = 0; $i < count($request->cantidad); $i++) {
+
+                        $rDetalle = new RequisicionDetalle();
+                        $rDetalle->requisicion_id = $r->id;
+                        $rDetalle->unidadmedida_id = $request->unidadmedidaarray[$i];
+                        $rDetalle->cantidad = $request->cantidad[$i];
+                        $rDetalle->descripcion = $request->descripcion[$i];
+                        $rDetalle->save();
+                    }
+                }
+
+                DB::commit();
+                return ['success' => 1, 'contador' => $contador];
+            }else{
+                DB::commit();
+                return ['success' => 1, 'contador' => $contador];
+            }
+
+        }catch(\Throwable $e){
+            DB::rollback();
+            return ['success' => 2];
+        }
+
+
+
+
+
     }
 
 }
