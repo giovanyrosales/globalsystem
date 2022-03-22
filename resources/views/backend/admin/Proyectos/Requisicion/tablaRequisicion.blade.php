@@ -20,12 +20,12 @@
                                     <td style="width: 10%">{{ $dato->fecha }}</td>
                                     <td>
 
-                                        <button type="button" class="btn btn-warning btn-xs" onclick="vistaCotizarRequisicion({{ $dato->id }})">
-                                            <i class="fas fa-pen" title="Cotizar"></i>&nbsp; Cotizar
+                                        <button type="button" class="btn btn-success btn-xs" onclick="vistaCotizarRequisicion({{ $dato->id }})">
+                                            <i class="fas fa-book-open" title="Cotizar"></i>&nbsp; Cotizar
                                         </button>
 
-                                        <button type="button" class="btn btn-info btn-xs" onclick="editarRequisicion({{ $dato->id }})">
-                                            <i class="fas fa-trash-alt" title="Editar"></i>&nbsp; Editar
+                                        <button type="button" class="btn btn-info btn-xs" onclick="editarRequisicion('{{ $dato->id }}', '{{ $dato->numero }}')">
+                                            <i class="fas fa-pen-alt" title="Editar"></i>&nbsp; Editar
                                         </button>
                                     </td>
                                 </tr>

@@ -283,7 +283,7 @@ class ProyectoController extends Controller
     public function indexProyectoVista($id){
         $proyecto = Proyecto::where('id', $id)->first();
 
-        $conteo = Requisicion::where('id_proyecto', $id)->count();
+        $conteo = Requisicion::where('id_proyecto', $id)->orderBy('fecha', 'ASC')->count();
         if($conteo == null){
             $conteo = 1;
         }else{
@@ -603,11 +603,27 @@ class ProyectoController extends Controller
             DB::rollback();
             return ['success' => 2];
         }
+    }
 
+    function informacionRequisicion(Request $request){
+        $rules = array(
+            'id' => 'required', // id fila requisicion
+        );
 
+        $validator = Validator::make($request->all(), $rules);
 
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
 
+        if($info = Requisicion::where('id', $request->id)->first()){
 
+            $detalle = RequisicionDetalle::where('requisicion_id', $request->id)
+                ->orderBy('id', 'ASC')->get();
+
+            return ['success' => 1, 'info' => $info, 'detalle' => $detalle];
+        }
+        return ['success' => 2];
     }
 
 }
