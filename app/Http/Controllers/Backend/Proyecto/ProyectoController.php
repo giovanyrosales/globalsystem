@@ -626,4 +626,83 @@ class ProyectoController extends Controller
         return ['success' => 2];
     }
 
+    public function editarRequisicion(Request $request){
+
+        DB::beginTransaction();
+
+        try {
+
+            // actualizar registros requisicion
+            Requisicion::where('id', $request->idrequisicion)->update([
+                'destino' => $request->destino,
+                'fecha' => $request->fecha,
+                'necesidad' => $request->necesidad,
+            ]);
+
+            if($request->hayregistro == 1){
+
+                // agregar id a pila
+                $pila = array();
+                for ($i = 0; $i < count($request->idarray); $i++) {
+                    // Los id que sean 0, seran nuevos registros
+                    if($request->idarray[$i] != 0) {
+                        array_push($pila, $request->idarray[$i]);
+                    }
+                }
+
+                // borrar todos los registros
+                // primero obtener solo la lista de requisicon obtenido de la fila
+                // y no quiero que borre los que si vamos a actualizar con los ID
+                RequisicionDetalle::where('requisicion_id', $request->idrequisicion)
+                    ->whereNotIn('id', $pila)
+                    ->delete();
+
+                // actualizar registros
+                for ($i = 0; $i < count($request->cantidad); $i++) {
+                    if($request->idarray[$i] != 0){
+                        RequisicionDetalle::where('id', $request->idarray[$i])->update([
+                            'unidadmedida_id' => $request->unidadmedidaarray[$i],
+                            'cantidad' => $request->cantidad[$i],
+                            'descripcion' => $request->descripcion[$i]
+                        ]);
+                    }
+                }
+
+                // hoy registrar los nuevos registros
+                for ($i = 0; $i < count($request->cantidad); $i++) {
+                    if($request->idarray[$i] == 0){
+                        $rDetalle = new RequisicionDetalle();
+                        $rDetalle->requisicion_id = $request->idrequisicion;
+                        $rDetalle->unidadmedida_id = $request->unidadmedidaarray[$i];
+                        $rDetalle->cantidad = $request->cantidad[$i];
+                        $rDetalle->descripcion = $request->descripcion[$i];
+                        $rDetalle->save();
+                    }
+                }
+
+                DB::commit();
+                return ['success' => 1];
+            }else{
+                // borrar registros detalle
+                // solo si viene vacio el array
+                if($request->cantidad == null){
+                    RequisicionDetalle::where('requisicion_id', $request->idrequisicion)->delete();
+                }
+
+                DB::commit();
+                return ['success' => 1];
+            }
+        }catch(\Throwable $e){
+            DB::rollback();
+            return ['success' => 2];
+        }
+    }
+
+
+    public function indexCotizacion($id){ // id requisicion
+
+
+
+    }
+
 }

@@ -208,7 +208,7 @@
                             </div>
                             <div class="col-md-8">
                                 <div class="form-group">
-                                    <label>Unidad de Medida *:</label>
+                                    <label>Unidad de Medida:</label>
                                     <select class="form-control" id="select-unidad-requi-deta-nuevo">
                                         @foreach($unidad as $sel)
                                             <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
@@ -408,6 +408,57 @@
     </div>
 </div>
 
+<!------------------ MODAL AGREGAR DETALLE DE REQUISICION EDITAR ---------------->
+<div class="modal fade" id="modalAgregarRequisicionDetaEditar" style="margin-top:3%;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Agregar Detalle de Requisición</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-requisicion-deta-editar">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Cantidad *:</label>
+                                    <input type="number" maxlength="10" class="form-control" id="cantidad-deta-requi-editar">
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label>Unidad de Medida:</label>
+                                    <select class="form-control" id="select-unidad-requi-deta-editar">
+                                        @foreach($unidad as $sel)
+                                            <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Descripción *:</label>
+                                    <input type="text" maxlength="400" class="form-control" id="descrip-requi-deta-editar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="addeditar">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @extends('backend.menus.footerjs')
 @section('archivos-js')
@@ -487,7 +538,7 @@
                     "<td>"+
                     "<select class='form-control seleccion' name='unidadmedidaarray[]'>"+
                     "@foreach($unidad as $data)"+
-                    "<option value='{{ $data->id }}' selected>{{ $data->nombre }}</option>"+
+                    "<option value='{{ $data->id }}'>{{ $data->nombre }}</option>"+
                     "@endforeach>"+
                     "</select>"+
                     "</td>"+
@@ -498,9 +549,7 @@
 
                     "</tr>";
 
-
                 $("#matriz-requisicion tbody").append(markup);
-
 
                 // modificar posicion del select, ultima row de la tabla
                 var row = $('#matriz-requisicion tr:last td:eq(2)');
@@ -510,9 +559,87 @@
 
                 $('#modalAgregarRequisicionDeta').modal('hide');
             });
+
+            $("#addeditar").on("click", function () {
+
+                var cantidad = document.getElementById('cantidad-deta-requi-editar').value;
+                var unidadmedidaid = document.getElementById('select-unidad-requi-deta-editar').value;
+                var descripcion = document.getElementById('descrip-requi-deta-editar').value;
+
+                var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+                if(cantidad === ''){
+                    toastr.error('Cantidad es requerida');
+                    return;
+                }
+
+                if(!cantidad.match(reglaNumeroDecimal)) {
+                    toastr.error('Cantidad debe ser decimal y no negativo');
+                    return;
+                }
+
+                if(cantidad <= 0){
+                    toastr.error('Cantidad no debe ser negativo');
+                    return;
+                }
+
+                if(cantidad.length > 10){
+                    toastr.error('Cantidad máximo 10 caracteres');
+                    return;
+                }
+
+                if(descripcion === ''){
+                    toastr.error('Descripción es requerida');
+                    return;
+                }
+
+                if(descripcion.length > 400){
+                    toastr.error('Descripción máximo 400 caracteres');
+                    return;
+                }
+
+                // el ID 0 significa que esta fila sera un nuevo registro.
+                var markup = "<tr id='0'>"+
+
+                    "<td>"+
+                    "<input name='cantidadeditararray[]' value='"+cantidad+"' maxlength='10' class='form-control' type='number'>"+
+                    "</td>"+
+
+                    "<td>"+
+                    "<input name='descripcioneditararray[]' value='"+descripcion+"' maxlength='400' class='form-control' type='text'>"+
+                    "</td>"+
+
+                    "<td>"+
+                    "<select class='form-control seleccioneditar' name='unidadmedidaeditararray[]'>"+
+                    "@foreach($unidad as $data)"+
+                    "<option value='{{ $data->id }}'>{{ $data->nombre }}</option>"+
+                    "@endforeach>"+
+                    "</select>"+
+                    "</td>"+
+
+                    "<td>"+
+                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
+                    "</td>"+
+
+                    "</tr>";
+
+                $("#matriz-requisicion-editar tbody").append(markup);
+
+                // modificar posicion del select, ultima row de la tabla
+                var row = $('#matriz-requisicion-editar tr:last td:eq(2)');
+                $(row).each(function (index, element) {
+                    $(this).find(".seleccioneditar").val(unidadmedidaid);
+                });
+
+                $('#modalAgregarRequisicionDetaEditar').modal('hide');
+            });
         });
 
         function borrarFilaRequiDetalle(elemento){
+            var tabla = elemento.parentNode.parentNode;
+            tabla.parentNode.removeChild(tabla);
+        }
+
+        function borrarFilaRequiEditar(elemento){
             var tabla = elemento.parentNode.parentNode;
             tabla.parentNode.removeChild(tabla);
         }
@@ -661,6 +788,25 @@
             })
         }
 
+        function preguntaGuardarRequisicionEditar(){
+            colorBlancoTablaRequisicionEditar();
+
+            Swal.fire({
+                title: 'Actualizar Requisición',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    verificarRequisicionEditar();
+                }
+            })
+        }
+
         function borrarBitacora(id){
             openLoading();
 
@@ -788,7 +934,6 @@
 
                 var cantidad = $("input[name='cantidadarray[]']").map(function(){return $(this).val();}).get();
                 var descripcion = $("input[name='descripcionarray[]']").map(function(){return $(this).val();}).get();
-                var medida = $("input[name='unidadmedidaarray[]']").map(function(){return $(this).val();}).get();
 
                 var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
@@ -842,8 +987,15 @@
                 for(var p = 0; p < cantidad.length; p++){
                     formData.append('cantidad[]', cantidad[p]);
                     formData.append('descripcion[]', descripcion[p]);
-                    formData.append('unidadmedidaarray[]', medida[p]);
                 }
+
+                $("#matriz-requisicion tr").each(function() {
+                    var unidad = $(this).find('.seleccion').val();
+
+                    if(unidad !== undefined && unidad != null){
+                        formData.append('unidadmedidaarray[]', unidad);
+                    }
+                });
 
                 hayRegistro = 1;
             }
@@ -868,7 +1020,6 @@
                     else{
                         toastr.error('error al crear requisición');
                     }
-
                 })
                 .catch((error) => {
                     toastr.error('error al crear requisición');
@@ -882,6 +1033,14 @@
 
         function colorBlancoTablaRequisicion(){
             $("#matriz-requisicion tbody tr").css('background', 'white');
+        }
+
+        function colorRojoTablaRequisicionEditar(index){
+            $("#matriz-requisicion-editar tr:eq("+(index+1)+")").css('background', '#F1948A');
+        }
+
+        function colorBlancoTablaRequisicionEditar(){
+            $("#matriz-requisicion-editar tbody tr").css('background', 'white');
         }
 
         function limpiarRequisicion(contador){
@@ -915,20 +1074,185 @@
                         $('#destino-requisicion-editar').val(response.data.info.destino);
                         $('#necesidad-requisicion-editar').val(response.data.info.necesidad);
 
+                        var infodetalle = response.data.detalle;
+                        for (var i = 0; i < infodetalle.length; i++) {
+
+                            var markup = "<tr id='"+infodetalle[i].id+"'>"+
+
+                                "<td>"+
+                                "<input name='cantidadeditararray[]' value='"+infodetalle[i].cantidad+"' maxlength='10' class='form-control' type='number'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input name='descripcioneditararray[]' value='"+infodetalle[i].descripcion+"' maxlength='400' class='form-control' type='text'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<select class='form-control seleccioneditar' name='unidadmedidaeditararray[]'>"+
+                                "@foreach($unidad as $data)"+
+                                "<option value='{{ $data->id }}'>{{ $data->nombre }}</option>"+
+                                "@endforeach>"+
+                                "</select>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
+                                "</td>"+
+
+                                "</tr>";
+
+                            $("#matriz-requisicion-editar tbody").append(markup);
+
+                            // modificar posicion del select, ultima row de la tabla
+                            var row = $('#matriz-requisicion-editar tr:last td:eq(2)');
+                            $(row).each(function (index, element) {
+                                $(this).find(".seleccioneditar").val(infodetalle[i].unidadmedida_id);
+                            });
+                        }
+
                         $('#modalEditarRequisicion').css('overflow-y', 'auto');
                         $('#modalEditarRequisicion').modal({backdrop: 'static', keyboard: false})
-
                     }
                     else{
                         toastr.error('error buscar información');
                     }
-
                 })
                 .catch((error) => {
                     toastr.error('error buscar información');
                     closeLoading();
                 });
         }
+
+        function verModalDetalleRequisicionEditar(){
+            document.getElementById("formulario-requisicion-deta-editar").reset();
+            $('#modalAgregarRequisicionDetaEditar').modal('show');
+        }
+
+        function verificarRequisicionEditar(){
+
+            var fecha = document.getElementById('fecha-requisicion-editar').value;
+            var idrequisicion = document.getElementById('id-requisicion-editar').value;
+            var destino = document.getElementById('destino-requisicion-editar').value; // null
+            var necesidad = document.getElementById('necesidad-requisicion-editar').value; // text
+
+            if(fecha === ''){
+                toastr.error('Fecha requisición es requerido');
+                return;
+            }
+
+            if(destino.length > 300){
+                toastr.error('Destino, máximo 300 caracteres');
+                return;
+            }
+
+            if(necesidad.length > 15000){
+                toastr.error('Necesidad debe tener máximo 15,000 caracteres');
+                return;
+            }
+
+            var hayRegistro = 0;
+            var nRegistro = $('#matriz-requisicion-editar >tbody >tr').length;
+            let formData = new FormData();
+
+            if (nRegistro > 0){
+
+                var cantidad = $("input[name='cantidadeditararray[]']").map(function(){return $(this).val();}).get();
+                var descripcion = $("input[name='descripcioneditararray[]']").map(function(){return $(this).val();}).get();
+
+                var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+                for(var a = 0; a < cantidad.length; a++){
+
+                    var datoCantidad = cantidad[a];
+
+                    if(datoCantidad === ''){
+                        colorRojoTablaRequisicionEditar(a);
+                        toastr.error('Cantidad es requerida');
+                        return;
+                    }
+
+                    if(!datoCantidad.match(reglaNumeroDecimal)) {
+                        colorRojoTablaRequisicionEditar(a);
+                        toastr.error('Cantidad debe ser decimal y no negativo');
+                        return;
+                    }
+
+                    if(datoCantidad <= 0){
+                        colorRojoTablaRequisicionEditar(a);
+                        toastr.error('Cantidad no debe ser negativo');
+                        return;
+                    }
+
+                    if(datoCantidad.length > 10){
+                        colorRojoTablaRequisicionEditar(a);
+                        toastr.error('Cantidad máximo 10 caracteres');
+                        return;
+                    }
+                }
+
+                for(var b = 0; b < descripcion.length; b++){
+
+                    var datoDescripcion = descripcion[b];
+
+                    if(datoDescripcion === ''){
+                        colorRojoTablaRequisicionEditar(b);
+                        toastr.error('Descripción es requerida');
+                        return;
+                    }
+
+                    if(datoDescripcion.length > 400){
+                        colorRojoTablaRequisicionEditar(b);
+                        toastr.error('Una descripción tiene más de 400 caracteres');
+                    }
+                }
+
+                // como tienen la misma cantidad de filas, podemos recorrer
+                // todas las filas de una vez
+                for(var p = 0; p < cantidad.length; p++){
+                    var id = $("#matriz-requisicion-editar tr:eq("+(p+1)+")").attr('id');
+                    formData.append('idarray[]', id);
+                    formData.append('cantidad[]', cantidad[p]);
+                    formData.append('descripcion[]', descripcion[p]);
+                }
+
+                $("#matriz-requisicion-editar tr").each(function() {
+                    var unidad = $(this).find('.seleccioneditar').val();
+
+                    if(unidad !== undefined && unidad != null){
+                        formData.append('unidadmedidaarray[]', unidad);
+                    }
+                });
+
+                hayRegistro = 1;
+            }
+
+            openLoading();
+            formData.append('hayregistro', hayRegistro);
+            formData.append('fecha', fecha);
+            formData.append('destino', destino);
+            formData.append('necesidad', necesidad);
+            formData.append('idrequisicion', idrequisicion);
+
+            axios.post(url+'/proyecto/vista/requisicion/editar', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado correctamente');
+                        recargarRequisicion();
+                        $('#modalEditarRequisicion').modal('hide');
+                    }
+                    else{
+                        toastr.error('error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('error al actualizar');
+                    closeLoading();
+                });
+        }
+
 
 
     </script>

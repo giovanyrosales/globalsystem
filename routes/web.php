@@ -74,7 +74,7 @@ Route::get('/admin/proyecto/lista/tabla/index', [ProyectoController::class,'tabl
 Route::post('/admin/proyecto/lista/informacion', [ProyectoController::class, 'informacionProyecto']);
 Route::post('/admin/proyecto/lista/editar', [ProyectoController::class, 'editarProyecto']);
 
-// vista de proyecto
+// --- VISTA DE PROYECTO ---
 Route::get('/admin/proyecto/vista/index/{id}', [ProyectoController::class,'indexProyectoVista']);
 Route::get('/admin/proyecto/vista/bitacora/{id}', [ProyectoController::class,'tablaProyectoListaBitacora']);
 Route::post('/admin/proyecto/vista/bitacora/registrar', [ProyectoController::class, 'registrarBitacora']);
@@ -87,13 +87,14 @@ Route::get('/admin/proyecto/vista/bitacora-detalle-doc/{file}' , [ProyectoContro
 Route::post('/admin/proyecto/vista/bitacora-detalle/borrar' , [ProyectoController::class, 'borrarBitacoraDetalle']);
 Route::post('/admin/proyecto/vista/bitacora-detalle/nuevo' , [ProyectoController::class, 'nuevoBitacoraDetalle']);
 
-// vista requisicion
+// --- VISTA REQUISICION ---
 Route::get('/admin/proyecto/vista/requisicion/{id}', [ProyectoController::class,'tablaProyectoListaRequisicion']);
 Route::post('/admin/proyecto/vista/requisicion/nuevo', [ProyectoController::class, 'nuevoRequisicion']);
 Route::post('/admin/proyecto/vista/requisicion/informacion', [ProyectoController::class, 'informacionRequisicion']);
+Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::class, 'editarRequisicion']);
 
-
-
+// --- VISTA COTIZACION ---
+Route::get('/admin/proyecto/vista/cotizacion/{id}', [ProyectoController::class,'indexCotizacion']);
 
 // --- CODIGO ESPECIFICO ---
 Route::get('/admin/cuenta/index', [CodigoEspecifController::class,'index'])->name('admin.cuenta.index');
