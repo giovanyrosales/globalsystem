@@ -18,14 +18,14 @@ class UnidadMedidaController extends Controller
     }
 
     public function tabla(){
-        $lista = UnidadMedida::orderBy('nombre', 'ASC')->get();
+        $lista = UnidadMedida::orderBy('medida', 'ASC')->get();
         return view('backend.admin.configuraciones.unidadmedida.tablaunidadmedida', compact('lista'));
     }
 
     public function nuevaUnidadMedida(Request $request){
 
         $regla = array(
-            'nombre' => 'required',
+            'medida' => 'required',
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -33,7 +33,6 @@ class UnidadMedidaController extends Controller
         if ($validar->fails()){ return ['success' => 0];}
 
         $dato = new UnidadMedida();
-        $dato->nombre = $request->nombre;
         $dato->medida = $request->medida;
 
         if($dato->save()){
@@ -66,7 +65,7 @@ class UnidadMedidaController extends Controller
 
         $regla = array(
             'id' => 'required',
-            'nombre' => 'required'
+            'medida' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -76,7 +75,6 @@ class UnidadMedidaController extends Controller
         if(UnidadMedida::where('id', $request->id)->first()){
 
             UnidadMedida::where('id', $request->id)->update([
-                'nombre' => $request->nombre,
                 'medida' => $request->medida
             ]);
 

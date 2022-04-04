@@ -95,6 +95,11 @@ Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::cla
 
 // --- VISTA COTIZACION ---
 Route::get('/admin/proyecto/vista/cotizacion/{id}', [ProyectoController::class,'indexCotizacion']);
+Route::post('/admin/proyecto/lista/cotizaciones',  [ProyectoController::class,'obtenerListaCotizaciones']);
+Route::post('/admin/proyecto/buscar/material',  [ProyectoController::class,'buscadorMaterial']);
+
+
+
 
 // --- CODIGO ESPECIFICO ---
 Route::get('/admin/cuenta/index', [CodigoEspecifController::class,'index'])->name('admin.cuenta.index');

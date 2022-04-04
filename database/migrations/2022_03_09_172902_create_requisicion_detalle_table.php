@@ -16,13 +16,13 @@ class CreateRequisicionDetalleTable extends Migration
         Schema::create('requisicion_detalle', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('requisicion_id')->unsigned();
-            $table->bigInteger('unidadmedida_id')->unsigned();
+            $table->bigInteger('material_id')->unsigned();
 
             $table->decimal('cantidad', 12, 2);
-            $table->string('descripcion', 400)();
+            $table->boolean('estado'); // cotizado y No cotizado
 
             $table->foreign('requisicion_id')->references('id')->on('requisicion');
-            $table->foreign('unidadmedida_id')->references('id')->on('unidad_medida');
+            $table->foreign('material_id')->references('id')->on('materiales');
         });
     }
 

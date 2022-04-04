@@ -15,19 +15,19 @@ class UnidadMedidaSeeder extends Seeder
     public function run()
     {
         UnidadMedida::create([
-            'nombre' => 'Libra'
+            'medida' => 'Libra'
         ]);
 
         UnidadMedida::create([
-            'nombre' => 'CM'
+            'medida' => 'CM'
         ]);
 
         UnidadMedida::create([
-            'nombre' => 'Bolsa'
+            'medida' => 'Bolsa'
         ]);
 
         UnidadMedida::create([
-            'nombre' => 'Plg'
+            'medida' => 'Plg'
         ]);
     }
 }

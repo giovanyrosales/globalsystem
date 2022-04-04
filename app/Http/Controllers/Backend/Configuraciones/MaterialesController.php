@@ -19,7 +19,7 @@ class MaterialesController extends Controller
 
     public function index(){
         $lClasificacion = Clasificaciones::orderBy('nombre', 'ASC')->get();
-        $lUnidad = UnidadMedida::orderBy('nombre', 'ASC')->get();
+        $lUnidad = UnidadMedida::orderBy('medida', 'ASC')->get();
         $lCodiEspec = Cuenta::orderBy('nombre', 'ASC')->get();
 
         return view('backend.admin.configuraciones.materiales.vistacatalogomateriales', compact('lClasificacion',
@@ -92,7 +92,7 @@ class MaterialesController extends Controller
         if($lista = CatalogoMateriales::where('id', $request->id)->first()){
 
             $arrayClasificacion = Clasificaciones::orderBy('nombre', 'ASC')->get();
-            $arrayUnidad = UnidadMedida::orderBy('nombre', 'ASC')->get();
+            $arrayUnidad = UnidadMedida::orderBy('medida', 'ASC')->get();
             $arrayCodiEspec = Cuenta::orderBy('nombre', 'ASC')->get();
 
             $idclasifi = $lista->id_clasificacion;

@@ -7,11 +7,13 @@ use App\Models\AreaGestion;
 use App\Models\Bitacora;
 use App\Models\BitacoraDetalle;
 use App\Models\Bolson;
+use App\Models\CatalogoMateriales;
 use App\Models\EstadoProyecto;
 use App\Models\FuenteFinanciamiento;
 use App\Models\FuenteRecursos;
 use App\Models\LineaTrabajo;
 use App\Models\Naturaleza;
+use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
 use App\Models\RequisicionDetalle;
@@ -290,10 +292,7 @@ class ProyectoController extends Controller
             $conteo += 1;
         }
 
-        $unidad = UnidadMedida::orderBy('nombre')->get();
-
-
-        return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id', 'conteo', 'unidad'));
+        return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id', 'conteo'));
     }
 
     public function tablaProyectoListaBitacora($id){
@@ -577,7 +576,8 @@ class ProyectoController extends Controller
             $r->estado = 0; // 0- no autorizado 1- autorizado
             $r->save();
 
-            $contador = $request->contador = 1;
+            $contador = $request->contador + 1;
+
             if($request->hayregistro == 1){
 
                 if($request->cantidad != null) {
@@ -585,9 +585,9 @@ class ProyectoController extends Controller
 
                         $rDetalle = new RequisicionDetalle();
                         $rDetalle->requisicion_id = $r->id;
-                        $rDetalle->unidadmedida_id = $request->unidadmedidaarray[$i];
+                        $rDetalle->material_id = $request->datainfo[$i];
                         $rDetalle->cantidad = $request->cantidad[$i];
-                        $rDetalle->descripcion = $request->descripcion[$i];
+                        $rDetalle->estado = 0;
                         $rDetalle->save();
                     }
                 }
@@ -612,7 +612,7 @@ class ProyectoController extends Controller
 
         $validator = Validator::make($request->all(), $rules);
 
-        if ( $validator->fails()){
+        if ($validator->fails()){
             return ['success' => 0];
         }
 
@@ -620,6 +620,12 @@ class ProyectoController extends Controller
 
             $detalle = RequisicionDetalle::where('requisicion_id', $request->id)
                 ->orderBy('id', 'ASC')->get();
+
+            foreach ($detalle as $dd){
+
+                $datos = CatalogoMateriales::where('id', $dd->material_id)->first();
+                $dd->descripcion = $datos->nombre;
+            }
 
             return ['success' => 1, 'info' => $info, 'detalle' => $detalle];
         }
@@ -661,9 +667,7 @@ class ProyectoController extends Controller
                 for ($i = 0; $i < count($request->cantidad); $i++) {
                     if($request->idarray[$i] != 0){
                         RequisicionDetalle::where('id', $request->idarray[$i])->update([
-                            'unidadmedida_id' => $request->unidadmedidaarray[$i],
                             'cantidad' => $request->cantidad[$i],
-                            'descripcion' => $request->descripcion[$i]
                         ]);
                     }
                 }
@@ -673,9 +677,9 @@ class ProyectoController extends Controller
                     if($request->idarray[$i] == 0){
                         $rDetalle = new RequisicionDetalle();
                         $rDetalle->requisicion_id = $request->idrequisicion;
-                        $rDetalle->unidadmedida_id = $request->unidadmedidaarray[$i];
                         $rDetalle->cantidad = $request->cantidad[$i];
-                        $rDetalle->descripcion = $request->descripcion[$i];
+                        $rDetalle->material_id = $request->datainfo[$i];
+                        $rDetalle->estado = 0;
                         $rDetalle->save();
                     }
                 }
@@ -698,11 +702,82 @@ class ProyectoController extends Controller
         }
     }
 
-
+    // vista cotizacion
     public function indexCotizacion($id){ // id requisicion
+        $requisicion = Requisicion::where('id', $id)->first();
+        $proveedores = Proveedores::orderBy('nombre')->get();
 
+        $requisicionDetalle = RequisicionDetalle::where('requisicion_id', $requisicion->id)
+            ->where('estado', 0)
+            ->get();
 
+        foreach ($requisicionDetalle as $dd){
+            $descripcion = CatalogoMateriales::where('id', $dd->material_id)->first();
+            $dd->descripcion = $descripcion->nombre;
+        }
 
+        return view('backend.admin.proyectos.cotizacion.vistacotizacion', compact('requisicion', 'proveedores',
+            'requisicionDetalle', 'id'));
+    }
+
+    public function obtenerListaCotizaciones(Request $request){
+
+        // obtener lista de detalle requisicion por array ID
+        $lista = RequisicionDetalle::whereIn('id', $request->lista)->get();
+
+        foreach ($lista as $dd){
+
+            $info = CatalogoMateriales::where('id', $dd->material_id)->first();
+            $unidad = UnidadMedida::where('id', $info->id_unidadmedida)->first();
+
+            $dd->descripcion = $info->nombre;
+            $dd->medida = $unidad->medida;
+        }
+
+        return ['success' => 1, 'lista' => $lista];
+    }
+
+    public function buscadorMaterial(Request $request){
+
+        if($request->get('query')){
+            $query = $request->get('query');
+            $data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
+
+            foreach ($data as $dd){
+                $info = UnidadMedida::where('id', $dd->id_unidadmedida)->first();
+                $dd->medida = $info->medida;
+            }
+
+            $output = '<ul class="dropdown-menu buscador" style="display:block; position:relative;">';
+            $tiene = true;
+            foreach($data as $row){
+
+                // si solo hay 1 fila, No mostrara el hr, salto de linea
+                if(count($data) == 1){
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValor(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->medida .'</a></li>
+                ';
+                    }
+                }
+
+                else{
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValor(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->medida .'</a></li>
+                   <hr>
+                ';
+                    }
+                }
+            }
+            $output .= '</ul>';
+            if($tiene){
+                $output = '';
+            }
+            echo $output;
+        }
     }
 
 }

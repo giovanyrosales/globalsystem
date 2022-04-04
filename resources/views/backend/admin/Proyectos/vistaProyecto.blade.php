@@ -4,7 +4,8 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/bootstrap-select.min.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/jquery-ui.min.css') }}" type="text/css" rel="stylesheet" />
 @stop
 
 <style>
@@ -12,6 +13,22 @@
         /*Ajustar tablas*/
         table-layout:fixed;
     }
+
+    .dropdown-menu {
+        max-height: 280px;
+        overflow-y: auto;
+        width: 65%;
+    }
+
+    .droplista{
+        width: 70%;
+    }
+
+    .droplistaeditar{
+        width: 70%;
+    }
+
+
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -154,7 +171,7 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <br>
-                                    <button type="button" onclick="verModalDetalleRequisicion()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                    <button type="button" onclick="addAgregarFilaNueva()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
                                         <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                 </div>
                             </div>
@@ -163,9 +180,9 @@
                             <table class="table" id="matriz-requisicion"  data-toggle="table">
                                 <thead>
                                 <tr>
-                                    <th style="width: 6%">Cantidad *</th>
+                                    <th style="width: 3%">#</th>
+                                    <th style="width: 5%">Cantidad *</th>
                                     <th style="width: 15%">Descripción *</th>
-                                    <th style="width: 8%">unidad</th>
                                     <th style="width: 5%">Opciones</th>
                                 </tr>
                                 </thead>
@@ -186,56 +203,7 @@
     </div>
 </div>
 
-<!------------------ MODAL AGREGAR DETALLE DE REQUISICION ---------------->
-<div class="modal fade" id="modalAgregarRequisicionDeta" style="margin-top:3%;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Agregar Detalle de Requisición</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-requisicion-deta-nuevo">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Cantidad *:</label>
-                                    <input type="number" maxlength="10" class="form-control" id="cantidad-deta-requi-nuevo">
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label>Unidad de Medida:</label>
-                                    <select class="form-control" id="select-unidad-requi-deta-nuevo">
-                                        @foreach($unidad as $sel)
-                                            <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
 
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Descripción *:</label>
-                                    <input type="text" maxlength="400" class="form-control" id="descrip-requi-deta-nuevo">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="add">Agregar</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!------------------ MODAL AGREGAR BITACORA ---------------->
 <div class="modal fade" id="modalAgregarBitacora">
@@ -376,7 +344,7 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <br>
-                                    <button type="button" onclick="verModalDetalleRequisicionEditar()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                    <button type="button" onclick="addAgregarFilaNuevaEditar()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
                                         <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                 </div>
                             </div>
@@ -385,9 +353,9 @@
                             <table class="table" id="matriz-requisicion-editar"  data-toggle="table">
                                 <thead>
                                 <tr>
+                                    <th style="width: 3%">#</th>
                                     <th style="width: 6%">Cantidad *</th>
                                     <th style="width: 15%">Descripción *</th>
-                                    <th style="width: 8%">unidad</th>
                                     <th style="width: 5%">Opciones</th>
                                 </tr>
                                 </thead>
@@ -408,57 +376,6 @@
     </div>
 </div>
 
-<!------------------ MODAL AGREGAR DETALLE DE REQUISICION EDITAR ---------------->
-<div class="modal fade" id="modalAgregarRequisicionDetaEditar" style="margin-top:3%;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Agregar Detalle de Requisición</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-requisicion-deta-editar">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Cantidad *:</label>
-                                    <input type="number" maxlength="10" class="form-control" id="cantidad-deta-requi-editar">
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label>Unidad de Medida:</label>
-                                    <select class="form-control" id="select-unidad-requi-deta-editar">
-                                        @foreach($unidad as $sel)
-                                            <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Descripción *:</label>
-                                    <input type="text" maxlength="400" class="form-control" id="descrip-requi-deta-editar">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="addeditar">Agregar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 @extends('backend.menus.footerjs')
 @section('archivos-js')
@@ -470,10 +387,17 @@
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+    <script src="{{ asset('js/bootstrap-select.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
 
     <script type="text/javascript">
         $(document).ready(function(){
             document.getElementById("divcontenedor").style.display = "block";
+            
+            // variable global para setear input al buscar nuevo material
+            window.txtContenedorGlobal = this;
+
+            window.seguroBuscador = true;
 
             var id = {{ $id }};
             var ruta = "{{ URL::to('/admin/proyecto/vista/bitacora') }}/" + id;
@@ -481,172 +405,193 @@
 
             var rutaR = "{{ URL::to('/admin/proyecto/vista/requisicion') }}/" + id;
             $('#tablaDatatableRequisicion').load(rutaR);
+
+            $(document).click(function(){
+                $(".droplista").hide();
+            });
+
+            $(document).click(function(){
+                $(".droplistaeditar").hide();
+            });
+
         });
     </script>
 
     <script type="text/javascript">
 
-        $(document).ready(function () {
+        function buscarMaterial(e){
 
-            $("#add").on("click", function () {
+            // seguro para evitar errores de busqueda continua
+            if(seguroBuscador){
+                seguroBuscador = false;
 
-                var cantidad = document.getElementById('cantidad-deta-requi-nuevo').value;
-                var unidadmedidaid = document.getElementById('select-unidad-requi-deta-nuevo').value;
-                var descripcion = document.getElementById('descrip-requi-deta-nuevo').value;
+                var row = $(e).closest('tr');
+                txtContenedorGlobal = e;
 
-                var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
-                if(cantidad === ''){
-                    toastr.error('Cantidad es requerida');
-                    return;
+                let texto = e.value;
+
+                if(texto === ''){
+                    // si se limpia el input, setear el atributo id
+                    $(e).attr('data-info', 0);
                 }
 
-                if(!cantidad.match(reglaNumeroDecimal)) {
-                    toastr.error('Cantidad debe ser decimal y no negativo');
-                    return;
+                axios.post(url+'/proyecto/buscar/material', {
+                    'query' : texto
+                })
+                    .then((response) => {
+                        seguroBuscador = true;
+                        $(row).each(function (index, element) {
+                            $(this).find(".droplista").fadeIn();
+                            $(this).find(".droplista").html(response.data);
+                        });
+
+                    })
+                    .catch((error) => {
+                    });
+            }
+        }
+
+        function buscarMaterialEditar(e){
+
+            // seguro para evitar errores de busqueda continua
+            if(seguroBuscador){
+                seguroBuscador = false;
+
+                var row = $(e).closest('tr');
+                txtContenedorGlobal = e;
+
+                let texto = e.value;
+
+                if(texto === ''){
+                    // si se limpia el input, setear el atributo id
+                    $(e).attr('data-info', 0);
                 }
 
-                if(cantidad <= 0){
-                    toastr.error('Cantidad no debe ser negativo');
-                    return;
-                }
+                axios.post(url+'/proyecto/buscar/material', {
+                    'query' : texto
+                })
+                    .then((response) => {
+                        seguroBuscador = true;
+                        $(row).each(function (index, element) {
+                            $(this).find(".droplistaeditar").fadeIn();
+                            $(this).find(".droplistaeditar").html(response.data);
+                        });
 
-                if(cantidad.length > 10){
-                    toastr.error('Cantidad máximo 10 caracteres');
-                    return;
-                }
+                    })
+                    .catch((error) => {
+                    });
+            }
+        }
 
-                if(descripcion === ''){
-                    toastr.error('Descripción es requerida');
-                    return;
-                }
+        // al hacer clic en material buscado
+        function modificarValor(edrop){
 
-                if(descripcion.length > 400){
-                    toastr.error('Descripción máximo 400 caracteres');
-                    return;
-                }
+            // obtener texto del li
+            let texto = $(edrop).text();
+            // setear el input de la descripcion
+            $(txtContenedorGlobal).val(texto);
 
-                var markup = "<tr>"+
+            // agregar el id al atributo del input descripcion
+            $(txtContenedorGlobal).attr('data-info', edrop.id);
+            //$(txtContenedorGlobal).data("info");
+        }
 
-                    "<td>"+
-                    "<input name='cantidadarray[]' value='"+cantidad+"' maxlength='10' class='form-control' type='number'>"+
-                    "</td>"+
+        function addAgregarFilaNueva(){
 
-                    "<td>"+
-                    "<input name='descripcionarray[]' value='"+descripcion+"' maxlength='400' class='form-control' type='text'>"+
-                    "</td>"+
+            var nFilas = $('#matriz-requisicion >tbody >tr').length;
+            nFilas += 1;
 
-                    "<td>"+
-                    "<select class='form-control seleccion' name='unidadmedidaarray[]'>"+
-                    "@foreach($unidad as $data)"+
-                    "<option value='{{ $data->id }}'>{{ $data->nombre }}</option>"+
-                    "@endforeach>"+
-                    "</select>"+
-                    "</td>"+
+            var markup = "<tr>"+
 
-                    "<td>"+
-                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiDetalle(this)'>Borrar</button>"+
-                    "</td>"+
+                "<td>"+
+                "<p id='fila"+(nFilas)+"' class='form-control' style='max-width: 65px'>"+(nFilas)+"</p>"+
+                "</td>"+
 
-                    "</tr>";
+                "<td>"+
+                "<input name='cantidadarray[]' maxlength='10' class='form-control' type='number'>"+
+                "</td>"+
 
-                $("#matriz-requisicion tbody").append(markup);
+                "<td>"+
+                "<input name='descripcionarray[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterial(this)' maxlength='400'  type='text'>"+
+                "<div class='droplista' style='position: absolute; z-index: 9;'></div>"+
+                "</td>"+
 
-                // modificar posicion del select, ultima row de la tabla
-                var row = $('#matriz-requisicion tr:last td:eq(2)');
-                $(row).each(function (index, element) {
-                    $(this).find(".seleccion").val(unidadmedidaid);
-                });
+                "<td>"+
+                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiDetalle(this)'>Borrar</button>"+
+                "</td>"+
 
-                $('#modalAgregarRequisicionDeta').modal('hide');
-            });
+                "</tr>";
 
-            $("#addeditar").on("click", function () {
+            $("#matriz-requisicion tbody").append(markup);
+        }
 
-                var cantidad = document.getElementById('cantidad-deta-requi-editar').value;
-                var unidadmedidaid = document.getElementById('select-unidad-requi-deta-editar').value;
-                var descripcion = document.getElementById('descrip-requi-deta-editar').value;
+        function addAgregarFilaNuevaEditar(){
 
-                var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
-                if(cantidad === ''){
-                    toastr.error('Cantidad es requerida');
-                    return;
-                }
+            var nFilas = $('#matriz-requisicion-editar >tbody >tr').length;
+            nFilas += 1;
 
-                if(!cantidad.match(reglaNumeroDecimal)) {
-                    toastr.error('Cantidad debe ser decimal y no negativo');
-                    return;
-                }
+            // el id 0 significa que sera un nuevo registro a la hora de editar
+            var markup = "<tr id='0'>"+
 
-                if(cantidad <= 0){
-                    toastr.error('Cantidad no debe ser negativo');
-                    return;
-                }
+                "<td>"+
+                "<p id='fila"+(nFilas)+"' class='form-control' style='max-width: 65px'>"+(nFilas)+"</p>"+
+                "</td>"+
 
-                if(cantidad.length > 10){
-                    toastr.error('Cantidad máximo 10 caracteres');
-                    return;
-                }
+                "<td>"+
+                "<input name='cantidadarrayeditar[]' maxlength='10' class='form-control' type='number'>"+
+                "</td>"+
 
-                if(descripcion === ''){
-                    toastr.error('Descripción es requerida');
-                    return;
-                }
+                "<td>"+
+                "<input name='descripcionarrayeditar[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterialEditar(this)' maxlength='400'  type='text'>"+
+                "<div class='droplistaeditar' style='position: absolute; z-index: 9;'></div>"+
+                "</td>"+
 
-                if(descripcion.length > 400){
-                    toastr.error('Descripción máximo 400 caracteres');
-                    return;
-                }
+                "<td>"+
+                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
+                "</td>"+
 
-                // el ID 0 significa que esta fila sera un nuevo registro.
-                var markup = "<tr id='0'>"+
+                "</tr>";
 
-                    "<td>"+
-                    "<input name='cantidadeditararray[]' value='"+cantidad+"' maxlength='10' class='form-control' type='number'>"+
-                    "</td>"+
+            $("#matriz-requisicion-editar tbody").append(markup);
+        }
 
-                    "<td>"+
-                    "<input name='descripcioneditararray[]' value='"+descripcion+"' maxlength='400' class='form-control' type='text'>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<select class='form-control seleccioneditar' name='unidadmedidaeditararray[]'>"+
-                    "@foreach($unidad as $data)"+
-                    "<option value='{{ $data->id }}'>{{ $data->nombre }}</option>"+
-                    "@endforeach>"+
-                    "</select>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
-                    "</td>"+
-
-                    "</tr>";
-
-                $("#matriz-requisicion-editar tbody").append(markup);
-
-                // modificar posicion del select, ultima row de la tabla
-                var row = $('#matriz-requisicion-editar tr:last td:eq(2)');
-                $(row).each(function (index, element) {
-                    $(this).find(".seleccioneditar").val(unidadmedidaid);
-                });
-
-                $('#modalAgregarRequisicionDetaEditar').modal('hide');
-            });
-        });
-
+        // borrar fila para tabla nueva requisicion material
         function borrarFilaRequiDetalle(elemento){
             var tabla = elemento.parentNode.parentNode;
             tabla.parentNode.removeChild(tabla);
+            setearFilaRequisicion();
         }
 
+        // borrar fila para tabla editar requisicion material
         function borrarFilaRequiEditar(elemento){
             var tabla = elemento.parentNode.parentNode;
             tabla.parentNode.removeChild(tabla);
+            setearFilaRequisicionEditar()
         }
 
-    </script>
+        // cambiar # de fila cada vez que se borra la fila de
+        // tabla nuevo material
+        function setearFilaRequisicion(){
 
-    <script>
+            var table = document.getElementById('matriz-requisicion');
+            var conteo = 0;
+            for (var r = 1, n = table.rows.length; r < n; r++) {
+                conteo +=1;
+                var element = table.rows[r].cells[0].children[0];
+                document.getElementById(element.id).innerHTML = ""+conteo;
+            }
+        }
+
+        function setearFilaRequisicionEditar(){
+
+            var table = document.getElementById('matriz-requisicion-editar');
+            var conteo = 0;
+            for (var r = 1, n = table.rows.length; r < n; r++) {
+                conteo +=1;
+                var element = table.rows[r].cells[0].children[0];
+                document.getElementById(element.id).innerHTML = ""+conteo;
+            }
+        }
 
         // recargar tabla solo para bitacoras
         function recargarBitacora(){
@@ -655,6 +600,7 @@
             $('#tablaDatatableBitacora').load(ruta);
         }
 
+        // recargar tabla de requisiciones
         function recargarRequisicion(){
             var id = {{ $id }};
             var rutaR = "{{ URL::to('/admin/proyecto/vista/requisicion') }}/" + id;
@@ -752,6 +698,7 @@
                 });
         }
 
+        // preguntar si quiere borrar la bitacora
         function preguntaBorrarBitacora(id){
             Swal.fire({
                 title: 'Borrar Bitacora',
@@ -769,6 +716,7 @@
             })
         }
 
+        // preguntar si quiere guardar la nueva requisicion
         function preguntaGuardarRequisicion(){
             colorBlancoTablaRequisicion();
 
@@ -788,6 +736,7 @@
             })
         }
 
+        // preguntar si quiere guardar la editada de requisicion
         function preguntaGuardarRequisicionEditar(){
             colorBlancoTablaRequisicionEditar();
 
@@ -807,6 +756,7 @@
             })
         }
 
+        // borrar la bitacora
         function borrarBitacora(id){
             openLoading();
 
@@ -831,6 +781,7 @@
                 });
         }
 
+        // ver modal para editar bitacora
         function vistaEditarBitacora(id){
 
             openLoading();
@@ -857,6 +808,7 @@
                 });
         }
 
+        // editar registro de bitacora
         function editarBitacora(){
             var id = document.getElementById('id-bitacora-editar').value;
             var fecha = document.getElementById('fecha-bitacora-editar').value;
@@ -904,6 +856,7 @@
             window.location.href="{{ url('/admin/proyecto/vista/bitacora-detalle') }}/" + id;
         }
 
+        // verificar la requisicin para agregar a la base
         function verificarRequisicion(){
 
             var fecha = document.getElementById('fecha-requisicion-nuevo').value;
@@ -934,34 +887,41 @@
 
                 var cantidad = $("input[name='cantidadarray[]']").map(function(){return $(this).val();}).get();
                 var descripcion = $("input[name='descripcionarray[]']").map(function(){return $(this).val();}).get();
-
+                var descripcionAtributo = $("input[name='descripcionarray[]']").map(function(){return $(this).attr("data-info");}).get();
                 var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
                 for(var a = 0; a < cantidad.length; a++){
+                    let detalle = descripcionAtributo[a];
+                    let datoCantidad = cantidad[a];
 
-                    var datoCantidad = cantidad[a];
+                    // identifica si el 0 es tipo number o texto
+                    if(detalle == 0){
+                        colorRojoTablaRequisicion(a);
+                        alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
+                        return;
+                    }
 
                     if(datoCantidad === ''){
                         colorRojoTablaRequisicion(a);
-                        toastr.error('Cantidad es requerida');
+                        toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
                         return;
                     }
 
                     if(!datoCantidad.match(reglaNumeroDecimal)) {
                         colorRojoTablaRequisicion(a);
-                        toastr.error('Cantidad debe ser decimal y no negativo');
+                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
                         return;
                     }
 
                     if(datoCantidad <= 0){
                         colorRojoTablaRequisicion(a);
-                        toastr.error('Cantidad no debe ser negativo');
+                        toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
                         return;
                     }
 
                     if(datoCantidad.length > 10){
                         colorRojoTablaRequisicion(a);
-                        toastr.error('Cantidad máximo 10 caracteres');
+                        toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
                         return;
                     }
                 }
@@ -972,13 +932,13 @@
 
                     if(datoDescripcion === ''){
                         colorRojoTablaRequisicion(b);
-                        toastr.error('Descripción es requerida');
+                        toastr.error('Fila #' + (b+1) + ' la descripción es requerida');
                         return;
                     }
 
                     if(datoDescripcion.length > 400){
                         colorRojoTablaRequisicion(b);
-                        toastr.error('Una descripción tiene más de 400 caracteres');
+                        toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
                     }
                 }
 
@@ -986,16 +946,8 @@
                 // todas las filas de una vez
                 for(var p = 0; p < cantidad.length; p++){
                     formData.append('cantidad[]', cantidad[p]);
-                    formData.append('descripcion[]', descripcion[p]);
+                    formData.append('datainfo[]', descripcionAtributo[p]);
                 }
-
-                $("#matriz-requisicion tr").each(function() {
-                    var unidad = $(this).find('.seleccion').val();
-
-                    if(unidad !== undefined && unidad != null){
-                        formData.append('unidadmedidaarray[]', unidad);
-                    }
-                });
 
                 hayRegistro = 1;
             }
@@ -1027,22 +979,27 @@
                 });
         }
 
+        // cambio de color de fila tabla a rojo
         function colorRojoTablaRequisicion(index){
             $("#matriz-requisicion tr:eq("+(index+1)+")").css('background', '#F1948A');
         }
 
+        // cambio de color de fila tabla a blanco
         function colorBlancoTablaRequisicion(){
             $("#matriz-requisicion tbody tr").css('background', 'white');
         }
 
+        // cambio de color de fila tabla a rojo
         function colorRojoTablaRequisicionEditar(index){
             $("#matriz-requisicion-editar tr:eq("+(index+1)+")").css('background', '#F1948A');
         }
 
+        // cambio de color de fila tabla a blanco
         function colorBlancoTablaRequisicionEditar(){
             $("#matriz-requisicion-editar tbody tr").css('background', 'white');
         }
 
+        // limpiar modal requisicion y su tabla
         function limpiarRequisicion(contador){
             document.getElementById('conteo-requisicion').value = contador;
             document.getElementById('fecha-requisicion-nuevo').value = '';
@@ -1053,9 +1010,9 @@
         }
 
 
-        //******* EDITAR REQUISICION *********
+        //******* VISTA EDITAR REQUISICION *********
 
-        function editarRequisicion(id, conteo){
+        function vistaEditarRequisicion(id, conteo){
 
             openLoading();
             document.getElementById("formulario-requisicion-editar").reset();
@@ -1080,19 +1037,16 @@
                             var markup = "<tr id='"+infodetalle[i].id+"'>"+
 
                                 "<td>"+
-                                "<input name='cantidadeditararray[]' value='"+infodetalle[i].cantidad+"' maxlength='10' class='form-control' type='number'>"+
+                                "<p id='fila"+(i+1)+"' class='form-control' style='max-width: 65px'>"+(i+1)+"</p>"+
                                 "</td>"+
 
                                 "<td>"+
-                                "<input name='descripcioneditararray[]' value='"+infodetalle[i].descripcion+"' maxlength='400' class='form-control' type='text'>"+
+                                "<input name='cantidadarrayeditar[]' value='"+infodetalle[i].cantidad+"' maxlength='10' class='form-control' type='number'>"+
                                 "</td>"+
 
                                 "<td>"+
-                                "<select class='form-control seleccioneditar' name='unidadmedidaeditararray[]'>"+
-                                "@foreach($unidad as $data)"+
-                                "<option value='{{ $data->id }}'>{{ $data->nombre }}</option>"+
-                                "@endforeach>"+
-                                "</select>"+
+                                "<input name='descripcionarrayeditar[]' disabled class='form-control' data-info='"+infodetalle[i].material_id+"' value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
+                                "<div class='droplistaeditar' style='position: absolute; z-index: 9;'></div>"+
                                 "</td>"+
 
                                 "<td>"+
@@ -1102,12 +1056,6 @@
                                 "</tr>";
 
                             $("#matriz-requisicion-editar tbody").append(markup);
-
-                            // modificar posicion del select, ultima row de la tabla
-                            var row = $('#matriz-requisicion-editar tr:last td:eq(2)');
-                            $(row).each(function (index, element) {
-                                $(this).find(".seleccioneditar").val(infodetalle[i].unidadmedida_id);
-                            });
                         }
 
                         $('#modalEditarRequisicion').css('overflow-y', 'auto');
@@ -1123,11 +1071,13 @@
                 });
         }
 
+        // ver modal para detalle requisicion editar
         function verModalDetalleRequisicionEditar(){
             document.getElementById("formulario-requisicion-deta-editar").reset();
             $('#modalAgregarRequisicionDetaEditar').modal('show');
         }
 
+        // verificar la editada de requisicion
         function verificarRequisicionEditar(){
 
             var fecha = document.getElementById('fecha-requisicion-editar').value;
@@ -1156,36 +1106,43 @@
 
             if (nRegistro > 0){
 
-                var cantidad = $("input[name='cantidadeditararray[]']").map(function(){return $(this).val();}).get();
-                var descripcion = $("input[name='descripcioneditararray[]']").map(function(){return $(this).val();}).get();
-
+                var cantidad = $("input[name='cantidadarrayeditar[]']").map(function(){return $(this).val();}).get();
+                var descripcion = $("input[name='descripcionarrayeditar[]']").map(function(){return $(this).val();}).get();
+                var descripcionAtributo = $("input[name='descripcionarrayeditar[]']").map(function(){return $(this).attr("data-info");}).get();
                 var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
                 for(var a = 0; a < cantidad.length; a++){
+                    let detalle = descripcionAtributo[a];
+                    let datoCantidad = cantidad[a];
 
-                    var datoCantidad = cantidad[a];
+                    // identifica si el 0 es tipo number o texto
+                    if(detalle == 0){
+                        colorRojoTablaRequisicionEditar(a);
+                        alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
+                        return;
+                    }
 
                     if(datoCantidad === ''){
                         colorRojoTablaRequisicionEditar(a);
-                        toastr.error('Cantidad es requerida');
+                        toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
                         return;
                     }
 
                     if(!datoCantidad.match(reglaNumeroDecimal)) {
                         colorRojoTablaRequisicionEditar(a);
-                        toastr.error('Cantidad debe ser decimal y no negativo');
+                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
                         return;
                     }
 
                     if(datoCantidad <= 0){
                         colorRojoTablaRequisicionEditar(a);
-                        toastr.error('Cantidad no debe ser negativo');
+                        toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
                         return;
                     }
 
                     if(datoCantidad.length > 10){
                         colorRojoTablaRequisicionEditar(a);
-                        toastr.error('Cantidad máximo 10 caracteres');
+                        toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
                         return;
                     }
                 }
@@ -1196,32 +1153,25 @@
 
                     if(datoDescripcion === ''){
                         colorRojoTablaRequisicionEditar(b);
-                        toastr.error('Descripción es requerida');
+                        toastr.error('Fila #' + (b+1) + ' la descripción es requerida');
                         return;
                     }
 
                     if(datoDescripcion.length > 400){
                         colorRojoTablaRequisicionEditar(b);
-                        toastr.error('Una descripción tiene más de 400 caracteres');
+                        toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
                     }
                 }
 
                 // como tienen la misma cantidad de filas, podemos recorrer
                 // todas las filas de una vez
                 for(var p = 0; p < cantidad.length; p++){
+                    // obtener el id de la fila, si el id fila es 0, significa que sera nuevo registro
                     var id = $("#matriz-requisicion-editar tr:eq("+(p+1)+")").attr('id');
                     formData.append('idarray[]', id);
+                    formData.append('datainfo[]', descripcionAtributo[p]);
                     formData.append('cantidad[]', cantidad[p]);
-                    formData.append('descripcion[]', descripcion[p]);
                 }
-
-                $("#matriz-requisicion-editar tr").each(function() {
-                    var unidad = $(this).find('.seleccioneditar').val();
-
-                    if(unidad !== undefined && unidad != null){
-                        formData.append('unidadmedidaarray[]', unidad);
-                    }
-                });
 
                 hayRegistro = 1;
             }
@@ -1245,7 +1195,6 @@
                     else{
                         toastr.error('error al actualizar');
                     }
-
                 })
                 .catch((error) => {
                     toastr.error('error al actualizar');
@@ -1253,7 +1202,11 @@
                 });
         }
 
-
+        // vista a ver cotizacion
+        function vistaCotizacion(id){
+            // id tabla requisicion
+            window.location.href="{{ url('/admin/proyecto/vista/cotizacion') }}/" + id;
+        }
 
     </script>
 

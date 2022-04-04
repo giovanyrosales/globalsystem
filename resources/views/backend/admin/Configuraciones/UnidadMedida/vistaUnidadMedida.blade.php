@@ -68,11 +68,6 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Nombre</label>
-                                        <input type="text" maxlength="100" class="form-control" id="nombre-nuevo" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group">
                                         <label>Medida</label>
                                         <input type="text" maxlength="100" class="form-control" id="medida-nuevo" autocomplete="off">
                                     </div>
@@ -109,11 +104,6 @@
 
                                     <div class="form-group">
                                         <input type="hidden" id="id-editar">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Nombre</label>
-                                        <input type="text" maxlength="100" class="form-control" id="nombre-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
@@ -171,26 +161,19 @@
 
         function nuevo(){
             var medida = document.getElementById('medida-nuevo').value;
-            var nombre = document.getElementById('nombre-nuevo').value;
 
-            if(nombre === ''){
-                toastr.error('Nombre es requerido');
-                return;
-            }
-
-            if(nombre.length > 100){
-                toastr.error('Nombre máximo 100 caracteres');
+            if(medida === ''){
+                toastr.error('Medida es requerido');
                 return;
             }
 
             if(medida.length > 100){
-                toastr.error('Código máximo 100 caracteres');
+                toastr.error('Medida máximo 100 caracteres');
                 return;
             }
 
             openLoading();
             var formData = new FormData();
-            formData.append('nombre', nombre);
             formData.append('medida', medida);
 
             axios.post(url+'/unidadmedida/nuevo', formData, {
@@ -224,7 +207,6 @@
                     if(response.data.success === 1){
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(response.data.medida.id);
-                        $('#nombre-editar').val(response.data.medida.nombre);
                         $('#medida-editar').val(response.data.medida.medida);
 
                     }else{
@@ -239,16 +221,10 @@
 
         function editar(){
             var id = document.getElementById('id-editar').value;
-            var nombre = document.getElementById('nombre-editar').value;
             var medida = document.getElementById('medida-editar').value;
 
-            if(nombre === ''){
-                toastr.error('Nombre es requerido');
-                return;
-            }
-
-            if(nombre.length > 100){
-                toastr.error('Nombre máximo 100 caracteres');
+            if(medida === ''){
+                toastr.error('Medida es requerido');
                 return;
             }
 
@@ -260,7 +236,6 @@
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
-            formData.append('nombre', nombre);
             formData.append('medida', medida);
 
             axios.post(url+'/unidadmedida/editar', formData, {

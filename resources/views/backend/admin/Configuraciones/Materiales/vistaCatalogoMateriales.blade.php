@@ -92,7 +92,7 @@
                                         <select width="60%"  class="form-control" id="select-unidad-nuevo">
                                             <option value="" disabled selected>Seleccione una opción...</option>
                                             @foreach($lUnidad as $sel)
-                                                <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
+                                                <option value="{{ $sel->id }}">{{ $sel->medida }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -109,7 +109,7 @@
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
-                                        <label>Clasificación:</label>
+                                        <label>Clasificación *:</label>
                                         <select width="60%"  class="form-control" id="select-clasi-nuevo">
                                             <option value="" disabled selected>Seleccione una opción...</option>
                                             @foreach($lClasificacion as $sel)
@@ -188,7 +188,7 @@
                                     <div class="row">
                                         <div class="col-md-5">
                                             <div class="form-group">
-                                                <label>Clasificación:</label>
+                                                <label>Clasificación *:</label>
                                                 <select width="60%"  class="form-control" id="select-clasi-editar">
                                                 </select>
                                             </div>
@@ -301,6 +301,11 @@
                 return;
             }
 
+            if(clasificacion === ''){
+                toastr.error('Clasificación es requerido');
+                return;
+            }
+
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
             if (!precio.match(reglaNumeroDecimal)) {
@@ -385,9 +390,9 @@
 
                         $.each(response.data.unidad, function( key, val ){
                             if(response.data.arraydatos['idmedida'] == val.id){
-                                $('#select-unidad-editar').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
+                                $('#select-unidad-editar').append('<option value="' +val.id +'" selected="selected">'+ val.medida +'</option>');
                             }else{
-                                $('#select-unidad-editar').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
+                                $('#select-unidad-editar').append('<option value="' +val.id +'">'+ val.medida +'</option>');
                             }
                         });
 
@@ -434,6 +439,11 @@
 
             if(precio === ''){
                 toastr.error('Precio es requerido');
+                return;
+            }
+
+            if(clasificacion === ''){
+                toastr.error('Clasificación es requerido');
                 return;
             }
 
