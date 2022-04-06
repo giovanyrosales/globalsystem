@@ -8,6 +8,8 @@ use App\Models\Bitacora;
 use App\Models\BitacoraDetalle;
 use App\Models\Bolson;
 use App\Models\CatalogoMateriales;
+use App\Models\Cotizacion;
+use App\Models\CotizacionDetalle;
 use App\Models\EstadoProyecto;
 use App\Models\FuenteFinanciamiento;
 use App\Models\FuenteRecursos;
@@ -777,6 +779,52 @@ class ProyectoController extends Controller
                 $output = '';
             }
             echo $output;
+        }
+    }
+
+    public function nuevaCotizacion(Request $request){
+
+        $rules = array(
+            'fecha' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            $r = new Cotizacion();
+            $r->proveedor_id = $request->proveedor;
+            $r->requisicion_id = $request->id;
+            $r->fecha = $request->fecha;
+            $r->estado = 0; // aprobada o no aprobada por jefa uaci
+            $r->save();
+
+            for ($i = 0; $i < count($request->precio); $i++) {
+
+                // obtener cantidad
+                $info = RequisicionDetalle::where('id', $request->idarray[$i])->first();
+
+                $rDetalle = new CotizacionDetalle();
+                $rDetalle->cotizacion_id = $r->id;
+                $rDetalle->material_id = $info->material_id;
+                $rDetalle->cantidad = $info->cantidad;
+                $rDetalle->precio_u = $request->precio[$i];
+                $rDetalle->cod_presup = $request->codigo[$i];
+                $rDetalle->estado = 0;
+                $rDetalle->save();
+            }
+
+            DB::commit();
+            return ['success' => 1];
+        }catch(\Throwable $e){
+            DB::rollback();
+            return ['success' => 2];
         }
     }
 

@@ -17,6 +17,8 @@ use App\Http\Controllers\Backend\Configuraciones\FuenteRecursosController;
 use App\Http\Controllers\Backend\Configuraciones\AreaGestionController;
 use App\Http\Controllers\Backend\Configuraciones\ProveedoresController;
 use App\Http\Controllers\Backend\Configuraciones\AdministradoresController;
+use App\Http\Controllers\Backend\Proyecto\CotizacionController;
+use App\Http\Controllers\Backend\Orden\OrdenController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -93,10 +95,33 @@ Route::post('/admin/proyecto/vista/requisicion/nuevo', [ProyectoController::clas
 Route::post('/admin/proyecto/vista/requisicion/informacion', [ProyectoController::class, 'informacionRequisicion']);
 Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::class, 'editarRequisicion']);
 
-// --- VISTA COTIZACION ---
+// --- VISTA GENERAR COTIZACION ---
 Route::get('/admin/proyecto/vista/cotizacion/{id}', [ProyectoController::class,'indexCotizacion']);
 Route::post('/admin/proyecto/lista/cotizaciones',  [ProyectoController::class,'obtenerListaCotizaciones']);
 Route::post('/admin/proyecto/buscar/material',  [ProyectoController::class,'buscadorMaterial']);
+Route::post('/admin/proyecto/cotizacion/nuevo',  [ProyectoController::class,'nuevaCotizacion']);
+
+// --- VISTA COTIZACIONES PENDIENTES ---
+Route::get('/admin/cotizacion/pendiente/index', [CotizacionController::class,'indexPendiente'])->name('cotizaciones.pendientes.index');
+Route::get('/admin/cotizacion/pendiente/tabla-index', [CotizacionController::class,'indexPendienteTabla']);
+Route::get('/admin/cotizacion/individual/index/{id}', [CotizacionController::class,'indexCotizacion']);
+Route::post('/admin/cotizacion/pendiente/actualizar',  [CotizacionController::class,'actualizarCotizacion']);
+Route::post('/admin/cotizacion/borrar',  [CotizacionController::class,'borrarCotizacion']);
+Route::post('/admin/cotizacion/autorizar',  [CotizacionController::class,'autorizarCotizacion']);
+Route::post('/admin/cotizacion/denegar',  [CotizacionController::class,'denegarCotizacion']);
+
+// --- VISTA COTIZACIONES AUTORIZADAS ---
+Route::get('/admin/cotizacion/autorizadas/index', [CotizacionController::class,'indexAutorizadas'])->name('cotizaciones.autorizadas.index');
+Route::get('/admin/cotizacion/autorizadas/tabla-index', [CotizacionController::class,'indexAutorizadasTabla']);
+
+// --- VISTA COTIZACIONES DENEGADAS ---
+Route::get('/admin/cotizacion/denegadas/index', [CotizacionController::class,'indexDenegadas'])->name('cotizaciones.denegadas.index');
+Route::get('/admin/cotizacion/denegadas/tabla-index', [CotizacionController::class,'indexDenegadasTabla']);
+
+// --- ORDENES ---
+Route::post('/admin/ordenes/generar/nuevo',  [OrdenController::class,'generarOrden']);
+Route::get('/admin/documento/pdf/orden/{id}', [OrdenController::class,'vistaPdfOrden']);
+
 
 
 

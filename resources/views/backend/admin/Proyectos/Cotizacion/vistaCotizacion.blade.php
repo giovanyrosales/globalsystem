@@ -128,7 +128,7 @@
                                 </div>
                                 <div class="modal-footer justify-content-between">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                    <button type="button" class="btn btn-primary" id="btnGuardarCotizacion">Guardar</button>
+                                    <button type="button" class="btn btn-primary" onclick="verificar()">Guardar</button>
                                 </div>
                             </div>
                         </div>
@@ -166,6 +166,19 @@
 
         function revisarCotizacion(){
 
+            var fecha = document.getElementById('fecha-cotizacion').value;
+            var proveedor = document.getElementById('select-proveedor').value;
+
+            if(fecha === ''){
+                toastr.error('Fecha de cotización es requerida');
+                return;
+            }
+
+            if(proveedor === ''){
+                toastr.error('Proveedor es requerido');
+                return;
+            }
+
             openLoading();
 
             let lista = [];
@@ -174,8 +187,7 @@
             });
 
             document.getElementById("formulario-crear-cotizacion").reset();
-            $('#tablecrearcotizacion tbody').empty();
-            //$('#matriz tbody').empty();
+            $("#matriz tbody tr").remove();
 
             axios.post(url+'/proyecto/lista/cotizaciones', {
                 'lista' : lista
@@ -207,11 +219,11 @@
                                "</td>"+
 
                                "<td>"+
-                               "<input name='precio[]' maxlength='10' class='form-control' type='number'>"+
+                               "<input name='precio[]' maxlength='10' value='0' class='form-control' type='number'>"+
                                "</td>"+
 
                                "<td>"+
-                               "<input name='codigo[]' maxlength='100' class='form-control' type='text'>"+
+                               "<input name='codigo[]' maxlength='100' value='0' class='form-control' type='number'>"+
                                "</td>"+
 
                                "</tr>";
@@ -224,7 +236,6 @@
                    }else{
                        toastr.error('información no encontrada');
                    }
-
                 })
                 .catch((error) => {
                     toastr.error('Error al registrar');
@@ -265,7 +276,7 @@
                 return;
             }
 
-            var nRegistro = $('#matriz-requisicion >tbody >tr').length;
+            var nRegistro = $('#matriz >tbody >tr').length;
 
             if(nRegistro <= 0){
                 toastr.error('Se necesitan Materiales para cotización');
@@ -279,31 +290,32 @@
             var codigo = $("input[name='codigo[]']").map(function(){return $(this).val();}).get();
 
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroEntero = /^[0-9]\d*$/;
 
                 for(var a = 0; a < precio.length; a++){
                     let datoPrecio = precio[a];
 
                     if(datoPrecio === ''){
-                        colorRojoTablaRequisicion(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
+                        colorRojoTabla(a);
+                        toastr.error('Fila #' + (a+1) + ' Precio es requerido');
                         return;
                     }
 
                     if(!datoPrecio.match(reglaNumeroDecimal)) {
-                        colorRojoTablaRequisicion(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
+                        colorRojoTabla(a);
+                        toastr.error('Fila #' + (a+1) + ' Precio debe ser decimal y no negativo');
                         return;
                     }
 
                     if(datoPrecio <= 0){
-                        colorRojoTablaRequisicion(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
+                        colorRojoTabla(a);
+                        toastr.error('Fila #' + (a+1) + ' Precio no debe ser negativo');
                         return;
                     }
 
                     if(datoPrecio.length > 10){
-                        colorRojoTablaRequisicion(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
+                        colorRojoTabla(a);
+                        toastr.error('Fila #' + (a+1) + ' Precio máximo 10 caracteres');
                         return;
                     }
                 }
@@ -313,45 +325,79 @@
 
                     var datoCodigo = codigo[b];
 
+                    if(datoCodigo === ''){
+                        colorRojoTabla(b);
+                        toastr.error('Fila #' + (b+1) + ' Código es requerido');
+                        return;
+                    }
+
+                    if(!datoCodigo.match(reglaNumeroEntero)) {
+                        colorRojoTabla(b);
+                        toastr.error('Fila #' + (b+1) + ' Código debe ser Entero y no negativo');
+                        return;
+                    }
+
+                    if(datoCodigo <= 0){
+                        colorRojoTabla(a);
+                        toastr.error('Fila #' + (b+1) + ' Código no debe ser negativo');
+                        return;
+                    }
+
                     if(datoCodigo.length > 10){
                         colorRojoTabla(b);
                         toastr.error('Fila #' + (b+1) + ' Código tiene más de 100 caracteres');
+                        return;
                     }
                 }
 
-                // como tienen la misma cantidad de filas, podemos recorrer
-                // todas las filas de una vez
-                for(var p = 0; p < cantidad.length; p++){
-                    var idarr = $("#matriz tr:eq("+(p+1)+")").attr('id');
-                    formData.append('idarray[]', idarr);
-                    formData.append('precio[]', precio[p]);
-                    formData.append('codigo[]', codigo[p]);
-                }
-
             openLoading();
+
+            // como tienen la misma cantidad de filas, podemos recorrer
+            // todas las filas de una vez
+            for(var p = 0; p < precio.length; p++){
+                var idarr = $("#matriz tr:eq("+(p+1)+")").attr('id');
+                formData.append('idarray[]', idarr);
+                formData.append('precio[]', precio[p]);
+                formData.append('codigo[]', codigo[p]);
+            }
 
             formData.append('fecha', fecha);
             formData.append('proveedor', proveedor);
             formData.append('id', id);
 
-            axios.post(url+'/proyecto/vista/requisicion/nuevo', formData, {
+            axios.post(url+'/proyecto/cotizacion/nuevo', formData, {
             })
                 .then((response) => {
-                    closeLoading();
                     if(response.data.success === 1){
-                        $('#modalAgregarRequisicion').modal('hide');
-                        toastr.success('Registrado correctamente');
-                        recargarRequisicion();
-                        limpiarRequisicion(response.data.contador);
+                        $('#modalAgregarCotizacion').modal('hide');
+                        siguienteVista();
                     }
                     else{
-                        toastr.error('error al crear requisición');
+                        closeLoading();
+                        toastr.error('error al crear cotización');
                     }
                 })
                 .catch((error) => {
-                    toastr.error('error al crear requisición');
+                    toastr.error('error al crear cotización');
                     closeLoading();
                 });
+        }
+
+        function siguienteVista(){
+
+            Swal.fire({
+                title: 'Registrado Correctamente',
+                text: '',
+                icon: 'success',
+                showCancelButton: false,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Aceptar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href="{{ url('/admin/cotizacion/pendiente/index') }}";
+                }
+            });
         }
 
         function colorRojoTabla(index){
@@ -364,6 +410,7 @@
                 selectElement.remove(i);
             }
         }
+
 
     </script>
 

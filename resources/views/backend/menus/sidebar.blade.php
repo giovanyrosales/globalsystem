@@ -71,6 +71,40 @@
                 <li class="nav-item">
 
                     <a href="#" class="nav-link nav-">
+                        <i class="fas fa-tasks"></i>
+                        <p>
+                            Cotizaciones
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('cotizaciones.pendientes.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Cotización Pendiente</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('cotizaciones.autorizadas.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Cotización Procesada</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('cotizaciones.denegadas.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Cotización Denegadas</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+
+                    <a href="#" class="nav-link nav-">
                         <i class="far fa-edit"></i>
                         <p>
                             Configuraciones
@@ -148,7 +182,6 @@
                                 <p>Administradores</p>
                             </a>
                         </li>
-
 
                     </ul>
 
