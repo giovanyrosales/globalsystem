@@ -124,6 +124,17 @@
             document.getElementById('fecha_orden').value = fecha.toJSON().slice(0,10);
 
             document.getElementById("divcontenedor").style.display = "block";
+
+
+            const checkbox = document.getElementById('myCheckbox')
+
+            checkbox.addEventListener('change', (event) => {
+                if (event.currentTarget.checked) {
+                    alert('checked');
+                } else {
+                    alert('not checked');
+                }
+            })
         });
     </script>
 

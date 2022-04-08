@@ -21,6 +21,10 @@ class CreateOrdenTable extends Migration
 
             $table->date('fecha_orden');
             $table->text('lugar')->nullable();
+
+            // 0: defecto
+            // 1: orden anulada
+
             $table->integer('estado');
 
             $table->foreign('admin_contrato_id')->references('id')->on('administradores');

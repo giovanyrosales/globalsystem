@@ -7,6 +7,7 @@ use App\Models\Administradores;
 use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
+use App\Models\Orden;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
@@ -180,8 +181,19 @@ class CotizacionController extends Controller
 
     public function indexAutorizadasTabla(){
 
+        // todas las ordenes de cotizacion, para no mostrarlas
+        $orden = Orden::all();
+        $pila = array();
+
+        foreach ($orden as $dd){
+            array_push($pila, $dd->id);
+        }
+
         // autorizadas
-        $lista = Cotizacion::where('estado', 1)->orderBy('id', 'ASC')->get();
+        $lista = Cotizacion::where('estado', 1)
+            ->whereNotIn('id', $pila)
+            ->orderBy('id', 'ASC')
+            ->get();
 
         foreach ($lista as $dd){
 
@@ -199,7 +211,6 @@ class CotizacionController extends Controller
     }
 
     public function indexDenegadas(){
-
         return view('backend.admin.cotizaciones.denegadas.vistacotizaciondenegada');
     }
 

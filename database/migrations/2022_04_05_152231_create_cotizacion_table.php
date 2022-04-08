@@ -21,7 +21,8 @@ class CreateCotizacionTable extends Migration
 
             $table->date('fecha');
 
-            // aprobada o no aprobada por jefa uaci
+            // 0 defecto
+            // aprobada por jefe uaci
             // estado 2: denegado
             $table->integer('estado');
 

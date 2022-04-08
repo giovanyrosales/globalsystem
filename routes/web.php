@@ -122,6 +122,13 @@ Route::get('/admin/cotizacion/denegadas/tabla-index', [CotizacionController::cla
 Route::post('/admin/ordenes/generar/nuevo',  [OrdenController::class,'generarOrden']);
 Route::get('/admin/documento/pdf/orden/{id}', [OrdenController::class,'vistaPdfOrden']);
 
+// --- ORDENES DE COMPRAS ---
+Route::get('/admin/ordenes/compras/index', [OrdenController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
+Route::get('/admin/ordenes/compras/tabla-index', [OrdenController::class,'tablaOrdenesCompras']);
+Route::post('/admin/ordenes/anular/compra',  [OrdenController::class,'anularCompra']);
+Route::post('/admin/ordenes/generar/acta',  [OrdenController::class,'generarActa']);
+Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenController::class,'reporteActaGenerada']);
+
 
 
 

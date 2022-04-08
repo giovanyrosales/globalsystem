@@ -102,6 +102,15 @@
                     </ul>
                 </li>
 
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('ordenes.compras.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="nav-icon fas fa-list"></i>
+                        <p>
+                            Ordenes de Compra
+                        </p>
+                    </a>
+                </li>
+
                 <li class="nav-item">
 
                     <a href="#" class="nav-link nav-">
