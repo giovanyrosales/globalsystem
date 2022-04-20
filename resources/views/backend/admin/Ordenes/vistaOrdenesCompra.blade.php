@@ -218,6 +218,10 @@
             window.open("{{ URL::to('admin/ordenes/acta/reporte') }}/" + actaid);
         }
 
+        function Imprimir(id){
+            window.open("{{ URL::to('admin/documento/pdf/orden') }}/" + id);
+        }
+
     </script>
 
 

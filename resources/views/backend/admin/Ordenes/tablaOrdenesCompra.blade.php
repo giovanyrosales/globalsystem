@@ -29,10 +29,9 @@
                                     <td>{{ $dato->requisicion_id }}</td>
                                     <td>{{ $dato->cotizacion_id }}</td>
                                     <td>
-                                        <a href="" target="_blank"><button type="button"  class="btn btn-info btn-xs">
-                                                <i class="fas fa-print" title="Imprimir"></i>&nbsp; Imprimir
-                                            </button>
-                                        </a>
+                                        <button type="button" class="btn btn-success btn-xs" onclick="Imprimir({{ $dato->id }})">
+                                            <i class="fa fa-print" title="Generar Acta"></i>&nbsp; Imprimir
+                                        </button>
 
                                         @if($dato->estado == 0)
                                         <button type="button" class="btn btn-danger btn-xs" onclick="abrirModalAnular({{ $dato->id }})">

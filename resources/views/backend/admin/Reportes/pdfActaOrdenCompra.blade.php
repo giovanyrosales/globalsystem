@@ -26,7 +26,7 @@
         <br></br>
         <td width="20%"><img style="margin-top: -20px; "src="{{ asset('/images/logo.png') }}" width="80px" height="80px"></td>
         <td width="60%" style="text-align:center; ">
-            <label style="font-weight: bold; font-size: 25px;  text-align:center;">ACTA DE RECEPCION DE BIENES, SERVICIIOS Y OBAS.</label>
+            <label style="font-weight: bold; font-size: 25px;  text-align:center;">ACTA DE RECEPCION DE BIENES, SERVICIOS Y OBAS.</label>
         </td>
         <td width="20%"></td>
     </tr>

@@ -21,13 +21,16 @@
     }
 
     .droplista{
-        width: 70%;
+        width: 65%;
     }
 
     .droplistaeditar{
-        width: 70%;
+        width: 65%;
     }
 
+    .droplistaPresupuesto{
+        width: 65%;
+    }
 
 </style>
 
@@ -73,21 +76,49 @@
                 </div>
             </div>
         </div>
+
         <!------------------ PRESUPUESTO DEL PROYECTO INDIVIDUAL ---------------->
+        <!--  <div class="col-sm-6 float-right">
+              <div class="container-fluid">
+                  <div class="card card-default">
+                      <div class="card-header">
+                          <h3 class="card-title"><strong>Requisiciones de Proyecto</strong></h3>
+                          <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-secondary btn-sm">
+                              Agregar Requisición
+                          </button>
+                      </div>
+
+                      <div class="card-body">
+                          <div class="row">
+                              <div class="col-md-12">
+                                  <div id="tablaDatatableRequisicion">
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>     -->
+
+
+
+        <!-- ******************** MODULO DE INGENIERIA ************************ -->
+
+        <!------------------ PRESUPUESTO DE PROYECTO ---------------->
         <div class="col-sm-6 float-right">
             <div class="container-fluid">
                 <div class="card card-default">
                     <div class="card-header">
                         <h3 class="card-title"><strong>Presupuesto de Proyecto</strong></h3>
-                        <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-secondary btn-sm">
-                            Agregar Requisición
+                        <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
+                            Agregar Presupuesto
                         </button>
                     </div>
 
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <div id="tablaDatatableRequisicion">
+                                <div id="tablaDatatablePresupuesto">
                                 </div>
                             </div>
                         </div>
@@ -95,6 +126,8 @@
                 </div>
             </div>
         </div>
+
+
 
         <!------------------ CONTROL DE BITACORAS ---------------->
         <div class="col-sm-6 float-left">
@@ -181,8 +214,8 @@
                                 <thead>
                                 <tr>
                                     <th style="width: 3%">#</th>
-                                    <th style="width: 5%">Cantidad *</th>
-                                    <th style="width: 15%">Descripción *</th>
+                                    <th style="width: 5%">Cantidad</th>
+                                    <th style="width: 15%">Descripción</th>
                                     <th style="width: 5%">Opciones</th>
                                 </tr>
                                 </thead>
@@ -354,8 +387,8 @@
                                 <thead>
                                 <tr>
                                     <th style="width: 3%">#</th>
-                                    <th style="width: 6%">Cantidad *</th>
-                                    <th style="width: 15%">Descripción *</th>
+                                    <th style="width: 6%">Cantidad</th>
+                                    <th style="width: 15%">Descripción</th>
                                     <th style="width: 5%">Opciones</th>
                                 </tr>
                                 </thead>
@@ -377,6 +410,83 @@
 </div>
 
 
+<!-- ****** INGENIERIA MODALES ******* !-->
+
+<div class="modal fade" id="modalAgregarPresupuesto" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Agregar Presupuesto de Proyecto</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <form id="formulario-presupuesto-nuevo">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Item:</label>
+                                    <input  type="text" class="form-control" id="conteo-partida" value="{{ $conteoPartida }}" readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Cantidad C/ Unidad *:</label>
+                                    <input class="form-control" id="cantidad-partida-nuevo">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Partida *:</label>
+                                    <input class="form-control" id="nombre-partida-nuevo" maxlength="300">
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <br>
+                                    <button type="button" onclick="addAgregarFilaPresupuestoNueva()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                        <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <table class="table" id="matriz-presupuesto"  data-toggle="table">
+                                <thead>
+                                <tr>
+                                    <th style="width: 3%">#</th>
+                                    <th style="width: 5%">Cantidad</th>
+                                    <th style="width: 15%">Descripción</th>
+                                    <th style="width: 5%">Opciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="preguntaGuardarPresupuesto()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 @extends('backend.menus.footerjs')
 @section('archivos-js')
 
@@ -393,25 +503,28 @@
     <script type="text/javascript">
         $(document).ready(function(){
             document.getElementById("divcontenedor").style.display = "block";
-            
+
             // variable global para setear input al buscar nuevo material
             window.txtContenedorGlobal = this;
-
             window.seguroBuscador = true;
 
             var id = {{ $id }};
             var ruta = "{{ URL::to('/admin/proyecto/vista/bitacora') }}/" + id;
             $('#tablaDatatableBitacora').load(ruta);
 
+            // vista otros
             var rutaR = "{{ URL::to('/admin/proyecto/vista/requisicion') }}/" + id;
             $('#tablaDatatableRequisicion').load(rutaR);
 
-            $(document).click(function(){
-                $(".droplista").hide();
-            });
+            // vista ingeniera
+            var rutaP = "{{ URL::to('/admin/proyecto/vista/presupuesto') }}/" + id;
+            $('#tablaDatatablePresupuesto').load(rutaP);
+
 
             $(document).click(function(){
+                $(".droplista").hide();
                 $(".droplistaeditar").hide();
+                $(".droplistapresupuesto").hide();
             });
 
         });
@@ -447,6 +560,7 @@
 
                     })
                     .catch((error) => {
+                        seguroBuscador = true;
                     });
             }
         }
@@ -476,9 +590,9 @@
                             $(this).find(".droplistaeditar").fadeIn();
                             $(this).find(".droplistaeditar").html(response.data);
                         });
-
                     })
                     .catch((error) => {
+                        seguroBuscador = true;
                     });
             }
         }
@@ -1207,6 +1321,276 @@
             // id tabla requisicion
             window.location.href="{{ url('/admin/proyecto/vista/cotizacion') }}/" + id;
         }
+
+    </script>
+
+    <script>
+
+        // **** INGENIERIA  ****
+
+        function verModalPresupuesto(){
+            document.getElementById("formulario-presupuesto-nuevo").reset();
+            $('#modalAgregarPresupuesto').css('overflow-y', 'auto');
+            $('#modalAgregarPresupuesto').modal({backdrop: 'static', keyboard: false})
+        }
+
+        function addAgregarFilaPresupuestoNueva(){
+
+            var nFilas = $('#matriz-presupuesto >tbody >tr').length;
+            nFilas += 1;
+
+            var markup = "<tr>"+
+
+                "<td>"+
+                "<p id='fila"+(nFilas)+"' class='form-control' style='max-width: 65px'>"+(nFilas)+"</p>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='cantidadPresupuestoArray[]' maxlength='10' class='form-control' type='number'>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>"+
+                "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9;'></div>"+
+                "</td>"+
+
+                "<td>"+
+                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoDetalle(this)'>Borrar</button>"+
+                "</td>"+
+
+                "</tr>";
+
+            $("#matriz-presupuesto tbody").append(markup);
+        }
+
+        // borrar fila para tabla editar requisicion material
+        function borrarFilaPresupuestoDetalle(elemento){
+            var tabla = elemento.parentNode.parentNode;
+            tabla.parentNode.removeChild(tabla);
+            setearFilaPresupuesto()
+        }
+
+        // cambiar # de fila cada vez que se borra la fila de
+        // tabla nuevo material
+        function setearFilaPresupuesto(){
+
+            var table = document.getElementById('matriz-presupuesto');
+            var conteo = 0;
+            for (var r = 1, n = table.rows.length; r < n; r++) {
+                conteo +=1;
+                var element = table.rows[r].cells[0].children[0];
+                document.getElementById(element.id).innerHTML = ""+conteo;
+            }
+        }
+
+
+        function buscarMaterialPresupuesto(e){
+
+            // seguro para evitar errores de busqueda continua
+            if(seguroBuscador){
+                seguroBuscador = false;
+
+                var row = $(e).closest('tr');
+                txtContenedorGlobal = e;
+
+                let texto = e.value;
+
+                if(texto === ''){
+                    // si se limpia el input, setear el atributo id
+                    $(e).attr('data-infopresupuesto', 0);
+                }
+
+                axios.post(url+'/proyecto/buscar/material', {
+                    'query' : texto
+                })
+                    .then((response) => {
+                        seguroBuscador = true;
+                        $(row).each(function (index, element) {
+                            $(this).find(".droplistaPresupuesto").fadeIn();
+                            $(this).find(".droplistaPresupuesto").html(response.data);
+                        });
+                    })
+                    .catch((error) => {
+                        seguroBuscador = true;
+                    });
+            }
+        }
+
+        // al hacer clic en material buscado
+        function modificarValorPresupuesto(edrop){
+
+            // obtener texto del li
+            let texto = $(edrop).text();
+            // setear el input de la descripcion
+            $(txtContenedorGlobal).val(texto);
+
+            // agregar el id al atributo del input descripcion
+            $(txtContenedorGlobal).attr('data-infopresupuesto', edrop.id);
+            //$(txtContenedorGlobal).data("info");
+        }
+
+        function preguntaGuardarPresupuesto(){
+            colorBlancoTablaPresupuesto();
+
+            Swal.fire({
+                title: 'Guardar Presupuesto',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    verificarPresupuesto();
+                }
+            })
+        }
+
+        function colorBlancoTablaPresupuesto(){
+            $("#matriz-presupuesto tbody tr").css('background', 'white');
+        }
+
+        // cambio de color de fila tabla a rojo
+        function colorRojoTablaPresupuesto(index){
+            $("#matriz-presupuesto tr:eq("+(index+1)+")").css('background', '#F1948A');
+        }
+
+        function verificarPresupuesto(){
+
+            var cantidadPartida = document.getElementById('cantidad-partida-nuevo').value; // decimal
+            var nombre = document.getElementById('nombre-partida-nuevo').value; // 300 caracteres
+
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+            if(cantidadPartida === ''){
+                toastr.error('Cantidad C/ Unidad es requerido');
+                return;
+            }
+
+            if(!cantidadPartida.match(reglaNumeroDecimal)) {
+                toastr.error('Cantidad Partida debe ser decimal y no negativo');
+                return;
+            }
+
+            if(cantidadPartida <= 0){
+                toastr.error('Cantidad partida no debe ser negativo');
+                return;
+            }
+
+            if(cantidadPartida.length > 10){
+                toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
+                return;
+            }
+
+            if(nombre === ''){
+                toastr.error('Partida es requerida');
+                return;
+            }
+
+            if(nombre.length > 300){
+                toastr.error('Partida debe tener máximo 300 caracteres');
+                return;
+            }
+
+            var hayRegistro = 0;
+            var nRegistro = $('#matriz-presupuesto > tbody >tr').length;
+            let formData = new FormData();
+            var id = {{ $id }}; // id proyecto
+
+            if (nRegistro > 0){
+
+                var cantidad = $("input[name='cantidadPresupuestoArray[]']").map(function(){return $(this).val();}).get();
+                var descripcion = $("input[name='descripcionPresupuestoArray[]']").map(function(){return $(this).val();}).get();
+                var descripcionAtributo = $("input[name='descripcionPresupuestoArray[]']").map(function(){return $(this).attr("data-infopresupuesto");}).get();
+
+                for(var a = 0; a < cantidad.length; a++){
+                    let detalle = descripcionAtributo[a];
+                    let datoCantidad = cantidad[a];
+
+                    // identifica si el 0 es tipo number o texto
+                    if(detalle == 0){
+                        colorRojoTablaPresupuesto(a);
+                        alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
+                        return;
+                    }
+
+                    if(datoCantidad === ''){
+                        colorRojoTablaPresupuesto(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
+                        return;
+                    }
+
+                    if(!datoCantidad.match(reglaNumeroDecimal)) {
+                        colorRojoTablaPresupuesto(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
+                        return;
+                    }
+
+                    if(datoCantidad <= 0){
+                        colorRojoTablaPresupuesto(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
+                        return;
+                    }
+
+                    if(datoCantidad.length > 10){
+                        colorRojoTablaPresupuesto(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
+                        return;
+                    }
+                }
+
+                for(var b = 0; b < descripcion.length; b++){
+
+                    var datoDescripcion = descripcion[b];
+
+                    if(datoDescripcion === ''){
+                        colorRojoTablaPresupuesto(b);
+                        toastr.error('Fila #' + (b+1) + ' la descripción es requerida');
+                        return;
+                    }
+
+                    if(datoDescripcion.length > 400){
+                        colorRojoTablaPresupuesto(b);
+                        toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
+                    }
+                }
+
+                // como tienen la misma cantidad de filas, podemos recorrer
+                // todas las filas de una vez
+                for(var p = 0; p < cantidad.length; p++){
+                    formData.append('cantidad[]', cantidad[p]);
+                    formData.append('datainfo[]', descripcionAtributo[p]);
+                }
+
+                hayRegistro = 1;
+            }
+
+            openLoading();
+            formData.append('hayregistro', hayRegistro);
+            formData.append('id', id);
+
+            axios.post(url+'/proyecto/agregar/presupuesto', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        $('#modalAgregarPresupuesto').modal('hide');
+                        toastr.success('Registrado correctamente');
+                        //recargarPresupuesto();
+                        //limpiarPresupuesto(response.data.contador);
+                    }
+                    else{
+                        toastr.error('error al crear presupuesto');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al crear presupuesto');
+                    closeLoading();
+                });
+        }
+
 
     </script>
 

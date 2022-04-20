@@ -15,6 +15,7 @@ use App\Models\FuenteFinanciamiento;
 use App\Models\FuenteRecursos;
 use App\Models\LineaTrabajo;
 use App\Models\Naturaleza;
+use App\Models\Partida;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
@@ -287,14 +288,22 @@ class ProyectoController extends Controller
     public function indexProyectoVista($id){
         $proyecto = Proyecto::where('id', $id)->first();
 
-        $conteo = Requisicion::where('id_proyecto', $id)->orderBy('fecha', 'ASC')->count();
+        $conteo = Requisicion::where('id_proyecto', $id)->count();
         if($conteo == null){
             $conteo = 1;
         }else{
             $conteo += 1;
         }
 
-        return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id', 'conteo'));
+        $conteoPartida = Partida::where('proyecto_id', $id)->count();
+        if($conteoPartida == null){
+            $conteoPartida = 1;
+        }else{
+            $conteoPartida += 1;
+        }
+
+        return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id',
+            'conteo', 'conteoPartida'));
     }
 
     public function tablaProyectoListaBitacora($id){
@@ -782,6 +791,50 @@ class ProyectoController extends Controller
         }
     }
 
+    // utilizado para un usuario tipo ingenieria
+    public function buscadorMaterialPresupuesto(Request $request){
+
+        if($request->get('query')){
+            $query = $request->get('query');
+            $data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
+
+            foreach ($data as $dd){
+                $info = UnidadMedida::where('id', $dd->id_unidadmedida)->first();
+                $dd->medida = $info->medida;
+            }
+
+            $output = '<ul class="dropdown-menu buscador" style="display:block; position:relative;">';
+            $tiene = true;
+            foreach($data as $row){
+
+                // si solo hay 1 fila, No mostrara el hr, salto de linea
+                if(count($data) == 1){
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValorPresupuesto(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->medida .'</a></li>
+                ';
+                    }
+                }
+
+                else{
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValorPresupuesto(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->medida .'</a></li>
+                   <hr>
+                ';
+                    }
+                }
+            }
+            $output .= '</ul>';
+            if($tiene){
+                $output = '';
+            }
+            echo $output;
+        }
+    }
+
     public function nuevaCotizacion(Request $request){
 
         $rules = array(
@@ -827,5 +880,21 @@ class ProyectoController extends Controller
             return ['success' => 2];
         }
     }
+
+    // *** INGENIERIA ***
+    public function tablaProyectoListaPresupuesto($id){
+
+        $partida = Partida::where('proyecto_id', $id)
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        return view('backend.admin.proyectos.tablalistapresupuesto', compact('partida'));
+    }
+
+    public function agregarPresupuesto(Request $request){
+
+        return ['success' => 1];
+    }
+
 
 }

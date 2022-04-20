@@ -25,7 +25,7 @@ class ControlController extends Controller
         }
 
         else  if($user->hasPermissionTo('vista.principal.sistema')){
-            $ruta = 'admin.vista.principal';
+            $ruta = 'admin.inicio.index';
         }
 
         else{

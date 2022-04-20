@@ -19,6 +19,7 @@ use App\Http\Controllers\Backend\Configuraciones\ProveedoresController;
 use App\Http\Controllers\Backend\Configuraciones\AdministradoresController;
 use App\Http\Controllers\Backend\Proyecto\CotizacionController;
 use App\Http\Controllers\Backend\Orden\OrdenController;
+use App\Http\Controllers\Backend\Inicio\InicioController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -66,6 +67,10 @@ Route::post('/admin/editar-perfil/actualizar', [PerfilController::class, 'editar
 // --- SIN PERMISOS VISTA 403 ---
 Route::get('sin-permisos', [ControlController::class,'indexSinPermiso'])->name('no.permisos.index');
 
+// --- VISTA INICIO ---
+Route::get('/admin/inicio/index', [InicioController::class,'index'])->name('admin.inicio.index');
+
+
 // --- PROYECTO ---
 Route::get('/admin/proyecto/nuevo/index', [ProyectoController::class,'index'])->name('admin.nuevo.proyecto.index');
 Route::post('/admin/proyecto/nuevo', [ProyectoController::class, 'nuevoProyecto']);
@@ -95,10 +100,21 @@ Route::post('/admin/proyecto/vista/requisicion/nuevo', [ProyectoController::clas
 Route::post('/admin/proyecto/vista/requisicion/informacion', [ProyectoController::class, 'informacionRequisicion']);
 Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::class, 'editarRequisicion']);
 
+
+//** INGENIERIA */
+// --- Presupuesto de Proyecto ---
+Route::get('/admin/proyecto/vista/presupuesto/{id}', [ProyectoController::class,'tablaProyectoListaPresupuesto']);
+Route::post('/admin/proyecto/agregar/presupuesto',  [ProyectoController::class,'agregarPresupuesto']);
+
+
 // --- VISTA GENERAR COTIZACION ---
 Route::get('/admin/proyecto/vista/cotizacion/{id}', [ProyectoController::class,'indexCotizacion']);
 Route::post('/admin/proyecto/lista/cotizaciones',  [ProyectoController::class,'obtenerListaCotizaciones']);
 Route::post('/admin/proyecto/buscar/material',  [ProyectoController::class,'buscadorMaterial']);
+
+// utilizado para un usuario tipo ingenieria
+Route::post('/admin/proyecto/buscar/material-presupuesto',  [ProyectoController::class,'buscadorMaterialPresupuesto']);
+
 Route::post('/admin/proyecto/cotizacion/nuevo',  [ProyectoController::class,'nuevaCotizacion']);
 
 // --- VISTA COTIZACIONES PENDIENTES ---

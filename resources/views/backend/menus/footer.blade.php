@@ -7,6 +7,7 @@
 </aside>
 
 <footer class="main-footer">
+    <p>Copyright &copy; 2022 <a href="#">Alcaldía Municipal de Metapán </a>.</p>
     <strong>Alcaldía de Metapán</strong>
 </footer>
 </div>
