@@ -18,8 +18,8 @@ class CreatePartidaTable extends Migration
 
             $table->bigInteger('proyecto_id')->unsigned();
 
-            $table->integer('item')->nullable();
-            $table->string('nombre', 300)->nullable();
+            $table->integer('tipo_partida');
+            $table->string('nombre', 300);
             $table->decimal('cantidadp', 10,2); // cantidad partida
 
             $table->integer('estado');

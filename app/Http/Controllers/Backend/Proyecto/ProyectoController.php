@@ -16,6 +16,7 @@ use App\Models\FuenteRecursos;
 use App\Models\LineaTrabajo;
 use App\Models\Naturaleza;
 use App\Models\Partida;
+use App\Models\PartidaDetalle;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
@@ -759,7 +760,7 @@ class ProyectoController extends Controller
                 $dd->medida = $info->medida;
             }
 
-            $output = '<ul class="dropdown-menu buscador" style="display:block; position:relative;">';
+            $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
             $tiene = true;
             foreach($data as $row){
 
@@ -803,7 +804,7 @@ class ProyectoController extends Controller
                 $dd->medida = $info->medida;
             }
 
-            $output = '<ul class="dropdown-menu buscador" style="display:block; position:relative;">';
+            $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
             $tiene = true;
             foreach($data as $row){
 
@@ -822,6 +823,50 @@ class ProyectoController extends Controller
                         $tiene = false;
                         $output .= '
                  <li onclick="modificarValorPresupuesto(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->medida .'</a></li>
+                   <hr>
+                ';
+                    }
+                }
+            }
+            $output .= '</ul>';
+            if($tiene){
+                $output = '';
+            }
+            echo $output;
+        }
+    }
+
+    // utilizado para un usuario tipo ingenieria al editar
+    public function buscadorMaterialPresupuestoEditar(Request $request){
+
+        if($request->get('query')){
+            $query = $request->get('query');
+            $data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
+
+            foreach ($data as $dd){
+                $info = UnidadMedida::where('id', $dd->id_unidadmedida)->first();
+                $dd->medida = $info->medida;
+            }
+
+            $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
+            $tiene = true;
+            foreach($data as $row){
+
+                // si solo hay 1 fila, No mostrara el hr, salto de linea
+                if(count($data) == 1){
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValorPresupuestoEditar(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->medida .'</a></li>
+                ';
+                    }
+                }
+
+                else{
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValorPresupuestoEditar(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->medida .'</a></li>
                    <hr>
                 ';
                     }
@@ -888,13 +933,170 @@ class ProyectoController extends Controller
             ->orderBy('id', 'ASC')
             ->get();
 
+        $conteo = 0;
+        foreach ($partida as $pp){
+           $conteo = $conteo + 1;
+           $pp->item = $conteo;
+        }
+
         return view('backend.admin.proyectos.tablalistapresupuesto', compact('partida'));
     }
 
     public function agregarPresupuesto(Request $request){
 
-        return ['success' => 1];
+        $rules = array(
+            'cantidadpartida' => 'required',
+            'nombrepartida' => 'required',
+            'tipopartida' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            $r = new Partida();
+            $r->proyecto_id = $request->id;
+            $r->item = $request->destino;
+            $r->nombre = $request->nombrepartida;
+            $r->cantidadp = $request->cantidadpartida;
+            $r->estado = 0;
+            $r->tipo_partida = $request->tipopartida;
+            $r->save();
+
+            $contador = $request->contador + 1;
+
+            if($request->hayregistro == 1){
+
+                if($request->cantidad != null) {
+                    for ($i = 0; $i < count($request->cantidad); $i++) {
+
+                        $rDetalle = new PartidaDetalle();
+                        $rDetalle->partida_id = $r->id;
+                        $rDetalle->material_id = $request->datainfo[$i];
+                        $rDetalle->cantidad = $request->cantidad[$i];
+                        $rDetalle->estado = 0;
+                        $rDetalle->save();
+                    }
+                }
+
+                DB::commit();
+                return ['success' => 1, 'contador' => $contador];
+            }else{
+                DB::commit();
+                return ['success' => 1, 'contador' => $contador];
+            }
+
+        }catch(\Throwable $e){
+            DB::rollback();
+            return ['success' => 2];
+        }
     }
+
+    function informacionPresupuesto(Request $request){
+        $rules = array(
+            'id' => 'required', // id fila presupuesto (partida)
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()){
+            return ['success' => 0];
+        }
+
+        if($info = Partida::where('id', $request->id)->first()){
+
+            $detalle = PartidaDetalle::where('partida_id', $request->id)
+                ->orderBy('id', 'ASC')
+                ->get();
+
+            foreach ($detalle as $dd){
+
+                $datos = CatalogoMateriales::where('id', $dd->material_id)->first();
+                $dd->descripcion = $datos->nombre;
+            }
+
+            return ['success' => 1, 'info' => $info, 'detalle' => $detalle];
+        }
+        return ['success' => 2];
+    }
+
+    public function editarPresupuesto(Request $request){
+
+        DB::beginTransaction();
+
+        try {
+
+            // actualizar registros requisicion
+            Partida::where('id', $request->idpartida)->update([
+                'cantidadp' => $request->cantidadpartida,
+                'nombre' => $request->nombrepartida,
+                'tipo_partida' => $request->tipopartida
+            ]);
+
+            if($request->hayregistro == 1){
+
+                // agregar id a pila
+                $pila = array();
+                for ($i = 0; $i < count($request->idarray); $i++) {
+                    // Los id que sean 0, seran nuevos registros
+                    if($request->idarray[$i] != 0) {
+                        array_push($pila, $request->idarray[$i]);
+                    }
+                }
+
+                // borrar todos los registros
+                // primero obtener solo la lista de requisicon obtenido de la fila
+                // y no quiero que borre los que si vamos a actualizar con los ID
+                PartidaDetalle::where('partida_id', $request->idpartida)
+                    ->whereNotIn('id', $pila)
+                    ->delete();
+
+                // actualizar registros
+                for ($i = 0; $i < count($request->cantidad); $i++) {
+                    if($request->idarray[$i] != 0){
+                        PartidaDetalle::where('id', $request->idarray[$i])->update([
+                            'cantidad' => $request->cantidad[$i],
+                        ]);
+                    }
+                }
+
+                // hoy registrar los nuevos registros
+                for ($i = 0; $i < count($request->cantidad); $i++) {
+                    if($request->idarray[$i] == 0){
+                        $rDetalle = new PartidaDetalle();
+                        $rDetalle->partida_id = $request->idpartida;
+                        $rDetalle->cantidad = $request->cantidad[$i];
+                        $rDetalle->material_id = $request->datainfo[$i];
+                        $rDetalle->estado = 0;
+                        $rDetalle->save();
+                    }
+                }
+
+                DB::commit();
+                return ['success' => 1];
+            }else{
+                // borrar registros detalle
+                // solo si viene vacio el array
+                if($request->cantidad == null){
+                    PartidaDetalle::where('partida_id', $request->idpartida)->delete();
+                }
+
+                DB::commit();
+                return ['success' => 1];
+            }
+        }catch(\Throwable $e){
+            Log::info('ee' . $e);
+            DB::rollback();
+            return ['success' => 2];
+        }
+    }
+
 
 
 }

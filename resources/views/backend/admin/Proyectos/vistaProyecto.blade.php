@@ -17,19 +17,7 @@
     .dropdown-menu {
         max-height: 280px;
         overflow-y: auto;
-        width: 65%;
-    }
-
-    .droplista{
-        width: 65%;
-    }
-
-    .droplistaeditar{
-        width: 65%;
-    }
-
-    .droplistaPresupuesto{
-        width: 65%;
+        width: 75%;
     }
 
 </style>
@@ -111,7 +99,7 @@
                     <div class="card-header">
                         <h3 class="card-title"><strong>Presupuesto de Proyecto</strong></h3>
                         <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
-                            Agregar Presupuesto
+                            Agregar Partida
                         </button>
                     </div>
 
@@ -126,7 +114,6 @@
                 </div>
             </div>
         </div>
-
 
 
         <!------------------ CONTROL DE BITACORAS ---------------->
@@ -411,7 +398,7 @@
 
 
 <!-- ****** INGENIERIA MODALES ******* !-->
-
+<!-- modal agregar nuevo presupuesto -->
 <div class="modal fade" id="modalAgregarPresupuesto" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -425,6 +412,23 @@
 
                 <form id="formulario-presupuesto-nuevo">
                     <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Partida:</label>
+                                    <select id="select-partida-nuevo" class="form-control">
+                                        <option value="1">Materiales</option>
+                                        <option value="2">Herramientas (2% de Materiales)</option>
+                                        <option value="3">Mano de obra (Por Administración)</option>
+                                        <option value="4">Aporte Mano de Obra</option>
+                                        <option value="5">Alquiler de Maquinaria</option>
+                                        <option value="6">Transporte de Concreto Fresco</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-2">
                                 <div class="form-group">
@@ -485,6 +489,98 @@
     </div>
 </div>
 
+<!-- modal editar presupuesto -->
+<div class="modal fade" id="modalEditarPresupuesto" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Editar Presupuesto de Proyecto</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <form id="formulario-presupuesto-editar">
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Tipo Partida:</label>
+                                    <select id="select-partida-editar" class="form-control">
+                                        <option value="1">Materiales</option>
+                                        <option value="2">Herramientas (2% de Materiales)</option>
+                                        <option value="3">Mano de obra (Por Administración)</option>
+                                        <option value="4">Aporte Mano de Obra</option>
+                                        <option value="5">Alquiler de Maquinaria</option>
+                                        <option value="6">Transporte de Concreto Fresco</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Item:</label>
+                                    <input  type="text" class="form-control" id="conteo-partida-editar" readonly>
+                                    <input  type="hidden" id="id-partida-editar">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Cantidad C/ Unidad *:</label>
+                                    <input class="form-control" id="cantidad-partida-editar">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Partida *:</label>
+                                    <input class="form-control" id="nombre-partida-editar" maxlength="300">
+                                </div>
+                            </div>
+
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <br>
+                                    <button type="button" onclick="addAgregarFilaPresupuestoEditar()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                        <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <table class="table" id="matriz-presupuesto-editar"  data-toggle="table">
+                                <thead>
+                                <tr>
+                                    <th style="width: 3%">#</th>
+                                    <th style="width: 5%">Cantidad</th>
+                                    <th style="width: 15%">Descripción</th>
+                                    <th style="width: 5%">Opciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="preguntaEditarPresupuestoEditar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 @extends('backend.menus.footerjs')
@@ -525,6 +621,7 @@
                 $(".droplista").hide();
                 $(".droplistaeditar").hide();
                 $(".droplistapresupuesto").hide();
+                $(".droplistapresupuestoEditar").hide();
             });
 
         });
@@ -1400,7 +1497,7 @@
                     $(e).attr('data-infopresupuesto', 0);
                 }
 
-                axios.post(url+'/proyecto/buscar/material', {
+                axios.post(url+'/proyecto/buscar/material-presupuesto', {
                     'query' : texto
                 })
                     .then((response) => {
@@ -1426,6 +1523,7 @@
 
             // agregar el id al atributo del input descripcion
             $(txtContenedorGlobal).attr('data-infopresupuesto', edrop.id);
+
             //$(txtContenedorGlobal).data("info");
         }
 
@@ -1461,6 +1559,8 @@
 
             var cantidadPartida = document.getElementById('cantidad-partida-nuevo').value; // decimal
             var nombre = document.getElementById('nombre-partida-nuevo').value; // 300 caracteres
+            var contador = document.getElementById('conteo-partida').value;
+            var tipopartida = document.getElementById('select-partida-nuevo').value;
 
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
@@ -1506,7 +1606,9 @@
                 var descripcionAtributo = $("input[name='descripcionPresupuestoArray[]']").map(function(){return $(this).attr("data-infopresupuesto");}).get();
 
                 for(var a = 0; a < cantidad.length; a++){
+
                     let detalle = descripcionAtributo[a];
+
                     let datoCantidad = cantidad[a];
 
                     // identifica si el 0 es tipo number o texto
@@ -1569,7 +1671,11 @@
 
             openLoading();
             formData.append('hayregistro', hayRegistro);
+            formData.append('cantidadpartida', cantidadPartida);
+            formData.append('nombrepartida', nombre);
+            formData.append('contador', contador);
             formData.append('id', id);
+            formData.append('tipopartida', tipopartida);
 
             axios.post(url+'/proyecto/agregar/presupuesto', formData, {
             })
@@ -1578,8 +1684,8 @@
                     if(response.data.success === 1){
                         $('#modalAgregarPresupuesto').modal('hide');
                         toastr.success('Registrado correctamente');
-                        //recargarPresupuesto();
-                        //limpiarPresupuesto(response.data.contador);
+                        recargarPresupuesto();
+                        limpiarPresupuesto(response.data.contador);
                     }
                     else{
                         toastr.error('error al crear presupuesto');
@@ -1589,6 +1695,345 @@
                     toastr.error('error al crear presupuesto');
                     closeLoading();
                 });
+        }
+
+        function recargarPresupuesto(){
+            var id = {{ $id }};
+            var rutaP = "{{ URL::to('/admin/proyecto/vista/presupuesto') }}/" + id;
+            $('#tablaDatatablePresupuesto').load(rutaP);
+        }
+
+        function limpiarPresupuesto(contador){
+            document.getElementById('conteo-partida').value = contador;
+            document.getElementById('cantidad-partida-nuevo').value = '';
+            document.getElementById('nombre-partida-nuevo').value = '';
+
+            $("#matriz-presupuesto tbody tr").remove();
+        }
+
+
+        function informacionPresupuesto(id, numero, tipo){
+            // tipo:  1- ver, 2-editar
+
+
+
+            openLoading();
+            document.getElementById("formulario-presupuesto-editar").reset();
+            $("#matriz-presupuesto-editar tbody tr").remove();
+
+            axios.post(url+'/proyecto/vista/presupuesto/informacion', {
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+
+                        $('#id-partida-editar').val(response.data.info.id);
+                        $('#cantidad-partida-editar').val(response.data.info.cantidadp);
+                        $('#nombre-partida-editar').val(response.data.info.nombre);
+
+                        $('#conteo-partida-editar').val(numero);
+
+                        document.getElementById("select-partida-editar").selectedIndex = response.data.info.tipo_partida;
+
+                        var infodetalle = response.data.detalle;
+                        for (var i = 0; i < infodetalle.length; i++) {
+
+                            var markup = "<tr id='"+infodetalle[i].id+"'>"+
+
+                                "<td>"+
+                                "<p id='fila"+(i+1)+"' class='form-control' style='max-width: 65px'>"+(i+1)+"</p>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input name='cantidadPresupuestoEditar[]' value='"+infodetalle[i].cantidad+"' maxlength='10' class='form-control' type='number'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input name='descripcionPresupuestoEditar[]' disabled class='form-control' data-infopresupuestoeditar='"+infodetalle[i].material_id+"' value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
+                                "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>"+
+                                "</td>"+
+
+                                "</tr>";
+
+                            $("#matriz-presupuesto-editar tbody").append(markup);
+                        }
+
+                        $('#modalEditarPresupuesto').css('overflow-y', 'auto');
+                        $('#modalEditarPresupuesto').modal({backdrop: 'static', keyboard: false})
+                    }
+                    else{
+                        toastr.error('error buscar información');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error buscar información');
+                    closeLoading();
+                });
+        }
+
+        function borrarFilaPresupuestoEditar(elemento){
+            var tabla = elemento.parentNode.parentNode;
+            tabla.parentNode.removeChild(tabla);
+            setearFilaPresupuestoEditar();
+        }
+
+        // cambiar # de fila cada vez que se borra la fila de
+        // tabla nuevo material
+        function setearFilaPresupuestoEditar(){
+
+            var table = document.getElementById('matriz-presupuesto-editar');
+            var conteo = 0;
+            for (var r = 1, n = table.rows.length; r < n; r++) {
+                conteo +=1;
+                var element = table.rows[r].cells[0].children[0];
+                document.getElementById(element.id).innerHTML = ""+conteo;
+            }
+        }
+
+        function addAgregarFilaPresupuestoEditar(){
+
+            var nFilas = $('#matriz-presupuesto-editar >tbody >tr').length;
+            nFilas += 1;
+
+            var markup = "<tr>"+
+
+                "<td>"+
+                "<p id='fila"+(nFilas)+"' class='form-control' style='max-width: 65px'>"+(nFilas)+"</p>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='cantidadPresupuestoEditar[]' maxlength='10' class='form-control' type='number'>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='descripcionPresupuestoEditar[]' data-infopresupuestoeditar='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuestoEditar(this)' maxlength='400'  type='text'>"+
+                "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
+                "</td>"+
+
+                "<td>"+
+                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>"+
+                "</td>"+
+
+                "</tr>";
+
+            $("#matriz-presupuesto-editar tbody").append(markup);
+        }
+
+        function buscarMaterialPresupuestoEditar(e){
+
+            // seguro para evitar errores de busqueda continua
+            if(seguroBuscador){
+                seguroBuscador = false;
+
+                var row = $(e).closest('tr');
+                txtContenedorGlobal = e;
+
+                let texto = e.value;
+
+                if(texto === ''){
+                    // si se limpia el input, setear el atributo id
+                    $(e).attr('data-infopresupuestoeditar', 0);
+                }
+
+                axios.post(url+'/proyecto/buscar/material-presupuesto-editar', {
+                    'query' : texto
+                })
+                    .then((response) => {
+                        seguroBuscador = true;
+                        $(row).each(function (index, element) {
+                            $(this).find(".droplistaPresupuestoEditar").fadeIn();
+                            $(this).find(".droplistaPresupuestoEditar").html(response.data);
+                        });
+                    })
+                    .catch((error) => {
+                        seguroBuscador = true;
+                    });
+            }
+        }
+
+        function modificarValorPresupuestoEditar(edrop){
+
+            // obtener texto del li
+            let texto = $(edrop).text();
+            // setear el input de la descripcion
+            $(txtContenedorGlobal).val(texto);
+
+            // agregar el id al atributo del input descripcion
+            $(txtContenedorGlobal).attr('data-infopresupuestoeditar', edrop.id);
+            //$(txtContenedorGlobal).data("info");
+        }
+
+        function preguntaEditarPresupuestoEditar(){
+            colorBlancoTablaPresupuestoEditar();
+
+            Swal.fire({
+                title: 'Editar Presupuesto',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    verificarPresupuestoEditado();
+                }
+            })
+        }
+
+        function verificarPresupuestoEditado(){
+
+            var tipopartida = document.getElementById('select-partida-editar').value;
+            var idpartida = document.getElementById('id-partida-editar').value;
+            var cantidadPartida = document.getElementById('cantidad-partida-editar').value; // decimal
+            var nombre = document.getElementById('nombre-partida-editar').value; // 300 caracteres
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+            if(cantidadPartida === ''){
+                toastr.error('Cantidad C/ Unidad es requerido');
+                return;
+            }
+
+            if(!cantidadPartida.match(reglaNumeroDecimal)) {
+                toastr.error('Cantidad Partida debe ser decimal y no negativo');
+                return;
+            }
+
+            if(cantidadPartida <= 0){
+                toastr.error('Cantidad partida no debe ser negativo');
+                return;
+            }
+
+            if(cantidadPartida.length > 10){
+                toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
+                return;
+            }
+
+            if(nombre === ''){
+                toastr.error('Partida es requerida');
+                return;
+            }
+
+            if(nombre.length > 300){
+                toastr.error('Partida debe tener máximo 300 caracteres');
+                return;
+            }
+
+            var hayRegistro = 0;
+            var nRegistro = $('#matriz-presupuesto-editar >tbody >tr').length;
+            let formData = new FormData();
+
+            if (nRegistro > 0){
+
+                var cantidad = $("input[name='cantidadPresupuestoEditar[]']").map(function(){return $(this).val();}).get();
+                var descripcion = $("input[name='descripcionPresupuestoEditar[]']").map(function(){return $(this).val();}).get();
+                var descripcionAtributo = $("input[name='descripcionPresupuestoEditar[]']").map(function(){return $(this).attr("data-infopresupuestoeditar");}).get();
+
+                for(var a = 0; a < cantidad.length; a++){
+                    let detalle = descripcionAtributo[a];
+                    let datoCantidad = cantidad[a];
+
+                    // identifica si el 0 es tipo number o texto
+                    if(detalle == 0){
+                        colorRojoTablaPresupuestoEditar(a);
+                        alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
+                        return;
+                    }
+
+                    if(datoCantidad === ''){
+                        colorRojoTablaPresupuestoEditar(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
+                        return;
+                    }
+
+                    if(!datoCantidad.match(reglaNumeroDecimal)) {
+                        colorRojoTablaPresupuestoEditar(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
+                        return;
+                    }
+
+                    if(datoCantidad <= 0){
+                        colorRojoTablaPresupuestoEditar(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
+                        return;
+                    }
+
+                    if(datoCantidad.length > 10){
+                        colorRojoTablaPresupuestoEditar(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
+                        return;
+                    }
+                }
+
+                for(var b = 0; b < descripcion.length; b++){
+
+                    var datoDescripcion = descripcion[b];
+
+                    if(datoDescripcion === ''){
+                        colorRojoTablaPresupuestoEditar(b);
+                        toastr.error('Fila #' + (b+1) + ' la descripción es requerida');
+                        return;
+                    }
+
+                    if(datoDescripcion.length > 400){
+                        colorRojoTablaPresupuestoEditar(b);
+                        toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
+                    }
+                }
+
+                // como tienen la misma cantidad de filas, podemos recorrer
+                // todas las filas de una vez
+                for(var p = 0; p < cantidad.length; p++){
+                    // obtener el id de la fila, si el id fila es 0, significa que sera nuevo registro
+                    var id = $("#matriz-presupuesto-editar tr:eq("+(p+1)+")").attr('id');
+                    formData.append('idarray[]', id);
+                    formData.append('datainfo[]', descripcionAtributo[p]);
+                    formData.append('cantidad[]', cantidad[p]);
+                }
+
+                hayRegistro = 1;
+            }
+
+            openLoading();
+            formData.append('hayregistro', hayRegistro);
+            formData.append('cantidadpartida', cantidadPartida);
+            formData.append('nombrepartida', nombre);
+            formData.append('idpartida', idpartida);
+            formData.append('tipopartida', tipopartida);
+
+            axios.post(url+'/proyecto/vista/presupuesto/editar', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado correctamente');
+                        recargarPresupuesto();
+                        $('#modalEditarPresupuesto').modal('hide');
+                    }
+                    else{
+                        toastr.error('error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al actualizar');
+                    closeLoading();
+                });
+
+        }
+
+        function colorBlancoTablaPresupuestoEditar(){
+            $("#matriz-presupuesto-editar tbody tr").css('background', 'white');
+        }
+
+        // cambio de color de fila tabla a rojo
+        function colorRojoTablaPresupuestoEditar(index){
+            $("#matriz-presupuesto-editar tr:eq("+(index+1)+")").css('background', '#F1948A');
         }
 
 

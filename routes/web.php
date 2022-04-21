@@ -105,6 +105,8 @@ Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::cla
 // --- Presupuesto de Proyecto ---
 Route::get('/admin/proyecto/vista/presupuesto/{id}', [ProyectoController::class,'tablaProyectoListaPresupuesto']);
 Route::post('/admin/proyecto/agregar/presupuesto',  [ProyectoController::class,'agregarPresupuesto']);
+Route::post('/admin/proyecto/vista/presupuesto/informacion', [ProyectoController::class, 'informacionPresupuesto']);
+Route::post('/admin/proyecto/vista/presupuesto/editar', [ProyectoController::class, 'editarPresupuesto']);
 
 
 // --- VISTA GENERAR COTIZACION ---
@@ -114,6 +116,7 @@ Route::post('/admin/proyecto/buscar/material',  [ProyectoController::class,'busc
 
 // utilizado para un usuario tipo ingenieria
 Route::post('/admin/proyecto/buscar/material-presupuesto',  [ProyectoController::class,'buscadorMaterialPresupuesto']);
+Route::post('/admin/proyecto/buscar/material-presupuesto-editar',  [ProyectoController::class,'buscadorMaterialPresupuestoEditar']);
 
 Route::post('/admin/proyecto/cotizacion/nuevo',  [ProyectoController::class,'nuevaCotizacion']);
 

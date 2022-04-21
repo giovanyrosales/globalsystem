@@ -20,11 +20,11 @@
                                     <td>{{ $dato->nombre }}</td>
 
                                     <td>
-                                        <button type="button" class="btn btn-warning btn-xs" onclick="vista({{ $dato->id }})">
+                                        <button type="button" class="btn btn-warning btn-xs" onclick="informacionPresupuesto('{{ $dato->id }}', '{{ $dato->item }}', '1')">
                                             <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
                                         </button>
 
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto('{{ $dato->id }}', '{{ $dato->item }}', '2')">
                                             <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar
                                         </button>
                                     </td>
