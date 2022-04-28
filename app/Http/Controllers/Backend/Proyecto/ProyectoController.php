@@ -22,6 +22,7 @@ use App\Models\Proyecto;
 use App\Models\Requisicion;
 use App\Models\RequisicionDetalle;
 use App\Models\UnidadMedida;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -1097,6 +1098,81 @@ class ProyectoController extends Controller
         }
     }
 
+    public function generarPrespuestoPdf($id){
+
+        // obtener todas los presupuesto por tipo_partida
+        // 1- Materiales
+        // 2- Herramientas (2% de Materiales)
+        // 3- Mano de obra (Por Administración)
+        // 4- Aporte Mano de Obra
+        // 5- Alquiler de Maquinaria
+        // 6- Transporte de Concreto Fresco
+
+        $partida1 = Partida::where('proyecto_id', $id)
+        ->where('tipo_partida', 1)
+        ->orderBy('id', 'ASC')
+        ->get();
+
+        $infoPro = Proyecto::where('id', $id)->first();
+        $nombrepro = $infoPro->nombre;
+        if($infoFuenteR = FuenteRecursos::where('id', $infoPro->id_fuenter)->first()){
+            $fuenter = $infoFuenteR->nombre;
+        }else{
+            $fuenter = "";
+        }
+
+        $resultsBloque = array();
+        $index = 0;
+
+        // Fechas
+        $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+        $fecha = Carbon::parse(Carbon::now());
+        $anio = Carbon::now()->format('Y');
+        $mes = $meses[($fecha->format('n')) - 1] . " del " . $anio;
+
+        $item = 0;
+
+        foreach ($partida1 as $secciones){
+            array_push($resultsBloque, $secciones);
+            $item = $item + 1;
+            $secciones->item = $item;
+
+            $secciones->cantidadp = number_format((float)$secciones->cantidadp, 2, '.', ',');
+
+            $detalle1 = PartidaDetalle::where('partida_id', $secciones->id)->get();
+
+            $total = 0;
+
+            foreach ($detalle1 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
+
+                $lista->medida = $infomedida->medida;
+                $lista->material = $infomaterial->nombre;
+
+                $multi = $lista->cantidad * $infomaterial->pu;
+
+                $lista->cantidad = number_format((float)$lista->cantidad, 2, '.', ',');
+                $lista->pu = "$" . number_format((float)$infomaterial->pu, 2, '.', ',');
+                $lista->subtotal = "$" . number_format((float)$multi, 2, '.', ',');
+
+                $total = $total + $multi;
+            }
+
+            $secciones->total = "$" . number_format((float)$total, 2, '.', ',');
+
+
+            $resultsBloque[$index]->bloque1 = $detalle1;
+            $index++;
+        }
+
+       // return [$partida1];
+
+        $pdf = PDF::loadView('backend.admin.proyectos.pdfpresupuesto', compact('partida1', 'mes', 'fuenter', 'nombrepro'));
+        $pdf->setPaper('letter', 'portrait')->setWarnings(false);
+        return $pdf->stream('presupuesto.pdf');
+    }
 
 
 }

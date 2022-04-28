@@ -107,6 +107,11 @@ Route::get('/admin/proyecto/vista/presupuesto/{id}', [ProyectoController::class,
 Route::post('/admin/proyecto/agregar/presupuesto',  [ProyectoController::class,'agregarPresupuesto']);
 Route::post('/admin/proyecto/vista/presupuesto/informacion', [ProyectoController::class, 'informacionPresupuesto']);
 Route::post('/admin/proyecto/vista/presupuesto/editar', [ProyectoController::class, 'editarPresupuesto']);
+Route::get('/admin/generar/pdf/presupuesto/{id}', [ProyectoController::class,'generarPrespuestoPdf']);
+
+
+
+
 
 
 // --- VISTA GENERAR COTIZACION ---

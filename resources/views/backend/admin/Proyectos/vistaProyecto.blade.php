@@ -29,6 +29,10 @@
             <div class="col-sm-6" style="margin-right: 10px;">
                 <h1>Control Individual de Proyecto</h1>
             </div>
+            <button type="button" onclick="modalGenerarPresupuesto()" class="btn btn-success btn-sm">
+                <i class="fas fa-file-pdf"></i>
+                Generar Presupuesto
+            </button>
         </div>
     </section>
 
@@ -1734,7 +1738,7 @@
 
                         $('#conteo-partida-editar').val(numero);
 
-                        document.getElementById("select-partida-editar").selectedIndex = response.data.info.tipo_partida;
+                        document.getElementById("select-partida-editar").value = response.data.info.tipo_partida;
 
                         var infodetalle = response.data.detalle;
                         for (var i = 0; i < infodetalle.length; i++) {
@@ -2034,6 +2038,29 @@
         // cambio de color de fila tabla a rojo
         function colorRojoTablaPresupuestoEditar(index){
             $("#matriz-presupuesto-editar tr:eq("+(index+1)+")").css('background', '#F1948A');
+        }
+
+        function modalGenerarPresupuesto(){
+
+            Swal.fire({
+                title: 'Generar Presupuesto',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                   generarPresupuesto();
+                }
+            })
+        }
+
+        function generarPresupuesto(){
+            let id = {{ $id }};  // id proyecto
+            window.open("{{ URL::to('admin/generar/pdf/presupuesto') }}/"+id);
         }
 
 
