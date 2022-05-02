@@ -963,7 +963,6 @@ class ProyectoController extends Controller
 
             $r = new Partida();
             $r->proyecto_id = $request->id;
-            $r->item = $request->destino;
             $r->nombre = $request->nombrepartida;
             $r->cantidadp = $request->cantidadpartida;
             $r->estado = 0;
@@ -994,6 +993,7 @@ class ProyectoController extends Controller
             }
 
         }catch(\Throwable $e){
+            Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 2];
         }
@@ -1123,6 +1123,8 @@ class ProyectoController extends Controller
 
         $resultsBloque = array();
         $index = 0;
+        $resultsBloque3 = array();
+        $index3 = 0;
 
         // Fechas
         $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
@@ -1162,14 +1164,66 @@ class ProyectoController extends Controller
 
             $secciones->total = "$" . number_format((float)$total, 2, '.', ',');
 
-
             $resultsBloque[$index]->bloque1 = $detalle1;
             $index++;
         }
 
-       // return [$partida1];
+        $manoobra = Partida::where('proyecto_id', $id)
+            ->where('tipo_partida', 3)
+            ->orderBy('id', 'ASC')
+            ->get();
 
-        $pdf = PDF::loadView('backend.admin.proyectos.pdfpresupuesto', compact('partida1', 'mes', 'fuenter', 'nombrepro'));
+        $totalManoObra = 0;
+
+        foreach ($manoobra as $secciones3){
+            array_push($resultsBloque3, $secciones3);
+            $item = $item + 1;
+            $secciones3->item = $item;
+
+            $secciones3->cantidadp = number_format((float)$secciones3->cantidadp, 2, '.', ',');
+
+            $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+            $total3 = 0;
+
+            foreach ($detalle3 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
+
+                $lista->medida = $infomedida->medida;
+                $lista->material = $infomaterial->nombre;
+
+                $multi = $lista->cantidad * $infomaterial->pu;
+
+                $lista->cantidad = number_format((float)$lista->cantidad, 2, '.', ',');
+                $lista->pu = "$" . number_format((float)$infomaterial->pu, 2, '.', ',');
+                $lista->subtotal = "$" . number_format((float)$multi, 2, '.', ',');
+
+                $totalManoObra = $totalManoObra + $multi;
+                $total3 = $total3 + $multi;
+            }
+
+            $secciones3->total = "$" . number_format((float)$total3, 2, '.', ',');
+
+            $resultsBloque3[$index3]->bloque3 = $detalle3;
+            $index3++;
+        }
+
+        $afp =  $totalManoObra * 0.0675;
+        $isss = $totalManoObra * 0.075;
+        $insaforp = $totalManoObra * 0.1;
+
+        $totalDescuento = $totalManoObra - ($afp + $isss + $insaforp);
+
+        $afp = "$" . number_format((float)$afp, 2, '.', ',');
+        $isss = "$" . number_format((float)$isss, 2, '.', ',');
+        $insaforp = "$" . number_format((float)$insaforp, 2, '.', ',');
+
+        $totalDescuento = "$" . number_format((float)$totalDescuento, 2, '.', ',');
+
+        $pdf = PDF::loadView('backend.admin.proyectos.pdfpresupuesto', compact('partida1',
+            'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento'));
         $pdf->setPaper('letter', 'portrait')->setWarnings(false);
         return $pdf->stream('presupuesto.pdf');
     }

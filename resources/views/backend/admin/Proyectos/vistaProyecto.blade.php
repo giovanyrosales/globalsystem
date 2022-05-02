@@ -443,7 +443,7 @@
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Cantidad C/ Unidad *:</label>
+                                    <label>Cantidad C/ Unidad:</label>
                                     <input class="form-control" id="cantidad-partida-nuevo">
                                 </div>
                             </div>
@@ -535,7 +535,7 @@
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Cantidad C/ Unidad *:</label>
+                                    <label>Cantidad C/ Unidad:</label>
                                     <input class="form-control" id="cantidad-partida-editar">
                                 </div>
                             </div>
@@ -1568,25 +1568,26 @@
 
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
-            if(cantidadPartida === ''){
-                toastr.error('Cantidad C/ Unidad es requerido');
-                return;
+            if(cantidadPartida !== null){
+                if(!cantidadPartida.match(reglaNumeroDecimal)) {
+                    toastr.error('Cantidad Partida debe ser decimal y no negativo');
+                    return;
+                }
+
+                if(cantidadPartida < 0){
+                    toastr.error('Cantidad partida no debe ser negativo');
+                    return;
+                }
+
+                if(cantidadPartida.length > 10){
+                    toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
+                    return;
+                }
+            }
+            else{
+                cantidadPartida = 0;
             }
 
-            if(!cantidadPartida.match(reglaNumeroDecimal)) {
-                toastr.error('Cantidad Partida debe ser decimal y no negativo');
-                return;
-            }
-
-            if(cantidadPartida <= 0){
-                toastr.error('Cantidad partida no debe ser negativo');
-                return;
-            }
-
-            if(cantidadPartida.length > 10){
-                toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
-                return;
-            }
 
             if(nombre === ''){
                 toastr.error('Partida es requerida');
@@ -1899,24 +1900,23 @@
             var nombre = document.getElementById('nombre-partida-editar').value; // 300 caracteres
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
-            if(cantidadPartida === ''){
-                toastr.error('Cantidad C/ Unidad es requerido');
-                return;
-            }
+            if(cantidadPartida !== null){
+                if(!cantidadPartida.match(reglaNumeroDecimal)) {
+                    toastr.error('Cantidad Partida debe ser decimal y no negativo');
+                    return;
+                }
 
-            if(!cantidadPartida.match(reglaNumeroDecimal)) {
-                toastr.error('Cantidad Partida debe ser decimal y no negativo');
-                return;
-            }
+                if(cantidadPartida < 0){
+                    toastr.error('Cantidad partida no debe ser negativo');
+                    return;
+                }
 
-            if(cantidadPartida <= 0){
-                toastr.error('Cantidad partida no debe ser negativo');
-                return;
-            }
-
-            if(cantidadPartida.length > 10){
-                toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
-                return;
+                if(cantidadPartida.length > 10){
+                    toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
+                    return;
+                }
+            }else{
+                cantidadPartida = 0;
             }
 
             if(nombre === ''){
@@ -2059,6 +2059,13 @@
         }
 
         function generarPresupuesto(){
+
+            // verificar primero si se ha creado la partida de mano de obra
+
+
+
+
+
             let id = {{ $id }};  // id proyecto
             window.open("{{ URL::to('admin/generar/pdf/presupuesto') }}/"+id);
         }
