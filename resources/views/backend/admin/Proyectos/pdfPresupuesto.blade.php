@@ -143,7 +143,6 @@
 
 </table>
 
-<div style="page-break-after:always;"></div>
 
 
 <table id="tabla" style="width: 95%">
@@ -261,6 +260,93 @@
 
 </table>
 
+<div style="page-break-after:always;"></div>
+<div id="header">
+    <div class="content">
+        <img id="logo" src="{{ asset('images/logo2.png') }}">
+        <p id="titulo">ALCALDÍA MUNICIPAL DE METAPÁN <br>
+            Fondo: {{ $fuenter }} <br>
+            Hoja de presupuesto <br>
+            Fecha: {{ $mes }} <br>
+    </div>
+</div>
+
+<br>
+
+<table id="tabla" style="width: 75%; margin: 0 auto">
+
+    <tbody>
+
+    <tr>
+        <td colspan="2">RESUMEN DE PARTIDA</td>
+    </tr>
+
+    <tr>
+        <td width="20%">MATERIALES</td>
+        <td width="12%">{{ $sumaMateriales }}</td>
+    </tr>
+
+    <tr>
+        <td width="20%">HERRAMIENTA (2% DE MAT.)</td>
+        <td width="12%">{{ $herramienta2Porciento }}</td>
+    </tr>
+
+    <tr>
+        <td width="20%">MANO DE OBRA (POR ADMINISTRACIÓN)</td>
+        <td width="12%">{{ $totalManoObra }}</td>
+    </tr>
+
+    <tr>
+        <td width="20%">APORTE MANO DE OBRA</td>
+        <td width="12%">{{ $totalAporteManoObra }}</td>
+    </tr>
+
+    <tr>
+        <td width="20%">ALQUILER DE MAQUINARIA</td>
+        <td width="12%">{{ $totalAlquilerMaquinaria }}</td>
+    </tr>
+
+    <tr>
+        <td width="20%">TRANSPORTE DE CONCRETO FRESCO</td>
+        <td width="12%">{{ $totalTransportePesado }}</td>
+    </tr>
+
+
+    <tr>
+        <td width="20%" style="font-weight: bold">SUB TOTAL</td>
+        <td width="12%" style="font-weight: bold">{{ $subtotalPartida }}</td>
+    </tr>
+
+    <tr>
+        <td width="20%" style="font-weight: bold">IMPREVISTOS (5% de sub total)</td>
+        <td width="12%" style="font-weight: bold">{{ $imprevisto }}</td>
+    </tr>
+
+    <tr>
+        <td width="20%" style="font-weight: bold">TOTAL</td>
+        <td width="12%" style="font-weight: bold">{{ $totalPartidaFinal }}</td>
+    </tr>
+
+
+    </tbody>
+
+</table>
+
+<script type="text/php">
+       if (isset($pdf)) {
+        $x = 270;
+        $y = 750;
+        $text = "Página {PAGE_NUM}/{PAGE_COUNT}";
+        $font = null;
+        $size = 9;
+        $color = array(0,0,0);
+        $word_space = 0.0;  //  default
+        $char_space = 0.0;  //  default
+        $angle = 0.0;   //  default
+        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+    }
+</script>
 
 </body>
 </html>
+

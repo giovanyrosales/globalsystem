@@ -1568,7 +1568,11 @@
 
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
-            if(cantidadPartida !== null){
+            if(cantidadPartida === ''){
+                cantidadPartida = 0;
+            }
+            else{
+
                 if(!cantidadPartida.match(reglaNumeroDecimal)) {
                     toastr.error('Cantidad Partida debe ser decimal y no negativo');
                     return;
@@ -1583,9 +1587,6 @@
                     toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
                     return;
                 }
-            }
-            else{
-                cantidadPartida = 0;
             }
 
 
@@ -1900,7 +1901,9 @@
             var nombre = document.getElementById('nombre-partida-editar').value; // 300 caracteres
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
-            if(cantidadPartida !== null){
+            if(cantidadPartida === ''){
+                cantidadPartida = 0;
+            }else{
                 if(!cantidadPartida.match(reglaNumeroDecimal)) {
                     toastr.error('Cantidad Partida debe ser decimal y no negativo');
                     return;
@@ -1915,8 +1918,6 @@
                     toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
                     return;
                 }
-            }else{
-                cantidadPartida = 0;
             }
 
             if(nombre === ''){
@@ -2061,13 +2062,43 @@
         function generarPresupuesto(){
 
             // verificar primero si se ha creado la partida de mano de obra
+            openLoading();
+
+            var idproyecto = {{ $id }};
+
+            axios.post(url+'/proyecto/partida/manoobra/existe', {
+                'id' : idproyecto
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        window.open("{{ URL::to('admin/generar/pdf/presupuesto') }}/"+idproyecto);
+                    }
+                    else if(response.data.success === 2){
+                        Swal.fire({
+                            title: 'Partida Requerida',
+                            text: "Se debe crear la Partida para Mano de Obra (por Administración)",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else{
+                        toastr.error('error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al buscar');
+                    closeLoading();
+                });
 
 
-
-
-
-            let id = {{ $id }};  // id proyecto
-            window.open("{{ URL::to('admin/generar/pdf/presupuesto') }}/"+id);
         }
 
 

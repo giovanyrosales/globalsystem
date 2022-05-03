@@ -1098,6 +1098,15 @@ class ProyectoController extends Controller
         }
     }
 
+    // para crear pdf se debe verificar que exista esta partida
+    public function verificarPartidaManoObra(Request $request){
+
+        if(Partida::where('proyecto_id', $request->id)->where('tipo_partida', 3)->first()){
+            return ['success' => 1];
+        }
+        return ['success' => 2];
+    }
+
     public function generarPrespuestoPdf($id){
 
         // obtener todas los presupuesto por tipo_partida
@@ -1109,7 +1118,7 @@ class ProyectoController extends Controller
         // 6- Transporte de Concreto Fresco
 
         $partida1 = Partida::where('proyecto_id', $id)
-        ->where('tipo_partida', 1)
+        ->whereIn('tipo_partida', [1, 2])
         ->orderBy('id', 'ASC')
         ->get();
 
@@ -1133,6 +1142,7 @@ class ProyectoController extends Controller
         $mes = $meses[($fecha->format('n')) - 1] . " del " . $anio;
 
         $item = 0;
+        $sumaMateriales = 0;
 
         foreach ($partida1 as $secciones){
             array_push($resultsBloque, $secciones);
@@ -1160,6 +1170,7 @@ class ProyectoController extends Controller
                 $lista->subtotal = "$" . number_format((float)$multi, 2, '.', ',');
 
                 $total = $total + $multi;
+                $sumaMateriales = $sumaMateriales + $multi;
             }
 
             $secciones->total = "$" . number_format((float)$total, 2, '.', ',');
@@ -1210,6 +1221,83 @@ class ProyectoController extends Controller
             $index3++;
         }
 
+
+        // APORTE DE MANO DE OBRA
+
+        $aporteManoObra = Partida::where('proyecto_id', $id)
+            ->where('tipo_partida', 4)
+            ->get();
+
+        $totalAporteManoObra = 0;
+
+        foreach ($aporteManoObra as $secciones3){
+
+            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+            foreach ($detalle4 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                $lista->material = $infomaterial->nombre;
+                $multi = $lista->cantidad * $infomaterial->pu;
+
+                $totalAporteManoObra = $totalAporteManoObra + $multi;
+            }
+        }
+
+        // ALQUILER DE MAQUINARIA
+
+        $alquilerMaquinaria = Partida::where('proyecto_id', $id)
+            ->where('tipo_partida', 5)
+            ->get();
+
+        $totalAlquilerMaquinaria = 0;
+
+        foreach ($alquilerMaquinaria as $secciones3){
+
+            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+            foreach ($detalle4 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                $lista->material = $infomaterial->nombre;
+                $multi = $lista->cantidad * $infomaterial->pu;
+
+                $totalAlquilerMaquinaria = $totalAporteManoObra + $multi;
+            }
+        }
+
+
+        // TRANSPORTE CONCRETO FRESCO
+
+        $trasportePesado = Partida::where('proyecto_id', $id)
+            ->where('tipo_partida', 6)
+            ->get();
+
+        $totalTransportePesado = 0;
+
+        foreach ($trasportePesado as $secciones3){
+
+            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+            foreach ($detalle4 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                $lista->material = $infomaterial->nombre;
+                $multi = $lista->cantidad * $infomaterial->pu;
+
+                $totalTransportePesado = $totalAporteManoObra + $multi;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
         $afp =  $totalManoObra * 0.0675;
         $isss = $totalManoObra * 0.075;
         $insaforp = $totalManoObra * 0.1;
@@ -1222,10 +1310,40 @@ class ProyectoController extends Controller
 
         $totalDescuento = "$" . number_format((float)$totalDescuento, 2, '.', ',');
 
+        $herramienta2Porciento = $sumaMateriales * 0.02;
+
+        // subtotal del presupuesto partida
+        $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalAporteManoObra
+                            + $totalAlquilerMaquinaria + $totalTransportePesado);
+
+        // imprevisto del 5%
+        $imprevisto = $subtotalPartida * 0.05;
+
+        // total de la partida final
+        $totalPartidaFinal = $subtotalPartida + $imprevisto;
+
+        $sumaMateriales = "$" . number_format((float)$sumaMateriales, 2, '.', ',');
+        $herramienta2Porciento = "$" . number_format((float)$herramienta2Porciento, 2, '.', ',');
+        $totalManoObra = "$" . number_format((float)$totalManoObra, 2, '.', ',');
+
+        $totalAporteManoObra = "$" . number_format((float)$totalAporteManoObra, 2, '.', ',');
+        $totalAlquilerMaquinaria = "$" . number_format((float)$totalAlquilerMaquinaria, 2, '.', ',');
+        $totalTransportePesado = "$" . number_format((float)$totalTransportePesado, 2, '.', ',');
+        $subtotalPartida = "$" . number_format((float)$subtotalPartida, 2, '.', ',');
+        $imprevisto = "$" . number_format((float)$imprevisto, 2, '.', ',');
+        $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
+
+
+
         $pdf = PDF::loadView('backend.admin.proyectos.pdfpresupuesto', compact('partida1',
-            'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento'));
+            'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento',
+        'sumaMateriales', 'herramienta2Porciento', 'totalManoObra', 'totalAporteManoObra', 'totalAlquilerMaquinaria',
+        'totalTransportePesado', 'subtotalPartida', 'imprevisto', 'totalPartidaFinal'));
         $pdf->setPaper('letter', 'portrait')->setWarnings(false);
-        return $pdf->stream('presupuesto.pdf');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+
+
+        return $pdf->stream();
     }
 
 

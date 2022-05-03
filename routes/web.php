@@ -108,6 +108,8 @@ Route::post('/admin/proyecto/agregar/presupuesto',  [ProyectoController::class,'
 Route::post('/admin/proyecto/vista/presupuesto/informacion', [ProyectoController::class, 'informacionPresupuesto']);
 Route::post('/admin/proyecto/vista/presupuesto/editar', [ProyectoController::class, 'editarPresupuesto']);
 Route::get('/admin/generar/pdf/presupuesto/{id}', [ProyectoController::class,'generarPrespuestoPdf']);
+// verifica si partida mano de obra existe
+Route::post('/admin/proyecto/partida/manoobra/existe', [ProyectoController::class, 'verificarPartidaManoObra']);
 
 
 
