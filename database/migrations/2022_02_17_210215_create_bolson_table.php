@@ -19,11 +19,11 @@ class CreateBolsonTable extends Migration
             $table->bigInteger('id_cuenta')->unsigned();
 
             $table->string('nombre', 300);
-            $table->string('numero', 300);
+            $table->string('numero', 100)->nullable();
             $table->date('fecha');
             $table->decimal('montoini', 12, 2);
-            $table->decimal('saldo', 12, 2);
-            $table->string('estado');
+            $table->decimal('saldo', 12, 2)->nullable();
+            $table->string('estado')->nullable();
 
             $table->foreign('id_cuenta')->references('id')->on('cuenta');
         });

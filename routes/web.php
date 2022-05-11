@@ -20,6 +20,8 @@ use App\Http\Controllers\Backend\Configuraciones\AdministradoresController;
 use App\Http\Controllers\Backend\Proyecto\CotizacionController;
 use App\Http\Controllers\Backend\Orden\OrdenController;
 use App\Http\Controllers\Backend\Inicio\InicioController;
+use App\Http\Controllers\Backend\Bolson\BolsonController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -111,6 +113,21 @@ Route::get('/admin/generar/pdf/presupuesto/{id}', [ProyectoController::class,'ge
 // verifica si partida mano de obra existe
 Route::post('/admin/proyecto/partida/manoobra/existe', [ProyectoController::class, 'verificarPartidaManoObra']);
 
+
+// --- CUENTA BOLSON ---
+Route::get('/admin/bolson/cuenta/index', [BolsonController::class,'indexCuenta'])->name('admin.bolson.cuenta.index');
+Route::get('/admin/bolson/cuenta/indextabla', [BolsonController::class,'tablaCuenta']);
+Route::post('/admin/bolson/buscar/cuenta', [BolsonController::class, 'buscarNombreCuenta']);
+Route::post('/admin/bolson/buscar/cuenta-editar', [BolsonController::class, 'buscarNombreCuentaEditar']);
+Route::post('/admin/bolson/nuevo',  [BolsonController::class,'nuevoRegistro']);
+Route::post('/admin/bolson/informacion',  [BolsonController::class,'informacionBolson']);
+Route::post('/admin/bolson/editar',  [BolsonController::class,'editarRegistro']);
+
+// --- Movimiento Bolson ---
+Route::get('/admin/bolson/movimiento/index', [BolsonController::class,'indexMovimiento'])->name('admin.movimiento.bolson.index');
+Route::get('/admin/bolson/movimiento/tabla', [BolsonController::class,'tablaMovimiento']);
+Route::post('/admin/bolson/movimiento/nuevo',  [BolsonController::class,'nuevoMovimiento']);
+Route::post('/admin/bolson/movimiento/informacion',  [BolsonController::class,'informacionMovimiento']);
 
 
 
