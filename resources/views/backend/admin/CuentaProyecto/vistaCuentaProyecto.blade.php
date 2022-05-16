@@ -4,7 +4,8 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
 @stop
 
 <style>
@@ -26,12 +27,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-3">
-                    <h1>Creación de Cuentas Bolsón</h1>
+                    <h1>Cuenta Proyecto</h1>
                 </div>
                 <div class="col-sm-2">
                     <button type="button" onclick="abrirModalAgregar()" class="btn btn-success btn-sm">
                         <i class="fas fa-pencil-alt"></i>
-                        Nuevo Cuenta Bolsón
+                        Nueva Cuenta Proyecto
                     </button>
                 </div>
             </div>
@@ -60,7 +61,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nueva Cuenta</h4>
+                    <h4 class="modal-title">Nueva Cuenta Proyecto</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -72,40 +73,37 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Nombre de la Cuenta *:</label>
-                                        <div class="col-sm-8">
-                                            <input name="nombre-cuenta-nuevo" id="nombre-cuenta-nuevo" placeholder="Buscar..." class="form-control" type="text" autocomplete="off">
-                                            <div id="cuentaLista" style="position: absolute; z-index: 9;">
-                                            </div>
+                                        <label>Proyecto *:</label>
+                                        <select class="form-control" id="select-proyecto" style="width: 100%">
+                                            @foreach($proyecto as $dd)
+                                                <option value="{{ $dd->id }}"> {{ $dd->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Cuenta:</label>
+                                        <select class="form-control" id="select-cuenta" style="width: 100%">
+                                            @foreach($cuenta as $dd)
+                                                <option value="{{ $dd->id }}"> {{ $dd->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Monto:</label>
+                                            <input type="text" class="form-control" id="monto-nuevo">
                                         </div>
                                     </div>
 
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Nombre *:</label>
-                                            <input type="text" class="form-control" maxlength="300" id="nombre-nuevo">
+                                            <label>Saldo:</label>
+                                            <input type="text" class="form-control" id="saldo-nuevo">
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Número de Cuenta:</label>
-                                            <input type="text" class="form-control" maxlength="100" id="numero-nuevo">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Mono Inicial:</label>
-                                            <input type="number" class="form-control" id="monto-nuevo">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Fecha *</label>
-                                            <input type="date" class="form-control" id="fecha-nuevo">
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -124,7 +122,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Editar Clasificación</h4>
+                    <h4 class="modal-title">Editar Cuenta Proyecto</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -141,41 +139,30 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Nombre de la Cuenta *:</label>
-                                        <div class="col-sm-8">
-                                            <input name="nombre-cuenta-editar" id="nombre-cuenta-editar" placeholder="Buscar..." class="form-control" type="text" autocomplete="off">
-                                            <div id="cuentaListaEditar" style="position: absolute; z-index: 9;">
-                                            </div>
+                                        <label>Proyecto:</label>
+                                        <select class="form-control" id="select-proyecto-editar" style="width: 100%">
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Cuenta:</label>
+                                        <select class="form-control" id="select-cuenta-editar" style="width: 100%">
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Monto:</label>
+                                            <input type="text" class="form-control" id="monto-editar">
                                         </div>
                                     </div>
 
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Nombre *:</label>
-                                            <input type="text" class="form-control" maxlength="300" id="nombre-editar">
+                                            <label>Saldo:</label>
+                                            <input type="text" class="form-control" id="saldo-editar">
                                         </div>
                                     </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Número de Cuenta:</label>
-                                            <input type="text" class="form-control" maxlength="100" id="numero-editar">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Mono Inicial:</label>
-                                            <input type="number" class="form-control" id="monto-editar">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Fecha *</label>
-                                            <input type="date" class="form-control" id="fecha-editar">
-                                        </div>
-                                    </div>
-
 
                                 </div>
                             </div>
@@ -191,7 +178,6 @@
     </div>
 </div>
 
-
 @extends('backend.menus.footerjs')
 @section('archivos-js')
 
@@ -202,96 +188,67 @@
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+    <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/bolson/cuenta/indextabla') }}";
+            var ruta = "{{ URL::to('/admin/cuentaproy/cuenta/indextabla') }}";
             $('#tablaDatatable').load(ruta);
 
+            $('#select-bolson').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-proyecto').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-cuenta').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-cuenta-editar').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-proyecto-editar').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
             document.getElementById("divcontenedor").style.display = "block";
-
-            window.idGlobalCuenta = 0;
-            window.idGlobalCuentaEditar = 0;
-
-            $('#nombre-cuenta-nuevo').keyup(function(){
-
-                idGlobalCuenta = 0;
-
-                var query = $(this).val();
-                if(query != ''){
-                    axios.post(url+'/bolson/buscar/cuenta', {
-                        'query' : query
-                    })
-                        .then((response) => {
-
-                            $('#cuentaLista').fadeIn();
-                            $('#cuentaLista').html(response.data);
-
-                            if(response.data == ''){
-                                idGlobalCuenta = 0;
-                            }
-                        })
-                        .catch((error) => {
-                        });
-                }else{
-                    idGlobalCuenta = 0;
-                }
-            });
-
-            $('#nombre-cuenta-editar').keyup(function(){
-
-                idGlobalCuentaEditar = 0;
-
-                var query = $(this).val();
-                if(query != ''){
-                    axios.post(url+'/bolson/buscar/cuenta-editar', {
-                        'query' : query
-                    })
-                        .then((response) => {
-
-                            $('#cuentaListaEditar').fadeIn();
-                            $('#cuentaListaEditar').html(response.data);
-
-                            if(response.data == ''){
-                                idGlobalCuentaEditar = 0;
-                            }
-                        })
-                        .catch((error) => {
-                        });
-                }else{
-                    idGlobalCuentaEditar = 0;
-                }
-            });
-
-            $(document).on('click', 'li', function(){
-                $('#nombre-cuenta-nuevo').val($(this).text());
-                $('#cuentaLista').fadeOut();
-
-                $('#nombre-cuenta-editar').val($(this).text());
-                $('#cuentaListaEditar').fadeOut();
-            });
-
-            $(document).click(function(){
-                $('#cuentaLista').fadeOut();
-                $('#cuentaListaEditar').fadeOut();
-            });
-
 
         });
     </script>
 
     <script>
 
-        function modificarValor(id) {
-            idGlobalCuenta = id;
-        }
-
-        function modificarValorEditar(id) {
-            idGlobalCuentaEditar = id;
-        }
-
         function recargar(){
-            var ruta = "{{ url('/admin/bolson/cuenta/indextabla') }}";
+            var ruta = "{{ url('/admin/cuentaproy/cuenta/indextabla') }}";
             $('#tablaDatatable').load(ruta);
         }
 
@@ -301,28 +258,19 @@
         }
 
         function nuevo(){
-            var nombre = document.getElementById('nombre-nuevo').value;
-            var numero = document.getElementById('numero-nuevo').value;
+            var proyecto = document.getElementById('select-proyecto').value;
+            var cuenta = document.getElementById('select-cuenta').value;
+
             var monto = document.getElementById('monto-nuevo').value;
-            var fecha = document.getElementById('fecha-nuevo').value;
+            var saldo = document.getElementById('saldo-nuevo').value;
 
-            if(idGlobalCuenta == 0){
-                toastr.error('Se debe buscar nombre de la Cuenta');
+            if(proyecto === ''){
+                toastr.error('Nombre de Proyecto es Requerido');
                 return;
             }
 
-            if(nombre === ''){
-                toastr.error('Nombre de Cuenta es Requerido');
-                return;
-            }
-
-            if(nombre.length > 300){
-                toastr.error('Máximo 300 caracteres para Nombre de Cuenta');
-                return;
-            }
-
-            if(numero.length > 100){
-                toastr.error('Máximo 100 caracteres para Número de Cuenta');
+            if(cuenta === ''){
+                toastr.error('Cuenta es Requerido');
                 return;
             }
 
@@ -347,20 +295,33 @@
                 monto = 0;
             }
 
-            if(fecha === ''){
-                toastr.error('Fecha es requerida');
-                return;
+            if(saldo.length > 0){
+                if(!saldo.match(reglaNumeroDecimal)) {
+                    toastr.error('Saldo debe ser decimal y no negativo');
+                    return;
+                }
+
+                if(saldo < 0){
+                    toastr.error('Saldo no debe ser negativo');
+                    return;
+                }
+
+                if(saldo.length > 10){
+                    toastr.error('Saldo debe tener máximo 10 caracteres');
+                    return;
+                }
+            }else{
+                saldo = 0;
             }
 
             openLoading();
             var formData = new FormData();
-            formData.append('nombre', nombre);
-            formData.append('numero', numero);
+            formData.append('proyecto', proyecto);
+            formData.append('cuenta', cuenta);
+            formData.append('saldo', saldo);
             formData.append('monto', monto);
-            formData.append('fecha', fecha);
-            formData.append('idcuenta', idGlobalCuenta);
 
-            axios.post(url+'/bolson/nuevo', formData, {
+            axios.post(url+'/cuentaproy/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -383,9 +344,7 @@
             openLoading();
             document.getElementById("formulario-editar").reset();
 
-            idGlobalCuentaEditar = 0;
-
-            axios.post(url+'/bolson/informacion',{
+            axios.post(url+'/cuentaproy/informacion',{
                 'id': id
             })
                 .then((response) => {
@@ -394,12 +353,27 @@
                         $('#modalEditar').modal('show');
 
                         $('#id-editar').val(id);
-                        $('#nombre-cuenta-editar').val(response.data.cuenta);
-                        $('#nombre-editar').val(response.data.info.nombre);
-                        $('#numero-editar').val(response.data.info.numero);
                         $('#monto-editar').val(response.data.info.montoini);
-                        $('#fecha-editar').val(response.data.info.fecha);
-                        idGlobalCuentaEditar = response.data.info.id_cuenta;
+                        $('#saldo-editar').val(response.data.info.saldo);
+
+                        document.getElementById("select-proyecto-editar").options.length = 0;
+                        document.getElementById("select-cuenta-editar").options.length = 0;
+
+                        $.each(response.data.proyecto, function( key, val ){
+                            if(response.data.idproyecto == val.id){
+                                $('#select-proyecto-editar').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
+                            }else{
+                                $('#select-proyecto-editar').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
+                            }
+                        });
+
+                        $.each(response.data.cuenta, function( key, val ){
+                            if(response.data.idcuenta == val.id){
+                                $('#select-cuenta-editar').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
+                            }else{
+                                $('#select-cuenta-editar').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
+                            }
+                        });
 
                     }else{
                         toastr.error('Información no encontrada');
@@ -413,28 +387,19 @@
 
         function editar(){
             var id = document.getElementById('id-editar').value;
-            var nombre = document.getElementById('nombre-editar').value;
-            var numero = document.getElementById('numero-editar').value;
+            var proyecto = document.getElementById('select-proyecto-editar').value;
+            var cuenta = document.getElementById('select-cuenta-editar').value;
+
             var monto = document.getElementById('monto-editar').value;
-            var fecha = document.getElementById('fecha-editar').value;
+            var saldo = document.getElementById('saldo-editar').value;
 
-            if(idGlobalCuentaEditar == 0){
-                toastr.error('Se debe buscar nombre de la Cuenta');
+            if(proyecto === ''){
+                toastr.error('Nombre de Proyecto es Requerido');
                 return;
             }
 
-            if(nombre === ''){
-                toastr.error('Nombre de Cuenta es Requerido');
-                return;
-            }
-
-            if(nombre.length > 300){
-                toastr.error('Máximo 300 caracteres para Nombre de Cuenta');
-                return;
-            }
-
-            if(numero.length > 100){
-                toastr.error('Máximo 100 caracteres para Número de Cuenta');
+            if(cuenta === ''){
+                toastr.error('Cuenta es Requerido');
                 return;
             }
 
@@ -459,21 +424,34 @@
                 monto = 0;
             }
 
-            if(fecha === ''){
-                toastr.error('Fecha es requerida');
-                return;
+            if(saldo.length > 0){
+                if(!saldo.match(reglaNumeroDecimal)) {
+                    toastr.error('Saldo debe ser decimal y no negativo');
+                    return;
+                }
+
+                if(saldo < 0){
+                    toastr.error('Saldo no debe ser negativo');
+                    return;
+                }
+
+                if(saldo.length > 10){
+                    toastr.error('Saldo debe tener máximo 10 caracteres');
+                    return;
+                }
+            }else{
+                saldo = 0;
             }
 
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
-            formData.append('nombre', nombre);
-            formData.append('numero', numero);
-            formData.append('monto', monto);
-            formData.append('fecha', fecha);
-            formData.append('idcuenta', idGlobalCuentaEditar);
+            formData.append('proyecto', proyecto);
+            formData.append('cuenta', cuenta);
+            formData.append('saldo', saldo);
+            formData.append('montoini', monto);
 
-            axios.post(url+'/bolson/editar', formData, {
+            axios.post(url+'/cuentaproy/editar', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -487,7 +465,6 @@
                     }
                 })
                 .catch((error) => {
-                   
                     toastr.error('Error al actualizar');
                     closeLoading();
                 });

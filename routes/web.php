@@ -21,6 +21,7 @@ use App\Http\Controllers\Backend\Proyecto\CotizacionController;
 use App\Http\Controllers\Backend\Orden\OrdenController;
 use App\Http\Controllers\Backend\Inicio\InicioController;
 use App\Http\Controllers\Backend\Bolson\BolsonController;
+use App\Http\Controllers\Backend\Cuenta\CuentaProyectoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,6 +97,12 @@ Route::get('/admin/proyecto/vista/bitacora-detalle-doc/{file}' , [ProyectoContro
 Route::post('/admin/proyecto/vista/bitacora-detalle/borrar' , [ProyectoController::class, 'borrarBitacoraDetalle']);
 Route::post('/admin/proyecto/vista/bitacora-detalle/nuevo' , [ProyectoController::class, 'nuevoBitacoraDetalle']);
 
+Route::get('/admin/proyecto/lista/index', [ProyectoController::class,'indexProyectoLista'])->name('admin.lista.proyectos.index');
+Route::get('/admin/proyecto/lista/tabla/index', [ProyectoController::class,'tablaProyectoLista']);
+
+
+
+
 // --- VISTA REQUISICION ---
 Route::get('/admin/proyecto/vista/requisicion/{id}', [ProyectoController::class,'tablaProyectoListaRequisicion']);
 Route::post('/admin/proyecto/vista/requisicion/nuevo', [ProyectoController::class, 'nuevoRequisicion']);
@@ -128,8 +135,23 @@ Route::get('/admin/bolson/movimiento/index', [BolsonController::class,'indexMovi
 Route::get('/admin/bolson/movimiento/tabla', [BolsonController::class,'tablaMovimiento']);
 Route::post('/admin/bolson/movimiento/nuevo',  [BolsonController::class,'nuevoMovimiento']);
 Route::post('/admin/bolson/movimiento/informacion',  [BolsonController::class,'informacionMovimiento']);
+Route::post('/admin/bolson/movimiento/editar',  [BolsonController::class,'editarMovimiento']);
 
+// --- CUENTA PROYECTO ----
+Route::get('/admin/cuentaproy/cuenta/index', [CuentaProyectoController::class,'indexCuenta'])->name('admin.cuenta.proyectos.index');
+Route::get('/admin/cuentaproy/cuenta/indextabla', [CuentaProyectoController::class,'tablaCuenta']);
+Route::post('/admin/cuentaproy/nuevo',  [CuentaProyectoController::class,'nuevaCuentaProy']);
+Route::post('/admin/cuentaproy/informacion',  [CuentaProyectoController::class,'informacionCuentaProy']);
+Route::post('/admin/cuentaproy/editar',  [CuentaProyectoController::class,'editarCuentaProy']);
 
+// --- MOVIMIENTO CUENTA PROYECTO ----
+Route::get('/admin/movicuentaproy/indexmovicuentaproy', [CuentaProyectoController::class,'indexMoviCuentaProy'])->name('admin.movi.cuenta.proy.index');
+Route::get('/admin/movicuentaproy/tablamovicuentaproy', [CuentaProyectoController::class,'indexTablaMoviCuentaProy']);
+Route::post('/admin/movicuentaproy/buscador',  [CuentaProyectoController::class,'buscadorCuentaProy']);
+Route::post('/admin/movicuentaproy/nuevo',  [CuentaProyectoController::class,'nuevaMoviCuentaProy']);
+Route::get('/admin/movicuentaproy/documento/{id}',  [CuentaProyectoController::class,'descargarReforma']);
+Route::post('/admin/movicuentaproy/informacion',  [CuentaProyectoController::class,'informacionMoviCuentaProy']);
+Route::post('/admin/movicuentaproy/editar',  [CuentaProyectoController::class,'editarMoviCuentaProy']);
 
 
 
@@ -171,10 +193,6 @@ Route::get('/admin/ordenes/compras/tabla-index', [OrdenController::class,'tablaO
 Route::post('/admin/ordenes/anular/compra',  [OrdenController::class,'anularCompra']);
 Route::post('/admin/ordenes/generar/acta',  [OrdenController::class,'generarActa']);
 Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenController::class,'reporteActaGenerada']);
-
-
-
-
 
 // --- CODIGO ESPECIFICO ---
 Route::get('/admin/cuenta/index', [CodigoEspecifController::class,'index'])->name('admin.cuenta.index');
@@ -245,6 +263,14 @@ Route::get('/admin/administradores/tabla/index', [AdministradoresController::cla
 Route::post('/admin/administradores/nuevo', [AdministradoresController::class, 'nuevoAdministrador']);
 Route::post('/admin/administradores/informacion', [AdministradoresController::class, 'informacionAdministrador']);
 Route::post('/admin/administradores/editar', [AdministradoresController::class, 'editarAdministrador']);
+
+
+
+
+
+
+
+
 
 
 

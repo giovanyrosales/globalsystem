@@ -273,8 +273,37 @@ class BolsonController extends Controller
         }else{
             return ['success' => 2];
         }
-
     }
+
+    public function editarMovimiento(Request $request){
+        $rules = array(
+            'fecha' => 'required',
+            'id' => 'required'
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if($validator->fails()){
+            return ['success' => 0];
+        }
+
+        if(MovimientoBolson::where('id', $request->id)->first()){
+
+            MovimientoBolson::where('id', $request->id)->update([
+                'bolson_id' => $request->bolsonid,
+                'tipomovi_id' => $request->movimientoid,
+                'proyecto_id' => $request->proyectoid,
+                'aumenta' => $request->aumenta,
+                'disminuye' => $request->disminuye,
+                'fecha' => $request->fecha,
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
 
 
 }

@@ -78,6 +78,21 @@
                                 <p>Lista de Proyectos</p>
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cuenta.proyectos.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Cuenta Proyecto</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.movi.cuenta.proy.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Movimiento Cuenta Proyecto</p>
+                            </a>
+                        </li>
+
                     </ul>
                 </li>
 
