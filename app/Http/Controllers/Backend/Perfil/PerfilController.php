@@ -15,6 +15,7 @@ class PerfilController extends Controller
 
     public function indexEditarPerfil(){
         $usuario = auth()->user();
+
         return view('backend.admin.perfil.index', compact('usuario'));
     }
 

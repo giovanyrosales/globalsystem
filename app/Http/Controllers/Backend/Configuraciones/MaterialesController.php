@@ -40,7 +40,7 @@ class MaterialesController extends Controller
             }
 
             if($dataUnidad = UnidadMedida::where('id', $item->id_unidadmedida)->first()){
-               $unidadmedida = $dataUnidad->nombre;
+               $unidadmedida = $dataUnidad->medida;
             }
 
             if($dataCodigo = Cuenta::where('id', $item->id_cuenta)->first()){

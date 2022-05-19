@@ -17,15 +17,29 @@ class ControlController extends Controller
 
         $user = Auth::user();
 
-        // $permiso = $user->getAllPermissions()->pluck('name');
-
-        // Rol 1: Encargado-Administrador
-        if($user->hasPermissionTo('vista.roles')){
-            $ruta = 'admin.roles.index';
+        // ADMINISTRADOR
+        if($user->hasPermissionTo('sidebar.roles.y.permisos')){
+            $ruta = 'admin.estadisticas.index';
         }
 
-        else  if($user->hasPermissionTo('vista.principal.sistema')){
-            $ruta = 'admin.inicio.index';
+        // UACI
+        else  if($user->hasPermissionTo('sidebar.estadisticas')){
+            $ruta = 'admin.estadisticas.index';
+        }
+
+        //PRESUPUESTO
+        else  if($user->hasPermissionTo('sidebar.estadisticas')){
+            $ruta = 'admin.estadisticas.index';
+        }
+
+        //INGENIERIA
+        else  if($user->hasPermissionTo('sidebar.estadisticas')){
+            $ruta = 'admin.estadisticas.index';
+        }
+
+        // JEFE UACI
+        else  if($user->hasPermissionTo('sidebar.estadisticas')){
+            $ruta = 'admin.estadisticas.index';
         }
 
         else{

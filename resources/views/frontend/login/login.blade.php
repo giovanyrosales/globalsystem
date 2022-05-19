@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/login/bootstrap.min.css') }}">
 
     <!-- icono del sistema -->
-    <link href="{{ asset('images/logo.png') }}" rel="icon">
+    <link href="{{ asset('images/icono-sistema.png') }}" rel="icon">
     <!-- libreria -->
     <link href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}" type="text/css" rel="stylesheet" />
     <!-- comprimido de librerias -->
@@ -41,7 +41,7 @@
                         <img src="{{ asset('images/logo.png') }}" width="150" height="140px" srcset="">
                     </div>
                 </div>
-                <h3 style="position: relative; top: -10px;">Alcaldía Municipal de Metapán</h3>
+                <h3 style="position: relative; top: -10px;">Control de Requerimientos</h3>
             </div>
             <div class="card-body">
                 <form class=" validate-form">
@@ -49,17 +49,17 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-user"></i></span>
                         </div>
-                        <input id="usuario" type="text" class="form-control" maxlength="50" placeholder="usuario">
+                        <input id="usuario" type="text" autocomplete="off" class="form-control" maxlength="50" placeholder="usuario">
                     </div>
                     <div class="input-group form-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-key"></i></span>
                         </div>
-                        <input id="password" type="password" class="form-control" maxlength="50" placeholder="contraseña">
+                        <input id="password" type="password" autocomplete="off" class="form-control" maxlength="50" placeholder="contraseña">
                     </div>
                     <br><br>
-                    <div class="form-group text-center">
-                        <input type="button" value="Iniciar" id="btnLogin" onclick="login()" class="btn login_btn">
+                    <div class="form-group text-center" >
+                        <input type="button" value="Entrar" id="btnLogin" onclick="login()" class="btn login_btn">
                     </div>
                 </form>
             </div>

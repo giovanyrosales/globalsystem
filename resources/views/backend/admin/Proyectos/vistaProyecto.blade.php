@@ -29,10 +29,14 @@
             <div class="col-sm-6" style="margin-right: 10px;">
                 <h1>Control Individual de Proyecto</h1>
             </div>
+
+            @can('boton.pdf.generar.presupuesto')
             <button type="button" onclick="modalGenerarPresupuesto()" class="btn btn-success btn-sm">
                 <i class="fas fa-file-pdf"></i>
                 Generar Presupuesto
             </button>
+            @endcan
+
         </div>
     </section>
 
@@ -70,14 +74,17 @@
         </div>
 
         <!------------------ PRESUPUESTO DEL PROYECTO INDIVIDUAL ---------------->
-        <!--  <div class="col-sm-6 float-right">
+        @can('modulo.agregar.requisicion.proyecto')
+        <div class="col-sm-6 float-right">
               <div class="container-fluid">
                   <div class="card card-default">
                       <div class="card-header">
                           <h3 class="card-title"><strong>Requisiciones de Proyecto</strong></h3>
+
                           <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-secondary btn-sm">
                               Agregar Requisición
                           </button>
+
                       </div>
 
                       <div class="card-body">
@@ -90,14 +97,15 @@
                       </div>
                   </div>
               </div>
-          </div>     -->
-
+          </div>
+        @endcan
 
 
         <!-- ******************** MODULO DE INGENIERIA ************************ -->
 
         <!------------------ PRESUPUESTO DE PROYECTO ---------------->
-        <div class="col-sm-6 float-right">
+        @can('modulo.agregar.partida.proyecto')
+         <div class="col-sm-6 float-right">
             <div class="container-fluid">
                 <div class="card card-default">
                     <div class="card-header">
@@ -118,29 +126,31 @@
                 </div>
             </div>
         </div>
-
+        @endcan
 
         <!------------------ CONTROL DE BITACORAS ---------------->
-        <div class="col-sm-6 float-left">
-            <div class="container-fluid">
-                <div class="card card-default">
-                    <div class="card-header">
-                        <h3 class="card-title"><strong>Control de Bitácoras</strong></h3>
-                        <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="modalAgregarBitacora()" class="btn btn-secondary btn-sm">
-                            Agregar Bitacora
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div id="tablaDatatableBitacora">
+        @can('modulo.agregar.bitacoras.proyecto')
+            <div class="col-sm-6 float-left">
+                <div class="container-fluid">
+                    <div class="card card-default">
+                        <div class="card-header">
+                            <h3 class="card-title"><strong>Control de Bitácoras</strong></h3>
+                            <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="modalAgregarBitacora()" class="btn btn-secondary btn-sm">
+                                Agregar Bitacora
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="tablaDatatableBitacora">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        @endcan
 
     </section>
 

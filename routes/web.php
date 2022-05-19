@@ -23,16 +23,6 @@ use App\Http\Controllers\Backend\Inicio\InicioController;
 use App\Http\Controllers\Backend\Bolson\BolsonController;
 use App\Http\Controllers\Backend\Cuenta\CuentaProyectoController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 
 Route::get('/', [LoginController::class,'index'])->name('login');
 
@@ -70,8 +60,8 @@ Route::post('/admin/editar-perfil/actualizar', [PerfilController::class, 'editar
 // --- SIN PERMISOS VISTA 403 ---
 Route::get('sin-permisos', [ControlController::class,'indexSinPermiso'])->name('no.permisos.index');
 
-// --- VISTA INICIO ---
-Route::get('/admin/inicio/index', [InicioController::class,'index'])->name('admin.inicio.index');
+// --- VISTA ESTADISTICAS ---
+Route::get('/admin/inicio/index', [InicioController::class,'index'])->name('admin.estadisticas.index');
 
 
 // --- PROYECTO ---

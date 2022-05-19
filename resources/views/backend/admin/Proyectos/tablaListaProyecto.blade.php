@@ -23,13 +23,18 @@
                                     <td>{{ $dato->fechaini }}</td>
                                     <td>{{ $dato->encargado }}</td>
                                     <td>
+                                        @can('boton.ver.proyecto')
                                         <button type="button" class="btn btn-warning btn-xs" onclick="vista({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
                                         </button>
+                                        @endcan
 
+                                        @can('boton.editar.proyecto')
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar
                                         </button>
+                                        @endcan
+
                                     </td>
                                 </tr>
                             @endforeach

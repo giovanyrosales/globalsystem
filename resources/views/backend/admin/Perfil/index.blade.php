@@ -55,7 +55,6 @@
     </div>
 </section>
 
-
 @extends('backend.menus.footerjs')
 @section('archivos-js')
 

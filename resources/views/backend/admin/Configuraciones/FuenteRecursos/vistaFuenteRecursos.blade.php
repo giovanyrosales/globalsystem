@@ -78,7 +78,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Línea de Trabajo</label>
+                                        <label>Fuente de Financiamiento</label>
                                         <select class="form-control" id="select-fuente-f-nuevo">
                                             <option value="" disabled selected>Seleccione una opción...</option>
                                             @foreach($fuentef as $sel)

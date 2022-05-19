@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 class UsuariosSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * usuarios por defecto
      *
      * @return void
      */
@@ -18,9 +18,41 @@ class UsuariosSeeder extends Seeder
             'nombre' => 'Jonathan',
             'apellido' => 'Moran',
             'usuario' => 'jonathan',
-            'password' => bcrypt('admin'),
+            'password' => bcrypt('1234'),
             'activo' => 1,
-        ])->assignRole('Encargado-Administrador');
+        ])->assignRole('admin');
+
+        Usuario::create([
+            'nombre' => 'Heidi',
+            'apellido' => 'Monzon',
+            'usuario' => 'uaci',
+            'password' => bcrypt('1234'),
+            'activo' => 1,
+        ])->assignRole('uaci');
+
+        Usuario::create([
+            'nombre' => 'Rina',
+            'apellido' => 'Tejada',
+            'usuario' => 'presupuesto',
+            'password' => bcrypt('1234'),
+            'activo' => 1,
+        ])->assignRole('presupuesto');
+
+        Usuario::create([
+            'nombre' => 'Giovany',
+            'apellido' => 'Rosales',
+            'usuario' => 'ingenieria',
+            'password' => bcrypt('1234'),
+            'activo' => 1,
+        ])->assignRole('formulador');
+
+        Usuario::create([
+            'nombre' => 'Heidi',
+            'apellido' => 'Chinchilla',
+            'usuario' => 'jefeuaci',
+            'password' => bcrypt('1234'),
+            'activo' => 1,
+        ])->assignRole('jefeuaci');
 
     }
 }
