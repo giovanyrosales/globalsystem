@@ -14,12 +14,12 @@ class UnidadMedidaController extends Controller
     }
 
     public function index(){
-        return view('backend.admin.configuraciones.unidadmedida.vistaunidadmedida');
+        return view('Backend.Admin.Configuraciones.UnidadMedida.vistaUnidadMedida');
     }
 
     public function tabla(){
         $lista = UnidadMedida::orderBy('medida', 'ASC')->get();
-        return view('backend.admin.configuraciones.unidadmedida.tablaunidadmedida', compact('lista'));
+        return view('Backend.Admin.Configuraciones.UnidadMedida.tablaUnidadMedida', compact('lista'));
     }
 
     public function nuevaUnidadMedida(Request $request){

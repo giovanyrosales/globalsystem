@@ -12,7 +12,7 @@ class InicioController extends Controller
     }
 
     public function index(){
-        return view('backend.admin.inicio.vistainicio');
+        return view('Backend.Admin.Inicio.vistaInicio');
     }
 
 

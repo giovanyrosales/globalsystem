@@ -14,12 +14,12 @@ class ClasificacionesController extends Controller
     }
 
     public function index(){
-        return view('backend.admin.configuraciones.clasificaciones.vistaclasificaciones');
+        return view('Backend.Admin.Configuraciones.Clasificaciones.vistaClasificaciones');
     }
 
     public function tabla(){
         $lista = Clasificaciones::orderBy('nombre', 'ASC')->get();
-        return view('backend.admin.configuraciones.clasificaciones.tablaclasificaciones', compact('lista'));
+        return view('Backend.Admin.Configuraciones.Clasificaciones.tablaClasificaciones', compact('lista'));
     }
 
     public function nuevaClasificacion(Request $request){

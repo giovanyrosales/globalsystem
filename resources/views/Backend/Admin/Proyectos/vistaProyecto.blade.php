@@ -738,7 +738,7 @@
 
                 "<td>"+
                 "<input name='descripcionarray[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterial(this)' maxlength='400'  type='text'>"+
-                "<div class='droplista' style='position: absolute; z-index: 9;'></div>"+
+                "<div class='droplista' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
                 "</td>"+
 
                 "<td>"+
@@ -768,7 +768,7 @@
 
                 "<td>"+
                 "<input name='descripcionarrayeditar[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterialEditar(this)' maxlength='400'  type='text'>"+
-                "<div class='droplistaeditar' style='position: absolute; z-index: 9;'></div>"+
+                "<div class='droplistaeditar' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
                 "</td>"+
 
                 "<td>"+
@@ -1462,7 +1462,7 @@
 
                 "<td>"+
                 "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>"+
-                "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9;'></div>"+
+                "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
                 "</td>"+
 
                 "<td>"+
@@ -1767,7 +1767,7 @@
 
                                 "<td>"+
                                 "<input name='descripcionPresupuestoEditar[]' disabled class='form-control' data-infopresupuestoeditar='"+infodetalle[i].material_id+"' value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
-                                "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
+                                "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
                                 "</td>"+
 
                                 "<td>"+

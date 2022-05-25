@@ -46,7 +46,7 @@ class ProyectoController extends Controller
         $arrayFuenteFinanciamiento = FuenteFinanciamiento::orderBy('codigo')->get();
         $arrayFuenteRecursos = FuenteRecursos::orderBy('codigo')->get();
 
-        return view('backend.admin.proyectos.nuevoproyecto', compact('arrayNaturaleza',
+        return view('Backend.Admin.Proyectos.vistaNuevoProyecto', compact('arrayNaturaleza',
         'arrayAreaGestion', 'arrayLineaTrabajo', 'arrayFuenteFinanciamiento', 'arrayFuenteRecursos'));
     }
 
@@ -127,7 +127,7 @@ class ProyectoController extends Controller
     }
 
     public function indexProyectoLista(){
-        return view('backend.admin.proyectos.listaproyecto');
+        return view('Backend.Admin.Proyectos.vistaListaProyecto');
     }
 
     public function tablaProyectoLista(){
@@ -140,7 +140,7 @@ class ProyectoController extends Controller
             }
         }
 
-        return view('backend.admin.proyectos.tablalistaproyecto', compact('lista'));
+        return view('Backend.Admin.Proyectos.tablaListaProyecto', compact('lista'));
     }
 
     public function informacionProyecto(Request $request){
@@ -304,7 +304,7 @@ class ProyectoController extends Controller
             $conteoPartida += 1;
         }
 
-        return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id',
+        return view('Backend.Admin.Proyectos.vistaProyecto', compact('proyecto', 'id',
             'conteo', 'conteoPartida'));
     }
 
@@ -320,9 +320,8 @@ class ProyectoController extends Controller
             $ll->numero = $numero;
         }
 
-        return view('backend.admin.proyectos.bitacoras.tablabitacoras', compact('listaBitacora'));
+        return view('Backend.Admin.Proyectos.Bitacoras.tablaBitacoras', compact('listaBitacora'));
     }
-
 
     // registrar nueva bitacora
     public function registrarBitacora(Request $request){
@@ -463,12 +462,12 @@ class ProyectoController extends Controller
     }
 
     public function vistaBitacoraDetalle($id){ // id de bitacora
-        return view('backend.admin.proyectos.bitacoras.vistabitacoradetalle', compact('id'));
+        return view('Backend.Admin.Proyectos.Bitacoras.vistaBitacoraDetalle', compact('id'));
     }
 
     public function tablaBitacoraDetalle($id){ // id de bitacora
         $lista = BitacoraDetalle::where('id_bitacora', $id)->orderBy('id')->get();
-        return view('backend.admin.proyectos.bitacoras.tablabitacoradetalle', compact('lista'));
+        return view('Backend.Admin.Proyectos.Bitacoras.tablaBitacoraDetalle', compact('lista'));
     }
 
     // descargar imagen de bitacora detalle
@@ -561,7 +560,7 @@ class ProyectoController extends Controller
             $ll->numero = $numero;
         }
 
-        return view('backend.admin.proyectos.requisicion.tablarequisicion', compact('listaRequisicion'));
+        return view('Backend.Admin.Proyectos.Requisicion.tablaRequisicion', compact('listaRequisicion'));
     }
 
 
@@ -729,7 +728,7 @@ class ProyectoController extends Controller
             $dd->descripcion = $descripcion->nombre;
         }
 
-        return view('backend.admin.proyectos.cotizacion.vistacotizacion', compact('requisicion', 'proveedores',
+        return view('Backend.Admin.Proyectos.Cotizacion.vistaCotizacion', compact('requisicion', 'proveedores',
             'requisicionDetalle', 'id'));
     }
 
@@ -940,7 +939,7 @@ class ProyectoController extends Controller
            $pp->item = $conteo;
         }
 
-        return view('backend.admin.proyectos.tablalistapresupuesto', compact('partida'));
+        return view('Backend.Admin.Proyectos.tablaListaPresupuesto', compact('partida'));
     }
 
     public function agregarPresupuesto(Request $request){
@@ -1289,15 +1288,6 @@ class ProyectoController extends Controller
             }
         }
 
-
-
-
-
-
-
-
-
-
         $afp =  $totalManoObra * 0.0675;
         $isss = $totalManoObra * 0.075;
         $insaforp = $totalManoObra * 0.1;
@@ -1334,8 +1324,7 @@ class ProyectoController extends Controller
         $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
 
 
-
-        $pdf = PDF::loadView('backend.admin.proyectos.pdfpresupuesto', compact('partida1',
+        $pdf = PDF::loadView('Backend.Admin.Proyectos.pdfPresupuesto', compact('partida1',
             'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento',
         'sumaMateriales', 'herramienta2Porciento', 'totalManoObra', 'totalAporteManoObra', 'totalAlquilerMaquinaria',
         'totalTransportePesado', 'subtotalPartida', 'imprevisto', 'totalPartidaFinal'));

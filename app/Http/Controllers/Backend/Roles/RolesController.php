@@ -14,12 +14,12 @@ class RolesController extends Controller
     }
 
     public function index(){
-        return view('backend.admin.rolesypermisos.roles');
+        return view('Backend.Admin.RolesYPermisos.roles');
     }
 
     public function tablaRoles(){
         $roles = Role::all()->pluck('name', 'id');
-        return view('backend.admin.rolesypermisos.tabla.tablaroles', compact('roles'));
+        return view('Backend.Admin.RolesYPermisos.Tabla.tablaRoles', compact('roles'));
     }
 
     public function vistaPermisos($id){
@@ -27,7 +27,7 @@ class RolesController extends Controller
         // obtener todos los permisos que existen
         $permisos = Permission::all()->pluck('name', 'id');
 
-        return view('backend.admin.rolesypermisos.rolespermisos', compact('id', 'permisos'));
+        return view('Backend.Admin.RolesYPermisos.RolesPermisos', compact('id', 'permisos'));
     }
 
     public function tablaRolesPermisos($id){
@@ -39,7 +39,7 @@ class RolesController extends Controller
         // lista de todos los permisos que existen
         //$permisos = Permission::pluck('name', 'id');
 
-        return view('backend.admin.rolesypermisos.tabla.tablarolespermisos', compact('permisos'));
+        return view('Backend.Admin.RolesYPermisos.Tabla.tablaRolesPermisos', compact('permisos'));
     }
 
     public function borrarPermiso(Request $request){
@@ -71,13 +71,13 @@ class RolesController extends Controller
     }
 
     public function listaTodosPermisos(){
-        return view('backend.admin.rolesypermisos.listapermisos');
+        return view('Backend.Admin.RolesYPermisos.listaPermisos');
     }
 
     public function tablaTodosPermisos(){
 
         $permisos = Permission::all();
-        return view('backend.admin.rolesypermisos.tabla.tablalistapermisos', compact('permisos'));
+        return view('Backend.Admin.RolesYPermisos.Tabla.tablaListaPermisos', compact('permisos'));
     }
 
     public function borrarRolGlobal(Request $request){

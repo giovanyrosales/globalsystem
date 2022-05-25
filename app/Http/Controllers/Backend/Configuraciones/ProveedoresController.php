@@ -15,13 +15,13 @@ class ProveedoresController extends Controller
 
     public function index(){
 
-        return view('backend.admin.configuraciones.proveedores.vistaproveedor');
+        return view('Backend.Admin.Configuraciones.Proveedores.vistaProveedor');
     }
 
     public function tabla(){
         $lista = Proveedores::orderBy('nombre', 'ASC')->get();
 
-        return view('backend.admin.configuraciones.proveedores.tablaproveedor', compact('lista'));
+        return view('Backend.Admin.Configuraciones.Proveedores.tablaProveedor', compact('lista'));
     }
 
     public function nuevoProveedor(Request $request){

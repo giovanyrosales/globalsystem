@@ -23,7 +23,7 @@ class CuentaProyectoController extends Controller
         $proyecto = Proyecto::orderBy('nombre')->get();
         $cuenta = Cuenta::orderBy('nombre')->get();
 
-        return view('backend.admin.cuentaproyecto.vistacuentaproyecto', compact('proyecto', 'cuenta'));
+        return view('Backend.Admin.CuentaProyecto.vistaCuentaProyecto', compact('proyecto', 'cuenta'));
     }
 
     public function tablaCuenta(){
@@ -42,7 +42,7 @@ class CuentaProyectoController extends Controller
             $dd->saldo = number_format((float)$dd->saldo, 2, '.', '');
         }
 
-        return view('backend.admin.cuentaproyecto.tablacuentaproyecto', compact('cuenta'));
+        return view('Backend.Admin.CuentaProyecto.tablaCuentaProyecto', compact('cuenta'));
     }
 
     public function nuevaCuentaProy(Request $request){
@@ -126,7 +126,7 @@ class CuentaProyectoController extends Controller
 
     public function indexMoviCuentaProy(){
         $proyecto = Proyecto::orderBy('nombre')->get();
-        return view('backend.admin.cuentaproyecto.movimiento.vistamovicuentaproy', compact('proyecto'));
+        return view('Backend.Admin.CuentaProyecto.Movimiento.vistaMoviCuentaProy', compact('proyecto'));
     }
 
     public function indexTablaMoviCuentaProy(){
@@ -147,7 +147,7 @@ class CuentaProyectoController extends Controller
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
         }
 
-        return view('backend.admin.cuentaproyecto.movimiento.tablamovicuentaproy', compact('cuenta'));
+        return view('Backend.Admin.CuentaProyecto.Movimiento.tablaMoviCuentaProy', compact('cuenta'));
     }
 
     public function buscadorCuentaProy(Request $request){

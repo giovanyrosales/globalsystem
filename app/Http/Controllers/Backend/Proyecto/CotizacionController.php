@@ -26,7 +26,7 @@ class CotizacionController extends Controller
 
     public function indexPendiente(){
 
-        return view('backend.admin.cotizaciones.pendiente.vistacotizacionpendiente');
+        return view('Backend.Admin.Cotizaciones.Pendiente.vistaCotizacionPendiente');
     }
 
     public function indexPendienteTabla(){
@@ -45,7 +45,7 @@ class CotizacionController extends Controller
             $dd->codigoproyecto = $infoProyecto->codigo;
         }
 
-        return view('backend.admin.cotizaciones.pendiente.tablacotizacionpendiente', compact('lista'));
+        return view('Backend.Admin.Cotizaciones.Pendiente.tablaCotizacionPendiente', compact('lista'));
     }
 
     public function indexCotizacion($id){ // id de cotizacion
@@ -69,7 +69,7 @@ class CotizacionController extends Controller
 
         $estado = $cotizacion->estado;
 
-        return view('backend.admin.cotizaciones.individual.vistacotizacionindividual', compact('id', 'info',
+        return view('Backend.Admin.Cotizaciones.Individual.vistaCotizacionIndividual', compact('id', 'info',
             'proveedor', 'estado', 'detalle'));
     }
 
@@ -176,7 +176,7 @@ class CotizacionController extends Controller
 
         $contrato = Administradores::orderBy('nombre')->get();
 
-        return view('backend.admin.cotizaciones.procesada.vistacotizacionprocesada', compact('contrato'));
+        return view('Backend.Admin.Cotizaciones.Procesada.vistaCotizacionProcesada', compact('contrato'));
     }
 
     public function indexAutorizadasTabla(){
@@ -207,11 +207,11 @@ class CotizacionController extends Controller
             $dd->codigoproyecto = $infoProyecto->codigo;
         }
 
-        return view('backend.admin.cotizaciones.procesada.tablacotizacionprocesada', compact('lista'));
+        return view('Backend.Admin.Cotizaciones.Procesada.tablaCotizacionProcesada', compact('lista'));
     }
 
     public function indexDenegadas(){
-        return view('backend.admin.cotizaciones.denegadas.vistacotizaciondenegada');
+        return view('Backend.Admin.Cotizaciones.Denegadas.vistaCotizacionDenegada');
     }
 
     public function indexDenegadasTabla(){
@@ -231,7 +231,7 @@ class CotizacionController extends Controller
             $dd->codigoproyecto = $infoProyecto->codigo;
         }
 
-        return view('backend.admin.cotizaciones.denegadas.tablacotizaciondenegada', compact('lista'));
+        return view('Backend.Admin.Cotizaciones.Denegadas.tablaCotizacionDenegada', compact('lista'));
     }
 
 

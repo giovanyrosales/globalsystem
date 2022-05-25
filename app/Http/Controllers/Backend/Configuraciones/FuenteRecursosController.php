@@ -24,7 +24,7 @@ class FuenteRecursosController extends Controller
             }
         }
 
-        return view('backend.admin.configuraciones.fuenterecursos.vistafuenterecursos', compact('fuentef'));
+        return view('Backend.Admin.Configuraciones.FuenteRecursos.vistaFuenteRecursos', compact('fuentef'));
     }
 
     public function tabla(){
@@ -38,7 +38,7 @@ class FuenteRecursosController extends Controller
             $ll->recurso = $recurso;
         }
 
-        return view('backend.admin.configuraciones.fuenterecursos.tablafuenterecursos', compact('lista'));
+        return view('Backend.Admin.Configuraciones.FuenteRecursos.tablaFuenteRecursos', compact('lista'));
     }
 
     public function nuevaFuente(Request $request){

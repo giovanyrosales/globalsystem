@@ -16,7 +16,7 @@ class PerfilController extends Controller
     public function indexEditarPerfil(){
         $usuario = auth()->user();
 
-        return view('backend.admin.perfil.index', compact('usuario'));
+        return view('Backend.Admin.Perfil.vistaPerfil', compact('usuario'));
     }
 
     public function editarUsuario(Request $request){

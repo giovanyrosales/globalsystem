@@ -4,7 +4,8 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
 @stop
 
 <style>
@@ -65,24 +66,26 @@
                     <form id="formulario-nuevo">
                         <div class="card-body">
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Código:</label>
-                                        <select style="width: 50%;" class="form-control" id="select-codigo-nuevo">
-                                            <option value="" disabled selected>Seleccione una opción...</option>
-                                            @foreach($lCodiEspec as $sel)
-                                                <option value="{{ $sel->id }}">{{ $sel->codigo.' '.$sel->nombre }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Nombre *:</label>
-                                        <input type="text" class="form-control" onpaste="contarcaracteresIngreso();" onkeyup="contarcaracteresIngreso();" maxlength="300" id="nombre-nuevo" placeholder="Nombre del material">
-                                        <div id="res-caracter-nuevo" style="float: right">0/300</div>
-                                    </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Código:</label>
+                                    <select style="width: 50%;" class="form-control" id="select-codigo-nuevo">
+                                        <option value="" disabled selected>Seleccione una opción...</option>
+                                        @foreach($lCodiEspec as $sel)
+                                            <option value="{{ $sel->id }}">{{ $sel->codigo.' '.$sel->nombre }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Nombre *:</label>
+                                    <input type="text" class="form-control" onpaste="contarcaracteresIngreso();" onkeyup="contarcaracteresIngreso();" maxlength="300" id="nombre-nuevo" placeholder="Nombre del material">
+                                    <div id="res-caracter-nuevo" style="float: right">0/300</div>
+                                </div>
+                            </div>
+
                             <br>
                             <div class="row">
                                 <div class="col-md-5">
@@ -106,19 +109,18 @@
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label>Clasificación *:</label>
-                                        <select width="60%"  class="form-control" id="select-clasi-nuevo">
-                                            <option value="" disabled selected>Seleccione una opción...</option>
-                                            @foreach($lClasificacion as $sel)
-                                                <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Clasificación:</label>
+                                    <select width="60%"  class="form-control" id="select-clasi-nuevo">
+                                        <option value="" disabled selected>Seleccione una opción...</option>
+                                        @foreach($lClasificacion as $sel)
+                                            <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
+
 
 
                         </div>
@@ -152,18 +154,19 @@
                                         <input type="hidden" id="id-editar">
                                     </div>
 
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label>Código:</label>
-                                                <select style="width: 50%;" class="form-control" id="select-codigo-editar">
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Nombre *:</label>
-                                                <input type="text" class="form-control" onpaste="contarcaracteresEditar();" onkeyup="contarcaracteresEditar();" maxlength="300" id="nombre-editar" placeholder="Nombre del material">
-                                                <div id="res-caracter-editar" style="float: right">0/300</div>
-                                            </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>Código:</label>
+                                            <select class="form-control" id="select-codigo-editar">
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Nombre *:</label>
+                                            <input type="text" class="form-control" onpaste="contarcaracteresEditar();" onkeyup="contarcaracteresEditar();" maxlength="300" id="nombre-editar" placeholder="Nombre del material">
+                                            <div id="res-caracter-editar" style="float: right">0/300</div>
                                         </div>
                                     </div>
                                     <br>
@@ -185,13 +188,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="row">
-                                        <div class="col-md-5">
-                                            <div class="form-group">
-                                                <label>Clasificación *:</label>
-                                                <select width="60%"  class="form-control" id="select-clasi-editar">
-                                                </select>
-                                            </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label>Clasificación *:</label>
+                                            <select width="60%"  class="form-control" id="select-clasi-editar">
+                                            </select>
                                         </div>
                                     </div>
 
@@ -220,14 +221,50 @@
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+    <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
 
     <script type="text/javascript">
         $(document).ready(function(){
             var ruta = "{{ URL::to('/admin/catalogo/materiales/tabla/index') }}";
             $('#tablaDatatable').load(ruta);
 
-            document.getElementById("divcontenedor").style.display = "block";
+            $('#select-codigo-nuevo').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
 
+            $('#select-codigo-editar').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-clasi-nuevo').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-clasi-editar').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            document.getElementById("divcontenedor").style.display = "block";
         });
     </script>
 
@@ -239,7 +276,13 @@
         }
 
         function modalAgregar(){
+
+
             document.getElementById("formulario-nuevo").reset();
+
+            document.getElementById("select-codigo-nuevo").select
+            document.getElementById("select-clasi-nuevo").style.display = "block";
+
             document.getElementById('res-caracter-nuevo').innerHTML = '0/300 ';
             $('#modalAgregar').modal({backdrop: 'static', keyboard: false})
         }

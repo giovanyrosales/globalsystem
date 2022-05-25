@@ -16,7 +16,7 @@ class LoginController extends Controller
     }
 
     public function index(){
-        return view('frontend.login.login');
+        return view('Frontend.Login.vistaLogin');
     }
 
     public function login(Request $request){

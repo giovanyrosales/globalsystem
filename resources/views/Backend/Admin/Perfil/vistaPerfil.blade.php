@@ -9,7 +9,7 @@
 <section class="content-header">
     <div class="container-fluid">
         <div class="col-sm-12">
-            <h1>Perfil</h1>
+            <h1>Perfil de Usuario</h1>
         </div>
 
     </div>

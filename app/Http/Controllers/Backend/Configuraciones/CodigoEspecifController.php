@@ -14,13 +14,13 @@ class CodigoEspecifController extends Controller
     }
 
     public function index(){
-        return view('backend.admin.configuraciones.codigoespecifico.vistacodigoespecifico');
+        return view('Backend.Admin.Configuraciones.CodigoEspecifico.vistaCodigoEspecifico');
     }
 
     public function tabla(){
         $lista = Cuenta::orderBy('codigo', 'ASC')->get();
 
-        return view('backend.admin.configuraciones.codigoespecifico.tablacodigoespecifico', compact('lista'));
+        return view('Backend.Admin.Configuraciones.CodigoEspecifico.tablaCodigoEspecifico', compact('lista'));
     }
 
     public function nuevaCuenta(Request $request){

@@ -14,12 +14,12 @@ class FuenteFinanciamientoController extends Controller
     }
 
     public function index(){
-        return view('backend.admin.configuraciones.fuentefinanciamiento.vistafuentefinanciamiento');
+        return view('Backend.Admin.Configuraciones.FuenteFinanciamiento.vistaFuenteFinanciamiento');
     }
 
     public function tabla(){
         $lista = FuenteFinanciamiento::orderBy('codigo', 'ASC')->get();
-        return view('backend.admin.configuraciones.fuentefinanciamiento.tablafuentefinanciamiento', compact('lista'));
+        return view('Backend.Admin.Configuraciones.FuenteFinanciamiento.tablaFuenteFinanciamiento', compact('lista'));
     }
 
     public function nuevaFuente(Request $request){

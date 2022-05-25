@@ -14,12 +14,12 @@ class LineaTrabajoController extends Controller
     }
 
     public function index(){
-        return view('backend.admin.configuraciones.lineatrabajo.vistalineadetrabajo');
+        return view('Backend.Admin.Configuraciones.LineaTrabajo.vistaLineaDeTrabajo');
     }
 
     public function tabla(){
         $lista = LineaTrabajo::orderBy('codigo', 'ASC')->get();
-        return view('backend.admin.configuraciones.lineatrabajo.tablalineadetrabajo', compact('lista'));
+        return view('Backend.Admin.Configuraciones.LineaTrabajo.tablaLineaDeTrabajo', compact('lista'));
     }
 
     public function nuevaLinea(Request $request){

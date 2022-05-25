@@ -20,7 +20,7 @@ class BolsonController extends Controller
     }
 
     public function indexCuenta(){
-        return view('backend.admin.bolson.cuenta.vistacuentabolson');
+        return view('Backend.Admin.Bolson.Cuenta.vistaCuentaBolson');
     }
 
     public function tablaCuenta(){
@@ -36,7 +36,7 @@ class BolsonController extends Controller
             $dd->saldo = number_format((float)$dd->saldo, 2, '.', '');
         }
 
-        return view('backend.admin.bolson.cuenta.tablacuentabolson', compact('cuenta'));
+        return view('Backend.Admin.Bolson.Cuenta.tablaCuentaBolson', compact('cuenta'));
     }
 
     public function buscarNombreCuenta(Request $request){
@@ -201,7 +201,7 @@ class BolsonController extends Controller
         $bolson = Bolson::orderBy('nombre')->get();
         $tipomovi = TipoMovimiento::orderBy('nombre')->get();
 
-        return view('backend.admin.bolson.cuenta.movimiento.vistamovibolson', compact('proyecto',
+        return view('Backend.Admin.Bolson.Cuenta.Movimiento.vistaMoviBolson', compact('proyecto',
         'bolson', 'tipomovi'));
     }
 
@@ -219,7 +219,7 @@ class BolsonController extends Controller
            $dd->bolson = $infoBolson->nombre;
        }
 
-        return view('backend.admin.bolson.cuenta.movimiento.tablamovibolson', compact('movi'));
+        return view('Backend.Admin.Bolson.Cuenta.Movimiento.tablaMoviBolson', compact('movi'));
     }
 
 
@@ -303,7 +303,5 @@ class BolsonController extends Controller
             return ['success' => 2];
         }
     }
-
-
 
 }

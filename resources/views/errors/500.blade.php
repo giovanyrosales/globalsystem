@@ -20,9 +20,9 @@
     <div class="notfound-bg"></div>
     <div class="notfound">
         <div class="notfound-404">
-            <h1>404</h1>
+            <h1>500</h1>
         </div>
-        <h2 style="font-family: 'Arial Black'">Ops.. Página no encontrada!</h2>
+        <h2 style="font-family: 'Arial Black'">Ops.. Error Interno!</h2>
     </div>
 </div>
 </body>

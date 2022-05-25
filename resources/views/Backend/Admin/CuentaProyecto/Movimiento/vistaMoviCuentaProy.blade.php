@@ -32,7 +32,7 @@
                 <div class="col-sm-2">
                     <button type="button" onclick="abrirModalAgregar()" class="btn btn-success btn-sm">
                         <i class="fas fa-pencil-alt"></i>
-                        Nueva Cuenta Proyecto
+                        Nuevo Movimiento de Cuenta
                     </button>
                 </div>
             </div>

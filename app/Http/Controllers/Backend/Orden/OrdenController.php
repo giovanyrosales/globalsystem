@@ -76,7 +76,7 @@ class OrdenController extends Controller
         $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
         $fecha = array(date("d", strtotime($orden->fecha_orden) ), $meses[date("n", strtotime($orden->fecha_orden) )-1], date("Y", strtotime($orden->fecha_orden) ) );
 
-        $pdf = PDF::loadView('backend.admin.reportes.pdfordencompra', compact('orden','cotizacion','proyecto','fecha','proveedor','det_cotizacion','administrador'));
+        $pdf = PDF::loadView('Backend.Admin.Reportes.pdfOrdenCompra', compact('orden','cotizacion','proyecto','fecha','proveedor','det_cotizacion','administrador'));
         //$customPaper = array(0,0,470.61,612.36);
         $customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper($customPaper)->setWarnings(false);
@@ -85,7 +85,7 @@ class OrdenController extends Controller
 
     public function indexOrdenesCompras(){
 
-        return view('backend.admin.ordenes.vistaordenescompra');
+        return view('Backend.Admin.Ordenes.vistaOrdenesCompra');
     }
 
     public function tablaOrdenesCompras(){
@@ -108,7 +108,7 @@ class OrdenController extends Controller
             $val->requisicion_id = $info->requisicion_id;
         }
 
-        return view('backend.admin.ordenes.tablaordenescompra', compact('lista'));
+        return view('Backend.Admin.Ordenes.tablaOrdenesCompra', compact('lista'));
     }
 
     public function anularCompra(Request $request){
@@ -162,7 +162,7 @@ class OrdenController extends Controller
         $fecha = strftime("%d-%B-%Y",strtotime($acta->fecha_acta));
         $hora = $acta->hora;
 
-        $pdf = PDF::loadView('backend.admin.reportes.pdfactaordencompra', compact('acta','proyecto','fecha','proveedor','administrador','hora','orden'));
+        $pdf = PDF::loadView('Backend.Admin.Reportes.pdfActaOrdenCompra', compact('acta','proyecto','fecha','proveedor','administrador','hora','orden'));
         $pdf->setPaper('letter', 'portrait')->setWarnings(false);
         return $pdf->stream('acta_orden_compra.pdf');
     }

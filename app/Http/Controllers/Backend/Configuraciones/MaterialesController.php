@@ -22,7 +22,7 @@ class MaterialesController extends Controller
         $lUnidad = UnidadMedida::orderBy('medida', 'ASC')->get();
         $lCodiEspec = Cuenta::orderBy('nombre', 'ASC')->get();
 
-        return view('backend.admin.configuraciones.materiales.vistacatalogomateriales', compact('lClasificacion',
+        return view('Backend.Admin.Configuraciones.Materiales.vistaCatalogoMateriales', compact('lClasificacion',
         'lUnidad', 'lCodiEspec'));
     }
 
@@ -52,7 +52,7 @@ class MaterialesController extends Controller
             $item->codigoespeci = $codigoespeci;
         }
 
-        return view('backend.admin.configuraciones.materiales.tablacatalogomateriales', compact('lista'));
+        return view('Backend.Admin.Configuraciones.Materiales.tablaCatalogoMateriales', compact('lista'));
     }
 
     public function nuevoMaterial(Request $request){
@@ -134,11 +134,5 @@ class MaterialesController extends Controller
 
         return ['success' => 1];
     }
-
-
-
-
-
-
 
 }

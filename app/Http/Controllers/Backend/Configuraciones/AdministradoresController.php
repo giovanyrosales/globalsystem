@@ -16,13 +16,13 @@ class AdministradoresController extends Controller
 
     public function index(){
 
-        return view('backend.admin.configuraciones.administradores.vistaadministradores');
+        return view('Backend.Admin.Configuraciones.Administradores.vistaAdministradores');
     }
 
     public function tabla(){
         $lista = Administradores::orderBy('nombre', 'ASC')->get();
 
-        return view('backend.admin.configuraciones.administradores.tablaadministradores', compact('lista'));
+        return view('Backend.Admin.Configuraciones.Administradores.tablaAdministradores', compact('lista'));
     }
 
     public function nuevoAdministrador(Request $request){

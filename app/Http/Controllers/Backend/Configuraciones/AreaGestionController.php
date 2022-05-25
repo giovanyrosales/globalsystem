@@ -24,7 +24,7 @@ class AreaGestionController extends Controller
             }
         }
 
-        return view('backend.admin.configuraciones.areagestion.vistaareagestion', compact('linea'));
+        return view('Backend.Admin.Configuraciones.AreaGestion.vistaAreaGestion', compact('linea'));
     }
 
     public function tabla(){
@@ -38,7 +38,7 @@ class AreaGestionController extends Controller
             $ll->linea = $linea;
         }
 
-        return view('backend.admin.configuraciones.areagestion.tablaareagestion', compact('lista'));
+        return view('Backend.Admin.Configuraciones.AreaGestion.tablaAreaGestion', compact('lista'));
     }
 
     public function nuevaAreaGestion(Request $request){

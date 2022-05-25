@@ -11,57 +11,82 @@
     <link href="{{ asset('images/icono-sistema.png') }}" rel="icon">
     <!-- libreria -->
     <link href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}" type="text/css" rel="stylesheet" />
-    <!-- comprimido de librerias -->
-    <link href="{{ asset('css/login/login.css') }}" type="text/css" rel="stylesheet" />
-    <!-- libreria para alertas -->
-    <link href="{{ asset('css/login/alertify.css') }}" type="text/css" rel="stylesheet" />
-    <!-- estilo del login -->
-    <link rel="stylesheet" href="{{asset('css/login/styleLogin.css')}}">
+
     <!-- estilo de toast -->
     <link href="{{ asset('css/toastr.min.css') }}" rel="stylesheet">
     <!-- estilo de sweet -->
     <link href="{{ asset('css/sweetalert2.min.css') }}" rel="stylesheet">
 
     <style>
-        h3 {
-            font-size: 1.5em;
+        html, body {
+            height: 100%;
         }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-image: url({{ asset('images/fondo3.jpg') }});
+        }
+
+        .demo-container {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .btn-lg {
+            padding: 12px 26px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        ::placeholder {
+            font-size:14px;
+            letter-spacing:0.5px;
+        }
+
+        .form-control-lg {
+            font-size: 16px;
+            padding: 25px 20px;
+        }
+        .font-500{
+            font-weight:500;
+        }
+        .image-size-small{
+            width:140px;
+            margin:0 auto;
+        }
+        .image-size-small img{
+            width:140px;
+            margin-bottom:-70px;
+        }
+
     </style>
 </head>
 
-<body style="background-image: url({{ asset('images/fondo3.jpg') }});">
+<body>
 <div class="container">
-    <div class="d-flex justify-content-center h-100">
+    <div>
+        <div class="demo-container" style="margin-top: 25px">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-12 mx-auto">
+                        <div class="text-center image-size-small position-relative">
+                            <img src="{{ asset('images/logo.png') }}" class="rounded-circle p-2 bg-white">
+                        </div>
+                        <div class="p-5 bg-white rounded shadow-lg">
+                            <h3 class="mb-2 text-center pt-5"><strong>Alcaldía Municipal de Metapán</strong></h3>
+                            <p class="text-center lead">Control de Requerimientos</p>
+                            <form>
+                                <label style="margin-top: 10px" class="font-500">Usuario</label>
+                                <input class="form-control form-control-lg mb-3" id="usuario" type="text">
+                                <label class="font-500">Contraseña</label>
+                                <input class="form-control form-control-lg" id="password" type="password">
 
-        <div class="card " style="height: 450px;">
-            <div class="card-header text-center">
-
-                <div class="row text-center d-flex" style="position: relative; top: -70px;">
-                    <div class="col-md-12">
-                        <img src="{{ asset('images/logo.png') }}" width="150" height="140px" srcset="">
+                                <input type="button" value="Entrar" style="margin-top: 15px" onclick="login()" class="btn btn-primary btn-lg w-100 shadow-lg">
+                            </form>
+                        </div>
                     </div>
                 </div>
-                <h3 style="position: relative; top: -10px;">Control de Requerimientos</h3>
-            </div>
-            <div class="card-body">
-                <form class=" validate-form">
-                    <div class="input-group form-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        </div>
-                        <input id="usuario" type="text" autocomplete="off" class="form-control" maxlength="50" placeholder="usuario">
-                    </div>
-                    <div class="input-group form-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-key"></i></span>
-                        </div>
-                        <input id="password" type="password" autocomplete="off" class="form-control" maxlength="50" placeholder="contraseña">
-                    </div>
-                    <br><br>
-                    <div class="form-group text-center" >
-                        <input type="button" value="Entrar" id="btnLogin" onclick="login()" class="btn login_btn">
-                    </div>
-                </form>
             </div>
         </div>
     </div>
