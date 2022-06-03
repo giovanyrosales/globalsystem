@@ -8,7 +8,7 @@
     <div class="sidebar">
 
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
 
                 @can('sidebar.roles.y.permisos')
                  <li class="nav-item">
@@ -82,12 +82,14 @@
                         @endcan
 
                         @can('sidebar.cuenta.proyecto')
+                            <!--
                         <li class="nav-item">
-                            <a href="{{ route('admin.cuenta.proyectos.index') }}" target="frameprincipal" class="nav-link">
+                            <a href="#admin.cuenta.proyectos.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Cuenta Proyecto</p>
                             </a>
                         </li>
+                            -->
                         @endcan
 
 
@@ -158,8 +160,8 @@
                 </li>
                 @endcan
 
-                    @can('sidebar.seccion.cuentabolson')
-                <li class="nav-item">
+                @can('sidebar.seccion.cuentabolson')
+               <!-- <li class="nav-item">
 
                     <a href="#" class="nav-link nav-">
                         <i class="far fa-edit"></i>
@@ -192,6 +194,7 @@
                     </ul>
                 </li>
                 @endcan
+                    -->
 
                 @can('sidebar.seccion.configuraciones')
                 <li class="nav-item">

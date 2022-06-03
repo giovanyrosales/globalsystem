@@ -25,16 +25,15 @@
 
     <section class="content-header">
         <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-3">
-                    <h1>Movimiento Cuenta Proyecto</h1>
-                </div>
-                <div class="col-sm-2">
-                    <button type="button" onclick="abrirModalAgregar()" class="btn btn-success btn-sm">
-                        <i class="fas fa-pencil-alt"></i>
+            <div class="row mb-6">
+                <div class="col-sm-5">
+                    <h1>Movimiento Cuenta de Proyecto</h1>
+                    <button type="button" style="margin-top: 15px" onclick="abrirModalAgregar()" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus-square"></i>
                         Nuevo Movimiento de Cuenta
                     </button>
                 </div>
+
             </div>
         </div>
     </section>
@@ -83,7 +82,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Cuenta Proyecto:</label>
+                                        <label>Cuenta Proyecto *:</label>
                                         <select class="form-control" id="select-cuentaproy"  style="width: 100%">
                                         </select>
                                     </div>
@@ -156,13 +155,13 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Proyecto:</label>
+                                        <label>Proyecto *:</label>
                                         <select class="form-control" id="select-proyecto-editar" onchange="verificar()" style="width: 100%">
                                         </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Cuenta Proyecto:</label>
+                                        <label>Cuenta Proyecto *:</label>
                                         <select class="form-control" id="select-cuentaproy-editar"  style="width: 100%">
                                         </select>
                                     </div>
@@ -554,8 +553,6 @@
                 });
         }
 
-
     </script>
-
 
 @endsection

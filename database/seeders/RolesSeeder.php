@@ -23,38 +23,51 @@ class RolesSeeder extends Seeder
         // UACI
         $roleUaci = Role::create(['name' => 'uaci']);
 
-        //PRESUPUESTO
+        // PRESUPUESTO
         $rolePresupuesto = Role::create(['name' => 'presupuesto']);
 
-        //INGENIERIA
+        // INGENIERIA
         $roleIng = Role::create(['name' => 'formulador']);
 
         // JEFE UACI
         $roleJefeUaci = Role::create(['name' => 'jefeuaci']);
 
+        // Administrador
+        $roleAdministrador = Role::create(['name' => 'administrador']);
+
+        // Secretaria
+        $roleSecretaria = Role::create(['name' => 'secretaria']);
+
         // ROLES Y PERMISOS
         Permission::create(['name' => 'sidebar.roles.y.permisos', 'description' => 'sidebar seccion roles y permisos'])->syncRoles($roleAdmin);
 
         // ESTADISTICAS
-        Permission::create(['name' => 'sidebar.estadisticas', 'description' => 'sidebar seccion estadisticas'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleJefeUaci);
+        Permission::create(['name' => 'sidebar.estadisticas', 'description' => 'sidebar seccion estadisticas'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleJefeUaci, $roleAdministrador, $roleSecretaria);
 
         // SECCION PROYECTO
-        Permission::create(['name' => 'sidebar.seccion.proyecto', 'description' => 'sidebar seccion proyecto'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng);
+        Permission::create(['name' => 'sidebar.seccion.proyecto', 'description' => 'sidebar seccion proyecto'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleAdministrador);
 
             Permission::create(['name' => 'sidebar.nuevo.proyecto', 'description' => 'sidebar seccion proyecto - nuevo proyecto'])->syncRoles($roleUaci);
-            Permission::create(['name' => 'sidebar.lista.proyecto', 'description' => 'sidebar seccion proyecto - lista proyectos'])->syncRoles($roleUaci, $roleIng, $rolePresupuesto);
+            Permission::create(['name' => 'sidebar.lista.proyecto', 'description' => 'sidebar seccion proyecto - lista proyectos'])->syncRoles($roleUaci, $roleIng, $rolePresupuesto, $roleAdministrador);
 
             // botones
-            Permission::create(['name' => 'boton.ver.proyecto', 'description' => 'sidebar seccion proyecto - boton ver proyecto'])->syncRoles($roleIng, $roleUaci);
+            Permission::create(['name' => 'boton.ver.proyecto', 'description' => 'sidebar seccion proyecto - boton ver proyecto'])->syncRoles($roleIng, $roleUaci, $roleAdministrador);
             Permission::create(['name' => 'boton.editar.proyecto', 'description' => 'sidebar seccion proyecto - boton editar proyecto'])->syncRoles($rolePresupuesto, $roleUaci, $roleIng);
             Permission::create(['name' => 'boton.pdf.generar.presupuesto', 'description' => 'sidebar seccion proyecto - boton generar presupuesto para proyecto pdf'])->syncRoles($roleIng);
 
-            Permission::create(['name' => 'modulo.agregar.requisicion.proyecto', 'description' => 'sidebar seccion proyecto - modulo para agregar requisicion'])->syncRoles($roleUaci);
+            Permission::create(['name' => 'boton.agregar.requisicion', 'description' => 'sidebar seccion proyecto - boton agregar nueva requisicion'])->syncRoles($roleAdministrador);
+            Permission::create(['name' => 'boton.editar.requisicion', 'description' => 'sidebar seccion proyecto - boton editar requisicion'])->syncRoles($roleAdministrador);
+            Permission::create(['name' => 'boton.ver.presupuesto', 'description' => 'sidebar seccion proyecto - boton ver presupuesto'])->syncRoles($rolePresupuesto, $roleAdministrador, $roleJefeUaci, $roleSecretaria);
+            Permission::create(['name' => 'boton.cotizar.requisicion', 'description' => 'sidebar seccion proyecto - boton cotizar requisicion'])->syncRoles($roleUaci);
+
+
+            Permission::create(['name' => 'modulo.agregar.requisicion.proyecto', 'description' => 'sidebar seccion proyecto - modulo para agregar requisicion'])->syncRoles($roleAdministrador);
 
             Permission::create(['name' => 'modulo.agregar.bitacoras.proyecto', 'description' => 'sidebar seccion proyecto - modulo para ver bitacoras'])->syncRoles($roleIng);
             Permission::create(['name' => 'modulo.agregar.partida.proyecto', 'description' => 'sidebar seccion proyecto - modulo para agregar partidas'])->syncRoles($roleIng);
 
-        Permission::create(['name' => 'sidebar.cuenta.proyecto', 'description' => 'sidebar seccion proyecto - cuenta de proyecto'])->syncRoles($roleUaci, $rolePresupuesto);
+
+        //Permission::create(['name' => 'sidebar.cuenta.proyecto', 'description' => 'sidebar seccion proyecto - cuenta de proyecto'])->syncRoles($roleUaci, $rolePresupuesto);
         Permission::create(['name' => 'sidebar.movimiento.cuenta', 'description' => 'sidebar seccion proyecto - movimiento de cuenta'])->syncRoles($roleUaci, $rolePresupuesto);
 
         // COTIZACIONES

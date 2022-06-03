@@ -18,24 +18,20 @@ class CuentaProyectoController extends Controller
         $this->middleware('auth');
     }
 
-    public function indexCuenta(){
+    public function indexCuenta($id){
+        $infoProyecto = Proyecto::where('id', $id)->first();
+        $nombre = $infoProyecto->codigo . " - " . $infoProyecto->nombre;
 
-        $proyecto = Proyecto::orderBy('nombre')->get();
-        $cuenta = Cuenta::orderBy('nombre')->get();
-
-        return view('Backend.Admin.CuentaProyecto.vistaCuentaProyecto', compact('proyecto', 'cuenta'));
+        return view('Backend.Admin.CuentaProyecto.vistaCuentaProyecto', compact('id', 'nombre'));
     }
 
-    public function tablaCuenta(){
+    public function tablaCuenta($id){
 
-        $cuenta = CuentaProy::orderBy('id')->get();
+        $cuenta = CuentaProy::where('proyecto_id', $id)->orderBy('id', 'DESC')->get();
 
         foreach ($cuenta as $dd){
 
-            $infoProyecto = Proyecto::where('id', $dd->proyecto_id)->first();
             $infoCuenta = Cuenta::where('id', $dd->cuenta_id)->first();
-
-            $dd->proyecto = $infoProyecto->nombre . " - " . $infoProyecto->codigo;
             $dd->cuenta = $infoCuenta->nombre . " - " . $infoCuenta->codigo;
 
             $dd->montoini = number_format((float)$dd->montoini, 2, '.', '');

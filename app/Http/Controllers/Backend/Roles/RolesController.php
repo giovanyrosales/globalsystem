@@ -23,9 +23,8 @@ class RolesController extends Controller
     }
 
     public function vistaPermisos($id){
-
         // obtener todos los permisos que existen
-        $permisos = Permission::all()->pluck('name', 'id');
+        $permisos = Permission::all()->sortBy('name')->pluck('name', 'id');
 
         return view('Backend.Admin.RolesYPermisos.RolesPermisos', compact('id', 'permisos'));
     }

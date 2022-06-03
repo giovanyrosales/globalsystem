@@ -13,6 +13,7 @@
         /*Ajustar tablas*/
         table-layout:fixed;
     }
+
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -20,8 +21,8 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
-                    <i class="fas fa-pencil-alt"></i>
+                <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus-square"></i>
                     Nuevo Material
                 </button>
             </div>
@@ -71,7 +72,7 @@
                                     <label>Código:</label>
                                     <select style="width: 50%;" class="form-control" id="select-codigo-nuevo">
                                         <option value="" disabled selected>Seleccione una opción...</option>
-                                        @foreach($lCodiEspec as $sel)
+                                        @foreach($lCuenta as $sel)
                                             <option value="{{ $sel->id }}">{{ $sel->codigo.' '.$sel->nombre }}</option>
                                         @endforeach
                                     </select>
@@ -256,6 +257,7 @@
             });
 
             $('#select-clasi-editar').select2({
+                dropdownParent: $("#modalEditar"),
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
@@ -263,6 +265,7 @@
                     }
                 },
             });
+
 
             document.getElementById("divcontenedor").style.display = "block";
         });
@@ -280,8 +283,9 @@
 
             document.getElementById("formulario-nuevo").reset();
 
-            document.getElementById("select-codigo-nuevo").select
-            document.getElementById("select-clasi-nuevo").style.display = "block";
+
+
+
 
             document.getElementById('res-caracter-nuevo').innerHTML = '0/300 ';
             $('#modalAgregar').modal({backdrop: 'static', keyboard: false})

@@ -7,10 +7,11 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 35%">Proyecto</th>
+                                <th style="width: 20%">Proyecto Cod.</th>
                                 <th style="width: 10%">Num. de Orden</th>
-                                <th style="width: 17%">Requisición</th>
-                                <th style="width: 17%">Cotización</th>
+                                <th style="width: 17%">Requi. Destino</th>
+                                <th style="width: 17%">Cotización #</th>
+                                <th style="width: 17%">Proveedor</th>
                                 <th style="width: 12%">Opciones</th>
                             </tr>
                             </thead>
@@ -26,8 +27,9 @@
 
                                     <td>{{ $dato->proyecto_cod }}</td>
                                     <td>{{ $dato->id }}</td>
-                                    <td>{{ $dato->requisicion_id }}</td>
+                                    <td>{{ $dato->requidestino }}</td>
                                     <td>{{ $dato->cotizacion_id }}</td>
+                                    <td>{{ $dato->nomproveedor }}</td>
                                     <td>
                                         <button type="button" class="btn btn-success btn-xs" onclick="Imprimir({{ $dato->id }})">
                                             <i class="fa fa-print" title="Generar Acta"></i>&nbsp; Imprimir
@@ -38,7 +40,7 @@
                                             <i class="fas fa-trash-alt" title="Anular"></i>&nbsp; Anular
                                         </button>
                                         @endif
-
+                                        <br> <br>
                                         @if($dato->actaid == 0)
                                             <button type="button" class="btn btn-warning btn-xs" onclick="abrirModalActa({{ $dato->id }})">
                                                 <i class="fa fa-laptop" title="Generar Acta"></i>&nbsp; Generar Acta

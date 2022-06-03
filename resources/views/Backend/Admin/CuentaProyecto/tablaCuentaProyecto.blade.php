@@ -7,7 +7,6 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Proyecto</th>
                                 <th>Cuenta</th>
                                 <th>Monto</th>
                                 <th>Saldo</th>
@@ -18,8 +17,6 @@
 
                             @foreach($cuenta as $dato)
                                 <tr>
-
-                                    <td>{{ $dato->proyecto }}</td>
                                     <td>{{ $dato->cuenta }}</td>
                                     <td>{{ $dato->montoini }}</td>
                                     <td>{{ $dato->saldo }}</td>

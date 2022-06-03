@@ -20,10 +20,10 @@ class MaterialesController extends Controller
     public function index(){
         $lClasificacion = Clasificaciones::orderBy('nombre', 'ASC')->get();
         $lUnidad = UnidadMedida::orderBy('medida', 'ASC')->get();
-        $lCodiEspec = Cuenta::orderBy('nombre', 'ASC')->get();
+        $lCuenta = Cuenta::orderBy('nombre', 'ASC')->get();
 
         return view('Backend.Admin.Configuraciones.Materiales.vistaCatalogoMateriales', compact('lClasificacion',
-        'lUnidad', 'lCodiEspec'));
+        'lUnidad', 'lCuenta'));
     }
 
     public function tabla(){

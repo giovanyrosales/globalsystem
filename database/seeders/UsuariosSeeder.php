@@ -54,5 +54,22 @@ class UsuariosSeeder extends Seeder
             'activo' => 1,
         ])->assignRole('jefeuaci');
 
+        Usuario::create([
+            'nombre' => 'Ruby',
+            'apellido' => 'Ruby',
+            'usuario' => 'admin',
+            'password' => bcrypt('1234'),
+            'activo' => 1,
+        ])->assignRole('administrador');
+
+        Usuario::create([
+            'nombre' => 'Secretaria',
+            'apellido' => 'Secre',
+            'usuario' => 'secretaria',
+            'password' => bcrypt('1234'),
+            'activo' => 1,
+        ])->assignRole('secretaria');
+
+
     }
 }

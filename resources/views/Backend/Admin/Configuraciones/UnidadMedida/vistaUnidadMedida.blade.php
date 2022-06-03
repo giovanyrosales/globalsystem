@@ -19,8 +19,8 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
-                    <i class="fas fa-pencil-alt"></i>
+                <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus-square"></i>
                     Nueva Unidad Medida
                 </button>
             </div>
@@ -38,7 +38,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
+                    <h3 class="card-title">Listado de Medidas</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">

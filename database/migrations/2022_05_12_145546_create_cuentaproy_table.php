@@ -18,7 +18,7 @@ class CreateCuentaproyTable extends Migration
             $table->bigInteger('proyecto_id')->unsigned();
             $table->bigInteger('cuenta_id')->unsigned();
             $table->decimal('montoini', 10, 2);
-            $table->decimal('saldo', 10, 2)->nullable();
+            $table->decimal('saldo', 10, 2);
             $table->integer('estado');
 
             $table->foreign('proyecto_id')->references('id')->on('proyectos');

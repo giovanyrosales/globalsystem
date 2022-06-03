@@ -78,7 +78,7 @@
                             <p class="text-center lead">Control de Requerimientos</p>
                             <form>
                                 <label style="margin-top: 10px" class="font-500">Usuario</label>
-                                <input class="form-control form-control-lg mb-3" id="usuario" type="text">
+                                <input class="form-control form-control-lg mb-3" id="usuario" autocomplete="off" type="text">
                                 <label class="font-500">Contraseña</label>
                                 <input class="form-control form-control-lg" id="password" type="password">
 

@@ -304,8 +304,10 @@ class ProyectoController extends Controller
             $conteoPartida += 1;
         }
 
+        $estado = $proyecto->id_estado;
+
         return view('Backend.Admin.Proyectos.vistaProyecto', compact('proyecto', 'id',
-            'conteo', 'conteoPartida'));
+            'conteo', 'conteoPartida', 'estado'));
     }
 
     public function tablaProyectoListaBitacora($id){

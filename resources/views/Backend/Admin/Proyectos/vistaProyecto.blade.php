@@ -81,9 +81,11 @@
                       <div class="card-header">
                           <h3 class="card-title"><strong>Requisiciones de Proyecto</strong></h3>
 
+                          @can('boton.agregar.requisicion')
                           <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-secondary btn-sm">
                               Agregar Requisición
                           </button>
+                          @endcan
 
                       </div>
 
@@ -834,12 +836,44 @@
 
         // modal agregar bitacora
         function modalAgregarBitacora(){
+
+            // verificar estado del proyecto
+            var estado = {{ $estado }};
+
+            if(estado == 1){ // priorizado
+                alertaEstado('No Iniciado', 'No puede agregar Bitacoras, porque el Proyecto no esta Aprobado');
+                return;
+            }
+            else if(estado == 3){ // pausado
+                alertaEstado('Pausado', 'No puede agregar Bitacoras, porque el Proyecto esta Pausado');
+                return;
+            }
+            else if(estado == 4){ // finalizado
+                alertaEstado('Finalizado', 'Se puede agregar Bitacoras porque el Proyecto esta Finalizado');
+                return;
+            }
+
             document.getElementById("formulario-bitacora-nuevo").reset();
 
             var fecha = new Date();
             document.getElementById('fecha-bitacora-nuevo').value = fecha.toJSON().slice(0,10);
 
             $('#modalAgregarBitacora').modal('show');
+        }
+
+        function alertaEstado(titulo, mensaje){
+            Swal.fire({
+                title: titulo,
+                text: mensaje,
+                icon: 'info',
+                showCancelButton: false,
+                confirmButtonColor: '#707070',
+                confirmButtonText: 'Aceptar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                }
+            })
         }
 
         // ver modal requisicion

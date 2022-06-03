@@ -22,6 +22,7 @@ use App\Http\Controllers\Backend\Orden\OrdenController;
 use App\Http\Controllers\Backend\Inicio\InicioController;
 use App\Http\Controllers\Backend\Bolson\BolsonController;
 use App\Http\Controllers\Backend\Cuenta\CuentaProyectoController;
+use App\Http\Controllers\Backend\Recursos\RecursosController;
 
 
 Route::get('/', [LoginController::class,'index'])->name('login');
@@ -127,12 +128,16 @@ Route::post('/admin/bolson/movimiento/nuevo',  [BolsonController::class,'nuevoMo
 Route::post('/admin/bolson/movimiento/informacion',  [BolsonController::class,'informacionMovimiento']);
 Route::post('/admin/bolson/movimiento/editar',  [BolsonController::class,'editarMovimiento']);
 
+
 // --- CUENTA PROYECTO ----
-Route::get('/admin/cuentaproy/cuenta/index', [CuentaProyectoController::class,'indexCuenta'])->name('admin.cuenta.proyectos.index');
-Route::get('/admin/cuentaproy/cuenta/indextabla', [CuentaProyectoController::class,'tablaCuenta']);
-Route::post('/admin/cuentaproy/nuevo',  [CuentaProyectoController::class,'nuevaCuentaProy']);
-Route::post('/admin/cuentaproy/informacion',  [CuentaProyectoController::class,'informacionCuentaProy']);
-Route::post('/admin/cuentaproy/editar',  [CuentaProyectoController::class,'editarCuentaProy']);
+Route::get('/admin/cuentaproy/cuenta/{id}', [CuentaProyectoController::class,'indexCuenta']);
+Route::get('/admin/cuentaproy/cuenta/indextabla/{id}', [CuentaProyectoController::class,'tablaCuenta']);
+//Route::post('/admin/cuentaproy/nuevo',  [CuentaProyectoController::class,'nuevaCuentaProy']);
+//Route::post('/admin/cuentaproy/informacion',  [CuentaProyectoController::class,'informacionCuentaProy']);
+//Route::post('/admin/cuentaproy/editar',  [CuentaProyectoController::class,'editarCuentaProy']);
+
+
+
 
 // --- MOVIMIENTO CUENTA PROYECTO ----
 Route::get('/admin/movicuentaproy/indexmovicuentaproy', [CuentaProyectoController::class,'indexMoviCuentaProy'])->name('admin.movi.cuenta.proy.index');
@@ -255,7 +260,8 @@ Route::post('/admin/administradores/informacion', [AdministradoresController::cl
 Route::post('/admin/administradores/editar', [AdministradoresController::class, 'editarAdministrador']);
 
 
-
+// --- RECURSOS HUMANOS ---
+Route::get('/admin/recursos/index', [RecursosController::class,'index'])->name('admin.recursos.index');
 
 
 

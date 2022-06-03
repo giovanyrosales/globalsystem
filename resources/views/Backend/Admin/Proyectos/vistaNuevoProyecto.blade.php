@@ -84,7 +84,7 @@
                                 <select class="form-control" id="select-area-gestion">
                                     <option value="" disabled selected>Seleccione una opción...</option>
                                     @foreach($arrayAreaGestion as $sel)
-                                        <option value="{{ $sel->id }}">{{ $sel->codigo }} {{ $sel->nombre }}</option>
+                                        <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -95,7 +95,7 @@
                                 <select class="form-control" id="select-linea" >
                                     <option value="" disabled selected>Seleccione una opción...</option>
                                     @foreach($arrayLineaTrabajo as $sel)
-                                        <option value="{{ $sel->id }}">{{ $sel->codigo }} {{ $sel->nombre }}</option>
+                                        <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -106,7 +106,7 @@
                                 <select class="form-control" id="select-fuente-financiamiento" >
                                     <option value="" disabled selected>Seleccione una opción...</option>
                                     @foreach($arrayFuenteFinanciamiento as $sel)
-                                        <option value="{{ $sel->id }}">{{ $sel->codigo }} {{ $sel->nombre }}</option>
+                                        <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -117,7 +117,7 @@
                                 <select class="form-control" id="select-fuente-recursos" >
                                     <option value="" disabled selected>Seleccione una opción...</option>
                                     @foreach($arrayFuenteRecursos as $sel)
-                                        <option value="{{ $sel->id }}">{{ $sel->codigo }} {{ $sel->nombre }}</option>
+                                        <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
                                     @endforeach
                                 </select>
                             </div>

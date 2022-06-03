@@ -93,9 +93,10 @@ class OrdenController extends Controller
         $lista = orden::orderBy('fecha_orden')->get();
 
         foreach($lista as $val){
-            $info = Cotizacion::where('id', $val->cotizacion_id)->first();
-            //$requerimiento = Requisicion::where('id', $info->requisicion_id)->first();
-            $proyecto = Proyecto::where('id', $info->proveedor_id)->first();
+            $infoContizacion = Cotizacion::where('id', $val->cotizacion_id)->first();
+            $infoRequisicion = Requisicion::where('id', $infoContizacion->requisicion_id)->first();
+            $infoProveedor = Proveedores::where('id', $infoContizacion->proveedor_id)->first();
+            $proyecto = Proyecto::where('id', $infoContizacion->proveedor_id)->first();
             //metemos nuevas variables en el arreglo $regdetalle
             $val->proyecto_cod = $proyecto->codigo;
 
@@ -105,7 +106,9 @@ class OrdenController extends Controller
                 $val->actaid = 0;
             }
 
-            $val->requisicion_id = $info->requisicion_id;
+            $val->requisicion_id = $infoContizacion->requisicion_id;
+            $val->requidestino = $infoRequisicion->destino;
+            $val->nomproveedor = $infoProveedor->nombre;
         }
 
         return view('Backend.Admin.Ordenes.tablaOrdenesCompra', compact('lista'));

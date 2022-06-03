@@ -608,6 +608,9 @@
             window.location.href="{{ url('/admin/proyecto/vista/index') }}/" + id;
         }
 
+        function informacionPresupuesto(id){ // id proyecto
+            window.location.href="{{ url('/admin/cuentaproy/cuenta') }}/" + id;
+        }
 
 
     </script>

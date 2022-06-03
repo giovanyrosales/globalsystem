@@ -19,14 +19,17 @@
                                     <td style="width: 10%">{{ $dato->numero }}</td>
                                     <td style="width: 10%">{{ $dato->fecha }}</td>
                                     <td>
-
+                                        @can('boton.cotizar.requisicion')
                                         <button type="button" class="btn btn-success btn-xs" onclick="vistaCotizacion({{ $dato->id }})">
                                             <i class="fas fa-book-open" title="Cotizar"></i>&nbsp; Cotizar
                                         </button>
+                                        @endcan
 
+                                        @can('boton.editar.requisicion')
                                         <button type="button" class="btn btn-info btn-xs" onclick="vistaEditarRequisicion('{{ $dato->id }}', '{{ $dato->numero }}')">
                                             <i class="fas fa-pen-alt" title="Editar"></i>&nbsp; Editar
                                         </button>
+                                        @endcan
                                     </td>
                                 </tr>
                             @endforeach

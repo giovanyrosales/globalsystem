@@ -24,7 +24,7 @@ class CreateProyectosTable extends Migration
             $table->bigInteger('id_naturaleza')->nullable()->unsigned();
             $table->bigInteger('id_estado')->nullable()->unsigned();
 
-            $table->string('codigo',100)->unique()->nullable();
+            $table->string('codigo',100)->unique();
             $table->string('nombre',300);
             $table->string('ubicacion',300);
             $table->string('contraparte',300)->nullable();
