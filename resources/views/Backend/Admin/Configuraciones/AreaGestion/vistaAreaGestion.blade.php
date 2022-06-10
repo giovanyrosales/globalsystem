@@ -17,20 +17,12 @@
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
-                    <i class="fas fa-pencil-alt"></i>
-                    Nueva Área de Gestión
-                </button>
-            </div>
-
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Área</li>
-                    <li class="breadcrumb-item active">Área de Gestión</li>
-                </ol>
-            </div>
+        <div class="row">
+            <h1 style="margin-left: 5px">Área de Gestión</h1>
+            <button type="button" style="margin-left: 20px" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                Nueva Área de Gestión
+            </button>
         </div>
     </section>
 
@@ -82,7 +74,7 @@
                                         <select class="form-control" id="select-fuente-l-nuevo">
                                             <option value="" disabled selected>Seleccione una opción...</option>
                                             @foreach($linea as $sel)
-                                                <option value="{{ $sel->id }}">{{ $sel->codigo }} {{ $sel->nombre }}</option>
+                                                <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
                                             @endforeach
                                         </select>
                                     </div>

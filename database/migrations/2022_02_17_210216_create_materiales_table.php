@@ -16,16 +16,16 @@ class CreateMaterialesTable extends Migration
         Schema::create('materiales', function (Blueprint $table) {
             $table->id();
 
-            $table->bigInteger('id_clasificacion')->unsigned();
+            $table->bigInteger('id_objespecifico')->nullable()->unsigned();
             $table->bigInteger('id_unidadmedida')->nullable()->unsigned();
-            $table->bigInteger('id_cuenta')->nullable()->unsigned(); // codigo especifico
+            $table->bigInteger('id_clasificacion')->nullable()->unsigned(); // codigo especifico
 
             $table->string('nombre', 300);
             $table->decimal('pu', 12, 2); // precio unitario
 
-            $table->foreign('id_clasificacion')->references('id')->on('clasificaciones');
+            $table->foreign('id_objespecifico')->references('id')->on('obj_especifico');
             $table->foreign('id_unidadmedida')->references('id')->on('unidad_medida');
-            $table->foreign('id_cuenta')->references('id')->on('cuenta');
+            $table->foreign('id_clasificacion')->references('id')->on('clasificaciones');
         });
     }
 

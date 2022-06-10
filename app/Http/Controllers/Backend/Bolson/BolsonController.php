@@ -32,8 +32,8 @@ class BolsonController extends Controller
             $infoCuenta = Cuenta::where('id', $dd->id_cuenta)->first();
             $dd->cuenta = $infoCuenta->nombre;
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
-            $dd->montoini = number_format((float)$dd->montoini, 2, '.', '');
-            $dd->saldo = number_format((float)$dd->saldo, 2, '.', '');
+            $dd->montoini = number_format((float)$dd->montoini, 2, '.', ',');
+            $dd->saldo = number_format((float)$dd->saldo, 2, '.', ',');
         }
 
         return view('Backend.Admin.Bolson.Cuenta.tablaCuentaBolson', compact('cuenta'));

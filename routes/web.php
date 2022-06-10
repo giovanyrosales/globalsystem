@@ -121,7 +121,7 @@ Route::post('/admin/bolson/nuevo',  [BolsonController::class,'nuevoRegistro']);
 Route::post('/admin/bolson/informacion',  [BolsonController::class,'informacionBolson']);
 Route::post('/admin/bolson/editar',  [BolsonController::class,'editarRegistro']);
 
-// --- Movimiento Bolson ---
+// --- MOVIMIENTO BOLSON ---
 Route::get('/admin/bolson/movimiento/index', [BolsonController::class,'indexMovimiento'])->name('admin.movimiento.bolson.index');
 Route::get('/admin/bolson/movimiento/tabla', [BolsonController::class,'tablaMovimiento']);
 Route::post('/admin/bolson/movimiento/nuevo',  [BolsonController::class,'nuevoMovimiento']);
@@ -135,6 +135,14 @@ Route::get('/admin/cuentaproy/cuenta/indextabla/{id}', [CuentaProyectoController
 //Route::post('/admin/cuentaproy/nuevo',  [CuentaProyectoController::class,'nuevaCuentaProy']);
 //Route::post('/admin/cuentaproy/informacion',  [CuentaProyectoController::class,'informacionCuentaProy']);
 //Route::post('/admin/cuentaproy/editar',  [CuentaProyectoController::class,'editarCuentaProy']);
+
+// --- PLANILLA ---
+Route::get('/admin/planilla/lista/{id}', [CuentaProyectoController::class,'indexPlanilla']);
+Route::get('/admin/planilla/tabla/lista/{id}', [CuentaProyectoController::class,'tablaPlanilla']);
+Route::post('/admin/planilla/nuevo',  [CuentaProyectoController::class,'nuevaPlanilla']);
+Route::post('/admin/planilla/informacion',  [CuentaProyectoController::class,'informacionPlanilla']);
+Route::post('/admin/planilla/editar',  [CuentaProyectoController::class,'editarPlanilla']);
+
 
 
 
@@ -189,12 +197,7 @@ Route::post('/admin/ordenes/anular/compra',  [OrdenController::class,'anularComp
 Route::post('/admin/ordenes/generar/acta',  [OrdenController::class,'generarActa']);
 Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenController::class,'reporteActaGenerada']);
 
-// --- CODIGO ESPECIFICO ---
-Route::get('/admin/cuenta/index', [CodigoEspecifController::class,'index'])->name('admin.cuenta.index');
-Route::get('/admin/cuenta/tabla/index', [CodigoEspecifController::class,'tabla']);
-Route::post('/admin/cuenta/nuevo', [CodigoEspecifController::class, 'nuevaCuenta']);
-Route::post('/admin/cuenta/informacion', [CodigoEspecifController::class, 'informacionCuenta']);
-Route::post('/admin/cuenta/editar', [CodigoEspecifController::class, 'editarCuenta']);
+
 
 // --- UNIDAD MEDIDA ---
 Route::get('/admin/unidadmedida/index', [UnidadMedidaController::class,'index'])->name('admin.unidadmedida.index');
@@ -263,10 +266,26 @@ Route::post('/admin/administradores/editar', [AdministradoresController::class, 
 // --- RECURSOS HUMANOS ---
 Route::get('/admin/recursos/index', [RecursosController::class,'index'])->name('admin.recursos.index');
 
+// --- RUBRO ---
+Route::get('/admin/rubro/index', [ProveedoresController::class,'indexRubro'])->name('admin.rubro.index');
+Route::get('/admin/rubro/tabla', [ProveedoresController::class,'tablaRubro']);
+Route::post('/admin/rubro/nuevo', [ProveedoresController::class, 'nuevaRubro']);
+Route::post('/admin/rubro/informacion', [ProveedoresController::class, 'informacionRubro']);
+Route::post('/admin/rubro/editar', [ProveedoresController::class, 'editarRubro']);
 
+// --- CUENTA ---
+Route::get('/admin/cuenta/index', [CodigoEspecifController::class,'indexCuenta'])->name('admin.cuenta.index');
+Route::get('/admin/cuenta/tabla', [CodigoEspecifController::class,'tablaCuenta']);
+Route::post('/admin/cuenta/nuevo', [CodigoEspecifController::class, 'nuevaCuenta']);
+Route::post('/admin/cuenta/informacion', [CodigoEspecifController::class, 'informacionCuenta']);
+Route::post('/admin/cuenta/editar', [CodigoEspecifController::class, 'editarCuenta']);
 
-
-
+// --- OBJETO ESPECIFICO ---
+Route::get('/admin/objespecifico/index', [CodigoEspecifController::class,'indexObjEspecifico'])->name('admin.obj.especifico.index');
+Route::get('/admin/objespecifico/tabla', [CodigoEspecifController::class,'tablaObjEspecifico']);
+Route::post('/admin/objespecifico/nuevo', [CodigoEspecifController::class, 'nuevaObjEspecifico']);
+Route::post('/admin/objespecifico/informacion', [CodigoEspecifController::class, 'informacionObjEspecifico']);
+Route::post('/admin/objespecifico/editar', [CodigoEspecifController::class, 'editarObjEspecifico']);
 
 
 

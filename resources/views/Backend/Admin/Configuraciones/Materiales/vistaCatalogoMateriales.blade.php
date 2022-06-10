@@ -19,20 +19,12 @@
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus-square"></i>
-                    Nuevo Material
-                </button>
-            </div>
-
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Materiales</li>
-                    <li class="breadcrumb-item active">Catálogo de Materiales</li>
-                </ol>
-            </div>
+        <div class="row">
+            <h1 style="margin-left: 5px">Materiales</h1>
+            <button type="button" style="margin-left: 15px" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus-square"></i>
+                Nuevo Material
+            </button>
         </div>
     </section>
 
@@ -69,11 +61,11 @@
 
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Código:</label>
+                                    <label>Obj. Específico:</label>
                                     <select style="width: 50%;" class="form-control" id="select-codigo-nuevo">
-                                        <option value="" disabled selected>Seleccione una opción...</option>
-                                        @foreach($lCuenta as $sel)
-                                            <option value="{{ $sel->id }}">{{ $sel->codigo.' '.$sel->nombre }}</option>
+                                        <option value="" selected>Seleccione una opción...</option>
+                                        @foreach($lObjEspeci as $sel)
+                                            <option value="{{ $sel->id }}">{{ $sel->codigo}} - {{ $sel->nombre }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -82,7 +74,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Nombre *:</label>
-                                    <input type="text" class="form-control" onpaste="contarcaracteresIngreso();" onkeyup="contarcaracteresIngreso();" maxlength="300" id="nombre-nuevo" placeholder="Nombre del material">
+                                    <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresIngreso();" onkeyup="contarcaracteresIngreso();" maxlength="300" id="nombre-nuevo" placeholder="Nombre del material">
                                     <div id="res-caracter-nuevo" style="float: right">0/300</div>
                                 </div>
                             </div>
@@ -94,7 +86,7 @@
                                         <label>Unidad de Medida:</label>
                                         <br>
                                         <select width="60%"  class="form-control" id="select-unidad-nuevo">
-                                            <option value="" disabled selected>Seleccione una opción...</option>
+                                            <option value="" selected>Seleccione una opción...</option>
                                             @foreach($lUnidad as $sel)
                                                 <option value="{{ $sel->id }}">{{ $sel->medida }}</option>
                                             @endforeach
@@ -105,7 +97,7 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Precio Unitario *:</label>
-                                        <input type="number" class="form-control" id="precio-nuevo" maxlength="10">
+                                        <input type="number" class="form-control" autocomplete="off" id="precio-nuevo" maxlength="10" placeholder="0.00">
                                     </div>
                                 </div>
                             </div>
@@ -116,13 +108,11 @@
                                     <select width="60%"  class="form-control" id="select-clasi-nuevo">
                                         <option value="" disabled selected>Seleccione una opción...</option>
                                         @foreach($lClasificacion as $sel)
-                                            <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
+                                            <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-
-
 
                         </div>
                     </form>
@@ -157,7 +147,7 @@
 
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Código:</label>
+                                            <label>Obj. Específico:</label>
                                             <select class="form-control" id="select-codigo-editar">
                                             </select>
                                         </div>
@@ -166,7 +156,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Nombre *:</label>
-                                            <input type="text" class="form-control" onpaste="contarcaracteresEditar();" onkeyup="contarcaracteresEditar();" maxlength="300" id="nombre-editar" placeholder="Nombre del material">
+                                            <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresEditar();" onkeyup="contarcaracteresEditar();" maxlength="300" id="nombre-editar" placeholder="Nombre del material">
                                             <div id="res-caracter-editar" style="float: right">0/300</div>
                                         </div>
                                     </div>
@@ -184,15 +174,15 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>Precio Unitario *:</label>
-                                                <input type="number" class="form-control" id="precio-editar" maxlength="10">
+                                                <input type="number" class="form-control" autocomplete="off" id="precio-editar" maxlength="10">
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-8">
+                                    <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Clasificación *:</label>
-                                            <select width="60%"  class="form-control" id="select-clasi-editar">
+                                            <label>Clasificación:</label>
+                                            <select class="form-control" id="select-class-editar">
                                             </select>
                                         </div>
                                     </div>
@@ -256,8 +246,7 @@
                 },
             });
 
-            $('#select-clasi-editar').select2({
-                dropdownParent: $("#modalEditar"),
+            $('#select-class-editar').select2({
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
@@ -266,6 +255,23 @@
                 },
             });
 
+            $('#select-unidad-nuevo').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-unidad-editar').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
 
             document.getElementById("divcontenedor").style.display = "block";
         });
@@ -279,15 +285,15 @@
         }
 
         function modalAgregar(){
-
-
             document.getElementById("formulario-nuevo").reset();
-
-
-
-
-
             document.getElementById('res-caracter-nuevo').innerHTML = '0/300 ';
+
+            document.getElementById("select-clasi-nuevo").selectedIndex = "0";
+
+            document.getElementById("select-codigo-nuevo").selectedIndex = "0";
+            document.getElementById("select-unidad-nuevo").selectedIndex = "0";
+            document.getElementById("select-clasi-nuevo").selectedIndex = "0";
+
             $('#modalAgregar').modal({backdrop: 'static', keyboard: false})
         }
 
@@ -372,7 +378,7 @@
 
             openLoading();
             var formData = new FormData();
-            formData.append('codigo', codigo);
+            formData.append('objespecifico', codigo);
             formData.append('nombre', nombre);
             formData.append('precio', precio);
             formData.append('unidad', unidad);
@@ -417,12 +423,24 @@
 
                         document.getElementById("select-codigo-editar").options.length = 0;
                         document.getElementById("select-unidad-editar").options.length = 0;
-                        document.getElementById("select-clasi-editar").options.length = 0;
+                        document.getElementById("select-class-editar").options.length = 0;
 
+                        // codigo especifico
                         if(response.data.arraydatos['idcodigo'] == null){
                             $('#select-codigo-editar').append('<option value="">Seleccionar una opción</option>');
                         }
 
+                        // unidad medida
+                        if(response.data.arraydatos['idmedida'] == null){
+                            $('#select-unidad-editar').append('<option value="">Seleccionar una opción</option>');
+                        }
+
+                        // clasificacion
+                        if(response.data.arraydatos['idclasifi'] == null){
+                            $('#select-class-editar').append('<option value="">Seleccionar una opción</option>');
+                        }
+
+                        // objeto especifico
                         $.each(response.data.codigo, function( key, val ){
                             if(response.data.arraydatos['idcodigo'] == val.id){
                                 $('#select-codigo-editar').append('<option value="' +val.id +'" selected="selected">'+val.codigo + ' ' + val.nombre +'</option>');
@@ -431,10 +449,7 @@
                             }
                         });
 
-                        if(response.data.arraydatos['idmedida'] == null){
-                            $('#select-unidad-editar').append('<option value="">Seleccionar una opción</option>');
-                        }
-
+                        // unidad de medida
                         $.each(response.data.unidad, function( key, val ){
                             if(response.data.arraydatos['idmedida'] == val.id){
                                 $('#select-unidad-editar').append('<option value="' +val.id +'" selected="selected">'+ val.medida +'</option>');
@@ -443,15 +458,12 @@
                             }
                         });
 
-                        if(response.data.arraydatos['idclasifi'] == null){
-                            $('#select-clasi-editar').append('<option value="">Seleccionar una opción</option>');
-                        }
-
+                        // clasificacion
                         $.each(response.data.clasificacion, function( key, val ){
                             if(response.data.arraydatos['idclasifi'] == val.id){
-                                $('#select-clasi-editar').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
+                                $('#select-class-editar').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
                             }else{
-                                $('#select-clasi-editar').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
+                                $('#select-class-editar').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
                             }
                         });
 
@@ -472,7 +484,7 @@
             var nombre = document.getElementById('nombre-editar').value;
             var precio = document.getElementById('precio-editar').value;
             var unidad = document.getElementById('select-unidad-editar').value; // nullable
-            var clasificacion = document.getElementById('select-clasi-editar').value; // nullable
+            var clasificacion = document.getElementById('select-class-editar').value; // nullable
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -486,11 +498,6 @@
 
             if(precio === ''){
                 toastr.error('Precio es requerido');
-                return;
-            }
-
-            if(clasificacion === ''){
-                toastr.error('Clasificación es requerido');
                 return;
             }
 

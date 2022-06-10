@@ -4,6 +4,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
 
 @stop
 
@@ -17,12 +18,15 @@
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
-        <div class="row">
-            <h1>Clasificaciones</h1>
-            <button type="button" style="margin-left: 15px" onclick="modalAgregar()" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus-square"></i>
-                Nueva Clasificación
-            </button>
+        <div class="container-fluid">
+            <div class="row">
+                <h1>Cuenta</h1>
+                <button type="button" style="margin-left: 15px" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus-square"></i>
+                    Nueva Cuenta
+                </button>
+            </div>
+
         </div>
     </section>
 
@@ -30,7 +34,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado de Clasificaciones</h3>
+                    <h3 class="card-title">Listado</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -48,7 +52,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nueva Clasificación</h4>
+                    <h4 class="modal-title">Nueva Cuenta</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -60,8 +64,22 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
+                                        <label>Código</label>
+                                        <input type="text" class="form-control" id="numero" placeholder="Código">
+                                    </div>
+
+                                    <div class="form-group">
                                         <label>Nombre</label>
-                                        <input type="text" maxlength="100" class="form-control" id="nombre-nuevo" autocomplete="off">
+                                        <input type="text" maxlength="300" class="form-control" id="nombre" placeholder="Nombre">
+                                    </div>
+
+                                    <div class="form-group row" style="margin-top: 30px">
+                                        <label class="control-label">Rubro: </label>
+                                        <select id="select-rubro" class="form-control">
+                                            @foreach($rubro as $item)
+                                                <option value="{{$item->id}}">{{$item->codigo}} - {{ $item->nombre }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
 
                                 </div>
@@ -82,12 +100,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Editar Clasificación</h4>
+                    <h4 class="modal-title">Editar Cuenta</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-
                 <div class="modal-body">
                     <form id="formulario-editar">
                         <div class="card-body">
@@ -95,12 +112,23 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
+                                        <label>Código</label>
                                         <input type="hidden" id="id-editar">
+                                        <input type="text" class="form-control" id="numero-editar" placeholder="Código">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Nombre</label>
-                                        <input type="text" maxlength="100" class="form-control" id="nombre-editar" autocomplete="off">
+                                        <input type="text" maxlength="300" class="form-control" id="nombre-editar" placeholder="Nombre">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label style="color:#191818">Rubro</label>
+                                        <br>
+                                        <div>
+                                            <select class="form-control" id="rubro-editar">
+                                            </select>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -117,7 +145,6 @@
     </div>
 </div>
 
-
 @extends('backend.menus.footerjs')
 @section('archivos-js')
 
@@ -131,18 +158,17 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/clasificaciones/tabla/index') }}";
+            var ruta = "{{ URL::to('/admin/cuenta/tabla') }}";
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
-
         });
     </script>
 
     <script>
 
         function recargar(){
-            var ruta = "{{ url('/admin/clasificaciones/tabla/index') }}";
+            var ruta = "{{ url('/admin/cuenta/tabla') }}";
             $('#tablaDatatable').load(ruta);
         }
 
@@ -152,23 +178,54 @@
         }
 
         function nuevo(){
-            var nombre = document.getElementById('nombre-nuevo').value;
+            var nombre = document.getElementById('nombre').value;
+            var numero = document.getElementById('numero').value;
+            var rubro = document.getElementById('select-rubro').value;
 
-            if(nombre === ''){
-                toastr.error('Nombre es requerido');
+            if(numero === ''){
+                toastr.error('código es requerido');
                 return;
             }
 
-            if(nombre.length > 100){
-                toastr.error('Nombre máximo 100 caracteres');
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
+            if(!numero.match(reglaNumeroEntero)) {
+                toastr.error('código debe ser número Entero');
+                return;
+            }
+
+            if(numero < 0){
+                toastr.error('código no debe tener negativos');
+                return;
+            }
+
+            if(numero.length > 7){
+                toastr.error('código máximo 7 dígitos de límite');
+                return;
+            }
+
+            if(nombre === ''){
+                toastr.error('nombre es requerido');
+                return;
+            }
+
+            if(nombre.length > 300){
+                toastr.error('nombre máximo 300 caracteres');
+                return;
+            }
+
+            if(rubro === ''){
+                toastr.error('rubro es requerido');
                 return;
             }
 
             openLoading();
             var formData = new FormData();
             formData.append('nombre', nombre);
+            formData.append('numero', numero);
+            formData.append('rubro', rubro);
 
-            axios.post(url+'/clasificaciones/nuevo', formData, {
+            axios.post(url+'/cuenta/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -182,7 +239,7 @@
                     }
                 })
                 .catch((error) => {
-                    toastr.error('Error al registrar');
+                    toastr.error('error al registrar');
                     closeLoading();
                 });
         }
@@ -191,37 +248,76 @@
             openLoading();
             document.getElementById("formulario-editar").reset();
 
-            axios.post(url+'/clasificaciones/informacion',{
+            axios.post(url+'/cuenta/informacion',{
                 'id': id
             })
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
                         $('#modalEditar').modal('show');
-                        $('#id-editar').val(response.data.clasificacion.id);
-                        $('#nombre-editar').val(response.data.clasificacion.nombre);
+                        $('#id-editar').val(response.data.cuenta.id);
+                        $('#numero-editar').val(response.data.cuenta.codigo);
+                        $('#nombre-editar').val(response.data.cuenta.nombre);
 
+                        document.getElementById("rubro-editar").options.length = 0;
+
+                        $.each(response.data.rr, function( key, val ){
+                            if(response.data.idrr == val.id){
+                                $('#rubro-editar').append('<option value="' +val.id +'" selected="selected">'+val.nombre+'</option>');
+                            }else{
+                                $('#rubro-editar').append('<option value="' +val.id +'">'+val.nombre+'</option>');
+                            }
+                        });
                     }else{
-                        toastr.error('Información no encontrada');
+                        toastr.error('información no encontrada');
                     }
                 })
                 .catch((error) => {
                     closeLoading();
-                    toastr.error('Información no encontrada');
+                    toastr.error('información no encontrada');
                 });
         }
 
         function editar(){
             var id = document.getElementById('id-editar').value;
             var nombre = document.getElementById('nombre-editar').value;
+            var numero = document.getElementById('numero-editar').value;
+            var rubro = document.getElementById('rubro-editar').value;
 
-            if(nombre === ''){
-                toastr.error('Nombre es requerido');
+            if(numero === ''){
+                toastr.error('código es requerido');
                 return;
             }
 
-            if(nombre.length > 100){
-                toastr.error('Nombre máximo 100 caracteres');
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
+            if(!numero.match(reglaNumeroEntero)) {
+                toastr.error('código debe ser número Entero');
+                return;
+            }
+
+            if(numero < 0){
+                toastr.error('código no debe tener negativos');
+                return;
+            }
+
+            if(numero.length > 7){
+                toastr.error('código máximo 7 digitos de límite');
+                return;
+            }
+
+            if(nombre === ''){
+                toastr.error('nombre es requerido');
+                return;
+            }
+
+            if(nombre.length > 300){
+                toastr.error('nombre máximo 300 caracteres');
+                return;
+            }
+
+            if(rubro === ''){
+                toastr.error('rubro es requerido');
                 return;
             }
 
@@ -229,8 +325,10 @@
             var formData = new FormData();
             formData.append('id', id);
             formData.append('nombre', nombre);
+            formData.append('numero', numero);
+            formData.append('rubro', rubro);
 
-            axios.post(url+'/clasificaciones/editar', formData, {
+            axios.post(url+'/cuenta/editar', formData, {
             })
                 .then((response) => {
                     closeLoading();

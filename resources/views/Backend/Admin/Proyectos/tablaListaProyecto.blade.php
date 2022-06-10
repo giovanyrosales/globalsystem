@@ -36,9 +36,17 @@
                                         @endcan
 
                                         @can('boton.ver.presupuesto')
+                                        <br><br>
                                         <button type="button" class="btn btn-info btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
                                         </button>
+                                        @endcan
+
+                                        @can('boton.ver.planilla')
+                                            <br><br>
+                                            <button type="button" class="btn btn-info btn-xs" onclick="informacionPlanilla({{ $dato->id }})">
+                                                <i class="fas fa-eye" title="Planilla"></i>&nbsp; Planilla
+                                            </button>
                                         @endcan
                                     </td>
                                 </tr>

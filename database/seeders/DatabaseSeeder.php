@@ -19,5 +19,14 @@ class DatabaseSeeder extends Seeder
         $this->call(NaturalezaSeeder::class);
         $this->call(EstadoProyectoSeeder::class);
         $this->call(UnidadMedidaSeeder::class);
+
+        $this->call(FFinanciamientoSeeder::class);
+        $this->call(LineaTrabajoSeeder::class);
+        $this->call(ClasificacionSeeder::class);
+        $this->call(RubroSeeder::class);
+        $this->call(CuentaSeeder::class);
+        $this->call(GestionSeeder::class);
+        $this->call(ObjetoSeeder::class);
+        $this->call(FuenteRSeeder::class);
     }
 }

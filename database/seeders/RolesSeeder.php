@@ -17,19 +17,19 @@ class RolesSeeder extends Seeder
     {
         // --- CREAR ROLES ---
 
-        // ADMINISTRADOR
+        // Administrador
         $roleAdmin = Role::create(['name' => 'admin']);
 
         // UACI
         $roleUaci = Role::create(['name' => 'uaci']);
 
-        // PRESUPUESTO
+        // Presupuesto
         $rolePresupuesto = Role::create(['name' => 'presupuesto']);
 
-        // INGENIERIA
+        // Ingenieria
         $roleIng = Role::create(['name' => 'formulador']);
 
-        // JEFE UACI
+        // Jefe UACI
         $roleJefeUaci = Role::create(['name' => 'jefeuaci']);
 
         // Administrador
@@ -37,6 +37,9 @@ class RolesSeeder extends Seeder
 
         // Secretaria
         $roleSecretaria = Role::create(['name' => 'secretaria']);
+
+        // Recursos Humanos
+        //$roleRRHH = Role::create(['name' => 'rrhh']);
 
         // ROLES Y PERMISOS
         Permission::create(['name' => 'sidebar.roles.y.permisos', 'description' => 'sidebar seccion roles y permisos'])->syncRoles($roleAdmin);
@@ -59,6 +62,8 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'boton.editar.requisicion', 'description' => 'sidebar seccion proyecto - boton editar requisicion'])->syncRoles($roleAdministrador);
             Permission::create(['name' => 'boton.ver.presupuesto', 'description' => 'sidebar seccion proyecto - boton ver presupuesto'])->syncRoles($rolePresupuesto, $roleAdministrador, $roleJefeUaci, $roleSecretaria);
             Permission::create(['name' => 'boton.cotizar.requisicion', 'description' => 'sidebar seccion proyecto - boton cotizar requisicion'])->syncRoles($roleUaci);
+            Permission::create(['name' => 'boton.ver.planilla', 'description' => 'sidebar seccion proyecto - boton ver planilla'])->syncRoles($roleUaci);
+
 
 
             Permission::create(['name' => 'modulo.agregar.requisicion.proyecto', 'description' => 'sidebar seccion proyecto - modulo para agregar requisicion'])->syncRoles($roleAdministrador);
@@ -89,7 +94,6 @@ class RolesSeeder extends Seeder
         // CONFIGURACIONES
         Permission::create(['name' => 'sidebar.seccion.configuraciones', 'description' => 'sidebar seccion configuraciones'])->syncRoles($roleUaci, $rolePresupuesto);
 
-            Permission::create(['name' => 'sidebar.codigo.especifico', 'description' => 'sidebar seccion codigo cspecifico'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'sidebar.fuente.financiamiento', 'description' => 'sidebar seccion fuente de financiamiento'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'sidebar.area.gestion', 'description' => 'sidebar seccion area de gestion'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'sidebar.fuente.recursos', 'description' => 'sidebar seccion fuente de recursos'])->syncRoles($rolePresupuesto);
@@ -99,6 +103,11 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'sidebar.unidad.medida', 'description' => 'sidebar seccion unidad de medida'])->syncRoles($roleUaci);
             Permission::create(['name' => 'sidebar.calificaciones', 'description' => 'sidebar seccion calificaciones'])->syncRoles($roleUaci);
             Permission::create(['name' => 'sidebar.administradores', 'description' => 'sidebar seccion administradores'])->syncRoles($roleUaci);
+            Permission::create(['name' => 'sidebar.rubro', 'description' => 'sidebar seccion rubro'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'sidebar.cuenta', 'description' => 'sidebar seccion cuenta'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'sidebar.obj.especifico', 'description' => 'sidebar objeto específico'])->syncRoles($rolePresupuesto);
+
+
 
     }
 }

@@ -17,20 +17,12 @@
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
-                    <i class="fas fa-pencil-alt"></i>
-                    Nueva Fuente de Financiamiento
-                </button>
-            </div>
-
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Financiamiento</li>
-                    <li class="breadcrumb-item active">Fuente de Financiamiento</li>
-                </ol>
-            </div>
+        <div class="row">
+            <h1 style="margin-left: 5px">Fuente de Financiamiento</h1>
+            <button type="button" style="margin-left: 20px" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                Nueva Fuente de Financiamiento
+            </button>
         </div>
     </section>
 

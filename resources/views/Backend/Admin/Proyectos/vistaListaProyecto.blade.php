@@ -612,6 +612,9 @@
             window.location.href="{{ url('/admin/cuentaproy/cuenta') }}/" + id;
         }
 
+        function informacionPlanilla(id){
+            window.location.href="{{ url('/admin/planilla/lista') }}/" + id;
+        }
 
     </script>
 

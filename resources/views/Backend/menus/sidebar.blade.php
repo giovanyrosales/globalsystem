@@ -192,9 +192,9 @@
                         @endcan
 
                     </ul>
-                </li>
+                </li>  -->
                 @endcan
-                    -->
+
 
                 @can('sidebar.seccion.configuraciones')
                 <li class="nav-item">
@@ -209,95 +209,113 @@
 
                     <ul class="nav nav-treeview">
 
-                        @can('sidebar.codigo.especifico')
+                        @can('sidebar.rubro')
+                            <li class="nav-item">
+                                <a href="{{ route('admin.rubro.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Rubro</p>
+                                </a>
+                            </li>
+                        @endcan
+
+                        @can('sidebar.cuenta')
+                            <li class="nav-item">
+                                <a href="{{ route('admin.cuenta.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Cuenta</p>
+                                </a>
+                            </li>
+                        @endcan
+
+                        @can('sidebar.obj.especifico')
                         <li class="nav-item">
-                            <a href="{{ route('admin.cuenta.index') }}" target="frameprincipal" class="nav-link">
+                            <a href="{{ route('admin.obj.especifico.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Código Específ.</p>
+                                <p>Obj. Específico</p>
                             </a>
                         </li>
                         @endcan
 
-                            @can('sidebar.unidad.medida')
+                        @can('sidebar.unidad.medida')
                         <li class="nav-item">
                             <a href="{{ route('admin.unidadmedida.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Unidad de Medida</p>
                             </a>
                         </li>
-                            @endcan
+                        @endcan
 
-                            @can('sidebar.calificaciones')
+                        @can('sidebar.calificaciones')
                         <li class="nav-item">
                             <a href="{{ route('admin.clasificaciones.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Clasificaciones</p>
                             </a>
                         </li>
-                            @endcan
+                        @endcan
 
-                            @can('sidebar.catalogo.materiales')
+                        @can('sidebar.catalogo.materiales')
                         <li class="nav-item">
                             <a href="{{ route('admin.catalogo.materiales.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Catálogo Materiales</p>
                             </a>
                         </li>
-                            @endcan
+                        @endcan
 
-                            @can('sidebar.linea.trabajo')
+                        @can('sidebar.linea.trabajo')
                         <li class="nav-item">
                             <a href="{{ route('admin.linea.de.trabajo.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Línea de Trabajo</p>
                             </a>
                         </li>
-                            @endcan
+                        @endcan
 
-                            @can('sidebar.fuente.financiamiento')
+                        @can('sidebar.fuente.financiamiento')
                         <li class="nav-item">
                             <a href="{{ route('admin.fuente.financiamiento.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Fuente Financiamiento</p>
                             </a>
                         </li>
-                            @endcan
+                        @endcan
 
-                            @can('sidebar.fuente.recursos')
+                        @can('sidebar.fuente.recursos')
                         <li class="nav-item">
                             <a href="{{ route('admin.fuente.recurso.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Fuente de Recursos</p>
                             </a>
                         </li>
-                            @endcan
+                        @endcan
 
-                            @can('sidebar.area.gestion')
+                        @can('sidebar.area.gestion')
                         <li class="nav-item">
                             <a href="{{ route('admin.area.gestion.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Área de Gestión</p>
                             </a>
                         </li>
-                            @endcan
+                        @endcan
 
-                            @can('sidebar.proveedores')
+                        @can('sidebar.proveedores')
                         <li class="nav-item">
                             <a href="{{ route('admin.proveedores.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Proveedores</p>
                             </a>
                         </li>
-                            @endcan
+                        @endcan
 
-                            @can('sidebar.administradores')
+                        @can('sidebar.administradores')
                         <li class="nav-item">
                             <a href="{{ route('admin.administradores.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Administradores</p>
                             </a>
                         </li>
-                            @endcan
+                        @endcan
 
                     </ul>
                 </li>

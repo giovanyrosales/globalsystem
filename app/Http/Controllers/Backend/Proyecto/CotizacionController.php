@@ -64,7 +64,7 @@ class CotizacionController extends Controller
             $infoDescripcion = CatalogoMateriales::where('id', $de->material_id)->first();
             $de->descripcion = $infoDescripcion->nombre;
 
-            $de->precio_u = number_format((float)$de->precio_u, 2, '.', '');
+            $de->precio_u = number_format((float)$de->precio_u, 2, '.', ',');
         }
 
         $estado = $cotizacion->estado;

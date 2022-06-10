@@ -7,24 +7,19 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 15%">Cod. Especifico</th>
-                                <th style="width: 20%">Nombre</th>
-                                <th style="width: 8%">Medida</th>
-                                <th style="width: 15%">Clasificación</th>
-                                <th style="width: 10%">Precio U.</th>
-
-                                <th style="width: 10%">Opciones</th>
+                                <th style="width: 10%">Código</th>
+                                <th style="width: 15%">Nombre</th>
+                                <th style="width: 15%">Rubro</th>
+                                <th style="width: 15%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($lista as $dato)
                                 <tr>
-                                    <td>{{ $dato->objespecifico }}</td>
+                                    <td>{{ $dato->codigo }}</td>
                                     <td>{{ $dato->nombre }}</td>
-                                    <td>{{ $dato->unidadmedida }}</td>
-                                    <td>{{ $dato->clasificacion }}</td>
-                                    <td>{{ $dato->pu }}</td>
+                                    <td>{{ $dato->rubro }}</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar

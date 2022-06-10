@@ -19,7 +19,7 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
+                <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
                     <i class="fas fa-pencil-alt"></i>
                     Nuevo Proveedor
                 </button>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Configuraciones;
 use App\Http\Controllers\Controller;
 use App\Models\CatalogoMateriales;
 use App\Models\Clasificaciones;
+use App\Models\ObjEspecifico;
 use App\Models\Cuenta;
 use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
@@ -20,10 +21,10 @@ class MaterialesController extends Controller
     public function index(){
         $lClasificacion = Clasificaciones::orderBy('nombre', 'ASC')->get();
         $lUnidad = UnidadMedida::orderBy('medida', 'ASC')->get();
-        $lCuenta = Cuenta::orderBy('nombre', 'ASC')->get();
+        $lObjEspeci = ObjEspecifico::orderBy('nombre', 'ASC')->get();
 
         return view('Backend.Admin.Configuraciones.Materiales.vistaCatalogoMateriales', compact('lClasificacion',
-        'lUnidad', 'lCuenta'));
+        'lUnidad', 'lObjEspeci'));
     }
 
     public function tabla(){
@@ -33,7 +34,7 @@ class MaterialesController extends Controller
 
             $clasificacion = '';
             $unidadmedida = '';
-            $codigoespeci = '';
+            $objespecifico = '';
 
             if($dataClasi = Clasificaciones::where('id', $item->id_clasificacion)->first()){
                $clasificacion = $dataClasi->nombre;
@@ -43,13 +44,13 @@ class MaterialesController extends Controller
                $unidadmedida = $dataUnidad->medida;
             }
 
-            if($dataCodigo = Cuenta::where('id', $item->id_cuenta)->first()){
-                $codigoespeci = $dataCodigo->codigo . ' - ' . $dataCodigo->nombre;
+            if($dataObj = ObjEspecifico::where('id', $item->id_objespecifico)->first()){
+                $objespecifico = $dataObj->codigo . ' - ' . $dataObj->nombre;
             }
 
             $item->clasificacion = $clasificacion;
             $item->unidadmedida = $unidadmedida;
-            $item->codigoespeci = $codigoespeci;
+            $item->objespecifico = $objespecifico;
         }
 
         return view('Backend.Admin.Configuraciones.Materiales.tablaCatalogoMateriales', compact('lista'));
@@ -69,7 +70,7 @@ class MaterialesController extends Controller
         $dato = new CatalogoMateriales();
         $dato->id_clasificacion = $request->clasificacion;
         $dato->id_unidadmedida = $request->unidad;
-        $dato->id_cuenta = $request->codigo;
+        $dato->id_objespecifico = $request->objespecifico;
         $dato->nombre = $request->nombre;
         $dato->pu = $request->precio;
 
@@ -93,16 +94,12 @@ class MaterialesController extends Controller
 
             $arrayClasificacion = Clasificaciones::orderBy('nombre', 'ASC')->get();
             $arrayUnidad = UnidadMedida::orderBy('medida', 'ASC')->get();
-            $arrayCodiEspec = Cuenta::orderBy('nombre', 'ASC')->get();
-
-            $idclasifi = $lista->id_clasificacion;
-            $idcodigo = $lista->id_cuenta;
-            $idmedida = $lista->id_unidadmedida;
+            $arrayCodiEspec = ObjEspecifico::orderBy('nombre', 'ASC')->get();
 
             $arrayDatos = [
-                "idmedida" => $idmedida,
-                "idcodigo" => $idcodigo,
-                "idclasifi" => $idclasifi,
+                "idmedida" => $lista->id_unidadmedida,
+                "idcodigo" => $lista->id_objespecifico,
+                "idclasifi" => $lista->id_clasificacion
             ];
 
             return ['success' => 1, 'registro' => $lista, 'clasificacion' => $arrayClasificacion,
@@ -123,11 +120,10 @@ class MaterialesController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
-
         CatalogoMateriales::where('id', $request->id)->update([
             'id_clasificacion' => $request->clasificacion,
             'id_unidadmedida' => $request->unidad,
-            'id_cuenta' => $request->codigo,
+            'id_objespecifico' => $request->codigo,
             'nombre' => $request->nombre,
             'pu' => $request->precio
         ]);
