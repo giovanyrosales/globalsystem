@@ -112,9 +112,18 @@
                 <div class="card card-default">
                     <div class="card-header">
                         <h3 class="card-title"><strong>Presupuesto de Proyecto</strong></h3>
-                        <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
-                            Agregar Partida
-                        </button>
+                        <br>
+                        <br>
+                        @if($proyecto->presu_aprobado == 1)
+                            <span class="badge bg-success">{{ $preaprobacion }}</span>
+                        @else
+                            <span class="badge bg-warning">{{ $preaprobacion }}</span>
+
+                            <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
+                                Agregar Partida
+                            </button>
+                        @endif
+
                     </div>
 
                     <div class="card-body">
@@ -456,16 +465,16 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Cantidad C/ Unidad:</label>
-                                    <input class="form-control" id="cantidad-partida-nuevo">
+                                    <input class="form-control" type="text" maxlength="50" id="cantidad-partida-nuevo">
                                 </div>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <div class="form-group">
                                     <label>Partida *:</label>
-                                    <input class="form-control" id="nombre-partida-nuevo" maxlength="300">
+                                    <input class="form-control" id="nombre-partida-nuevo" maxlength="600">
                                 </div>
                             </div>
 
@@ -485,6 +494,7 @@
                                     <th style="width: 3%">#</th>
                                     <th style="width: 5%">Cantidad</th>
                                     <th style="width: 15%">Descripción</th>
+                                    <th style="width: 3%">Multiplicar <i class="fas fa-question-circle" data-toggle="popover" title="Multiplicar" data-content="Se multiplica el mismo material si se coloca mayor a 0"></i></th>
                                     <th style="width: 5%">Opciones</th>
                                 </tr>
                                 </thead>
@@ -548,26 +558,28 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Cantidad C/ Unidad:</label>
-                                    <input class="form-control" id="cantidad-partida-editar">
+                                    <input class="form-control" type="text" maxlength="50" id="cantidad-partida-editar">
                                 </div>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <div class="form-group">
                                     <label>Partida *:</label>
-                                    <input class="form-control" id="nombre-partida-editar" maxlength="300">
+                                    <input class="form-control" id="nombre-partida-editar" maxlength="600">
                                 </div>
                             </div>
 
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <br>
-                                    <button type="button" onclick="addAgregarFilaPresupuestoEditar()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
-                                        <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
+                            @if($proyecto->presu_aprobado == 0)
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <br>
+                                        <button type="button" onclick="addAgregarFilaPresupuestoEditar()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                            <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
 
                         </div>
                         <div class="row">
@@ -577,6 +589,7 @@
                                     <th style="width: 3%">#</th>
                                     <th style="width: 5%">Cantidad</th>
                                     <th style="width: 15%">Descripción</th>
+                                    <th style="width: 3%">Multiplicar <i class="fas fa-question-circle" data-toggle="popover" title="Multiplicar" data-content="Se multiplica el mismo material si se coloca mayor a 0"></i></th>
                                     <th style="width: 5%">Opciones</th>
                                 </tr>
                                 </thead>
@@ -591,7 +604,9 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="preguntaEditarPresupuestoEditar()">Guardar</button>
+                @if($proyecto->presu_aprobado == 0)
+                    <button type="button" class="btn btn-primary" onclick="preguntaEditarPresupuestoEditar()">Guardar</button>
+                @endif
             </div>
         </div>
     </div>
@@ -638,6 +653,13 @@
                 $(".droplistaeditar").hide();
                 $(".droplistapresupuesto").hide();
                 $(".droplistapresupuestoEditar").hide();
+            });
+
+            $(document).ready(function() {
+                $('[data-toggle="popover"]').popover({
+                    placement: 'top',
+                    trigger: 'hover'
+                });
             });
 
         });
@@ -840,16 +862,8 @@
             // verificar estado del proyecto
             var estado = {{ $estado }};
 
-            if(estado == 1){ // priorizado
-                alertaEstado('No Iniciado', 'No puede agregar Bitacoras, porque el Proyecto no esta Aprobado');
-                return;
-            }
-            else if(estado == 3){ // pausado
-                alertaEstado('Pausado', 'No puede agregar Bitacoras, porque el Proyecto esta Pausado');
-                return;
-            }
-            else if(estado == 4){ // finalizado
-                alertaEstado('Finalizado', 'Se puede agregar Bitacoras porque el Proyecto esta Finalizado');
+            if(estado === 0){ // priorizado
+                alertaEstado('Información', 'No puede agregar Bitácoras, porque el Presupuesto no ha sido Aprobado');
                 return;
             }
 
@@ -1500,6 +1514,11 @@
                 "</td>"+
 
                 "<td>"+
+                "<input name='duplicarPresupuestoArray[]' maxlength='3' class='form-control' value='0' type='number'>"+
+                "</td>"+
+
+
+                "<td>"+
                 "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoDetalle(this)'>Borrar</button>"+
                 "</td>"+
 
@@ -1606,41 +1625,24 @@
         function verificarPresupuesto(){
 
             var cantidadPartida = document.getElementById('cantidad-partida-nuevo').value; // decimal
-            var nombre = document.getElementById('nombre-partida-nuevo').value; // 300 caracteres
+            var nombre = document.getElementById('nombre-partida-nuevo').value; // 600 caracteres
             var contador = document.getElementById('conteo-partida').value;
             var tipopartida = document.getElementById('select-partida-nuevo').value;
 
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
-            if(cantidadPartida === ''){
-                cantidadPartida = 0;
+            if(cantidadPartida.length > 50){
+                toastr.error('Cantidad Partida debe tener máximo 50 caracteres');
+                return;
             }
-            else{
-
-                if(!cantidadPartida.match(reglaNumeroDecimal)) {
-                    toastr.error('Cantidad Partida debe ser decimal y no negativo');
-                    return;
-                }
-
-                if(cantidadPartida < 0){
-                    toastr.error('Cantidad partida no debe ser negativo');
-                    return;
-                }
-
-                if(cantidadPartida.length > 10){
-                    toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
-                    return;
-                }
-            }
-
 
             if(nombre === ''){
                 toastr.error('Partida es requerida');
                 return;
             }
 
-            if(nombre.length > 300){
-                toastr.error('Partida debe tener máximo 300 caracteres');
+            if(nombre.length > 600){
+                toastr.error('Partida debe tener máximo 600 caracteres');
                 return;
             }
 
@@ -1654,6 +1656,8 @@
                 var cantidad = $("input[name='cantidadPresupuestoArray[]']").map(function(){return $(this).val();}).get();
                 var descripcion = $("input[name='descripcionPresupuestoArray[]']").map(function(){return $(this).val();}).get();
                 var descripcionAtributo = $("input[name='descripcionPresupuestoArray[]']").map(function(){return $(this).attr("data-infopresupuesto");}).get();
+                var duplicado = $("input[name='duplicarPresupuestoArray[]']").map(function(){return $(this).val();}).get();
+
 
                 for(var a = 0; a < cantidad.length; a++){
 
@@ -1709,11 +1713,44 @@
                     }
                 }
 
+                var reglaNumeroEntero = /^[0-9]\d*$/;
+
+                // verificar duplicado
+                for(var d = 0; d < duplicado.length; d++){
+
+                    let datoDuplicado = duplicado[d];
+
+                    if(datoDuplicado === ''){
+                        colorRojoTablaPresupuesto(d);
+                        toastr.error('Fila #' + (d+1) + ' Duplicado debe ser 0 como mínimo');
+                        return;
+                    }
+
+                    if(!datoDuplicado.match(reglaNumeroEntero)) {
+                        colorRojoTablaPresupuesto(d);
+                        toastr.error('Fila #' + (d+1) + ' Duplicado debe ser número Entero y no Negativo');
+                        return;
+                    }
+
+                    if(datoDuplicado < 0){
+                        colorRojoTablaPresupuesto(d);
+                        toastr.error('Fila #' + (d+1) + ' Duplicado no debe ser negativo');
+                        return;
+                    }
+
+                    if(datoDuplicado.length > 3){
+                        colorRojoTablaPresupuesto(d);
+                        toastr.error('Fila #' + (d+1) + ' Duplicado máximo 3 caracteres');
+                        return;
+                    }
+                }
+
                 // como tienen la misma cantidad de filas, podemos recorrer
                 // todas las filas de una vez
                 for(var p = 0; p < cantidad.length; p++){
                     formData.append('cantidad[]', cantidad[p]);
                     formData.append('datainfo[]', descripcionAtributo[p]);
+                    formData.append('duplicado[]', duplicado[p]);
                 }
 
                 hayRegistro = 1;
@@ -1761,11 +1798,7 @@
             $("#matriz-presupuesto tbody tr").remove();
         }
 
-
-        function informacionPresupuesto(id, numero, tipo){
-            // tipo:  1- ver, 2-editar
-
-
+        function informacionPresupuesto(id, numero){
 
             openLoading();
             document.getElementById("formulario-presupuesto-editar").reset();
@@ -1802,6 +1835,10 @@
                                 "<td>"+
                                 "<input name='descripcionPresupuestoEditar[]' disabled class='form-control' data-infopresupuestoeditar='"+infodetalle[i].material_id+"' value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
                                 "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='"+infodetalle[i].duplicado+"' class='form-control' type='number'>"+
                                 "</td>"+
 
                                 "<td>"+
@@ -1863,6 +1900,10 @@
                 "<td>"+
                 "<input name='descripcionPresupuestoEditar[]' data-infopresupuestoeditar='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuestoEditar(this)' maxlength='400'  type='text'>"+
                 "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='0' class='form-control' type='number'>"+
                 "</td>"+
 
                 "<td>"+
@@ -1937,6 +1978,65 @@
             })
         }
 
+        function infoBorrar(id){
+            // borrar el presupuesto
+
+            Swal.fire({
+                title: 'Borrar Presupuesto',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Borrar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    borrarPresupuesto(id);
+                }
+            })
+        }
+
+        function borrarPresupuesto(id){
+
+            openLoading();
+
+            axios.post(url+'/proyecto/vista/presupuesto/borrar', {
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    // el presupuesto ya fue aprobado
+                    if(response.data.success === 1){
+                        Swal.fire({
+                            title: 'Error al Borrar',
+                            text: "El Presupuesto ya fue Aprobado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
+                        toastr.success('Borrado correctamente');
+                        recargarPresupuesto();
+                    }
+                    else{
+                        toastr.error('error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al buscar');
+                    closeLoading();
+                });
+        }
+
         function verificarPresupuestoEditado(){
 
             var tipopartida = document.getElementById('select-partida-editar').value;
@@ -1945,23 +2045,9 @@
             var nombre = document.getElementById('nombre-partida-editar').value; // 300 caracteres
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
-            if(cantidadPartida === ''){
-                cantidadPartida = 0;
-            }else{
-                if(!cantidadPartida.match(reglaNumeroDecimal)) {
-                    toastr.error('Cantidad Partida debe ser decimal y no negativo');
-                    return;
-                }
-
-                if(cantidadPartida < 0){
-                    toastr.error('Cantidad partida no debe ser negativo');
-                    return;
-                }
-
-                if(cantidadPartida.length > 10){
-                    toastr.error('Cantidad Partida debe tener máximo 10 caracteres');
-                    return;
-                }
+            if(cantidadPartida.length > 50){
+                toastr.error('Cantidad Partida debe tener máximo 50 caracteres');
+                return;
             }
 
             if(nombre === ''){
@@ -1969,8 +2055,8 @@
                 return;
             }
 
-            if(nombre.length > 300){
-                toastr.error('Partida debe tener máximo 300 caracteres');
+            if(nombre.length > 600){
+                toastr.error('Partida debe tener máximo 600 caracteres');
                 return;
             }
 
@@ -1983,8 +2069,9 @@
                 var cantidad = $("input[name='cantidadPresupuestoEditar[]']").map(function(){return $(this).val();}).get();
                 var descripcion = $("input[name='descripcionPresupuestoEditar[]']").map(function(){return $(this).val();}).get();
                 var descripcionAtributo = $("input[name='descripcionPresupuestoEditar[]']").map(function(){return $(this).attr("data-infopresupuestoeditar");}).get();
+                var duplicado = $("input[name='duplicarPresupuestoEditarArray[]']").map(function(){return $(this).val();}).get();
 
-                for(var a = 0; a < cantidad.length; a++){
+                for(let a = 0; a < cantidad.length; a++){
                     let detalle = descripcionAtributo[a];
                     let datoCantidad = cantidad[a];
 
@@ -2020,9 +2107,9 @@
                     }
                 }
 
-                for(var b = 0; b < descripcion.length; b++){
+                for(let b = 0; b < descripcion.length; b++){
 
-                    var datoDescripcion = descripcion[b];
+                    let datoDescripcion = descripcion[b];
 
                     if(datoDescripcion === ''){
                         colorRojoTablaPresupuestoEditar(b);
@@ -2036,6 +2123,38 @@
                     }
                 }
 
+                let reglaNumeroEntero = /^[0-9]\d*$/;
+
+                // verificar duplicado
+                for(let d = 0; d < duplicado.length; d++){
+
+                    let datoDuplicado = duplicado[d];
+
+                    if(datoDuplicado === ''){
+                        colorRojoTablaPresupuesto(d);
+                        toastr.error('Fila #' + (d+1) + ' Duplicado debe ser 0 como mínimo');
+                        return;
+                    }
+
+                    if(!datoDuplicado.match(reglaNumeroEntero)) {
+                        colorRojoTablaPresupuesto(d);
+                        toastr.error('Fila #' + (d+1) + ' Duplicado debe ser número Entero y no Negativo');
+                        return;
+                    }
+
+                    if(datoDuplicado < 0){
+                        colorRojoTablaPresupuesto(d);
+                        toastr.error('Fila #' + (d+1) + ' Duplicado no debe ser negativo');
+                        return;
+                    }
+
+                    if(datoDuplicado.length > 3){
+                        colorRojoTablaPresupuesto(d);
+                        toastr.error('Fila #' + (d+1) + ' Duplicado máximo 3 caracteres');
+                        return;
+                    }
+                }
+
                 // como tienen la misma cantidad de filas, podemos recorrer
                 // todas las filas de una vez
                 for(var p = 0; p < cantidad.length; p++){
@@ -2044,6 +2163,7 @@
                     formData.append('idarray[]', id);
                     formData.append('datainfo[]', descripcionAtributo[p]);
                     formData.append('cantidad[]', cantidad[p]);
+                    formData.append('duplicado[]', duplicado[p]);
                 }
 
                 hayRegistro = 1;
@@ -2061,10 +2181,27 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'Error al Editar',
+                            text: "El Presupuesto ya fue Aprobado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         recargarPresupuesto();
                         $('#modalEditarPresupuesto').modal('hide');
                     }
+
                     else{
                         toastr.error('error al actualizar');
                     }

@@ -36,10 +36,14 @@
                                         @endcan
 
                                         @can('boton.ver.presupuesto')
-                                        <br><br>
-                                        <button type="button" class="btn btn-info btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
-                                        </button>
+                                                <br><br>
+                                                @if($dato->presu_aprobado == 0)
+                                                    <button type="button" class="btn btn-info btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
+                                                        <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
+                                                    </button>
+                                                @else
+                                                    <span class="badge bg-success">Presupuesto Aprobado</span>
+                                                @endif
                                         @endcan
 
                                         @can('boton.ver.planilla')

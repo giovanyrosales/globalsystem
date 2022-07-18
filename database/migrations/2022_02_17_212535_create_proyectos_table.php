@@ -40,6 +40,10 @@ class CreateProyectosTable extends Migration
             $table->string('acuerdocierre', 100)->nullable(); // file
             $table->decimal('monto', 12, 2)->nullable();
 
+            // para aprobar las partidas presupuesto
+            $table->boolean('presu_aprobado');
+            $table->dateTime('fecha_aprobado')->nullable();
+
             $table->foreign('id_linea')->references('id')->on('linea');
             $table->foreign('id_fuentef')->references('id')->on('fuentef');
             $table->foreign('id_fuenter')->references('id')->on('fuenter');

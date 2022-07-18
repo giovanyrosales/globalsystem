@@ -20,13 +20,19 @@
                                     <td>{{ $dato->nombre }}</td>
 
                                     <td>
-                                        <button type="button" class="btn btn-warning btn-xs" onclick="informacionPresupuesto('{{ $dato->id }}', '{{ $dato->item }}', '1')">
-                                            <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
-                                        </button>
-
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto('{{ $dato->id }}', '{{ $dato->item }}', '2')">
-                                            <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar
-                                        </button>
+                                        @if($presuaprobado == 0)
+                                            <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto('{{ $dato->id }}', '{{ $dato->item }}')">
+                                                <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar
+                                            </button>
+                                            <br> <br>
+                                            <button type="button" class="btn btn-danger btn-xs" onclick="infoBorrar({{ $dato->id }})">
+                                                <i class="fas fa-trash-alt" title="Borrar"></i>&nbsp; Borrar
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto('{{ $dato->id }}', '{{ $dato->item }}')">
+                                                <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
+                                            </button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -50,7 +56,7 @@
             "info": true,
             "autoWidth": false,
             "pagingType": "simple",
-            "lengthMenu": [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Todo"]],
+            "lengthMenu": [[5, 25, 50, 100, 150, -1], [5, 25, 50, 100, 150, "Todo"]],
             "language": {
 
                 "sProcessing": "Procesando...",

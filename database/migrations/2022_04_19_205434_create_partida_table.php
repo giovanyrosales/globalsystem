@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreatePartidaTable extends Migration
 {
     /**
-     * Run the migrations.
+     * partidas creadas por usuarios ingenieros
      *
      * @return void
      */
@@ -16,15 +16,11 @@ class CreatePartidaTable extends Migration
         Schema::create('partida', function (Blueprint $table) {
             $table->id();
 
-            $table->bigInteger('proyecto_id')->unsigned();
+            $table->bigInteger('proyecto_id')->unsigned()->nullable();
 
             $table->integer('tipo_partida');
-            $table->string('nombre', 300);
-            $table->decimal('cantidadp', 10,2); // cantidad partida
-
-            $table->integer('estado');
-            // 0 defecto
-            // 1 aprobada
+            $table->string('nombre', 600);
+            $table->string('cantidadp', 50)->nullable(); // cantidad partida
 
             $table->foreign('proyecto_id')->references('id')->on('proyectos');
         });

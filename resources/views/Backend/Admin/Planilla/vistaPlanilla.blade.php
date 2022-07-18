@@ -18,7 +18,7 @@
 
     <section class="content-header">
         <div class="col-sm-11">
-            <h2>Planilla para Proyecto: {{ $nombre }}</h2>
+            <h4>Proyecto: {{ $nombre }}</h4>
         </div>
         <br>
         <button type="button" style="margin-left: 10px" onclick="modalAgregar()" class="btn btn-success btn-sm">
@@ -46,7 +46,7 @@
     </section>
 
     <div class="modal fade" id="modalAgregar">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Nueva Planilla</h4>
@@ -60,65 +60,98 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-                                    <div class="form-group">
-                                        <label>Fecha De</label>
-                                        <input type="date" class="form-control" id="fechade-nuevo">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Fecha De</label>
+                                                <input type="date" class="form-control" id="fechade-nuevo">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Fecha Hasta</label>
+                                                <input type="date" class="form-control" id="fechahasta-nuevo">
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Fecha Hasta</label>
-                                        <input type="date" class="form-control" id="fechahasta-nuevo">
-                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Salario Total</label>
+                                                <input type="number" class="form-control" id="salariototal-nuevo" placeholder="0.00">
+                                            </div>
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label>Salario Total</label>
-                                        <input type="number" class="form-control" id="salariototal-nuevo" placeholder="Salario Total">
-                                    </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Horas Extras</label>
+                                                <input type="number" class="form-control" id="horasextras-nuevo" placeholder="Horas Extras">
+                                            </div>
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label>Horas Extras</label>
-                                        <input type="number" class="form-control" id="horasextras-nuevo" placeholder="Horas Extras">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Insaforp</label>
-                                        <input type="number" class="form-control" id="insaforp-nuevo" placeholder="Insaforp">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Insaforp</label>
+                                                <input type="number" class="form-control" id="insaforp-nuevo" placeholder="Insaforp">
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <hr>
                                     <label>ISSS</label>
-                                    <div class="form-group">
-                                        <label>Laboral</label>
-                                        <input type="number" class="form-control" id="issslaboral-nuevo" placeholder="ISSS Laboral">
+                                    <div class="row">
+                                        <div class="col-md-3">
+
+                                            <div class="form-group">
+                                                <label>Laboral</label>
+                                                <input type="number" class="form-control" id="issslaboral-nuevo" placeholder="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Patronal</label>
+                                                <input type="number" class="form-control" id="issspatronal-nuevo" placeholder="0.00">
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Patronal</label>
-                                        <input type="number" class="form-control" id="issspatronal-nuevo" placeholder="ISSS Patronal">
-                                    </div>
+
 
                                     <hr>
                                     <label>AFP Confía</label>
-                                    <div class="form-group">
-                                        <label>Laboral</label>
-                                        <input type="number" class="form-control" id="confialaboral-nuevo" placeholder="AFP Confía - Labporal">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Patronal</label>
-                                        <input type="number" class="form-control" id="confiapatronal-nuevo" placeholder="AFP Confía - Patronal">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Laboral</label>
+                                                <input type="number" class="form-control" id="confialaboral-nuevo" placeholder="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Patronal</label>
+                                                <input type="number" class="form-control" id="confiapatronal-nuevo" placeholder="0.00">
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <hr>
-                                    <label>AFP Crecer</label>
-                                    <div class="form-group">
-                                        <label>Laboral</label>
-                                        <input type="number" class="form-control" id="crecerlaboral-nuevo" placeholder="AFP Crecer - Labporal">
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label>Patronal</label>
-                                        <input type="number" class="form-control" id="crecerpatronal-nuevo" placeholder="AFP Crecer - Patronal">
+                                    <label>AFP Crecer</label>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Laboral</label>
+                                                <input type="number" class="form-control" id="crecerlaboral-nuevo" placeholder="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Patronal</label>
+                                                <input type="number" class="form-control" id="crecerpatronal-nuevo" placeholder="0.00">
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -150,66 +183,94 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-                                    <div class="form-group">
-                                        <label>Fecha De</label>
-                                        <input type="hidden" id="id-editar">
-                                        <input type="date" class="form-control" id="fechade-editar">
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label>Fecha De</label>
+                                            <input type="hidden" id="id-editar">
+                                            <input type="date" class="form-control" id="fechade-editar">
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label>Fecha Hasta</label>
+                                            <input type="date" class="form-control" id="fechahasta-editar">
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Fecha Hasta</label>
-                                        <input type="date" class="form-control" id="fechahasta-editar">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Salario Total</label>
+                                                <input type="number" class="form-control" id="salariototal-editar" placeholder="Salario Total">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Horas Extras</label>
+                                                <input type="number" class="form-control" id="horasextras-editar" placeholder="Horas Extras">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Insaforp</label>
+                                                <input type="number" class="form-control" id="insaforp-editar" placeholder="Insaforp">
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Salario Total</label>
-                                        <input type="number" class="form-control" id="salariototal-editar" placeholder="Salario Total">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Horas Extras</label>
-                                        <input type="number" class="form-control" id="horasextras-editar" placeholder="Horas Extras">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Insaforp</label>
-                                        <input type="number" class="form-control" id="insaforp-editar" placeholder="Insaforp">
-                                    </div>
 
                                     <hr>
                                     <label>ISSS</label>
-                                    <div class="form-group">
-                                        <label>Laboral</label>
-                                        <input type="number" class="form-control" id="issslaboral-editar" placeholder="ISSS Laboral">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Patronal</label>
-                                        <input type="number" class="form-control" id="issspatronal-editar" placeholder="ISSS Patronal">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Laboral</label>
+                                                <input type="number" class="form-control" id="issslaboral-editar" placeholder="ISSS Laboral">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Patronal</label>
+                                                <input type="number" class="form-control" id="issspatronal-editar" placeholder="ISSS Patronal">
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <hr>
                                     <label>AFP Confía</label>
-                                    <div class="form-group">
-                                        <label>Laboral</label>
-                                        <input type="number" class="form-control" id="confialaboral-editar" placeholder="AFP Confía - Labporal">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Patronal</label>
-                                        <input type="number" class="form-control" id="confiapatronal-editar" placeholder="AFP Confía - Patronal">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Laboral</label>
+                                                <input type="number" class="form-control" id="confialaboral-editar" placeholder="AFP Confía - Labporal">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Patronal</label>
+                                                <input type="number" class="form-control" id="confiapatronal-editar" placeholder="AFP Confía - Patronal">
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <hr>
-                                    <label>AFP Crecer</label>
-                                    <div class="form-group">
-                                        <label>Laboral</label>
-                                        <input type="number" class="form-control" id="crecerlaboral-editar" placeholder="AFP Crecer - Labporal">
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label>Patronal</label>
-                                        <input type="number" class="form-control" id="crecerpatronal-editar" placeholder="AFP Crecer - Patronal">
+                                    <label>AFP Crecer</label>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Laboral</label>
+                                                <input type="number" class="form-control" id="crecerlaboral-editar" placeholder="AFP Crecer - Labporal">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Patronal</label>
+                                                <input type="number" class="form-control" id="crecerpatronal-editar" placeholder="AFP Crecer - Patronal">
+                                            </div>
+                                        </div>
                                     </div>
 
                                 </div>

@@ -23,7 +23,7 @@ use App\Http\Controllers\Backend\Inicio\InicioController;
 use App\Http\Controllers\Backend\Bolson\BolsonController;
 use App\Http\Controllers\Backend\Cuenta\CuentaProyectoController;
 use App\Http\Controllers\Backend\Recursos\RecursosController;
-
+use App\Http\Controllers\Backend\Pdf\ControlPdfController;
 
 Route::get('/', [LoginController::class,'index'])->name('login');
 
@@ -74,6 +74,12 @@ Route::get('/admin/proyecto/lista/index', [ProyectoController::class,'indexProye
 Route::get('/admin/proyecto/lista/tabla/index', [ProyectoController::class,'tablaProyectoLista']);
 Route::post('/admin/proyecto/lista/informacion', [ProyectoController::class, 'informacionProyecto']);
 Route::post('/admin/proyecto/lista/editar', [ProyectoController::class, 'editarProyecto']);
+Route::get('/admin/ver/presupuesto/uaci/{id}', [ProyectoController::class,'informacionPresupuestoParaAprobacion']);
+Route::post('/admin/proyecto/aprobar/presupuesto', [ProyectoController::class, 'aprobarPresupuesto']);
+
+
+
+
 
 // --- VISTA DE PROYECTO ---
 Route::get('/admin/proyecto/vista/index/{id}', [ProyectoController::class,'indexProyectoVista']);
@@ -93,7 +99,6 @@ Route::get('/admin/proyecto/lista/tabla/index', [ProyectoController::class,'tabl
 
 
 
-
 // --- VISTA REQUISICION ---
 Route::get('/admin/proyecto/vista/requisicion/{id}', [ProyectoController::class,'tablaProyectoListaRequisicion']);
 Route::post('/admin/proyecto/vista/requisicion/nuevo', [ProyectoController::class, 'nuevoRequisicion']);
@@ -107,7 +112,12 @@ Route::get('/admin/proyecto/vista/presupuesto/{id}', [ProyectoController::class,
 Route::post('/admin/proyecto/agregar/presupuesto',  [ProyectoController::class,'agregarPresupuesto']);
 Route::post('/admin/proyecto/vista/presupuesto/informacion', [ProyectoController::class, 'informacionPresupuesto']);
 Route::post('/admin/proyecto/vista/presupuesto/editar', [ProyectoController::class, 'editarPresupuesto']);
-Route::get('/admin/generar/pdf/presupuesto/{id}', [ProyectoController::class,'generarPrespuestoPdf']);
+Route::post('/admin/proyecto/vista/presupuesto/borrar', [ProyectoController::class, 'borrarPresupuesto']);
+
+//Route::get('/admin/generar/pdf/presupuesto/{id}', [ProyectoController::class,'generarPrespuestoPdf']);
+
+Route::get('/admin/generar/pdf/presupuesto/{id}', [ControlPdfController::class,'generarPrespuestoPdf']);
+
 // verifica si partida mano de obra existe
 Route::post('/admin/proyecto/partida/manoobra/existe', [ProyectoController::class, 'verificarPartidaManoObra']);
 
@@ -116,7 +126,7 @@ Route::post('/admin/proyecto/partida/manoobra/existe', [ProyectoController::clas
 Route::get('/admin/bolson/cuenta/index', [BolsonController::class,'indexCuenta'])->name('admin.bolson.cuenta.index');
 Route::get('/admin/bolson/cuenta/indextabla', [BolsonController::class,'tablaCuenta']);
 Route::post('/admin/bolson/buscar/cuenta', [BolsonController::class, 'buscarNombreCuenta']);
-Route::post('/admin/bolson/buscar/cuenta-editar', [BolsonController::class, 'buscarNombreCuentaEditar']);
+Route::post('/adm/proyecto/agregar/presupuestoin/bolson/buscar/cuenta-editar', [BolsonController::class, 'buscarNombreCuentaEditar']);
 Route::post('/admin/bolson/nuevo',  [BolsonController::class,'nuevoRegistro']);
 Route::post('/admin/bolson/informacion',  [BolsonController::class,'informacionBolson']);
 Route::post('/admin/bolson/editar',  [BolsonController::class,'editarRegistro']);
@@ -287,6 +297,6 @@ Route::post('/admin/objespecifico/nuevo', [CodigoEspecifController::class, 'nuev
 Route::post('/admin/objespecifico/informacion', [CodigoEspecifController::class, 'informacionObjEspecifico']);
 Route::post('/admin/objespecifico/editar', [CodigoEspecifController::class, 'editarObjEspecifico']);
 
-
-
+// --- GENERAR PRESUPUESTO PDF
+Route::get('/admin/generar/presupuesto/{id}', [CodigoEspecifController::class,'generarPrespuesto']);
 

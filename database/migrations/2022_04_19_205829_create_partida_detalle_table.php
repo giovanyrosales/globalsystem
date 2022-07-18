@@ -20,6 +20,9 @@ class CreatePartidaDetalleTable extends Migration
             $table->bigInteger('material_id')->unsigned();
             $table->decimal('cantidad', 10, 2);
 
+            // multiplicar
+            $table->integer('duplicado');
+
             $table->integer('estado');
 
             $table->foreign('partida_id')->references('id')->on('partida');

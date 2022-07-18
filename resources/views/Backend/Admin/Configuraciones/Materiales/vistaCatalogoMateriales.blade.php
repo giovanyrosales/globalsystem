@@ -13,6 +13,10 @@
         /*Ajustar tablas*/
         table-layout:fixed;
     }
+    .select2-container{
+        height: 30px !important;
+    }
+
 
 </style>
 
@@ -59,24 +63,35 @@
                     <form id="formulario-nuevo">
                         <div class="card-body">
 
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Obj. Específico:</label>
-                                    <select style="width: 50%;" class="form-control" id="select-codigo-nuevo">
-                                        <option value="" selected>Seleccione una opción...</option>
-                                        @foreach($lObjEspeci as $sel)
-                                            <option value="{{ $sel->id }}">{{ $sel->codigo}} - {{ $sel->nombre }}</option>
-                                        @endforeach
-                                    </select>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Obj. Específico:</label>
+                                        <select class="form-control" id="select-codigo-nuevo">
+                                            <option value="" selected>Seleccione una opción...</option>
+                                            @foreach($lObjEspeci as $sel)
+                                                <option value="{{ $sel->id }}">{{ $sel->codigo}} - {{ $sel->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Clasificación:</label>
+                                        <select class="form-control" id="select-clasi-nuevo">
+                                            <option value="" disabled selected>Seleccione una opción...</option>
+                                            @foreach($lClasificacion as $sel)
+                                                <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>Nombre *:</label>
-                                    <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresIngreso();" onkeyup="contarcaracteresIngreso();" maxlength="300" id="nombre-nuevo" placeholder="Nombre del material">
-                                    <div id="res-caracter-nuevo" style="float: right">0/300</div>
-                                </div>
+                            <div class="form-group">
+                                <label>Nombre *:</label>
+                                <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresIngreso();" onkeyup="contarcaracteresIngreso();" maxlength="300" id="nombre-nuevo" placeholder="Nombre del material">
+                                <div id="res-caracter-nuevo" style="float: right">0/300</div>
                             </div>
 
                             <br>
@@ -102,17 +117,8 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label>Clasificación:</label>
-                                    <select width="60%"  class="form-control" id="select-clasi-nuevo">
-                                        <option value="" disabled selected>Seleccione una opción...</option>
-                                        @foreach($lClasificacion as $sel)
-                                            <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+
+
 
                         </div>
                     </form>
@@ -145,28 +151,37 @@
                                         <input type="hidden" id="id-editar">
                                     </div>
 
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label>Obj. Específico:</label>
-                                            <select class="form-control" id="select-codigo-editar">
-                                            </select>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Obj. Específico:</label>
+                                                <select class="form-control" id="select-codigo-editar">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Clasificación:</label>
+                                                <select class="form-control" id="select-class-editar">
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Nombre *:</label>
-                                            <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresEditar();" onkeyup="contarcaracteresEditar();" maxlength="300" id="nombre-editar" placeholder="Nombre del material">
-                                            <div id="res-caracter-editar" style="float: right">0/300</div>
-                                        </div>
+                                    <div class="form-group">
+                                        <label>Nombre *:</label>
+                                        <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresEditar();" onkeyup="contarcaracteresEditar();" maxlength="300" id="nombre-editar" placeholder="Nombre del material">
+                                        <div id="res-caracter-editar" style="float: right">0/300</div>
                                     </div>
+
                                     <br>
+
                                     <div class="row">
                                         <div class="col-md-5">
                                             <div class="form-group">
                                                 <label>Unidad de Medida:</label>
                                                 <br>
-                                                <select width="60%"  class="form-control" id="select-unidad-editar">
+                                                <select style="width: 70%; height: 45px"  class="form-control" id="select-unidad-editar">
                                                 </select>
                                             </div>
                                         </div>
@@ -176,14 +191,6 @@
                                                 <label>Precio Unitario *:</label>
                                                 <input type="number" class="form-control" autocomplete="off" id="precio-editar" maxlength="10">
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label>Clasificación:</label>
-                                            <select class="form-control" id="select-class-editar">
-                                            </select>
                                         </div>
                                     </div>
 
@@ -288,11 +295,9 @@
             document.getElementById("formulario-nuevo").reset();
             document.getElementById('res-caracter-nuevo').innerHTML = '0/300 ';
 
-            document.getElementById("select-clasi-nuevo").selectedIndex = "0";
-
-            document.getElementById("select-codigo-nuevo").selectedIndex = "0";
-            document.getElementById("select-unidad-nuevo").selectedIndex = "0";
-            document.getElementById("select-clasi-nuevo").selectedIndex = "0";
+            $('#select-codigo-nuevo').prop('selectedIndex', 0).change();
+            $('#select-unidad-nuevo').prop('selectedIndex', 0).change();
+            $('#select-clasi-nuevo').prop('selectedIndex', 0).change();
 
             $('#modalAgregar').modal({backdrop: 'static', keyboard: false})
         }
@@ -349,32 +354,34 @@
                 return;
             }
 
-            if(precio === ''){
-                toastr.error('Precio es requerido');
-                return;
+            if(precio.length > 0){
+                var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+                if (!precio.match(reglaNumeroDecimal)) {
+                    toastr.error('Precio debe ser número Decimal y no Negativo');
+                    return;
+                }
+
+                if (precio < 0) {
+                    toastr.error('Precio no permite números negativos');
+                    return;
+                }
+
+                if (precio.length > 10) {
+                    toastr.error('Precio máximo 10 dígitos de límite');
+                    return;
+                }
+            }else{
+                precio = 0;
             }
+
+            // verificacion
 
             if(clasificacion === ''){
                 toastr.error('Clasificación es requerido');
                 return;
             }
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
-
-            if (!precio.match(reglaNumeroDecimal)) {
-                toastr.error('Precio debe ser número Decimal y no Negativo');
-                return;
-            }
-
-            if (precio < 0) {
-                toastr.error('Precio no permite números negativos');
-                return;
-            }
-
-            if (precio.length > 10) {
-                toastr.error('Precio máximo 10 dígitos de límite');
-                return;
-            }
 
             openLoading();
             var formData = new FormData();

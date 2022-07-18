@@ -29,7 +29,7 @@
             margin-right: 15px;
         }
 
-        #tabla {
+        #tablaFor {
             font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
             border-collapse: collapse;
             width: 100%;
@@ -39,20 +39,20 @@
             text-align: center;
         }
 
-        #tabla td{
+        #tablaFor td{
             border: 1px solid #1E1E1E;
             padding: 8px;
             text-align: center;
             font-size: 14px;
         }
 
-        #tabla th {
+        #tablaFor th {
             border: 1px solid #1E1E1E;
             padding: 8px;
             text-align: center;
         }
 
-        #tabla th {
+        #tablaFor th {
             padding-top: 12px;
             padding-bottom: 12px;
             color: #1E1E1E;
@@ -78,7 +78,7 @@
 </div>
 
 
-<table id="tabla" style="width: 95%">
+<table id="tablaFor" style="width: 95%">
 
         <tbody>
 
@@ -144,8 +144,7 @@
 </table>
 
 
-
-<table id="tabla" style="width: 95%">
+<table id="tablaFor" style="width: 95%">
 
     <tbody>
 
@@ -219,7 +218,7 @@
     <!-- partida de mano de obra -->
 
 
-<table id="tabla" style="width: 95%">
+<table id="tablaFor" style="width: 95%">
 
     <tbody>
 
@@ -261,6 +260,7 @@
 </table>
 
 <div style="page-break-after:always;"></div>
+<br>
 <div id="header">
     <div class="content">
         <img id="logo" src="{{ asset('images/logo2.png') }}">
@@ -273,7 +273,7 @@
 
 <br>
 
-<table id="tabla" style="width: 75%; margin: 0 auto">
+<table id="tablaFor" style="width: 75%; margin: 0 auto">
 
     <tbody>
 

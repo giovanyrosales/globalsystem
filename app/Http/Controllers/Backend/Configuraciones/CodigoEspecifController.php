@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Configuraciones;
 
 use App\Http\Controllers\Controller;
+use App\Models\Administradores;
 use App\Models\Cuenta;
 use App\Models\ObjEspecifico;
 use App\Models\Rubro;
@@ -171,8 +172,6 @@ class CodigoEspecifController extends Controller
         }else{
             return ['success' => 2];
         }
-
-
     }
 
     public function editarObjEspecifico(Request $request){
@@ -199,6 +198,31 @@ class CodigoEspecifController extends Controller
         }else{
             return ['success' => 2];
         }
+    }
+
+    public function generarPrespuesto($id){
+
+        $mpdf = new \Mpdf\Mpdf(['orientation' => 'P']);
+
+        $admin = Administradores::get();
+
+        $tabla = "<table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                    </tr>";
+        foreach ($admin as $dd){
+            $tabla .= "<tr>
+                        <td>".$dd->id."</td>
+                        <td>".$dd->id."</td>
+                       </tr>";
+        }
+
+        $tabla .= "</table>";
+
+        $mpdf->WriteHTML($tabla);
+        $mpdf->Output();
+
     }
 
 }

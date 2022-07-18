@@ -241,6 +241,37 @@
         </div>
     </div>
 
+    <!-- modal presupuesto para aprobacion-->
+    <div class="modal fade" id="modalPresupuesto">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Presupuesto</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input type="hidden" id="idpreaprobar">
+
+                                <div id="tablaPre">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="btnAprobarPresupuesto()">Aprobar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </div>
@@ -328,9 +359,9 @@
 
                         $.each(response.data.arrayAreaGestion, function( key, val ){
                             if (response.data.info.id_areagestion == val.id) {
-                                $('#select-area-gestion').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " " + val.nombre + '</option>');
+                                $('#select-area-gestion').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " - " + val.nombre + '</option>');
                             } else {
-                                $('#select-area-gestion').append('<option value="' + val.id + '">' + val.codigo + " " + val.nombre + '</option>');
+                                $('#select-area-gestion').append('<option value="' + val.id + '">' + val.codigo + " - " + val.nombre + '</option>');
                             }
                         });
 
@@ -343,9 +374,9 @@
 
                         $.each(response.data.arrayLineaTrabajo, function( key, val ){
                             if (response.data.info.id_linea == val.id) {
-                                $('#select-linea').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " " + val.nombre + '</option>');
+                                $('#select-linea').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " - " + val.nombre + '</option>');
                             } else {
-                                $('#select-linea').append('<option value="' + val.id + '">' + val.codigo + " " + val.nombre + '</option>');
+                                $('#select-linea').append('<option value="' + val.id + '">' + val.codigo + " - " + val.nombre + '</option>');
                             }
                         });
 
@@ -358,9 +389,9 @@
 
                         $.each(response.data.arrayFuenteFinanciamiento, function( key, val ){
                             if (response.data.info.id_fuentef == val.id) {
-                                $('#select-fuente-financiamiento').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " " + val.nombre + '</option>');
+                                $('#select-fuente-financiamiento').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " - " + val.nombre + '</option>');
                             } else {
-                                $('#select-fuente-financiamiento').append('<option value="' + val.id + '">' + val.codigo + " " + val.nombre + '</option>');
+                                $('#select-fuente-financiamiento').append('<option value="' + val.id + '">' + val.codigo + " - " + val.nombre + '</option>');
                             }
                         });
 
@@ -373,9 +404,9 @@
 
                         $.each(response.data.arrayFuenteRecursos, function( key, val ){
                             if (response.data.info.id_fuenter == val.id) {
-                                $('#select-fuente-recursos').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " " + val.nombre + '</option>');
+                                $('#select-fuente-recursos').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " - " + val.nombre + '</option>');
                             } else {
-                                $('#select-fuente-recursos').append('<option value="' + val.id + '">' + val.codigo + " " + val.nombre + '</option>');
+                                $('#select-fuente-recursos').append('<option value="' + val.id + '">' + val.codigo + " - " + val.nombre + '</option>');
                             }
                         });
 
@@ -608,13 +639,71 @@
             window.location.href="{{ url('/admin/proyecto/vista/index') }}/" + id;
         }
 
-        function informacionPresupuesto(id){ // id proyecto
-            window.location.href="{{ url('/admin/cuentaproy/cuenta') }}/" + id;
-        }
-
         function informacionPlanilla(id){
             window.location.href="{{ url('/admin/planilla/lista') }}/" + id;
         }
+
+        // cargar modal con todos el presupuesto
+        function informacionPresupuesto(id){
+
+            $('#idpreaprobar').val(id);
+
+            var ruta = "{{ URL::to('/admin/ver/presupuesto/uaci') }}/" + id;
+            $('#tablaPre').load(ruta);
+            $('#modalPresupuesto').modal('show');
+        }
+
+        function btnAprobarPresupuesto(){
+
+            Swal.fire({
+                title: 'Aprobar Presupuesto',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aprobar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    aprobarPresupuesto();
+                }
+            })
+        }
+
+        function aprobarPresupuesto(){
+
+            var id = document.getElementById('idpreaprobar').value;
+
+            axios.post(url+'/proyecto/aprobar/presupuesto', {
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        $('#modalPresupuesto').modal('hide');
+                        recargar();
+
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Presupuesto Aprobado',
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                    }
+                    else{
+                        toastr.error('error al aprobar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al aprobar');
+                    closeLoading();
+                });
+        }
+
+
+
 
     </script>
 
