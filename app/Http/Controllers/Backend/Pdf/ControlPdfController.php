@@ -407,10 +407,115 @@ class ControlPdfController extends Controller
             <br>
             <br>";
 
+        $tabla .= "<table id='tablaFor' style='width: 100%'><tbody>";
+
+        $tabla .= "
+        <tr>
+            <td colspan='3'>APORTE PATRONAL</td>
+        </tr>
+
+        <tr>
+            <td width='20%'>Descripción</td>
+            <td width='12%'>Sub Total</td>
+            <td width='20%'>Total</td>
+        </tr>
+
+        <tr>
+            <td width='20%'>ISSS (7.5% mano de obra)</td>
+            <td width='12%'>$isss</td>
+            <td width='20%'></td>
+        </tr>
+        <tr>
+            <td width='20%'>AFP (7.75% mano de obra)</td>
+            <td width='12%'>$afp</td>
+            <td width='20%'></td>
+        </tr>
+        <tr>
+            <td width='20%'>INSAFOR (1.0% mano de obra)</td>
+            <td width='12%'>$insaforp</td>
+            <td width='20%'></td>
+        </tr>
+
+        <tr>
+            <td width='20%'></td>
+            <td width='12%'></td>
+            <td width='20%'><strong>$totalDescuento</strong></td>
+        </tr>
+    </tbody>
+</table>";
+
+
+        $tabla2 = "<div class='content'>
+            <img id='logo' src='$logoalcaldia'>
+            <p id='titulo'>ALCALDÍA MUNICIPAL DE METAPÁN <br>
+            Fondo: " . $fuenter . " <br>
+            Hoja de presupuesto <br>
+            Fecha: " . $mes . " <br></p>
+            </div>";
+
+        $tabla2 .= "<table style='width: 75%; margin: 0 auto' id='tablaFor'>
+            <tbody>
+
+             <tr>
+        <td colspan='2'>RESUMEN DE PARTIDA</td>
+    </tr>
+
+    <tr>
+        <td width='20%'>MATERIALES</td>
+        <td width='12%'>$sumaMateriales</td>
+    </tr>
+
+    <tr>
+        <td width='20%'>HERRAMIENTA (2% DE MAT.)</td>
+        <td width='12%'>$herramienta2Porciento</td>
+    </tr>
+
+    <tr>
+        <td width='20%'>MANO DE OBRA (POR ADMINISTRACIÓN)</td>
+        <td width='12%'>$totalManoObra</td>
+    </tr>
+
+    <tr>
+        <td width='20%'>APORTE MANO DE OBRA</td>
+        <td width='12%'>$totalAporteManoObra</td>
+    </tr>
+
+    <tr>
+        <td width='20%'>ALQUILER DE MAQUINARIA</td>
+        <td width='12%'>$totalAlquilerMaquinaria</td>
+    </tr>
+
+    <tr>
+        <td width='20%'>TRANSPORTE DE CONCRETO FRESCO</td>
+        <td width='12%'>$totalTransportePesado</td>
+    </tr>
+
+
+    <tr>
+        <td width='20%' style='font-weight: bold'>SUB TOTAL</td>
+        <td width='12%' style='font-weight: bold'>$subtotalPartida</td>
+    </tr>
+
+    <tr>
+        <td width='20%' style='font-weight: bold'>IMPREVISTOS (5% de sub total)</td>
+        <td width='12%' style='font-weight: bold'>$imprevisto</td>
+    </tr>
+
+    <tr>
+        <td width='20%' style='font-weight: bold'>TOTAL</td>
+        <td width='12%' style='font-weight: bold'>$totalPartidaFinal</td>
+    </tr>
+    </tbody>
+</table> ";
+
+
 
         $stylesheet = file_get_contents('css/csspresupuesto.css');
         $mpdf->WriteHTML($stylesheet,1);
         $mpdf->WriteHTML($tabla,2);
+        $mpdf->AddPage();
+        $mpdf->WriteHTML($tabla2,2);
+
         $mpdf->Output();
 
 
