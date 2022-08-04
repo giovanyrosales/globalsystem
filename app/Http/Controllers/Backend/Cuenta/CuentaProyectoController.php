@@ -376,7 +376,7 @@ class CuentaProyectoController extends Controller
             DB::commit();
             return ['success' => 1];
         }catch(\Throwable $e){
-            Log::info('ee' . $e);
+
             DB::rollback();
             return ['success' => 2];
         }

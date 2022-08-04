@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Schema;
 class CreateRequisicionDetalleTable extends Migration
 {
     /**
-     * los estados son
-     *  *  cotizado o no
      * @return void
      */
     public function up()
@@ -19,7 +17,11 @@ class CreateRequisicionDetalleTable extends Migration
             $table->bigInteger('material_id')->unsigned();
 
             $table->decimal('cantidad', 12, 2);
-            $table->boolean('estado'); // cotizado y No cotizado
+
+            //0: defecto
+            //1: material cotizado
+
+            $table->boolean('estado');
 
             $table->foreign('requisicion_id')->references('id')->on('requisicion');
             $table->foreign('material_id')->references('id')->on('materiales');

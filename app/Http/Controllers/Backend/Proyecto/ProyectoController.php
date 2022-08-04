@@ -17,12 +17,12 @@ use App\Models\LineaTrabajo;
 use App\Models\Naturaleza;
 use App\Models\Partida;
 use App\Models\PartidaDetalle;
+use App\Models\Presupuesto;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
 use App\Models\RequisicionDetalle;
 use App\Models\UnidadMedida;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -602,7 +602,7 @@ class ProyectoController extends Controller
             $r->estado = 0; // 0- no autorizado 1- autorizado
             $r->save();
 
-            $contador = $request->contador + 1;
+            //$contador = $request->contador + 1;
 
             if($request->hayregistro == 1){
 
@@ -765,9 +765,28 @@ class ProyectoController extends Controller
 
     public function buscadorMaterial(Request $request){
 
+            //idpro
+
         if($request->get('query')){
             $query = $request->get('query');
-            $data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
+
+            $listado = Partida::where('proyecto_id', $request->idpro)->get();
+
+            $pila = array();
+
+            foreach ($listado as $dd){
+                array_push($pila, $dd->id);
+            }
+
+            $data = DB::table('partida_detalle AS pd')
+                ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
+                ->select('pd.id', 'm.nombre', 'm.id_unidadmedida')
+                ->whereIn('pd.partida_id', $pila)
+                ->where('m.nombre', 'LIKE', "%{$query}%")
+                ->take(25)
+                ->get();
+
+            //$data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
 
             foreach ($data as $dd){
                 $info = UnidadMedida::where('id', $dd->id_unidadmedida)->first();
@@ -798,6 +817,7 @@ class ProyectoController extends Controller
                     }
                 }
             }
+
             $output .= '</ul>';
             if($tiene){
                 $output = '';
@@ -978,6 +998,12 @@ class ProyectoController extends Controller
             return ['success' => 0];
         }
 
+        if($infop = Proyecto::where('id', $request->id)->first()){
+            if ($infop->presu_aprobado == 1){
+                return ['success' => 1];
+            }
+        }
+
         DB::beginTransaction();
 
         try {
@@ -1007,16 +1033,16 @@ class ProyectoController extends Controller
                 }
 
                 DB::commit();
-                return ['success' => 1, 'contador' => $contador];
+                return ['success' => 2, 'contador' => $contador];
             }else{
                 DB::commit();
-                return ['success' => 1, 'contador' => $contador];
+                return ['success' => 2, 'contador' => $contador];
             }
 
         }catch(\Throwable $e){
 
             DB::rollback();
-            return ['success' => 2];
+            return ['success' => 3];
         }
     }
 
@@ -1171,250 +1197,6 @@ class ProyectoController extends Controller
         return ['success' => 2];
     }
 
-    public function generarPrespuestoPdf($id){
-
-        // obtener todas los presupuesto por tipo_partida
-        // 1- Materiales
-        // 2- Herramientas (2% de Materiales)
-        // 3- Mano de obra (Por Administración)
-        // 4- Aporte Mano de Obra
-        // 5- Alquiler de Maquinaria
-        // 6- Transporte de Concreto Fresco
-
-        $partida1 = Partida::where('proyecto_id', $id)
-        ->whereIn('tipo_partida', [1, 2])
-        ->orderBy('id', 'ASC')
-        ->get();
-
-        $infoPro = Proyecto::where('id', $id)->first();
-        $nombrepro = $infoPro->nombre;
-        if($infoFuenteR = FuenteRecursos::where('id', $infoPro->id_fuenter)->first()){
-            $fuenter = $infoFuenteR->nombre;
-        }else{
-            $fuenter = "";
-        }
-
-        $resultsBloque = array();
-        $index = 0;
-        $resultsBloque3 = array();
-        $index3 = 0;
-
-        // Fechas
-        $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
-        $fecha = Carbon::parse(Carbon::now());
-        $anio = Carbon::now()->format('Y');
-        $mes = $meses[($fecha->format('n')) - 1] . " del " . $anio;
-
-        $item = 0;
-        $sumaMateriales = 0;
-
-        foreach ($partida1 as $secciones){
-            array_push($resultsBloque, $secciones);
-            $item = $item + 1;
-            $secciones->item = $item;
-
-            $secciones->cantidadp = number_format((float)$secciones->cantidadp, 2, '.', ',');
-
-            $detalle1 = PartidaDetalle::where('partida_id', $secciones->id)->get();
-
-            $total = 0;
-
-            foreach ($detalle1 as $lista){
-
-                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
-
-                $lista->medida = $infomedida->medida;
-                if($lista->duplicado != 0){
-                    $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
-                }else{
-                    $lista->material = $infomaterial->nombre;
-                }
-
-                $multi = $lista->cantidad * $infomaterial->pu;
-
-                $lista->cantidad = number_format((float)$lista->cantidad, 2, '.', ',');
-                $lista->pu = "$" . number_format((float)$infomaterial->pu, 2, '.', ',');
-                $lista->subtotal = "$" . number_format((float)$multi, 2, '.', ',');
-
-                $total = $total + $multi;
-                $sumaMateriales = $sumaMateriales + $multi;
-            }
-
-            $secciones->total = "$" . number_format((float)$total, 2, '.', ',');
-
-            $resultsBloque[$index]->bloque1 = $detalle1;
-            $index++;
-        }
-
-        $manoobra = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 3)
-            ->orderBy('id', 'ASC')
-            ->get();
-
-        $totalManoObra = 0;
-
-        foreach ($manoobra as $secciones3){
-            array_push($resultsBloque3, $secciones3);
-            $item = $item + 1;
-            $secciones3->item = $item;
-
-            $secciones3->cantidadp = number_format((float)$secciones3->cantidadp, 2, '.', ',');
-
-            $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
-
-            $total3 = 0;
-
-            foreach ($detalle3 as $lista){
-
-                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
-
-                $lista->medida = $infomedida->medida;
-                if($lista->duplicado != 0){
-                    $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
-                }else{
-                    $lista->material = $infomaterial->nombre;
-                }
-
-                $multi = $lista->cantidad * $infomaterial->pu;
-                if($lista->duplicado != 0){
-                    $multi = $multi * $lista->duplicado;
-                }
-
-                $lista->cantidad = number_format((float)$lista->cantidad, 2, '.', ',');
-                $lista->pu = "$" . number_format((float)$infomaterial->pu, 2, '.', ',');
-                $lista->subtotal = "$" . number_format((float)$multi, 2, '.', ',');
-
-                $totalManoObra = $totalManoObra + $multi;
-                $total3 = $total3 + $multi;
-            }
-
-            $secciones3->total = "$" . number_format((float)$total3, 2, '.', ',');
-
-            $resultsBloque3[$index3]->bloque3 = $detalle3;
-            $index3++;
-        }
-
-
-        // APORTE DE MANO DE OBRA
-
-        $aporteManoObra = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 4)
-            ->get();
-
-        $totalAporteManoObra = 0;
-
-        foreach ($aporteManoObra as $secciones3){
-
-            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
-
-            foreach ($detalle4 as $lista){
-
-                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                if($lista->duplicado != 0){
-                    $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
-                }else{
-                    $lista->material = $infomaterial->nombre;
-                }
-
-                $multi = $lista->cantidad * $infomaterial->pu;
-
-                $totalAporteManoObra = $totalAporteManoObra + $multi;
-            }
-        }
-
-        // ALQUILER DE MAQUINARIA
-
-        $alquilerMaquinaria = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 5)
-            ->get();
-
-        $totalAlquilerMaquinaria = 0;
-
-        foreach ($alquilerMaquinaria as $secciones3){
-
-            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
-
-            foreach ($detalle4 as $lista){
-
-                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                $lista->material = $infomaterial->nombre;
-                $multi = $lista->cantidad * $infomaterial->pu;
-
-                $totalAlquilerMaquinaria = $totalAporteManoObra + $multi;
-            }
-        }
-
-
-        // TRANSPORTE CONCRETO FRESCO
-
-        $trasportePesado = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 6)
-            ->get();
-
-        $totalTransportePesado = 0;
-
-        foreach ($trasportePesado as $secciones3){
-
-            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
-
-            foreach ($detalle4 as $lista){
-
-                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                $lista->material = $infomaterial->nombre;
-                $multi = $lista->cantidad * $infomaterial->pu;
-
-                $totalTransportePesado = $totalAporteManoObra + $multi;
-            }
-        }
-
-        $afp =  $totalManoObra * 0.0675;
-        $isss = $totalManoObra * 0.075;
-        $insaforp = $totalManoObra * 0.1;
-
-        $totalDescuento = $totalManoObra - ($afp + $isss + $insaforp);
-
-        $afp = "$" . number_format((float)$afp, 2, '.', ',');
-        $isss = "$" . number_format((float)$isss, 2, '.', ',');
-        $insaforp = "$" . number_format((float)$insaforp, 2, '.', ',');
-
-        $totalDescuento = "$" . number_format((float)$totalDescuento, 2, '.', ',');
-
-        $herramienta2Porciento = $sumaMateriales * 0.02;
-
-        // subtotal del presupuesto partida
-        $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalAporteManoObra
-                            + $totalAlquilerMaquinaria + $totalTransportePesado);
-
-        // imprevisto del 5%
-        $imprevisto = $subtotalPartida * 0.05;
-
-        // total de la partida final
-        $totalPartidaFinal = $subtotalPartida + $imprevisto;
-
-        $sumaMateriales = "$" . number_format((float)$sumaMateriales, 2, '.', ',');
-        $herramienta2Porciento = "$" . number_format((float)$herramienta2Porciento, 2, '.', ',');
-        $totalManoObra = "$" . number_format((float)$totalManoObra, 2, '.', ',');
-
-        $totalAporteManoObra = "$" . number_format((float)$totalAporteManoObra, 2, '.', ',');
-        $totalAlquilerMaquinaria = "$" . number_format((float)$totalAlquilerMaquinaria, 2, '.', ',');
-        $totalTransportePesado = "$" . number_format((float)$totalTransportePesado, 2, '.', ',');
-        $subtotalPartida = "$" . number_format((float)$subtotalPartida, 2, '.', ',');
-        $imprevisto = "$" . number_format((float)$imprevisto, 2, '.', ',');
-        $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
-
-
-        $pdf = PDF::loadView('Backend.Admin.Proyectos.pdfPresupuesto', compact('partida1',
-            'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento',
-        'sumaMateriales', 'herramienta2Porciento', 'totalManoObra', 'totalAporteManoObra', 'totalAlquilerMaquinaria',
-        'totalTransportePesado', 'subtotalPartida', 'imprevisto', 'totalPartidaFinal'));
-        $pdf->setPaper('letter', 'portrait')->setWarnings(false);
-        $pdf->getDomPDF()->set_option("enable_php", true);
-
-
-        return $pdf->stream();
-    }
 
     // informacion para presupuesto para uaci
     public function informacionPresupuestoParaAprobacion($id){
@@ -1661,16 +1443,80 @@ class ProyectoController extends Controller
         if($pro = Proyecto::where('id', $request->id)->first()){
 
             if($pro->presu_aprobado == 0){
-                Proyecto::where('id', $request->id)->update([
-                    'fecha_aprobado' => Carbon::now('America/El_Salvador'),
-                    'presu_aprobado' => 1]);
+                DB::beginTransaction();
+                try {
 
-                return ['success' => 1];
+                    Proyecto::where('id', $request->id)->update([
+                        'fecha_aprobado' => Carbon::now('America/El_Salvador'),
+                        'presu_aprobado' => 1]);
+
+                    $partidas = Partida::where('proyecto_id', $request->id)
+                        ->orderBy('id')
+                        ->get();
+
+                    $pila = array();
+
+                    foreach ($partidas as $dd){
+                        array_push($pila, $dd->id);
+                    }
+
+                    // agrupando para obtener solo los ID de objetos especificos.
+                    $detalles = DB::table('partida_detalle AS pd')
+                        ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
+                        ->select('m.id_objespecifico')
+                        ->whereIn('pd.partida_id', $pila)
+                        ->groupBy('m.id_objespecifico')
+                        ->get();
+
+                    // recorrer lista de objetos especificos
+                   foreach ($detalles as $det){
+
+                       // obtener lista de materiales
+                       $info = DB::table('partida_detalle AS pd')
+                           ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
+                           ->select('m.id_objespecifico', 'pd.cantidad', 'pd.duplicado', 'm.pu')
+                           ->where('m.id_objespecifico', $det->id_objespecifico)
+                           ->get();
+
+                       $suma = 0;
+
+                       // obtener sumatoria de los materiales
+                       foreach ($info as $dato){
+                           if($dato->duplicado > 0){
+                               $suma = ($dato->cantidad * $dato->pu) * $dato->duplicado;
+                           }else{
+                               $suma = ($dato->cantidad * $dato->pu);
+                           }
+                       }
+
+                       // guardar registro
+                       $presu = new Presupuesto();
+                       $presu->proyecto_id = $request->id;
+                       $presu->objespeci_id = $det->id_objespecifico;
+                       $presu->saldo = $suma;
+                       $presu->saldo_inicial = $suma;
+                       $presu->save();
+                   }
+
+                    DB::commit();
+                    return ['success' => 1];
+                }catch(\Throwable $e){
+                    Log::info('error: ' . $e);
+                    DB::rollback();
+                    return ['success' => 2];
+                }
             }
             return ['success' => 1];
         }else{
             return ['success' => 2];
         }
+    }
+
+    // mostrar PDF de presupuesto para que revisen los administradores.
+    public function infoPresupuestoPorAdministradores($id){
+
+
+
     }
 
 

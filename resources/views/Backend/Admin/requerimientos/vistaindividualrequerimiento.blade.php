@@ -17,13 +17,17 @@
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
+        <div class="col-sm-11">
+            <h4>Requisiciones Pendientes</h4>
+        </div>
+
         <div class="row mb-2">
             <div class="col-sm-6">
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">Listado</li>
-                    <li class="breadcrumb-item active">Proyectos Registrados</li>
+                    <li class="breadcrumb-item active">Requisiciones Pendientes</li>
                 </ol>
             </div>
         </div>
@@ -33,7 +37,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado de Proyectos</h3>
+                    <h3 class="card-title">Listado de Requisiciones</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -276,7 +280,6 @@
 
 </div>
 
-
 @extends('backend.menus.footerjs')
 @section('archivos-js')
 
@@ -290,12 +293,13 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/proyecto/lista/tabla/index') }}";
+            let id = {{ $id }};
+            var ruta = "{{ URL::to('/admin/requerimientos/listado/tabla') }}/"+id;
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
-
         });
+
     </script>
 
     <script>
@@ -635,107 +639,7 @@
             })
         }
 
-        function vista(id){
-            window.location.href="{{ url('/admin/proyecto/vista/index') }}/" + id;
-        }
 
-        function informacionPlanilla(id){
-            window.location.href="{{ url('/admin/planilla/lista') }}/" + id;
-        }
-
-        // cargar modal con todos el presupuesto
-        function informacionPresupuesto(id){
-
-            $('#idpreaprobar').val(id);
-
-            var ruta = "{{ URL::to('/admin/ver/presupuesto/uaci') }}/" + id;
-            $('#tablaPre').load(ruta);
-            $('#modalPresupuesto').modal('show');
-        }
-
-        function btnAprobarPresupuesto(){
-
-            Swal.fire({
-                title: 'Aprobar Presupuesto',
-                text: "",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aprobar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    aprobarPresupuesto();
-                }
-            })
-        }
-
-        function aprobarPresupuesto(){
-
-            var id = document.getElementById('idpreaprobar').value;
-
-            axios.post(url+'/proyecto/aprobar/presupuesto', {
-                'id' : id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        $('#modalPresupuesto').modal('hide');
-                        recargar();
-
-                        Swal.fire({
-                            position: 'center',
-                            icon: 'success',
-                            title: 'Presupuesto Aprobado',
-                            showConfirmButton: false,
-                            timer: 2000
-                        })
-                    }
-                    else{
-                        toastr.error('error al aprobar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('error al aprobar');
-                    closeLoading();
-                });
-        }
-
-        function verPresupuestoPorAdministrador(id){
-
-            axios.post(url+'/proyecto/partida/manoobra/existe', {
-                'id' : id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        window.open("{{ URL::to('admin/generar/pdf/presupuesto') }}/"+id);
-                    }
-                    else if(response.data.success === 2){
-                        Swal.fire({
-                            title: 'Partida Requerida',
-                            text: "Se debe crear la Partida para Mano de Obra (por Administración)",
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-                    else{
-                        toastr.error('error al buscar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('error al buscar');
-                    closeLoading();
-                });
-        }
 
 
     </script>

@@ -11,6 +11,7 @@ use App\Models\Orden;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
+use App\Models\RequisicionDetalle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -233,6 +234,56 @@ class CotizacionController extends Controller
 
         return view('Backend.Admin.Cotizaciones.Denegadas.tablaCotizacionDenegada', compact('lista'));
     }
+
+    // vista listar requerimientos para que sea visible para UACI
+    public function indexListarRequerimientos(){
+        return view('Backend.Admin.requerimientos.vistarequerimientos');
+    }
+
+    public function indexTablaListarRequerimientos(){
+
+        // obtener listado de materiales no cotizados aun
+        $detalle = RequisicionDetalle::where('estado', 0)
+            ->select('requisicion_id')
+            ->groupBy('requisicion_id')
+            ->get();
+
+        $pila = array();
+
+        foreach ($detalle as $dd){
+            array_push($pila, $dd->requisicion_id);
+        }
+
+        // obtener listado de proyectos con requisicones pendiente
+        $info = Requisicion::whereIn('id', $pila)
+            ->select('id')
+            ->groupBy('id')
+            ->get();
+
+        $pila2 = array();
+
+        foreach ($info as $dd){
+            array_push($pila2, $dd->id);
+        }
+
+        // obtener informacion de los proyectos que tienen requisicion pendiente.
+        $lista = Proyecto::whereIn('id', $pila2)
+            ->orderBy('fecha', 'DESC')
+            ->get();
+
+        return view('Backend.Admin.requerimientos.tablarequerimientos', compact('lista'));
+    }
+
+    // mostrara vista de listado de requerimientos pendiente para x proyecto
+    public function listadoRequerimientoPorProyecto($id){
+        return view('Backend.Admin.requerimientos.vistaindividualrequerimiento', compact('id'));
+    }
+
+    public function tablaRequerimientosIndividual($id){
+
+        return "tabla";
+    }
+
 
 
 }

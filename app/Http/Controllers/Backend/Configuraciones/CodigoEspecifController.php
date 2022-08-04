@@ -200,29 +200,5 @@ class CodigoEspecifController extends Controller
         }
     }
 
-    public function generarPrespuesto($id){
-
-        $mpdf = new \Mpdf\Mpdf(['orientation' => 'P']);
-
-        $admin = Administradores::get();
-
-        $tabla = "<table>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                    </tr>";
-        foreach ($admin as $dd){
-            $tabla .= "<tr>
-                        <td>".$dd->id."</td>
-                        <td>".$dd->id."</td>
-                       </tr>";
-        }
-
-        $tabla .= "</table>";
-
-        $mpdf->WriteHTML($tabla);
-        $mpdf->Output();
-
-    }
 
 }

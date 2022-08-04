@@ -81,11 +81,18 @@
                       <div class="card-header">
                           <h3 class="card-title"><strong>Requisiciones de Proyecto</strong></h3>
 
-                          @can('boton.agregar.requisicion')
-                          <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-secondary btn-sm">
-                              Agregar Requisición
-                          </button>
-                          @endcan
+                          @if($proyecto->presu_aprobado == 0)
+                              <br><br>
+                              <span class="badge bg-warning">Esperando aprobación de Presupuesto</span>
+                          @else
+                              @can('boton.agregar.requisicion')
+                                  <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-secondary btn-sm">
+                                      Agregar Requisición
+                                  </button>
+                              @endcan
+                          @endif
+
+
 
                       </div>
 
@@ -667,11 +674,15 @@
 
     <script type="text/javascript">
 
+        // para modal agregar Requisicion por parte de administradora
         function buscarMaterial(e){
 
             // seguro para evitar errores de busqueda continua
             if(seguroBuscador){
                 seguroBuscador = false;
+
+                // id proyecto
+                var idpro = {{ $id }};
 
                 var row = $(e).closest('tr');
                 txtContenedorGlobal = e;
@@ -684,7 +695,8 @@
                 }
 
                 axios.post(url+'/proyecto/buscar/material', {
-                    'query' : texto
+                    'query' : texto,
+                    'idpro' : idpro
                 })
                     .then((response) => {
                         seguroBuscador = true;
@@ -893,6 +905,10 @@
         // ver modal requisicion
         function verModalRequisicion(){
             document.getElementById("formulario-requisicion-nuevo").reset();
+
+            let nombre = "{{ $proyecto->nombre }}";
+            $("#destino-requisicion-nuevo").val(nombre);
+
             $('#modalAgregarRequisicion').css('overflow-y', 'auto');
             $('#modalAgregarRequisicion').modal({backdrop: 'static', keyboard: false})
         }
@@ -1768,7 +1784,25 @@
             })
                 .then((response) => {
                     closeLoading();
-                    if(response.data.success === 1){
+
+                    if(response.data.success === 1) {
+
+                        Swal.fire({
+                            title: 'No Guardado',
+                            text: "El presupuesto ya fue Aprobado",
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Sí',
+                            cancelButtonText: 'Cancelar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                verificarPresupuesto();
+                            }
+                        })
+
+                    }if(response.data.success === 2){
                         $('#modalAgregarPresupuesto').modal('hide');
                         toastr.success('Registrado correctamente');
                         recargarPresupuesto();
@@ -2278,9 +2312,9 @@
                     toastr.error('error al buscar');
                     closeLoading();
                 });
-
-
         }
+
+
 
 
     </script>

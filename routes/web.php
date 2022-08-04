@@ -113,9 +113,6 @@ Route::post('/admin/proyecto/agregar/presupuesto',  [ProyectoController::class,'
 Route::post('/admin/proyecto/vista/presupuesto/informacion', [ProyectoController::class, 'informacionPresupuesto']);
 Route::post('/admin/proyecto/vista/presupuesto/editar', [ProyectoController::class, 'editarPresupuesto']);
 Route::post('/admin/proyecto/vista/presupuesto/borrar', [ProyectoController::class, 'borrarPresupuesto']);
-
-//Route::get('/admin/generar/pdf/presupuesto/{id}', [ProyectoController::class,'generarPrespuestoPdf']);
-
 Route::get('/admin/generar/pdf/presupuesto/{id}', [ControlPdfController::class,'generarPrespuestoPdf']);
 
 // verifica si partida mano de obra existe
@@ -153,10 +150,6 @@ Route::post('/admin/planilla/nuevo',  [CuentaProyectoController::class,'nuevaPla
 Route::post('/admin/planilla/informacion',  [CuentaProyectoController::class,'informacionPlanilla']);
 Route::post('/admin/planilla/editar',  [CuentaProyectoController::class,'editarPlanilla']);
 
-
-
-
-
 // --- MOVIMIENTO CUENTA PROYECTO ----
 Route::get('/admin/movicuentaproy/indexmovicuentaproy', [CuentaProyectoController::class,'indexMoviCuentaProy'])->name('admin.movi.cuenta.proy.index');
 Route::get('/admin/movicuentaproy/tablamovicuentaproy', [CuentaProyectoController::class,'indexTablaMoviCuentaProy']);
@@ -165,7 +158,6 @@ Route::post('/admin/movicuentaproy/nuevo',  [CuentaProyectoController::class,'nu
 Route::get('/admin/movicuentaproy/documento/{id}',  [CuentaProyectoController::class,'descargarReforma']);
 Route::post('/admin/movicuentaproy/informacion',  [CuentaProyectoController::class,'informacionMoviCuentaProy']);
 Route::post('/admin/movicuentaproy/editar',  [CuentaProyectoController::class,'editarMoviCuentaProy']);
-
 
 
 // --- VISTA GENERAR COTIZACION ---
@@ -297,6 +289,25 @@ Route::post('/admin/objespecifico/nuevo', [CodigoEspecifController::class, 'nuev
 Route::post('/admin/objespecifico/informacion', [CodigoEspecifController::class, 'informacionObjEspecifico']);
 Route::post('/admin/objespecifico/editar', [CodigoEspecifController::class, 'editarObjEspecifico']);
 
-// --- GENERAR PRESUPUESTO PDF
-Route::get('/admin/generar/presupuesto/{id}', [CodigoEspecifController::class,'generarPrespuesto']);
+
+// --- REQUERIMIENTOS ---
+Route::get('/admin/listar/requerimientos/index', [CotizacionController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientos.index');
+Route::get('/admin/listar/requerimientos/tabla', [CotizacionController::class,'indexTablaListarRequerimientos']);
+Route::get('/admin/requerimientos/listado/{id}', [CotizacionController::class,'listadoRequerimientoPorProyecto']);
+Route::get('/admin/requerimientos/listado/tabla/{id}', [CotizacionController::class,'tablaRequerimientosIndividual']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

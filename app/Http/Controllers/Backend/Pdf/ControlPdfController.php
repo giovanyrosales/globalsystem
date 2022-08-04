@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Backend\Pdf;
 
 use App\Http\Controllers\Controller;
-use App\Models\Administradores;
 use App\Models\CatalogoMateriales;
 use App\Models\FuenteRecursos;
 use App\Models\Partida;
 use App\Models\PartidaDetalle;
 use App\Models\Proyecto;
 use App\Models\UnidadMedida;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class ControlPdfController extends Controller
 {
@@ -21,8 +18,7 @@ class ControlPdfController extends Controller
         $this->middleware('auth');
     }
 
-    public function generarPrespuestoPdf($id)
-    {
+    public function generarPrespuestoPdf($id){
 
         // obtener todas los presupuesto por tipo_partida
         // 1- Materiales
@@ -32,14 +28,13 @@ class ControlPdfController extends Controller
         // 5- Alquiler de Maquinaria
         // 6- Transporte de Concreto Fresco
 
-
         $partida1 = Partida::where('proyecto_id', $id)
             ->whereIn('tipo_partida', [1, 2])
             ->orderBy('id', 'ASC')
             ->get();
 
         $infoPro = Proyecto::where('id', $id)->first();
-        $nombrepro = $infoPro->nombre;
+
         if ($infoFuenteR = FuenteRecursos::where('id', $infoPro->id_fuenter)->first()) {
             $fuenter = $infoFuenteR->nombre;
         } else {
@@ -148,7 +143,6 @@ class ControlPdfController extends Controller
             $index3++;
         }
 
-
         // APORTE DE MANO DE OBRA
 
         $aporteManoObra = Partida::where('proyecto_id', $id)
@@ -197,7 +191,6 @@ class ControlPdfController extends Controller
                 $totalAlquilerMaquinaria = $totalAporteManoObra + $multi;
             }
         }
-
 
         // TRANSPORTE CONCRETO FRESCO
 
@@ -256,9 +249,8 @@ class ControlPdfController extends Controller
         $imprevisto = "$" . number_format((float)$imprevisto, 2, '.', ',');
         $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
 
-
-        $mpdf = new \Mpdf\Mpdf(['orientation' => 'P']);
-        $mpdf->SetTitle('Presupuesto');
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf->SetTitle('Presupuesto -' . $mes);
 
         // mostrar errores
         $mpdf->showImageErrors = false;
@@ -268,9 +260,9 @@ class ControlPdfController extends Controller
         $tabla = "<div class='content'>
             <img id='logo' src='$logoalcaldia'>
             <p id='titulo'>ALCALDÍA MUNICIPAL DE METAPÁN <br>
-            Fondo: " . $fuenter . " <br>
+            Fondo: $fuenter <br>
             Hoja de presupuesto <br>
-            Fecha: " . $mes . " <br></p>
+            Fecha: $mes <br></p>
             </div>";
 
 
@@ -280,7 +272,7 @@ class ControlPdfController extends Controller
         foreach ($partida1 as $dd) {
 
             if ($partida1->last() == $dd) {
-                $tabla .= "<<tr>
+                $tabla .= "<tr>
                     <td width='100%' colspan='6'></td>
                     </tr>>";
             }
@@ -509,23 +501,15 @@ class ControlPdfController extends Controller
 </table> ";
 
 
-
         $stylesheet = file_get_contents('css/csspresupuesto.css');
         $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
         $mpdf->WriteHTML($tabla,2);
         $mpdf->AddPage();
         $mpdf->WriteHTML($tabla2,2);
 
         $mpdf->Output();
-
-
-       /* $pdf = PDF::loadView('Backend.Admin.Proyectos.pdfPresupuesto', compact('partida1',
-            'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento',
-            'sumaMateriales', 'herramienta2Porciento', 'totalManoObra', 'totalAporteManoObra', 'totalAlquilerMaquinaria',
-            'totalTransportePesado', 'subtotalPartida', 'imprevisto', 'totalPartidaFinal'));
-        $pdf->setPaper('letter', 'portrait')->setWarnings(false);
-        $pdf->getDomPDF()->set_option("enable_php", true);
-        return $pdf->stream();*/
     }
 
 

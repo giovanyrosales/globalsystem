@@ -10,8 +10,6 @@ class CreateRequisicionTable extends Migration
      *  peticion que hace el encargado del proyecto y en base a eso se hace la requisicion
      * estados
      *
-     * los estados son
-     * autorizado / no autorizado
 
      * @return void
      */
@@ -24,6 +22,10 @@ class CreateRequisicionTable extends Migration
             $table->string('destino', 300)->nullable();
             $table->date('fecha')->nullable();
             $table->text('necesidad')->nullable();
+
+
+            //0: defecto
+            //1: inicio su cotizacion de uno o todos los materiales
             $table->integer('estado');
 
             $table->foreign('id_proyecto')->references('id')->on('proyectos');

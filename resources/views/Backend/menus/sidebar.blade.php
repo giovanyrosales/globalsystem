@@ -81,18 +81,6 @@
                         </li>
                         @endcan
 
-                        @can('sidebar.cuenta.proyecto')
-                            <!--
-                        <li class="nav-item">
-                            <a href="#admin.cuenta.proyectos.index') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Cuenta Proyecto</p>
-                            </a>
-                        </li>
-                            -->
-                        @endcan
-
-
                         @can('sidebar.movimiento.cuenta')
                         <li class="nav-item">
                             <a href="{{ route('admin.movi.cuenta.proy.index') }}" target="frameprincipal" class="nav-link">
@@ -105,6 +93,34 @@
                     </ul>
                 </li>
                 @endcan
+
+
+                @can('sidebar.seccion.requerimientos')
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Requerimientos
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            @can('sidebar.requerimientos.listar')
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.listar.requerimientos.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Listar Requerimientos</p>
+                                    </a>
+                                </li>
+                            @endcan
+
+                        </ul>
+                    </li>
+                @endcan
+
 
                 @can('sidebar.seccion.cotizaciones')
                 <li class="nav-item">
