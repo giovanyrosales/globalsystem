@@ -7,10 +7,9 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 10%">Código</th>
-                                <th style="width: 35%">Nombre</th>
-                                <th style="width: 10%">Fecha Inicio</th>
-                                <th style="width: 17%">Encargado</th>
+                                <th style="width: 10%">Fecha</th>
+                                <th style="width: 18%">Destino</th>
+                                <th style="width: 16%">Necesidad</th>
                                 <th style="width: 12%">Opciones</th>
                             </tr>
                             </thead>
@@ -18,48 +17,13 @@
 
                             @foreach($lista as $dato)
                                 <tr>
-                                    <td>{{ $dato->codigo }}</td>
-                                    <td>{{ $dato->nombre }}</td>
-                                    <td>{{ $dato->fechaini }}</td>
-                                    <td>{{ $dato->encargado }}</td>
+                                    <td>{{ $dato->fecha }}</td>
+                                    <td>{{ $dato->destino }}</td>
+                                    <td>{{ $dato->necesidad }}</td>
                                     <td>
-                                        @can('boton.ver.proyecto')
-                                            <button type="button" class="btn btn-warning btn-xs" onclick="vista({{ $dato->id }})">
-                                                <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
-                                            </button>
-                                        @endcan
-
-                                        @can('boton.editar.proyecto')
-                                            <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                                                <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar
-                                            </button>
-                                        @endcan
-
-                                        @can('boton.ver.presupuesto')
-                                            <br><br>
-                                            @if($dato->presu_aprobado == 0)
-                                                <button type="button" class="btn btn-info btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
-                                                    <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
-                                                </button>
-                                            @else
-                                                <span class="badge bg-success">Presupuesto Aprobado</span>
-                                            @endif
-                                        @endcan
-
-                                        @can('boton.ver.planilla')
-                                            <br><br>
-                                            <button type="button" class="btn btn-info btn-xs" onclick="informacionPlanilla({{ $dato->id }})">
-                                                <i class="fas fa-eye" title="Planilla"></i>&nbsp; Planilla
-                                            </button>
-                                        @endcan
-
-                                    <!-- administradores de proyecto pueden ver unicamente el presupuesto -->
-                                        @can('boton.ver.presupuesto.administrador')
-                                            <button type="button" class="btn btn-info btn-xs" onclick="verPresupuestoPorAdministrador({{ $dato->id }})">
-                                                <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
-                                            </button>
-                                        @endcan
-
+                                        <button type="button" class="btn btn-warning btn-xs" onclick="modalCotizar({{ $dato->id }})">
+                                            <i class="fas fa-list-alt" title="Cotizar"></i>&nbsp; Cotizar
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach

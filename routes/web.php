@@ -295,6 +295,7 @@ Route::get('/admin/listar/requerimientos/index', [CotizacionController::class,'i
 Route::get('/admin/listar/requerimientos/tabla', [CotizacionController::class,'indexTablaListarRequerimientos']);
 Route::get('/admin/requerimientos/listado/{id}', [CotizacionController::class,'listadoRequerimientoPorProyecto']);
 Route::get('/admin/requerimientos/listado/tabla/{id}', [CotizacionController::class,'tablaRequerimientosIndividual']);
+Route::post('/admin/requerimientos/informacion', [CotizacionController::class, 'informacionRequerimiento']);
 
 
 

@@ -12,6 +12,7 @@ use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
 use App\Models\RequisicionDetalle;
+use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -172,11 +173,8 @@ class CotizacionController extends Controller
         return ['success' => 1];
     }
 
-
     public function indexAutorizadas(){
-
         $contrato = Administradores::orderBy('nombre')->get();
-
         return view('Backend.Admin.Cotizaciones.Procesada.vistaCotizacionProcesada', compact('contrato'));
     }
 
@@ -242,48 +240,91 @@ class CotizacionController extends Controller
 
     public function indexTablaListarRequerimientos(){
 
-        // obtener listado de materiales no cotizados aun
-        $detalle = RequisicionDetalle::where('estado', 0)
-            ->select('requisicion_id')
-            ->groupBy('requisicion_id')
+        $data = DB::table('requisicion AS r')
+            ->join('requisicion_detalle AS d', 'd.requisicion_id', '=', 'r.id')
+            ->select('r.id_proyecto')
+            ->where('d.estado', 0)
+            ->groupBy('r.id_proyecto')
             ->get();
 
         $pila = array();
 
-        foreach ($detalle as $dd){
-            array_push($pila, $dd->requisicion_id);
+        foreach ($data as $dd){
+            array_push($pila, $dd->id_proyecto);
         }
 
-        // obtener listado de proyectos con requisicones pendiente
-        $info = Requisicion::whereIn('id', $pila)
-            ->select('id')
-            ->groupBy('id')
-            ->get();
-
-        $pila2 = array();
-
-        foreach ($info as $dd){
-            array_push($pila2, $dd->id);
-        }
-
-        // obtener informacion de los proyectos que tienen requisicion pendiente.
-        $lista = Proyecto::whereIn('id', $pila2)
+        $lista = Proyecto::whereIn('id', $pila)
             ->orderBy('fecha', 'DESC')
             ->get();
+
+        foreach ($lista as $ll){
+            $ll->fecha = date("d-m-Y", strtotime($ll->fecha));
+        }
 
         return view('Backend.Admin.requerimientos.tablarequerimientos', compact('lista'));
     }
 
-    // mostrara vista de listado de requerimientos pendiente para x proyecto
+    // mostrar la vista de requerimientos pendiente para x proyecto
     public function listadoRequerimientoPorProyecto($id){
-        return view('Backend.Admin.requerimientos.vistaindividualrequerimiento', compact('id'));
+
+        $proveedores = Proveedores::orderBy('nombre')->get();
+
+        return view('Backend.Admin.requerimientos.vistaindividualrequerimiento', compact('id', 'proveedores'));
     }
 
     public function tablaRequerimientosIndividual($id){
 
-        return "tabla";
+        $data = DB::table('requisicion AS r')
+            ->join('requisicion_detalle AS d', 'd.requisicion_id', '=', 'r.id')
+            ->select('r.id')
+            ->where('d.estado', 0)
+            ->groupBy('r.id')
+            ->get();
+
+        $pila = array(); // array id de requerimientos
+
+        foreach ($data as $dd){
+            array_push($pila, $dd->id);
+        }
+
+        $lista = Requisicion::whereIn('id', $pila)->orderBy('fecha', 'ASC')->get();
+
+        foreach ($lista as $dd){
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+        }
+
+        return view('Backend.Admin.requerimientos.tablaindividualrequerimiento', compact('lista'));
     }
 
+    public function informacionRequerimiento(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($info = Requisicion::where('id', $request->id)->first()){
+
+            $listado = RequisicionDetalle::where('requisicion_id', $request->id)
+                ->where('estado', 0)
+                ->get();
+
+            foreach ($listado as $l){
+                $data = CatalogoMateriales::where('id', $l->material_id)->first();
+                $data2 = UnidadMedida::where('id', $data->id_unidadmedida)->first();
+
+                $l->nombre = $data->nombre;
+                $l->medida = $data2->medida;
+            }
+
+            return ['success' => 1, 'info' => $info, 'listado' => $listado];
+        }else{
+            return ['success' => 2];
+        }
+    }
 
 
 }

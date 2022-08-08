@@ -25,7 +25,7 @@ class CreateRequisicionTable extends Migration
 
 
             //0: defecto
-            //1: inicio su cotizacion de uno o todos los materiales
+            //1: inicio su cotización de uno o todos los materiales
             $table->integer('estado');
 
             $table->foreign('id_proyecto')->references('id')->on('proyectos');

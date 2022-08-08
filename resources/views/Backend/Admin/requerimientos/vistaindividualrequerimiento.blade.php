@@ -17,12 +17,9 @@
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
-        <div class="col-sm-11">
-            <h4>Requisiciones Pendientes</h4>
-        </div>
-
         <div class="row mb-2">
             <div class="col-sm-6">
+                <h4>Requisiciones Pendientes</h4>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -52,230 +49,94 @@
     </section>
 
 
-    <div class="modal fade" id="modalEditar">
+    <div class="modal fade" id="modalCotizar" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Editar Información del Proyecto</h4>
+                    <h4 class="modal-title">Cotizar</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form class="form-horizontal" id="formulario-editar">
+
+                    <form id="formulario-cotizar-nuevo">
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Código:</label>
-                                        <input type="hidden" id="id-editar">
-                                        <input type="text" maxlength="100" id="codigo" class="form-control" placeholder="Código de proyecto" autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-5">
                                     <div class="form-group">
-                                        <label>Nombre *:</label>
-                                        <input type="text" maxlength="300" id="nombre" class="form-control" placeholder="Nombre del proyecto" autocomplete="off">
+                                        <label>Destino</label>
+                                        <input type="text" class="form-control" id="destino" disabled>
+                                        <input id="idcotizar" type="hidden" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Necesidad</label>
+                                        <textarea class="form-control" id="necesidad" rows="3" disabled></textarea>
                                     </div>
                                 </div>
 
-                                <div class="col-md-3">
+                                <div class="col-md-5">
                                     <div class="form-group">
-                                        <label>Ubicación *:</label>
-                                        <input type="text" maxlength="300" id="ubicacion" placeholder="Ubicación" class="form-control" autocomplete="off">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Naturaleza:</label>
-                                        <select id="select-naturaleza" class="form-control">
-                                            <option value="" disabled selected>Seleccione una opción...</option>
-
+                                        <label >Proveedor</label>
+                                        <select class="custom-select" id="proveedor">
+                                            @foreach($proveedores as $proveedor)
+                                                <option value="{{ $proveedor->id }}">{{ $proveedor->nombre }}</option>
+                                            @endforeach
                                         </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Fecha de cotización:</label>
+                                        <input type="date" id="fecha-cotizacion" class="form-control">
                                     </div>
                                 </div>
                             </div>
+
 
                             <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Área de Gestión:</label>
-                                        <select class="form-control" id="select-area-gestion">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <!-- Selección del lado izquierdo -->
+                                        <div class="col-xs-5 col-md-5 col-sm-5">
+                                            <label>Lista de Items de Requisición</label>
+                                            <select name="from[]" id="mySideToSideSelect" class="form-control" size="8" multiple="multiple">
 
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Linea de Trabajo:</label>
-                                        <select class="form-control" id="select-linea" >
+                                            </select>
+                                        </div>
 
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Fuente de Financiamiento:</label>
-                                        <select class="form-control" id="select-fuente-financiamiento" >
+                                        <!-- Botones de acción -->
+                                        <div class="col-xs-2 col-md-2 col-sm-2">
 
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Fuente de Recursos:</label>
-                                        <select class="form-control" id="select-fuente-recursos" >
+                                            <label>&nbsp;</label>
+                                            <button type="button" id="mySideToSideSelect_rightAll" class="btn btn-secondary col-xs-12 col-md-12 col-sm-12 mt-1"><i class="fas fa-forward"></i></button>
+                                            <button type="button" id="mySideToSideSelect_rightSelected" class="btn btn-secondary col-md-12 col-sm-12 mt-1"><i class="fas fa-chevron-right"></i></button>
+                                            <button type="button" id="mySideToSideSelect_leftSelected" class="btn btn-secondary col-md-12 col-sm-12 mt-1"><i class="fas fa-chevron-left"></i></button>
+                                            <button type="button" id="mySideToSideSelect_leftAll" class="btn btn-secondary col-md-12 col-sm-12 mt-1"><i class="fas fa-backward"></i></button>
+                                        </div>
 
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Contraparte:</label>
-                                        <input type="text" maxlength="300" id="contraparte" autocomplete="off" placeholder="Contraparte" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Código Contable:</label>
-                                        <input type="text" maxlength="150" id="codcontable" class="form-control" placeholder="Código contable" autocomplete="off">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Fecha de Inicio:</label>
-                                        <input type="date" id="fecha-inicio" class="form-control">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Acuerdo Apertura:</label>
-                                        <p id="hayAcuerdo"></p>
-                                        <input type="file" id="acuerdo-apertura" class="form-control" accept="image/jpeg, image/jpg, image/png, .pdf"/>
+                                        <!-- Selección del lado derecho -->
+                                        <div class="col-xs-5 col-md-5 col-sm-5">
+                                            <label>Lista de Items a cotizar</label>
+                                            <select name="to[]" id="mySideToSideSelect_to" class="form-control" size="8" multiple="multiple"></select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Ejecutor:</label>
-                                        <input type="text" maxlength="300" id="ejecutor" placeholder="Nombre de Ejecutor de la Obra" class="form-control" autocomplete="off">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Formulador:</label>
-                                        <input type="text" maxlength="300" id="formulador" placeholder="Nombre de formulador" class="form-control" autocomplete="off">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Supervisor:</label>
-                                        <input type="text" maxlength="300" id="supervisor" placeholder="Nombre de Supervisor" class="form-control" autocomplete="off">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Encargado:</label>
-                                        <input type="text" maxlength="300" id="encargado"  placeholder="Nombre de Encargado" class="form-control" autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <hr>
-                                    <label>Sección de Prespuesto</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Cuenta Bolsón:</label>
-                                    <select id="select-bolson" class="form-control">
-
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Monto de proyecto $:</label>
-                                    <input type="number" id="monto"  class="form-control" step="any">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <hr>
-                                    <label>Sección de UACI</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-5">
-                                <div class="form-group">
-                                    <label>Estado del Proyecto:</label>
-                                    <select id="select-estado" class="form-control">
-
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
                     </form>
+
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="btnGuardarU" onclick="verificar()">Guardar</button>
+                    <button type="button" class="btn btn-primary" onclick="preguntaGuardarRequisicion()">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- modal presupuesto para aprobacion-->
-    <div class="modal fade" id="modalPresupuesto">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Presupuesto</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
 
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <input type="hidden" id="idpreaprobar">
-
-                                <div id="tablaPre">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="btnAprobarPresupuesto()">Aprobar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 
 </div>
@@ -290,6 +151,7 @@
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+    <script src="{{ asset('js/multiselect.min.js') }}"></script>
 
     <script type="text/javascript">
         $(document).ready(function(){
@@ -298,6 +160,8 @@
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
+
+            $('#mySideToSideSelect').multiselect();
         });
 
     </script>
@@ -308,6 +172,43 @@
             var ruta = "{{ url('/admin/proyecto/lista/tabla/index') }}";
             $('#tablaDatatable').load(ruta);
         }
+
+        function modalCotizar(id){
+
+            openLoading();
+
+            axios.post(url+'/requerimientos/informacion', {
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalCotizar').modal('show');
+                        $('#idcotizar').val(id);
+                        $('#destino').val(response.data.info.destino);
+                        $('#necesidad').val(response.data.info.necesidad);
+
+                        var fecha = new Date();
+                        document.getElementById('fecha-cotizacion').value = fecha.toJSON().slice(0,10);
+
+                        document.getElementById("mySideToSideSelect").options.length = 0;
+
+                        $.each(response.data.listado, function( key, val ){
+                            $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.nombre+'</option>');
+                        });
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
+        }
+
 
         function informacion(id){
             openLoading();
@@ -640,7 +541,12 @@
         }
 
 
-
+        function removeOptionsFromSelect(selectElement) {
+            var i, L = selectElement.options.length - 1;
+            for(i = L; i >= 0; i--) {
+                selectElement.remove(i);
+            }
+        }
 
     </script>
 
