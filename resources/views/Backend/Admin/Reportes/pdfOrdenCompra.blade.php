@@ -1,4 +1,4 @@
-<style>
+<style type="text/css">
     input {
         border-width:1px;  border:none;
     }
@@ -30,9 +30,8 @@
         <td width="5%"></td>
     </tr>
 </table>
-<br>
 
-<br>
+
 <br>
 <table class="table-body" border="0" cellspacing=0 style="margin-top: -35px;">
     <tr>
@@ -76,13 +75,13 @@
 <br></br>
 
 <?php $total = 0; ?>
-<table class="table-body center" border="0" cellspacing=0 style="padding-right: 25px; padding-left: 25px; margin-left: 20px; width: 100%">
+<table class="table-body" border="0" cellspacing=0  style="margin-left:35px" >
 
     @foreach($det_cotizacion as $item)
 
         <tr style=" height: 30px" >
             <td  style=" width: 8.9%; text-align:center; ">
-                <label style="  vertical-align:middle; text-align:center; font-size:14px;">{{ $item->cantidad }}</label>
+                <label style="  vertical-align:middle; text-align:center;   font-size:14px;">{{ $item->cantidad }}</label>
             </td>
             <td  style=" width: 48.1%; text-align:left; ">
                 <label style="  vertical-align:middle; text-align:left; margin-left: 5%;   font-size:14px;">{{ $item->descripcion }} </label>

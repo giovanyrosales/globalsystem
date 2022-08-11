@@ -25,13 +25,20 @@
                                     <td>{{ $dato->proveedor }}</td>
                                     <td>{{ $dato->codigoproyecto }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-warning btn-xs" onclick="verProcesadas({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="verProcesadas({{ $dato->id }})">
+                                            <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
                                         </button>
 
-                                        <button type="button" class="btn btn-info btn-xs" onclick="abrirModalOrden({{ $dato->id }})">
-                                            <i class="fas fa-pen" title="Generar Orden"></i>&nbsp; Generar Orden
-                                        </button>
+                                        @if(!$dato->bloqueo)
+
+                                            @can('boton.cotizacion.generar.orden')
+                                            <br><br>
+                                            <button type="button" class="btn btn-info btn-xs" onclick="abrirModalOrden({{ $dato->id }})">
+                                                <i class="fas fa-pen" title="Generar Orden"></i>&nbsp; Generar Orden
+                                            </button>
+                                            @endcan
+
+                                        @endif
 
                                     </td>
                                 </tr>

@@ -174,11 +174,14 @@ Route::post('/admin/proyecto/cotizacion/nuevo',  [ProyectoController::class,'nue
 // --- VISTA COTIZACIONES PENDIENTES ---
 Route::get('/admin/cotizacion/pendiente/index', [CotizacionController::class,'indexPendiente'])->name('cotizaciones.pendientes.index');
 Route::get('/admin/cotizacion/pendiente/tabla-index', [CotizacionController::class,'indexPendienteTabla']);
+
 Route::get('/admin/cotizacion/individual/index/{id}', [CotizacionController::class,'indexCotizacion']);
-Route::post('/admin/cotizacion/pendiente/actualizar',  [CotizacionController::class,'actualizarCotizacion']);
-Route::post('/admin/cotizacion/borrar',  [CotizacionController::class,'borrarCotizacion']);
 Route::post('/admin/cotizacion/autorizar',  [CotizacionController::class,'autorizarCotizacion']);
 Route::post('/admin/cotizacion/denegar',  [CotizacionController::class,'denegarCotizacion']);
+
+// vista de cotizacion detalle para procesadas o denegadas
+Route::get('/admin/cotizacion/detalle/{id}', [CotizacionController::class,'vistaDetalleCotizacion']);
+
 
 // --- VISTA COTIZACIONES AUTORIZADAS ---
 Route::get('/admin/cotizacion/autorizadas/index', [CotizacionController::class,'indexAutorizadas'])->name('cotizaciones.autorizadas.index');
@@ -190,7 +193,7 @@ Route::get('/admin/cotizacion/denegadas/tabla-index', [CotizacionController::cla
 
 // --- ORDENES ---
 Route::post('/admin/ordenes/generar/nuevo',  [OrdenController::class,'generarOrden']);
-Route::get('/admin/documento/pdf/orden/{id}', [OrdenController::class,'vistaPdfOrden']);
+Route::get('/admin/ordenes/pdf/{id}', [OrdenController::class,'vistaPdfOrden']);
 
 // --- ORDENES DE COMPRAS ---
 Route::get('/admin/ordenes/compras/index', [OrdenController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
@@ -296,6 +299,8 @@ Route::get('/admin/listar/requerimientos/tabla', [CotizacionController::class,'i
 Route::get('/admin/requerimientos/listado/{id}', [CotizacionController::class,'listadoRequerimientoPorProyecto']);
 Route::get('/admin/requerimientos/listado/tabla/{id}', [CotizacionController::class,'tablaRequerimientosIndividual']);
 Route::post('/admin/requerimientos/informacion', [CotizacionController::class, 'informacionRequerimiento']);
+Route::post('/admin/requerimientos/verificar', [CotizacionController::class, 'verificarRequerimiento']);
+Route::post('/admin/requerimientos/cotizacion/guardar', [CotizacionController::class, 'guardarNuevaCotizacion']);
 
 
 

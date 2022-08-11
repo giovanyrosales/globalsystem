@@ -19,7 +19,7 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Cotizaciones Pendientes</h1>
+                <h1>Cotizaciones Pendientes de Autorización</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -80,48 +80,6 @@
 
         function verPendientes(id){
             window.location.href="{{ url('/admin/cotizacion/individual/index') }}/" + id;
-        }
-
-        function modalBorrar(id){
-            Swal.fire({
-                title: 'Borrar Cotización?',
-                text: "",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Borrar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    borrar(id);
-                }
-            })
-        }
-
-        function borrar(id){
-            openLoading();
-
-            axios.post(url+'/cotizacion/borrar', {
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        toastr.success('Borrado correctamente');
-                        recargar();
-                    }
-                    else if(response.data.success === 2){
-                        toastr.info('Cotizacion ya esta Aprobada');
-                    }else{
-                        toastr.error('Error al borrar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('Error al borrar');
-                    closeLoading();
-                });
-
         }
 
     </script>

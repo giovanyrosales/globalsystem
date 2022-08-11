@@ -24,7 +24,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">Listado</li>
-                    <li class="breadcrumb-item active">Cotizaciones Pendientes</li>
+                    <li class="breadcrumb-item active">Cotizaciones</li>
                 </ol>
             </div>
         </div>
@@ -109,14 +109,8 @@
 
                         <div class="col-md-8">
                             <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
-                                <i title="Cancelar"></i> Cancelar </a>
+                                <i title="Cancelar"></i> Atras </a>
                         </div>
-
-                        <div class="col-md-4" style="float: right">
-                                <button type="button" class="btn btn-success float-right mt-3" onclick="autorizarCotizacion()">Autorizar Cotización</button>
-                                <button type="button"  class="btn btn-danger float-right mt-3" style="margin-right: 20px" onclick="denegarCotizacion()">Denegar Cotización</button>
-                        </div>
-
                     </div>
                 </div>
 
@@ -143,119 +137,5 @@
             document.getElementById("divcontenedor").style.display = "block";
         });
     </script>
-
-    <script>
-
-        function autorizarCotizacion(){
-            Swal.fire({
-                title: 'Autorizar Cotización',
-                text: "",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    verificarAutorizacion();
-                }
-            })
-        }
-
-        function denegarCotizacion(){
-            Swal.fire({
-                title: 'Denegar Cotización',
-                text: "",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    verificarDenegada();
-                }
-            })
-        }
-
-        function verificarAutorizacion(){
-            // id de cotizacion
-            var id = {{ $id }};
-
-            openLoading();
-
-            axios.post(url+'/cotizacion/autorizar', {
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        Swal.fire({
-                            title: 'Cotización Autorizada',
-                            text: "",
-                            icon: 'success',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href="{{ url('/admin/cotizacion/autorizadas/index') }}";
-                            }
-                        })
-                    }
-                    else{
-                        toastr.error('Error al autorizar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('Error al autorizar');
-                    closeLoading();
-                });
-        }
-
-        function verificarDenegada(){
-            // id de cotizacion
-            var id = {{ $id }};
-
-            openLoading();
-
-            axios.post(url+'/cotizacion/denegar', {
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        Swal.fire({
-                            title: 'Cotización Denegada',
-                            text: "",
-                            icon: 'success',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href="{{ url('/admin/cotizacion/denegadas/index') }}";
-                            }
-                        })
-                    }
-                    else{
-                        toastr.error('Error al denegar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('Error al denegar');
-                    closeLoading();
-                });
-        }
-
-
-    </script>
-
 
 @endsection

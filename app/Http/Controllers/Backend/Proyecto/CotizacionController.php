@@ -7,12 +7,14 @@ use App\Models\Administradores;
 use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
+use App\Models\ObjEspecifico;
 use App\Models\Orden;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
 use App\Models\RequisicionDetalle;
 use App\Models\UnidadMedida;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +39,8 @@ class CotizacionController extends Controller
 
         foreach ($lista as $dd){
 
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+
             $infoProveedor = Proveedores::where('id', $dd->proveedor_id)->first();
             $infoRequisicion = Requisicion::where('id', $dd->requisicion_id)->first();
             $infoProyecto = Proyecto::where('id', $infoRequisicion->id_proyecto)->first();
@@ -59,107 +63,44 @@ class CotizacionController extends Controller
 
         $detalle = CotizacionDetalle::where('cotizacion_id', $id)->orderBy('cod_presup', 'ASC')->get();
         $conteo = 0;
+
+        $fecha = date("d-m-Y", strtotime($cotizacion->fecha));
+
+        $totalCantidad = 0;
+        $totalPrecio = 0;
+        $totalTotal = 0;
+
         foreach ($detalle as $de){
+
             $conteo += 1;
             $de->conteo = $conteo;
 
             $infoDescripcion = CatalogoMateriales::where('id', $de->material_id)->first();
             $de->descripcion = $infoDescripcion->nombre;
+            $multi = $de->cantidad * $de->precio_u;
+
+            $totalCantidad = $totalCantidad + $de->cantidad;
+            $totalPrecio = $totalPrecio + $de->precio_u;
+            $totalTotal = $totalTotal + $multi;
 
             $de->precio_u = number_format((float)$de->precio_u, 2, '.', ',');
+            $de->total = number_format((float)$multi, 2, '.', ',');
         }
 
-        $estado = $cotizacion->estado;
+        $de->total = number_format((float)$multi, 2, '.', ',');
+
+        $totalCantidad = number_format((float)$totalCantidad, 2, '.', ',');
+        $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
+        $totalTotal = number_format((float)$totalTotal, 2, '.', ',');
 
         return view('Backend.Admin.Cotizaciones.Individual.vistaCotizacionIndividual', compact('id', 'info',
-            'proveedor', 'estado', 'detalle'));
-    }
-
-
-    public function actualizarCotizacion(Request $request){
-
-        DB::beginTransaction();
-
-        try {
-
-            if($request->hayregistro == 1){
-
-                // agregar id a pila
-                $pila = array();
-                for ($i = 0; $i < count($request->idarray); $i++) {
-                    // Los id que sean 0, seran nuevos registros
-                    if($request->idarray[$i] != 0) {
-                        array_push($pila, $request->idarray[$i]);
-                    }
-                }
-
-                // borrar todos los registros
-                // primero obtener solo la lista de cotizacion obtenido de la fila
-                // y no quiero que borre los que si vamos a actualizar con los ID
-                CotizacionDetalle::where('cotizacion_id', $request->idcotizacion)
-                    ->whereNotIn('id', $pila)
-                    ->delete();
-
-                // actualizar registros
-                for ($i = 0; $i < count($request->cantidadarray); $i++) {
-                    if($request->idarray[$i] != 0){
-                        CotizacionDetalle::where('id', $request->idarray[$i])->update([
-                            'cantidad' => $request->cantidadarray[$i],
-                            'precio_u' => $request->preciounitarioarray[$i],
-                            'cod_presup' => $request->codpresuparray[$i],
-                        ]);
-                    }
-                }
-
-                DB::commit();
-                return ['success' => 1];
-            }else{
-                // borrar registros
-                // solo si viene vacio el array
-                if($request->cantidad == null){
-                    CotizacionDetalle::where('cotizacion_id', $request->idcotizacion)->delete();
-                    Cotizacion::where('id', $request->idcotizacion)->delete();
-                }
-
-                DB::commit();
-                return ['success' => 2];
-            }
-        }catch(\Throwable $e){
-            Log::info('ee' . $e);
-            DB::rollback();
-            return ['success' => 2];
-        }
-
-    }
-
-    public function borrarCotizacion(Request $request){
-
-        $regla = array(
-            'id' => 'required', // id cotizacion
-        );
-
-        $validar = Validator::make($request->all(), $regla);
-
-        if ($validar->fails()){ return ['success' => 0];}
-
-        if($info = Cotizacion::where('id', $request->id)->first()){
-
-            if($info->estado == 0){
-
-                CotizacionDetalle::where('cotizacion_id', $request->id)->delete();
-                Cotizacion::where('id', $request->id)->delete();
-                return ['success' => 1];
-            }else{
-                return ['success' => 2];
-            }
-        }else{
-            return ['success' => 3];
-        }
+            'proveedor', 'detalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
     }
 
     public function autorizarCotizacion(Request $request){
         Cotizacion::where('id', $request->id)->update([
-            'estado' => 1
+            'estado' => 1,
+            'fecha_estado' => Carbon::now('America/El_Salvador')
         ]);
 
         return ['success' => 1];
@@ -167,7 +108,8 @@ class CotizacionController extends Controller
 
     public function denegarCotizacion(Request $request){
         Cotizacion::where('id', $request->id)->update([
-            'estado' => 2
+            'estado' => 2,
+            'fecha_estado' => Carbon::now('America/El_Salvador')
         ]);
 
         return ['success' => 1];
@@ -175,26 +117,29 @@ class CotizacionController extends Controller
 
     public function indexAutorizadas(){
         $contrato = Administradores::orderBy('nombre')->get();
+
         return view('Backend.Admin.Cotizaciones.Procesada.vistaCotizacionProcesada', compact('contrato'));
     }
 
     public function indexAutorizadasTabla(){
 
         // todas las ordenes de cotizacion, para no mostrarlas
-        $orden = Orden::all();
+        /*$orden = Orden::all();
         $pila = array();
 
         foreach ($orden as $dd){
-            array_push($pila, $dd->id);
-        }
+            array_push($pila, $dd->cotizacion_id);
+        }*/
 
         // autorizadas
         $lista = Cotizacion::where('estado', 1)
-            ->whereNotIn('id', $pila)
-            ->orderBy('id', 'ASC')
+           // ->whereNotIn('id', $pila) // no quiero las que ya se genero la orden de compra
+            ->orderBy('fecha', 'DESC') // la ultima cotizacion quiero primero
             ->get();
 
         foreach ($lista as $dd){
+
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
 
             $infoProveedor = Proveedores::where('id', $dd->proveedor_id)->first();
             $infoRequisicion = Requisicion::where('id', $dd->requisicion_id)->first();
@@ -204,6 +149,12 @@ class CotizacionController extends Controller
             $dd->necesidad = $infoRequisicion->necesidad;
             $dd->destino = $infoRequisicion->destino;
             $dd->codigoproyecto = $infoProyecto->codigo;
+
+            if(Orden::where('cotizacion_id', $dd->id)->first()){
+                $dd->bloqueo = true;
+            }else{
+                $dd->bloqueo = false;
+            }
         }
 
         return view('Backend.Admin.Cotizaciones.Procesada.tablaCotizacionProcesada', compact('lista'));
@@ -324,6 +275,143 @@ class CotizacionController extends Controller
         }else{
             return ['success' => 2];
         }
+    }
+
+    // obtener listado de materiales de requisicion, para mostrar detalle
+    public function verificarRequerimiento(Request $request){
+
+        $lista = RequisicionDetalle::whereIn('requisicion_id', $request->lista)
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        $totalCantidad = 0;
+        $totalPrecio = 0;
+        $totalMulti = 0;
+
+        foreach ($lista as $dd){
+
+            $infoCatalogo = CatalogoMateriales::where('id', $dd->material_id)->first();
+            $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
+            $infoCodigo = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
+
+            $dd->nombre = $infoCatalogo->nombre;
+            $dd->pu = $infoCatalogo->pu;
+            $dd->medida = $infoUnidad->medida;
+            $dd->codigo = $infoCodigo->codigo;
+
+            $multi = $dd->cantidad * $infoCatalogo->pu;
+            $totalMulti = $totalMulti + $multi;
+
+            $dd->multiTotal = number_format((float)$multi, 2, '.', ',');
+
+            $totalCantidad = $totalCantidad + $dd->cantidad;
+            $totalPrecio = $totalPrecio + $infoCatalogo->pu;
+        }
+
+        $totalCantidad = number_format((float)$totalCantidad, 2, '.', ',');
+        $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
+        $totalMulti = number_format((float)$totalMulti, 2, '.', ',');
+
+        return ['success' => 1, 'lista' => $lista,
+            'totalCantidad' => $totalCantidad,
+            'totalPrecio' => $totalPrecio,
+            'totalMulti' => $totalMulti];
+    }
+
+
+    public function guardarNuevaCotizacion(Request $request){
+
+        DB::beginTransaction();
+
+        try {
+
+            // crear cotizacion
+            $coti = new Cotizacion();
+            $coti->proveedor_id = $request->proveedor;
+            $coti->requisicion_id = $request->idcotizar;
+            $coti->fecha = $request->fecha;
+            $coti->estado = 0;
+            $coti->save();
+
+            $lista = RequisicionDetalle::whereIn('requisicion_id', $request->lista)
+                ->orderBy('id', 'ASC')
+                ->get();
+
+            foreach ($lista as $dd){
+
+                $infoCatalogo = CatalogoMateriales::where('id', $dd->material_id)->first();
+                $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
+                $infoCodigo = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
+
+                $detalle = new CotizacionDetalle();
+                $detalle->cotizacion_id = $coti->id;
+                $detalle->material_id = $dd->material_id;
+                $detalle->nombre = $infoCatalogo->nombre;
+                $detalle->medida = $infoUnidad->medida;
+                $detalle->cantidad = $dd->cantidad;
+                $detalle->precio_u = $infoCatalogo->pu;
+                $detalle->cod_presup = $infoCodigo->codigo;
+                $detalle->estado = 0;
+                $detalle->save();
+
+                // cambiar estado de requisiciones detalle porque ya fueron cotizadas
+                RequisicionDetalle::where('id', $dd->id)->update([
+                    'estado' => 1,
+                ]);
+            }
+
+            DB::commit();
+            return ['success' => 1];
+        }catch(\Throwable $e){
+
+            DB::rollback();
+            return ['success' => 2];
+        }
+    }
+
+
+    public function vistaDetalleCotizacion($id){
+        // id de cotizacion
+
+        // destino, necesidad, proveedor, fecha cotizacion
+        $cotizacion = Cotizacion::where('id', $id)->first();
+        $info = Requisicion::where('id', $cotizacion->requisicion_id)->first();
+        $proveedor = Proveedores::where('id', $cotizacion->proveedor_id)->first();
+
+        $detalle = CotizacionDetalle::where('cotizacion_id', $id)->orderBy('cod_presup', 'ASC')->get();
+        $conteo = 0;
+
+        $fecha = date("d-m-Y", strtotime($cotizacion->fecha));
+
+        $totalCantidad = 0;
+        $totalPrecio = 0;
+        $totalTotal = 0;
+
+        foreach ($detalle as $de){
+
+            $conteo += 1;
+            $de->conteo = $conteo;
+
+            $infoDescripcion = CatalogoMateriales::where('id', $de->material_id)->first();
+            $de->descripcion = $infoDescripcion->nombre;
+            $multi = $de->cantidad * $de->precio_u;
+
+            $totalCantidad = $totalCantidad + $de->cantidad;
+            $totalPrecio = $totalPrecio + $de->precio_u;
+            $totalTotal = $totalTotal + $multi;
+
+            $de->precio_u = number_format((float)$de->precio_u, 2, '.', ',');
+            $de->total = number_format((float)$multi, 2, '.', ',');
+        }
+
+        $de->total = number_format((float)$multi, 2, '.', ',');
+
+        $totalCantidad = number_format((float)$totalCantidad, 2, '.', ',');
+        $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
+        $totalTotal = number_format((float)$totalTotal, 2, '.', ',');
+
+        return view('Backend.Admin.Cotizaciones.Individual.vistacotizaciondetalle', compact('id', 'info',
+            'proveedor', 'detalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
     }
 
 

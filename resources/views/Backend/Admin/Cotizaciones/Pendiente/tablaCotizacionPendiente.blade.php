@@ -8,7 +8,7 @@
                             <thead>
                             <tr>
                                 <th style="width: 35%">Destino</th>
-                                <th style="width: 10%">Fecha</th>
+                                <th style="width: 10%">Fecha Coti.</th>
                                 <th style="width: 17%">Necesidad</th>
                                 <th style="width: 17%">Proveedor</th>
                                 <th style="width: 17%">Cod. Proyecto</th>
@@ -25,17 +25,9 @@
                                     <td>{{ $dato->proveedor }}</td>
                                     <td>{{ $dato->codigoproyecto }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-warning btn-xs" onclick="verPendientes({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="verPendientes({{ $dato->id }})">
+                                            <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
                                         </button>
-
-                                        @if($dato->estado == 0)
-
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="modalBorrar({{ $dato->id }})">
-                                            <i class="fas fa-pen" title="Borrar"></i>&nbsp; Borrar
-                                        </button>
-
-                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

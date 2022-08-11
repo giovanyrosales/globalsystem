@@ -34,7 +34,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado de Cotizaciones Autorizadas</h3>
+                    <h3 class="card-title">Listado</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -146,7 +146,10 @@
         }
 
         function verProcesadas(id){
-            window.location.href="{{ url('/admin/cotizacion/individual/index') }}/" + id;
+            let iddd = 1;
+            window.open("{{ URL::to('admin/ordenes/pdf') }}/" + iddd);
+            return;
+            window.location.href="{{ url('/admin/cotizacion/detalle') }}/" + id;
         }
 
         function abrirModalOrden(id){
@@ -188,7 +191,7 @@
                         toastr.success('Orden Generada');
                         recargar();
                         // vista pdf
-                        window.open("{{ URL::to('admin/documento/pdf/orden') }}/" + response.data.id);
+                        window.open("{{ URL::to('admin/ordenes/pdf') }}/" + response.data.id);
                     }
                     else {
                         toastr.error('Error al crear orden');

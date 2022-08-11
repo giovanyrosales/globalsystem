@@ -4,7 +4,8 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
 @stop
 
 <style>
@@ -49,7 +50,7 @@
     </section>
 
 
-    <div class="modal fade" id="modalCotizar" tabindex="-1">
+    <div class="modal fade" id="modalCotizar">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -77,14 +78,13 @@
                                 </div>
 
                                 <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label >Proveedor</label>
-                                        <select class="custom-select" id="proveedor">
+
+                                        <label>Proveedor</label>
+                                        <select class="form-control" id="select-proveedor">
                                             @foreach($proveedores as $proveedor)
                                                 <option value="{{ $proveedor->id }}">{{ $proveedor->nombre }}</option>
                                             @endforeach
                                         </select>
-                                    </div>
 
                                     <div class="form-group">
                                         <label>Fecha de cotización:</label>
@@ -92,7 +92,6 @@
                                     </div>
                                 </div>
                             </div>
-
 
                             <div class="row">
                                 <div class="col-md-12">
@@ -130,7 +129,49 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="preguntaGuardarRequisicion()">Guardar</button>
+                    <button type="button" class="btn btn-primary" onclick="detalleCotizacion()">Detalle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="modalDetalle" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Detalles Cotizacion</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulariocrearcotizacion">
+                        <div class="card-body">
+                            <div class="row">
+                                <table  class="table" id="matriz-requisicion"  data-toggle="table">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 3%">#</th>
+                                        <th style="width: 5%">Cantidad</th>
+                                        <th style="width: 12%">Descripción</th>
+                                        <th style="width: 5%">Medida</th>
+                                        <th style="width: 5%">Precio U.</th>
+                                        <th style="width: 5%">Total</th>
+                                        <th style="width: 8%">Cod. Presup</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" onclick="verificarCotizacion()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -152,6 +193,7 @@
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
     <script src="{{ asset('js/multiselect.min.js') }}"></script>
+    <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
 
     <script type="text/javascript">
         $(document).ready(function(){
@@ -162,6 +204,15 @@
             document.getElementById("divcontenedor").style.display = "block";
 
             $('#mySideToSideSelect').multiselect();
+
+            $('#select-proveedor').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
         });
 
     </script>
@@ -169,11 +220,16 @@
     <script>
 
         function recargar(){
-            var ruta = "{{ url('/admin/proyecto/lista/tabla/index') }}";
+            var ruta = "{{ URL::to('/admin/requerimientos/listado/tabla') }}/"+id;
             $('#tablaDatatable').load(ruta);
         }
 
         function modalCotizar(id){
+
+            document.getElementById("formulario-cotizar-nuevo").reset();
+            $('#select-proveedor').prop('selectedIndex', 0).change();
+            document.getElementById("mySideToSideSelect").options.length = 0;
+            document.getElementById("mySideToSideSelect_to").options.length = 0;
 
             openLoading();
 
@@ -192,8 +248,6 @@
                         var fecha = new Date();
                         document.getElementById('fecha-cotizacion').value = fecha.toJSON().slice(0,10);
 
-                        document.getElementById("mySideToSideSelect").options.length = 0;
-
                         $.each(response.data.listado, function( key, val ){
                             $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.nombre+'</option>');
                         });
@@ -209,142 +263,124 @@
                 });
         }
 
+        function detalleCotizacion(){
 
-        function informacion(id){
+            var fecha = document.getElementById('fecha-cotizacion').value;
+            $("#matriz-requisicion tbody tr").remove();
+
+            if(fecha === ''){
+                toastr.error('Fecha es requerido');
+                return;
+            }
+
+            var formData = new FormData();
+            var hayLista = true;
+
+            $("#mySideToSideSelect_to option").each(function(){
+                hayLista = false;
+                formData.append('lista[]', $(this).val());
+            });
+
+            if(hayLista){
+                Swal.fire({
+                    title: 'Nota',
+                    text: "Lista de Items de Requisición es Requerido",
+                    icon: 'warning',
+                    showCancelButton: false,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Aceptar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                    }
+                });
+                return;
+            }
+
             openLoading();
-            document.getElementById("formulario-editar").reset();
 
-            axios.post(url+'/proyecto/lista/informacion',{
-                'id': id
+            axios.post(url+'/requerimientos/verificar', formData,{
+
             })
                 .then((response) => {
                     closeLoading();
+
                     if(response.data.success === 1){
-                        $('#modalEditar').modal({backdrop: 'static', keyboard: false})
-                        $('#id-editar').val(response.data.info.id);
-                        $('#codigo').val(response.data.info.codigo);
-                        $('#nombre').val(response.data.info.nombre);
-                        $('#ubicacion').val(response.data.info.ubicacion);
-                        $('#fecha-inicio').val(response.data.info.fechaini);
-                        $('#ejecutor').val(response.data.info.ejecutor);
-                        $('#formulador').val(response.data.info.formulador);
-                        $('#supervisor').val(response.data.info.supervisor);
-                        $('#encargado').val(response.data.info.encargado);
-                        $('#contraparte').val(response.data.info.contraparte);
-                        $('#codcontable').val(response.data.info.codcontable);
-                        $('#monto').val(response.data.info.monto);
 
-                        if(response.data.info.acuerdoapertura === null){
-                            document.getElementById("hayAcuerdo").innerHTML = '';
-                        }else{
-                            document.getElementById("hayAcuerdo").innerHTML = 'Ya se encuentra un Acuerdo registrado';
+                        var infodetalle = response.data.lista;
+
+                        for (var i = 0; i < infodetalle.length; i++) {
+
+                            var markup = "<tr id='"+infodetalle[i].id+"'>"+
+
+                                "<td>"+
+                                "<p id='fila"+(i+1)+"' class='form-control' style='max-width: 65px'>"+(i+1)+"</p>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input value='"+infodetalle[i].cantidad+"' disabled class='form-control'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input value='"+infodetalle[i].nombre+"' disabled class='form-control'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input value='"+infodetalle[i].medida+"' disabled class='form-control'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input value='"+infodetalle[i].pu+"' disabled class='form-control'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input value='"+infodetalle[i].multiTotal+"' disabled class='form-control'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input value='"+infodetalle[i].codigo+"' disabled class='form-control'>"+
+                                "</td>"+
+
+                                "</tr>";
+
+                            $("#matriz-requisicion tbody").append(markup);
                         }
 
-                        document.getElementById("select-naturaleza").options.length = 0;
-                        document.getElementById("select-area-gestion").options.length = 0;
-                        document.getElementById("select-linea").options.length = 0;
-                        document.getElementById("select-bolson").options.length = 0;
-                        document.getElementById("select-estado").options.length = 0;
+                        // TOTAL (CANTIDAD * PRECIO UNITARIO)
 
-                        $.each(response.data.arrayNaturaleza, function( key, val ){
-                            if(response.data.info.id_naturaleza == val.id){
-                                $('#select-naturaleza').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
-                            }else{
-                                $('#select-naturaleza').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
-                            }
-                        });
+                        var markup = "<tr id=''>"+
 
-                        // *** area gestion
+                            "<td>"+
+                            "<p class='form-control' style='max-width: 65px'>Total</p>"+
+                            "</td>"+
 
-                        if(response.data.info.id_areagestion == null){
-                            $('#select-area-gestion').append('<option value="" selected="selected">Ninguna</option>');
-                        }else{
-                            $('#select-area-gestion').append('<option value="">Ninguna</option>');
-                        }
+                            "<td>"+
+                            "<input value='"+response.data.totalCantidad+"' disabled class='form-control'>"+
+                            "</td>"+
 
-                        $.each(response.data.arrayAreaGestion, function( key, val ){
-                            if (response.data.info.id_areagestion == val.id) {
-                                $('#select-area-gestion').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " - " + val.nombre + '</option>');
-                            } else {
-                                $('#select-area-gestion').append('<option value="' + val.id + '">' + val.codigo + " - " + val.nombre + '</option>');
-                            }
-                        });
+                            "<td>"+
+                            "<input value='' disabled class='form-control'>"+
+                            "</td>"+
 
-                        // *** linea de trabajo
-                        if(response.data.info.id_linea == null){
-                            $('#select-linea').append('<option value="" selected="selected">Ninguna</option>');
-                        }else{
-                            $('#select-linea').append('<option value="">Ninguna</option>');
-                        }
+                            "<td>"+
+                            "<input value='' disabled class='form-control'>"+
+                            "</td>"+
 
-                        $.each(response.data.arrayLineaTrabajo, function( key, val ){
-                            if (response.data.info.id_linea == val.id) {
-                                $('#select-linea').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " - " + val.nombre + '</option>');
-                            } else {
-                                $('#select-linea').append('<option value="' + val.id + '">' + val.codigo + " - " + val.nombre + '</option>');
-                            }
-                        });
+                            "<td>"+
+                            "<input value='"+response.data.totalPrecio+"' disabled class='form-control'>"+
+                            "</td>"+
 
-                        // *** fuente de financiamiento
-                        if(response.data.info.id_fuentef == null){
-                            $('#select-fuente-financiamiento').append('<option value="" selected="selected">Ninguna</option>');
-                        }else{
-                            $('#select-fuente-financiamiento').append('<option value="">Ninguna</option>');
-                        }
+                            "<td>"+
+                            "<input value='"+response.data.totalMulti+"' disabled class='form-control'>"+
+                            "</td>"+
 
-                        $.each(response.data.arrayFuenteFinanciamiento, function( key, val ){
-                            if (response.data.info.id_fuentef == val.id) {
-                                $('#select-fuente-financiamiento').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " - " + val.nombre + '</option>');
-                            } else {
-                                $('#select-fuente-financiamiento').append('<option value="' + val.id + '">' + val.codigo + " - " + val.nombre + '</option>');
-                            }
-                        });
+                            "</tr>";
 
-                        // *** fuente de recursos
-                        if(response.data.info.id_fuenter == null){
-                            $('#select-fuente-recursos').append('<option value="" selected="selected">Ninguna</option>');
-                        }else{
-                            $('#select-fuente-recursos').append('<option value="">Ninguna</option>');
-                        }
+                        $("#matriz-requisicion tbody").append(markup);
 
-                        $.each(response.data.arrayFuenteRecursos, function( key, val ){
-                            if (response.data.info.id_fuenter == val.id) {
-                                $('#select-fuente-recursos').append('<option value="' + val.id + '" selected="selected">' + val.codigo + " - " + val.nombre + '</option>');
-                            } else {
-                                $('#select-fuente-recursos').append('<option value="' + val.id + '">' + val.codigo + " - " + val.nombre + '</option>');
-                            }
-                        });
-
-                        // *** bolson
-                        if(response.data.info.id_bolson == null){
-                            $('#select-bolson').append('<option value="" selected="selected">Ninguna</option>');
-                        }else{
-                            $('#select-bolson').append('<option value="">Ninguna</option>');
-                        }
-
-                        $.each(response.data.arrayBolson, function( key, val ){
-                            if (response.data.info.id_fuenter == val.id) {
-                                $('#select-bolson').append('<option value="' + val.id + '" selected="selected">'+ val.nombre + '</option>');
-                            } else {
-                                $('#select-bolson').append('<option value="' + val.id + '">' + val.nombre + '</option>');
-                            }
-                        });
-
-                        // *** estado de proyecto
-                        if(response.data.info.id_estado == null){
-                            $('#select-estado').append('<option value="" selected="selected">Ninguna</option>');
-                        }else{
-                            $('#select-estado').append('<option value="">Ninguna</option>');
-                        }
-
-                        $.each(response.data.arrayEstado, function( key, val ){
-                            if (response.data.info.id_estado == val.id) {
-                                $('#select-estado').append('<option value="' + val.id + '" selected="selected">'+ val.nombre + '</option>');
-                            } else {
-                                $('#select-estado').append('<option value="' + val.id + '">' + val.nombre + '</option>');
-                            }
-                        });
-
+                        $('#modalDetalle').css('overflow-y', 'auto');
+                        $('#modalDetalle').modal({backdrop: 'static', keyboard: false})
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -355,189 +391,61 @@
                 });
         }
 
-        function verificar(){
+        function verificarCotizacion(){
             Swal.fire({
-                title: 'Actualizar Proyecto?',
-                text: "",
-                icon: 'question',
+                title: 'Guardar',
+                text: "Nueva Cotización",
+                icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#d33',
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Si'
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    editar();
+                    guardarCotizacion();
                 }
-            })
+            });
         }
 
-        function editar(){
+        function guardarCotizacion(){
 
-            var id = document.getElementById('id-editar').value;
-            var codigo = document.getElementById('codigo').value; //null
-            var nombre = document.getElementById('nombre').value;
-            var ubicacion = document.getElementById('ubicacion').value;
-            var naturaleza = document.getElementById('select-naturaleza').value; // null
-            var areagestion = document.getElementById('select-area-gestion').value; // null
-            var linea = document.getElementById('select-linea').value; // null
-            var fuentef = document.getElementById('select-fuente-financiamiento').value; // null
-            var fuenter = document.getElementById('select-fuente-recursos').value; // null
-            var contraparte = document.getElementById('contraparte').value; // null
-            var codcontable = document.getElementById('codcontable').value; // null
-            var fechainicio = document.getElementById('fecha-inicio').value; // null
-            var acuerdoApertura = document.getElementById('acuerdo-apertura'); // null file
-            var ejecutor = document.getElementById('ejecutor').value; // null
-            var formulador = document.getElementById('formulador').value; // null
-            var supervisor = document.getElementById('supervisor').value; // null
-            var encargado = document.getElementById('encargado').value; // null
-            var bolson = document.getElementById('select-bolson').value; // null
-            var monto = document.getElementById('monto').value; // null
-            var estado = document.getElementById('select-estado').value; // null
+            var fecha = document.getElementById('fecha-cotizacion').value;
+            var proveedor = document.getElementById('select-proveedor').value;
 
-            if(codigo.length > 100){
-                toastr.error('Código máximo 100 caracteres');
-                return;
-            }
+            var formData = new FormData();
+            formData.append('fecha', fecha);
+            formData.append('proveedor', proveedor);
+            formData.append('idcotizar', $('#idcotizar').val());
 
-            if(nombre === ''){
-                toastr.error('Nombre es requerido');
-                return;
-            }
-
-            if(nombre.length > 300){
-                toastr.error('Nombre máximo 300 caracteres');
-                return;
-            }
-
-            if(ubicacion === ''){
-                toastr.error('Ubicación es requerido');
-                return;
-            }
-
-            if(ubicacion.length > 300){
-                toastr.error('Ubicación máximo 300 caracteres');
-                return;
-            }
-
-            if(contraparte.length > 300){
-                toastr.error('Contraparte máximo 300 caracteres');
-                return;
-            }
-
-            if(codcontable.length > 150){
-                toastr.error('Cod. Contable máximo 150 caracteres');
-                return;
-            }
-
-            if(acuerdoApertura.files && acuerdoApertura.files[0]){ // si trae doc
-                if (!acuerdoApertura.files[0].type.match('image/jpeg|image/jpeg|image/png|pdf')){
-                    toastr.error('formato de acuerdo apertura permitido: .png .jpg .jpeg .pdf');
-                    return;
-                }
-            }
-
-            if(ejecutor.length > 300){
-                toastr.error('Ejecutor máximo 300 caracteres');
-                return;
-            }
-
-            if(formulador.length > 300){
-                toastr.error('Formulador máximo 300 caracteres');
-                return;
-            }
-
-            if(supervisor.length > 300){
-                toastr.error('Supervisor máximo 300 caracteres');
-                return;
-            }
-
-            if(encargado.length > 300){
-                toastr.error('Encargado máximo 300 caracteres');
-                return;
-            }
-
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
-
-            if(monto.length > 0){
-                if(!monto.match(reglaNumeroDecimal)) {
-                    toastr.error('valor debe ser número Decimal y No Negativos');
-                    return;
-                }
-
-                if(monto < 0){
-                    toastr.error('monto no permite números negativos');
-                    return;
-                }
-
-                if(monto.length > 10){
-                    toastr.error('monto máximo 10 dígitos de límite');
-                    return;
-                }
-            }else{
-                monto = 0;
-            }
+            $("#mySideToSideSelect_to option").each(function(){
+                hayLista = false;
+                formData.append('lista[]', $(this).val());
+            });
 
             openLoading();
-            var formData = new FormData();
-            formData.append('id', id);
-            formData.append('codigo', codigo);
-            formData.append('nombre', nombre);
-            formData.append('ubicacion', ubicacion);
-            formData.append('naturaleza', naturaleza);
-            formData.append('areagestion', areagestion);
-            formData.append('linea', linea);
-            formData.append('fuentef', fuentef);
-            formData.append('fuenter', fuenter);
-            formData.append('contraparte', contraparte);
-            formData.append('codcontable', codcontable);
-            formData.append('fechainicio', fechainicio);
-            formData.append('documento', acuerdoApertura.files[0]);
-            formData.append('ejecutor', ejecutor);
-            formData.append('formulador', formulador);
-            formData.append('supervisor', supervisor);
-            formData.append('encargado', encargado);
-            formData.append('bolson', bolson);
-            formData.append('monto', monto);
-            formData.append('estado', estado);
 
-            axios.post(url+'/proyecto/lista/editar', formData, {
+            axios.post(url+'/requerimientos/cotizacion/guardar', formData,{
+
             })
                 .then((response) => {
                     closeLoading();
 
                     if(response.data.success === 1){
-                        errorCodigo();
-                    }
-                    else if(response.data.success === 2){
-                        $('#modalEditar').modal('hide');
-                        toastr.success('Actualizado correctamente');
-                    }
-                    else {
-                        toastr.error('Error al actualizar');
-                    }
+                        $('#modalCotizar').modal('hide');
+                        $('#modalDetalle').modal('hide');
 
+                        recargar();
+
+                        toastr.success('guardado');
+                    }else{
+                        toastr.error('Error al guardar');
+                    }
                 })
                 .catch((error) => {
-                    toastr.error('Error al actualizar');
                     closeLoading();
+                    toastr.error('Error al guardar');
                 });
-        }
-
-        function errorCodigo(){
-            Swal.fire({
-                title: 'Código Erróneo',
-                text: "El código ya se encuentra registrado",
-                icon: 'error',
-                showCancelButton: false,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                }
-            })
         }
 
 

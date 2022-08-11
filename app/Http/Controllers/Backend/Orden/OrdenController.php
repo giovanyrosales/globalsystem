@@ -62,6 +62,7 @@ class OrdenController extends Controller
         }
     }
 
+    // pdf orden de compra
     public function vistaPdfOrden($id){ // id de la orden
 
         $orden = Orden::where('id', $id)->first();
@@ -76,11 +77,16 @@ class OrdenController extends Controller
         $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
         $fecha = array(date("d", strtotime($orden->fecha_orden) ), $meses[date("n", strtotime($orden->fecha_orden) )-1], date("Y", strtotime($orden->fecha_orden) ) );
 
+
         $pdf = PDF::loadView('Backend.Admin.Reportes.pdfOrdenCompra', compact('orden','cotizacion','proyecto','fecha','proveedor','det_cotizacion','administrador'));
         //$customPaper = array(0,0,470.61,612.36);
         $customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper($customPaper)->setWarnings(false);
         return $pdf->stream('Orden_Compra.pdf');
+
+
+
+
     }
 
     public function indexOrdenesCompras(){

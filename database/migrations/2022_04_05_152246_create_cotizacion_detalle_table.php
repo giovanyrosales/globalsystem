@@ -19,10 +19,16 @@ class CreateCotizacionDetalleTable extends Migration
             $table->bigInteger('cotizacion_id')->unsigned();
             $table->bigInteger('material_id')->unsigned();
 
+            // copia de seguridad para nombre, en dado caso cambia algo en }
+            // catalogo de materiales
+            $table->string('nombre', 300);
+            $table->string('medida', 100);
+
             $table->decimal('cantidad', 10, 2);
             $table->decimal('precio_u', 10, 2);
             $table->integer('cod_presup');
 
+            // 0: defecto y sin uso
             $table->integer('estado');
 
             $table->foreign('cotizacion_id')->references('id')->on('cotizacion');

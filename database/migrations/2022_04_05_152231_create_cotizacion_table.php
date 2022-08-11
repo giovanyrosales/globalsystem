@@ -19,11 +19,15 @@ class CreateCotizacionTable extends Migration
             $table->bigInteger('proveedor_id')->unsigned();
             $table->bigInteger('requisicion_id')->unsigned();
 
+            // fecha se creo la cotizacion
             $table->date('fecha');
 
-            // 0 defecto
-            // aprobada por jefe uaci
-            // estado 2: denegado
+            // fecha cuando se modifica su estado
+            $table->dateTime('fecha_estado');
+
+            // 0: defecto
+            // 1: aprobada por jefe uaci
+            // 2: denegado
             $table->integer('estado');
 
             $table->foreign('proveedor_id')->references('id')->on('proveedores');
