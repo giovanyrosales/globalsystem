@@ -70,22 +70,68 @@ class OrdenController extends Controller
         $requisicion = Requisicion::where('id',  $cotizacion->requisicion_id)->first();
         $proyecto =  Proyecto::where('id',  $requisicion->id_proyecto)->first();
         $proveedor =  Proveedores::where('id',  $cotizacion->proveedor_id)->first();
-        $det_cotizacion = CotizacionDetalle::where('cotizacion_id',  $orden->cotizacion_id)->get();
         $administrador = Administradores::where('id',  $orden->admin_contrato_id)->first();
+        $det_cotizacion = CotizacionDetalle::where('cotizacion_id',  $orden->cotizacion_id)->get();
+
+        $total = 0;
+
+        $dataArray = array();
+        $array_merged = array();
+        $seguro = false;
+        $vuelta = 0;
+
+        foreach ($det_cotizacion as $dd){
+            $vuelta += 1;
+
+            if(strlen($dd->nombre) >= 25){
+                $subcadena = substr($dd->nombre, 0, 25);
+                $dd->nombre = ($subcadena . ".");
+            }
+
+            $multi = $dd->cantidad * $dd->precio_u;
+            $total = $total + $multi;
+
+            $precio_u = number_format((float)$dd->precio_u, 2, '.', ',');
+            $multi = number_format((float)$multi, 2, '.', ',');
+
+            $dataArray[] = [
+                'cantidad' => $dd->cantidad,
+                'nombre' => $dd->nombre,
+                'cod_presup' => $dd->cod_presup,
+                'precio_u' => $precio_u,
+                'multi' => $multi
+            ];
+
+            // CANTIDAD POR HOJA
+            if($vuelta == 15){
+                $array_merged[] = array_merge($dataArray);
+                $dataArray = array();
+                $vuelta = 0;
+            }
+        }
+
+        if(!empty($dataArray)){
+            $array_merged[] = array_merge($dataArray);
+        }
+
+        $total = number_format((float)$total, 2, '.', ',');
 
         //$fecha = strftime("%d-%B-%Y", strtotime($orden->fechaorden));
         $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
         $fecha = array(date("d", strtotime($orden->fecha_orden) ), $meses[date("n", strtotime($orden->fecha_orden) )-1], date("Y", strtotime($orden->fecha_orden) ) );
 
+        $dia = $fecha[0];
+        $mes = $fecha[1];
+        $anio = $fecha[2];
 
-        $pdf = PDF::loadView('Backend.Admin.Reportes.pdfOrdenCompra', compact('orden','cotizacion','proyecto','fecha','proveedor','det_cotizacion','administrador'));
+        $pdf = PDF::loadView('Backend.Admin.Reportes.pdfOrdenCompra', compact('orden',
+            'cotizacion','proyecto','dia','mes',
+            'anio','proveedor','array_merged',
+            'administrador', 'total'));
         //$customPaper = array(0,0,470.61,612.36);
         $customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper($customPaper)->setWarnings(false);
         return $pdf->stream('Orden_Compra.pdf');
-
-
-
 
     }
 
