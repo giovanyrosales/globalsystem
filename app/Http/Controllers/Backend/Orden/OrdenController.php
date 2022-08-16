@@ -8,14 +8,17 @@ use App\Models\Administradores;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
 use App\Models\Orden;
+use App\Models\Presupuesto;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Barryvdh\DomPDF\Facade\Pdf;
+use function Illuminate\Events\queueable;
 
 // Definir zona horaria o region.
 date_default_timezone_set('America/El_Salvador');
@@ -50,7 +53,11 @@ class OrdenController extends Controller
         if($info = Orden::where('cotizacion_id', $request->idcoti)->first()){
             // no hacer nada, evita ordenes duplicadas
             return ['success' => 1, 'id' => $info->id];
-        }else{
+        }
+
+        DB::beginTransaction();
+        try {
+
             $or = new Orden();
             $or->admin_contrato_id = $request->admin;
             $or->cotizacion_id = $request->idcoti;
@@ -58,7 +65,54 @@ class OrdenController extends Controller
             $or->lugar = $request->lugar;
             $or->estado = 0;
             $or->save();
+
+            // DESCUENTO DE PRESUPUESTO
+
+            // obtener todos los detalles de la cotizacion
+            $infoDetalle = CotizacionDetalle::where('cotizacion_id', $request->idcoti)
+                ->select('cod_presup')
+                ->groupBy('cod_presup')
+                ->get();
+
+            $infoCotizacion = Cotizacion::where('id', $request->idcoti)->first();
+            $infoRequisicion = Requisicion::where('id', $infoCotizacion->requisicion_id)->first();
+
+            // sumar por codigo
+            foreach ($infoDetalle as $dd){
+
+                $detalle = CotizacionDetalle::where('cotizacion_id', $request->idcoti)
+                    ->where('cod_presup', $dd->cod_presup)
+                    ->get();
+
+                $multi = 0; // dinero a descontar por codigo
+                foreach ($detalle as $cd){
+                    $multi = $cd->cantidad * $cd->precio_u;
+                }
+
+                // buscar codigo para descontar
+                if($data = DB::table('presupuesto AS p')
+                    ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
+                    ->select('p.id', 'p.saldo')
+                    ->where('p.proyecto_id', $infoRequisicion->id_proyecto)
+                    ->where('obj.codigo', $dd->cod_presup)
+                    ->first()){
+
+                    // descuento
+                    $resta = $data->saldo - $multi;
+
+                    Presupuesto::where('id', $data->id)->update([
+                        'saldo' => $resta,
+                    ]);
+                }
+            }
+
+            DB::commit();
             return ['success' => 1, 'id' => $or->id];
+
+        }catch(\Throwable $e){
+           // Log::info('error: ' . $e);
+            DB::rollback();
+            return ['success' => 2];
         }
     }
 
@@ -77,7 +131,6 @@ class OrdenController extends Controller
 
         $dataArray = array();
         $array_merged = array();
-        $seguro = false;
         $vuelta = 0;
 
         foreach ($det_cotizacion as $dd){
@@ -148,8 +201,8 @@ class OrdenController extends Controller
             $infoContizacion = Cotizacion::where('id', $val->cotizacion_id)->first();
             $infoRequisicion = Requisicion::where('id', $infoContizacion->requisicion_id)->first();
             $infoProveedor = Proveedores::where('id', $infoContizacion->proveedor_id)->first();
-            $proyecto = Proyecto::where('id', $infoContizacion->proveedor_id)->first();
-            //metemos nuevas variables en el arreglo $regdetalle
+            $proyecto = Proyecto::where('id', $infoRequisicion->id_proyecto)->first();
+
             $val->proyecto_cod = $proyecto->codigo;
 
             if($infoacta = Acta::where('orden_id', $val->id)->first()){
@@ -168,10 +221,15 @@ class OrdenController extends Controller
 
     public function anularCompra(Request $request){
 
-        if(Orden::where('id', $request->id)->first()){
+        if($info = Orden::where('id', $request->id)->first()){
 
-            Orden::where('id', $request->id)->update([
-                'estado' => 1]);
+            // pendiente de anulación
+            if($info->estado == 0){
+                Orden::where('id', $request->id)->update([
+                    'estado' => 1,
+                    'fecha_anulada' => Carbon::now('America/El_Salvador'),
+                    ]);
+            }
 
             return ['success' => 1];
         }else{
@@ -182,7 +240,7 @@ class OrdenController extends Controller
     function generarActa(Request $request){
 
         $regla = array(
-            'idacta' => 'required',
+            'idorden' => 'required',
             'horaacta' => 'required',
             'fechaacta' => 'required'
         );
@@ -191,16 +249,20 @@ class OrdenController extends Controller
 
         if ($validar->fails()){return ['success' => 0]; }
 
-        $acta = new Acta();
-        $acta->orden_id = $request->idacta;
-        $acta->fecha_acta = $request->fechaacta;
-        $acta->hora = $request->horaacta;
-        $acta->estado = 1; // acta generada
+        if($info = Acta::where('orden_id', $request->idorden)->first()){
+            return ['success' => 1, 'actaid'=> $info->id];
+        }else{
+            $acta = new Acta();
+            $acta->orden_id = $request->idorden;
+            $acta->fecha_acta = $request->fechaacta;
+            $acta->hora = $request->horaacta;
+            $acta->estado = 1; // acta generada
 
-        if($acta->save()) {
-            return ['success' => 1, 'actaid'=> $acta->id];
-        }else {
-            return ['success' => 2];
+            if($acta->save()) {
+                return ['success' => 1, 'actaid'=> $acta->id];
+            }else {
+                return ['success' => 2];
+            }
         }
     }
 

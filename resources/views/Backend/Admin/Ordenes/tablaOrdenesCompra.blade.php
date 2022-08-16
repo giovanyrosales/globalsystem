@@ -31,23 +31,35 @@
                                     <td>{{ $dato->cotizacion_id }}</td>
                                     <td>{{ $dato->nomproveedor }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-success btn-xs" onclick="Imprimir({{ $dato->id }})">
-                                            <i class="fa fa-print" title="Generar Acta"></i>&nbsp; Imprimir
-                                        </button>
 
+                                        <!-- orden aun no anulada -->
                                         @if($dato->estado == 0)
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="abrirModalAnular({{ $dato->id }})">
-                                            <i class="fas fa-trash-alt" title="Anular"></i>&nbsp; Anular
-                                        </button>
-                                        @endif
-                                        <br> <br>
-                                        @if($dato->actaid == 0)
-                                            <button type="button" class="btn btn-warning btn-xs" onclick="abrirModalActa({{ $dato->id }})">
-                                                <i class="fa fa-laptop" title="Generar Acta"></i>&nbsp; Generar Acta
+
+                                            <!-- acta aun no generada -->
+                                            @if($dato->actaid == 0)
+                                                <button type="button" class="btn btn-danger btn-xs" onclick="abrirModalAnular({{ $dato->id }})">
+                                                    <i class="fas fa-trash-alt" title="Anular"></i>&nbsp; Anular
+                                                </button>
+                                                <br> <br>
+                                            @endif
+
+                                            <button type="button" class="btn btn-success btn-xs" onclick="Imprimir({{ $dato->id }})">
+                                                <i class="fa fa-print" title="Generar Acta"></i>&nbsp; Imprimir Orden
                                             </button>
-                                        @else
-                                            <button type="button" class="btn btn-info btn-xs" onclick="imprimirActa({{ $dato->actaid }})">
-                                                <i class="fas fa-print" title="Imprimir Acta"></i>&nbsp; Imprimir Acta
+
+                                            <br> <br>
+                                            @if($dato->actaid == 0)
+                                                <button type="button" class="btn btn-warning btn-xs" onclick="abrirModalActa({{ $dato->id }})">
+                                                    <i class="fa fa-laptop" title="Generar Acta"></i>&nbsp; Generar Acta
+                                                </button>
+                                            @else
+                                                <button type="button" class="btn btn-info btn-xs" onclick="imprimirActa({{ $dato->actaid }})">
+                                                    <i class="fas fa-print" title="Imprimir Acta"></i>&nbsp; Imprimir Acta
+                                                </button>
+                                            @endif
+                                        @elseif($dato->estado == 1)
+                                            <button type="button" class="btn btn-primary btn-xs" onclick="verProcesadas({{ $dato->requisicion_id }})">
+                                                <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
                                             </button>
                                         @endif
 

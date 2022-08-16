@@ -34,7 +34,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado de Ordenes de Compra</h3>
+                    <h3 class="card-title">Listado</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -139,13 +139,30 @@
             $('#tablaDatatable').load(ruta);
         }
 
-        function abrirModalAnular(id){
-            $('#modalAnular').modal('show');
-            $('#idorden').val(id);
+        function verProcesadas(id){
+            window.location.href="{{ url('/admin/cotizacion/detalle') }}/" + id;
         }
 
-        function anularOrden(){
-            var id = document.getElementById("idorden").value;
+        function abrirModalAnular(id){
+
+            Swal.fire({
+                title: 'Anular Orden',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#808080',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Anular',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    anularOrden(id);
+                }
+            })
+        }
+
+        function anularOrden(id){
 
             openLoading();
 
@@ -157,25 +174,24 @@
 
                     if(response.data.success === 1){
                         toastr.success('Orden Anulada!')
-                        $('#modalAnular').modal('hide');
                         recargar();
                     }else{
-                        toastr.error('Error', 'No se pudo anular la Orden');
+                        toastr.error('Error al Anular Orden');
                     }
                 })
                 .catch((error) => {
                     closeLoading();
-                    toastr.error('Error', 'No se pudo anular la Orden');
+                    toastr.error('Error al Anular Orden');
                 });
         }
 
         function abrirModalActa(id){
             $('#modalGenerarActa').modal('show');
-            $('#idacta').val(id);
+            $('#idacta').val(id); // id orden
         }
 
         function enviarModalGenerarActa(){
-            var idacta = document.getElementById('idacta').value;
+            var idorden = document.getElementById('idacta').value;
             var horaacta = document.getElementById('horaacta').value;
             var fechaacta = document.getElementById('fechaacta').value;
 
@@ -190,7 +206,7 @@
             }
 
             let formData = new FormData();
-            formData.append('idacta', idacta);
+            formData.append('idorden', idorden);
             formData.append('horaacta', horaacta);
             formData.append('fechaacta', fechaacta);
 
@@ -219,7 +235,7 @@
         }
 
         function Imprimir(id){
-            window.open("{{ URL::to('admin/documento/pdf/orden') }}/" + id);
+            window.open("{{ URL::to('admin/ordenes/pdf') }}/" + id);
         }
 
     </script>

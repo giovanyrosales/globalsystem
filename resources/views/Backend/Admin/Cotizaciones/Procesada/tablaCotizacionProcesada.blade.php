@@ -29,6 +29,7 @@
                                             <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
                                         </button>
 
+                                        <!-- verifica que no haya orden de compra aun para esta cotizacion -->
                                         @if(!$dato->bloqueo)
 
                                             @can('boton.cotizacion.generar.orden')

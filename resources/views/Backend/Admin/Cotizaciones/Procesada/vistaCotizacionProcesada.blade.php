@@ -122,19 +122,7 @@
 
             var fecha = new Date();
             document.getElementById('fecha_orden').value = fecha.toJSON().slice(0,10);
-
             document.getElementById("divcontenedor").style.display = "block";
-
-
-            const checkbox = document.getElementById('myCheckbox')
-
-            checkbox.addEventListener('change', (event) => {
-                if (event.currentTarget.checked) {
-                    alert('checked');
-                } else {
-                    alert('not checked');
-                }
-            })
         });
     </script>
 
@@ -146,9 +134,6 @@
         }
 
         function verProcesadas(id){
-            let iddd = 1;
-            window.open("{{ URL::to('admin/ordenes/pdf') }}/" + iddd);
-            return;
             window.location.href="{{ url('/admin/cotizacion/detalle') }}/" + id;
         }
 
