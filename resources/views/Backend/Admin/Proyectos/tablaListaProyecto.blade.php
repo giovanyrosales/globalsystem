@@ -37,13 +37,10 @@
 
                                         @can('boton.ver.presupuesto')
                                                 <br><br>
-                                                @if($dato->presu_aprobado == 0)
-                                                    <button type="button" class="btn btn-info btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
-                                                        <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
-                                                    </button>
-                                                @else
-                                                    <span class="badge bg-success">Presupuesto Aprobado</span>
-                                                @endif
+                                                <button type="button" class="btn btn-info btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
+                                                    <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
+                                                </button>
+                                                <span class="badge bg-success">Presupuesto Aprobado</span>
                                         @endcan
 
                                         @can('boton.ver.planilla')
@@ -54,11 +51,11 @@
                                         @endcan
 
                                         <!-- administradores de proyecto pueden ver unicamente el presupuesto -->
-                                        @can('boton.ver.presupuesto.administrador')
+
                                                 <button type="button" class="btn btn-info btn-xs" onclick="verPresupuestoPorAdministrador({{ $dato->id }})">
-                                                    <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
+                                                    <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuestox
                                                 </button>
-                                        @endcan
+
 
                                     </td>
                                 </tr>

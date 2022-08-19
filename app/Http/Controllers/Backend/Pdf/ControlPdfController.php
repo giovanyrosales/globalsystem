@@ -78,14 +78,22 @@ class ControlPdfController extends Controller
                     $lista->material = $infomaterial->nombre;
                 }
 
-                $multi = $lista->cantidad * $infomaterial->pu;
+                if($lista->duplicado > 0){
+                    $multi = ($lista->cantidad * $infomaterial->pu) * $lista->duplicado;
+                }else{
+                    $multi = $lista->cantidad * $infomaterial->pu;
+                }
 
                 $lista->cantidad = number_format((float)$lista->cantidad, 2, '.', ',');
                 $lista->pu = "$" . number_format((float)$infomaterial->pu, 2, '.', ',');
                 $lista->subtotal = "$" . number_format((float)$multi, 2, '.', ',');
 
+                // se sumara solo materiales
+                if($secciones->tipo_partida == 1){
+                    $sumaMateriales = $sumaMateriales + $multi;
+                }
+
                 $total = $total + $multi;
-                $sumaMateriales = $sumaMateriales + $multi;
             }
 
             $secciones->total = "$" . number_format((float)$total, 2, '.', ',');
@@ -214,9 +222,9 @@ class ControlPdfController extends Controller
             }
         }
 
-        $afp = $totalManoObra * 0.0675;
-        $isss = $totalManoObra * 0.075;
-        $insaforp = $totalManoObra * 0.1;
+        $afp = ($totalManoObra * 7.75) / 100;
+        $isss = ($totalManoObra * 7.5) / 100;
+        $insaforp = ($totalManoObra * 1) / 100;
 
         $totalDescuento = $totalManoObra - ($afp + $isss + $insaforp);
 
@@ -226,17 +234,17 @@ class ControlPdfController extends Controller
 
         $totalDescuento = "$" . number_format((float)$totalDescuento, 2, '.', ',');
 
-        $herramienta2Porciento = $sumaMateriales * 0.02;
+        $herramienta2Porciento = ($sumaMateriales * 2) / 100;
 
         // subtotal del presupuesto partida
         $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalAporteManoObra
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
         // imprevisto del 5%
-        $imprevisto = $subtotalPartida * 0.05;
+        $imprevisto = ($subtotalPartida * 5) / 100;
 
         // total de la partida final
-        $totalPartidaFinal = $subtotalPartida + $imprevisto;
+        $totalPartidaFinal = $imprevisto;
 
         $sumaMateriales = "$" . number_format((float)$sumaMateriales, 2, '.', ',');
         $herramienta2Porciento = "$" . number_format((float)$herramienta2Porciento, 2, '.', ',');

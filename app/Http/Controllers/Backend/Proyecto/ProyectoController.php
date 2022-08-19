@@ -304,7 +304,7 @@ class ProyectoController extends Controller
         }
 
         $conteoPartida = Partida::where('proyecto_id', $id)->count();
-        if($conteoPartida == null){
+        if($conteoPartida == 0){
             $conteoPartida = 1;
         }else{
             $conteoPartida += 1;
@@ -834,8 +834,11 @@ class ProyectoController extends Controller
             $data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
 
             foreach ($data as $dd){
-                $info = UnidadMedida::where('id', $dd->id_unidadmedida)->first();
-                $dd->medida = $info->medida;
+                if($info = UnidadMedida::where('id', $dd->id_unidadmedida)->first()){
+                    $dd->medida = "- " . $info->medida;
+                }else{
+                    $dd->medida = "";
+                }
             }
 
             $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
@@ -847,7 +850,7 @@ class ProyectoController extends Controller
                     if(!empty($row)){
                         $tiene = false;
                         $output .= '
-                 <li onclick="modificarValorPresupuesto(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->medida .'</a></li>
+                 <li onclick="modificarValorPresupuesto(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' ' .$row->medida .'</a></li>
                 ';
                     }
                 }
@@ -856,7 +859,7 @@ class ProyectoController extends Controller
                     if(!empty($row)){
                         $tiene = false;
                         $output .= '
-                 <li onclick="modificarValorPresupuesto(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->medida .'</a></li>
+                 <li onclick="modificarValorPresupuesto(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' ' .$row->medida .'</a></li>
                    <hr>
                 ';
                     }
@@ -987,13 +990,11 @@ class ProyectoController extends Controller
     public function agregarPresupuesto(Request $request){
 
         $rules = array(
-            'cantidadpartida' => 'required',
             'nombrepartida' => 'required',
             'tipopartida' => 'required',
         );
 
         $validator = Validator::make($request->all(), $rules);
-
         if ( $validator->fails()){
             return ['success' => 0];
         }
@@ -1015,32 +1016,32 @@ class ProyectoController extends Controller
             $r->tipo_partida = $request->tipopartida;
             $r->save();
 
-            $contador = $request->contador + 1;
-
-            if($request->hayregistro == 1){
-
-                if($request->cantidad != null) {
-                    for ($i = 0; $i < count($request->cantidad); $i++) {
-
-                        $rDetalle = new PartidaDetalle();
-                        $rDetalle->partida_id = $r->id;
-                        $rDetalle->material_id = $request->datainfo[$i];
-                        $rDetalle->cantidad = $request->cantidad[$i];
-                        $rDetalle->estado = 0;
-                        $rDetalle->duplicado = $request->duplicado[$i];
-                        $rDetalle->save();
-                    }
-                }
-
-                DB::commit();
-                return ['success' => 2, 'contador' => $contador];
+            $conteoPartida = Partida::where('proyecto_id', $request->id)->count();
+            if($conteoPartida == 0){
+                $conteoPartida = 1;
             }else{
-                DB::commit();
-                return ['success' => 2, 'contador' => $contador];
+                $conteoPartida += 1;
             }
 
-        }catch(\Throwable $e){
+            // siempre habra registros
 
+            if($request->cantidad != null) {
+                for ($i = 0; $i < count($request->cantidad); $i++) {
+
+                    $rDetalle = new PartidaDetalle();
+                    $rDetalle->partida_id = $r->id;
+                    $rDetalle->material_id = $request->datainfo[$i];
+                    $rDetalle->cantidad = $request->cantidad[$i];
+                    $rDetalle->estado = 0;
+                    $rDetalle->duplicado = $request->duplicado[$i];
+                    $rDetalle->save();
+                }
+            }
+
+            DB::commit();
+            return ['success' => 2, 'contador' => $conteoPartida];
+
+        }catch(\Throwable $e){
             DB::rollback();
             return ['success' => 3];
         }
@@ -1100,8 +1101,6 @@ class ProyectoController extends Controller
                 'tipo_partida' => $request->tipopartida
             ]);
 
-            if($request->hayregistro == 1){
-
                 // agregar id a pila
                 $pila = array();
                 for ($i = 0; $i < count($request->idarray); $i++) {
@@ -1141,20 +1140,10 @@ class ProyectoController extends Controller
                     }
                 }
 
-                DB::commit();
-                return ['success' => 2];
-            }else{
-                // borrar registros detalle
-                // solo si viene vacio el array
-                if($request->cantidad == null){
-                    PartidaDetalle::where('partida_id', $request->idpartida)->delete();
-                }
+            DB::commit();
+            return ['success' => 2];
 
-                DB::commit();
-                return ['success' => 2];
-            }
         }catch(\Throwable $e){
-            Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 3];
         }
@@ -1182,7 +1171,14 @@ class ProyectoController extends Controller
             PartidaDetalle::where('partida_id', $request->id)->delete();
             Partida::where('id', $request->id)->delete();
 
-            return ['success' => 2];
+            $conteoPartida = Partida::where('proyecto_id', $info->proyecto_id)->count();
+            if($conteoPartida == 0){
+                $conteoPartida = 1;
+            }else{
+                $conteoPartida += 1;
+            }
+
+            return ['success' => 2, 'contador' => $conteoPartida];
         }else{
             return ['success' => 3];
         }
