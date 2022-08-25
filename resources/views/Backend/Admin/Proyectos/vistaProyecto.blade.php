@@ -1168,82 +1168,80 @@
                 return;
             }
 
-            var hayRegistro = 0;
             var nRegistro = $('#matriz-requisicion >tbody >tr').length;
             let formData = new FormData();
             var id = {{ $id }};
 
-            if (nRegistro > 0){
+            if (nRegistro <= 0) {
+                toastr.error('Detalle es requerido');
+                return;
+            }
 
-                var cantidad = $("input[name='cantidadarray[]']").map(function(){return $(this).val();}).get();
-                var descripcion = $("input[name='descripcionarray[]']").map(function(){return $(this).val();}).get();
-                var descripcionAtributo = $("input[name='descripcionarray[]']").map(function(){return $(this).attr("data-info");}).get();
-                var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var cantidad = $("input[name='cantidadarray[]']").map(function(){return $(this).val();}).get();
+            var descripcion = $("input[name='descripcionarray[]']").map(function(){return $(this).val();}).get();
+            var descripcionAtributo = $("input[name='descripcionarray[]']").map(function(){return $(this).attr("data-info");}).get();
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
-                for(var a = 0; a < cantidad.length; a++){
-                    let detalle = descripcionAtributo[a];
-                    let datoCantidad = cantidad[a];
+            for(var a = 0; a < cantidad.length; a++){
+                let detalle = descripcionAtributo[a];
+                let datoCantidad = cantidad[a];
 
-                    // identifica si el 0 es tipo number o texto
-                    if(detalle == 0){
-                        colorRojoTablaRequisicion(a);
-                        alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
-                        return;
-                    }
-
-                    if(datoCantidad === ''){
-                        colorRojoTablaRequisicion(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
-                        return;
-                    }
-
-                    if(!datoCantidad.match(reglaNumeroDecimal)) {
-                        colorRojoTablaRequisicion(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
-                        return;
-                    }
-
-                    if(datoCantidad <= 0){
-                        colorRojoTablaRequisicion(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
-                        return;
-                    }
-
-                    if(datoCantidad.length > 10){
-                        colorRojoTablaRequisicion(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
-                        return;
-                    }
+                // identifica si el 0 es tipo number o texto
+                if(detalle == 0){
+                    colorRojoTablaRequisicion(a);
+                    alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
+                    return;
                 }
 
-                for(var b = 0; b < descripcion.length; b++){
-
-                    var datoDescripcion = descripcion[b];
-
-                    if(datoDescripcion === ''){
-                        colorRojoTablaRequisicion(b);
-                        toastr.error('Fila #' + (b+1) + ' la descripción es requerida');
-                        return;
-                    }
-
-                    if(datoDescripcion.length > 400){
-                        colorRojoTablaRequisicion(b);
-                        toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
-                    }
+                if(datoCantidad === ''){
+                    colorRojoTablaRequisicion(a);
+                    toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
+                    return;
                 }
 
-                // como tienen la misma cantidad de filas, podemos recorrer
-                // todas las filas de una vez
-                for(var p = 0; p < cantidad.length; p++){
-                    formData.append('cantidad[]', cantidad[p]);
-                    formData.append('datainfo[]', descripcionAtributo[p]);
+                if(!datoCantidad.match(reglaNumeroDecimal)) {
+                    colorRojoTablaRequisicion(a);
+                    toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
+                    return;
                 }
 
-                hayRegistro = 1;
+                if(datoCantidad <= 0){
+                    colorRojoTablaRequisicion(a);
+                    toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
+                    return;
+                }
+
+                if(datoCantidad.length > 10){
+                    colorRojoTablaRequisicion(a);
+                    toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
+                    return;
+                }
+            }
+
+            for(var b = 0; b < descripcion.length; b++){
+
+                var datoDescripcion = descripcion[b];
+
+                if(datoDescripcion === ''){
+                    colorRojoTablaRequisicion(b);
+                    toastr.error('Fila #' + (b+1) + ' la descripción es requerida');
+                    return;
+                }
+
+                if(datoDescripcion.length > 400){
+                    colorRojoTablaRequisicion(b);
+                    toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
+                }
+            }
+
+            // como tienen la misma cantidad de filas, podemos recorrer
+            // todas las filas de una vez
+            for(var p = 0; p < cantidad.length; p++){
+                formData.append('cantidad[]', cantidad[p]);
+                formData.append('datainfo[]', descripcionAtributo[p]);
             }
 
             openLoading();
-            formData.append('hayregistro', hayRegistro);
             formData.append('fecha', fecha);
             formData.append('destino', destino);
             formData.append('necesidad', necesidad);
@@ -1259,6 +1257,11 @@
                         recargarRequisicion();
                         limpiarRequisicion(response.data.contador);
                     }
+
+
+
+
+
                     else{
                         toastr.error('error al crear requisición');
                     }

@@ -273,7 +273,6 @@ class ControlPdfController extends Controller
             Fecha: $mes <br></p>
             </div>";
 
-
         $tabla .= "<table width='100%' id='tablaFor'>
             <tbody>";
 

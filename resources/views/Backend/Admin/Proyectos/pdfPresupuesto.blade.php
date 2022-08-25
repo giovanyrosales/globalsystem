@@ -332,6 +332,20 @@
 
 </table>
 
+<br><br>
+
+<div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+    <!-- boton aprobar solo sera visible para x usuarios, y solo aparecera si no esta aprobado -->
+    @can('boton.aprobar.presupuesto')
+        @if($preAprobado)
+        <!-- sera visible solamente si no esta aprobado aun -->
+        <button type="button" class="btn btn-primary" id="btnAprobarPresupuesto" style="visibility: hidden" onclick="btnAprobarPresupuesto()">Aprobar</button>
+        @endcan
+    @endcan
+
+</div>
+
 <script type="text/php">
        if (isset($pdf)) {
         $x = 270;

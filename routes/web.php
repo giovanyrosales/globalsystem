@@ -77,7 +77,8 @@ Route::post('/admin/proyecto/lista/editar', [ProyectoController::class, 'editarP
 Route::get('/admin/ver/presupuesto/uaci/{id}', [ProyectoController::class,'informacionPresupuestoParaAprobacion']);
 Route::post('/admin/proyecto/aprobar/presupuesto', [ProyectoController::class, 'aprobarPresupuesto']);
 
-
+// ver saldo
+Route::get('/admin/ver/presupuesto/saldo/{id}', [ProyectoController::class,'infoTablaSaldoProyecto']);
 
 
 

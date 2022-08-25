@@ -85,6 +85,8 @@ class RolesSeeder extends Seeder
 
             Permission::create(['name' => 'boton.cotizacion.generar.orden', 'description' => 'sidebar seccion cotizacion - boton para generar orden de compra'])->syncRoles($roleUaci);
 
+        Permission::create(['name' => 'boton.ver.presupuesto.lista', 'description' => 'ver boton, generar presupuesto en la tabla listado de proyectos'])->syncRoles($roleUaci);
+
 
 
         // ORDENES DE COMPRAS
@@ -117,6 +119,9 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'sidebar.requerimientos.listar', 'description' => 'sidebar seccion requerimientos - listar requerimientos'])->syncRoles($roleUaci);
 
 
+        Permission::create(['name' => 'texto.presupuesto.aprobado', 'description' => 'usuarios que pueden ver que el presupuesto esta aprobado'])->syncRoles($roleUaci, $roleIng);
+        Permission::create(['name' => 'boton.aprobar.presupuesto', 'description' => 'boton para aprobar presupuesto'])->syncRoles($roleUaci);
+        Permission::create(['name' => 'boton.dinero.presupuesto', 'description' => 'boton para mostrar cuanto dinero le queda a un proyecto del presupuesto'])->syncRoles($roleAdministrador);
 
 
 

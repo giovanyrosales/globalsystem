@@ -35,12 +35,21 @@
                                         </button>
                                         @endcan
 
+                                        @can('texto.presupuesto.aprobado')
+                                            <br><br>
+                                                @if($dato->estadoPresupuesto)
+                                                    <span class="badge bg-success">Presupuesto Aprobado</span>
+                                                @else
+                                                    <span class="badge bg-warning">Presupuesto Pendiente</span>
+                                                @endif
+                                        @endcan
+
+                                        <!-- este el presupuesto mostrado en un modal, aqui aparece boton para aprobar -->
                                         @can('boton.ver.presupuesto')
-                                                <br><br>
-                                                <button type="button" class="btn btn-info btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
-                                                    <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
-                                                </button>
-                                                <span class="badge bg-success">Presupuesto Aprobado</span>
+                                            <br><br>
+                                            <button type="button" class="btn btn-info btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
+                                                <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
+                                            </button>
                                         @endcan
 
                                         @can('boton.ver.planilla')
@@ -50,12 +59,21 @@
                                             </button>
                                         @endcan
 
-                                        <!-- administradores de proyecto pueden ver unicamente el presupuesto -->
-
-                                                <button type="button" class="btn btn-info btn-xs" onclick="verPresupuestoPorAdministrador({{ $dato->id }})">
-                                                    <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuestox
+                                        @can('boton.dinero.presupuesto')
+                                                <br><br>
+                                                <button type="button" class="btn btn-info btn-xs" onclick="informacionSaldo({{ $dato->id }})">
+                                                    <i class="fas fa-eye" title="Saldos"></i>&nbsp; Saldos
                                                 </button>
+                                        @endcan
 
+                                        <!-- Este es el presupuesto generado a PDF en nueva vista -->
+
+                                        @can('boton.ver.presupuesto.lista')
+                                        <br><br>
+                                        <button type="button" class="btn btn-info btn-xs" onclick="verPresupuestoPorAdministrador({{ $dato->id }})">
+                                            <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
+                                        </button>
+                                        @endcan
 
                                     </td>
                                 </tr>

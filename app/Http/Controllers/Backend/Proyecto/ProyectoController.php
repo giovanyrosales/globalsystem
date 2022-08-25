@@ -144,7 +144,15 @@ class ProyectoController extends Controller
             if($ll->fechaini != null) {
                 $ll->fechaini = date("d-m-Y", strtotime($ll->fechaini));
             }
+
+            if($ll->presu_aprobado == 0){
+                $ll->estadoPresupuesto = false;
+            }else{
+                $ll->estadoPresupuesto = true;
+            }
         }
+
+
 
         return view('Backend.Admin.Proyectos.tablaListaProyecto', compact('lista'));
     }
@@ -602,20 +610,21 @@ class ProyectoController extends Controller
             $r->estado = 0; // 0- no autorizado 1- autorizado
             $r->save();
 
-            //$contador = $request->contador + 1;
+            if($request->cantidad != null) {
+                for ($i = 0; $i < count($request->cantidad); $i++) {
 
-            if($request->hayregistro == 1){
 
-                if($request->cantidad != null) {
-                    for ($i = 0; $i < count($request->cantidad); $i++) {
+                    // hay que verificar cantidad disponible
 
-                        $rDetalle = new RequisicionDetalle();
-                        $rDetalle->requisicion_id = $r->id;
-                        $rDetalle->material_id = $request->datainfo[$i];
-                        $rDetalle->cantidad = $request->cantidad[$i];
-                        $rDetalle->estado = 0;
-                        $rDetalle->save();
-                    }
+
+
+
+                    $rDetalle = new RequisicionDetalle();
+                    $rDetalle->requisicion_id = $r->id;
+                    $rDetalle->material_id = $request->datainfo[$i];
+                    $rDetalle->cantidad = $request->cantidad[$i];
+                    $rDetalle->estado = 0;
+                    $rDetalle->save();
                 }
             }
 
@@ -1428,10 +1437,15 @@ class ProyectoController extends Controller
         $imprevisto = "$" . number_format((float)$imprevisto, 2, '.', ',');
         $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
 
+        $preAprobado = true;
+        if($infoPro->presu_aprobado != 0){
+            $preAprobado = false;
+        }
+
         return view('Backend.Admin.Proyectos.pdfPresupuesto', compact('partida1',
             'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento',
             'sumaMateriales', 'herramienta2Porciento', 'totalManoObra', 'totalAporteManoObra', 'totalAlquilerMaquinaria',
-            'totalTransportePesado', 'subtotalPartida', 'imprevisto', 'totalPartidaFinal'));
+            'totalTransportePesado', 'subtotalPartida', 'imprevisto', 'totalPartidaFinal', 'preAprobado'));
     }
 
     public function aprobarPresupuesto(Request $request){
@@ -1508,12 +1522,23 @@ class ProyectoController extends Controller
         }
     }
 
-    // mostrar PDF de presupuesto para que revisen los administradores.
-    public function infoPresupuestoPorAdministradores($id){
+    // informacion para presupuesto para uaci
+    public function infoTablaSaldoProyecto($id){
 
+        $presupuesto = DB::table('presupuesto AS p')
+            ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
+            ->select('p.saldo_inicial', 'obj.nombre', 'obj.codigo')
+            ->where('p.proyecto_id', $id)
+            ->get();
 
+        foreach ($presupuesto as $pp){
+            $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
+        }
 
+        return view('backend.admin.proyectos.modal.modalsaldo', compact('presupuesto'));
     }
+
+
 
 
 }
