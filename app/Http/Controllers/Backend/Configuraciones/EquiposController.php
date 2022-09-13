@@ -20,7 +20,7 @@ class EquiposController extends Controller
     }
 
     public function tabla(){
-        $lista = Equipos::orderBy('nombre', 'ASC')->get();
+        $lista = Equipos::orderBy('codigo', 'ASC')->get();
 
         return view('Backend.Admin.Configuraciones.equipos.tablaEquipos', compact('lista'));
     }

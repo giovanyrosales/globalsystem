@@ -268,10 +268,9 @@
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
-            formData.append('nombre', nombre);
-            formData.append('telefono', telefono);
-            formData.append('nit', nit);
-            formData.append('nrc', nrc);
+            formData.append('codigo', codigo);
+            formData.append('descripcion', descripcion);
+            formData.append('placa', placa);
 
             axios.post(url+'/equipos/editar', formData, {
             })
