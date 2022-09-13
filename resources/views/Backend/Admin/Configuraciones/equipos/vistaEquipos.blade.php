@@ -252,7 +252,7 @@
             var id = document.getElementById('id-editar').value;
             var codigo = document.getElementById('codigo-editar').value;
             var descripcion = document.getElementById('descripcion-editar').value;
-            var nit = document.getElementById('placa-editar').value;
+            var placa = document.getElementById('placa-editar').value;
 
             if(codigo === ''){
                 toastr.error('Codigo es requerido');
