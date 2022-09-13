@@ -28,7 +28,7 @@ class EquiposController extends Controller
     public function nuevoEquipo(Request $request){
 
         $regla = array(
-            'nombre' => 'required'
+            'codigo' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -70,7 +70,7 @@ class EquiposController extends Controller
 
         $regla = array(
             'id' => 'required',
-            'nombre' => 'required',
+            'codigo' => 'required',
         );
 
         $validar = Validator::make($request->all(), $regla);
