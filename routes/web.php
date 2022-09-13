@@ -16,6 +16,9 @@ use App\Http\Controllers\Backend\Configuraciones\FuenteFinanciamientoController;
 use App\Http\Controllers\Backend\Configuraciones\FuenteRecursosController;
 use App\Http\Controllers\Backend\Configuraciones\AreaGestionController;
 use App\Http\Controllers\Backend\Configuraciones\ProveedoresController;
+use App\Http\Controllers\Backend\Configuraciones\AdescosController;
+use App\Http\Controllers\Backend\Configuraciones\EquiposController;
+use App\Http\Controllers\Backend\Configuraciones\AsociacionesController;
 use App\Http\Controllers\Backend\Configuraciones\AdministradoresController;
 use App\Http\Controllers\Backend\Proyecto\CotizacionController;
 use App\Http\Controllers\Backend\Orden\OrdenController;
@@ -260,6 +263,27 @@ Route::get('/admin/proveedores/tabla/index', [ProveedoresController::class,'tabl
 Route::post('/admin/proveedores/nuevo', [ProveedoresController::class, 'nuevoProveedor']);
 Route::post('/admin/proveedores/informacion', [ProveedoresController::class, 'informacionProveedor']);
 Route::post('/admin/proveedores/editar', [ProveedoresController::class, 'editarProveedor']);
+
+// --- ADESCOS ---
+Route::get('/admin/adescos/index', [AdescosController::class,'index'])->name('admin.adescos.index');
+Route::get('/admin/adescos/tabla/index', [AdescosController::class,'tabla']);
+Route::post('/admin/adescos/nuevo', [AdescosController::class, 'nuevoAdesco']);
+Route::post('/admin/adescos/informacion', [AdescosController::class, 'informacionAdesco']);
+Route::post('/admin/adescos/editar', [AdescosController::class, 'editarAdesco']);
+
+// --- EQUIPOS ---
+Route::get('/admin/equipos/index', [EquiposController::class,'index'])->name('admin.equipos.index');
+Route::get('/admin/equipos/tabla/index', [EquiposController::class,'tabla']);
+Route::post('/admin/equipos/nuevo', [EquiposController::class, 'nuevoEquipo']);
+Route::post('/admin/equipos/informacion', [EquiposController::class, 'informacionEquipo']);
+Route::post('/admin/equipos/editar', [EquiposController::class, 'editarEquipo']);
+
+// --- ASOCIACIONES ---
+Route::get('/admin/asociaciones/index', [AsociacionesController::class,'index'])->name('admin.asociaciones.index');
+Route::get('/admin/asociaciones/tabla/index', [AsociacionesController::class,'tabla']);
+Route::post('/admin/asociaciones/nuevo', [AsociacionesController::class, 'nuevoAsociacion']);
+Route::post('/admin/asociaciones/informacion', [AsociacionesController::class, 'informacionAsociacion']);
+Route::post('/admin/asociaciones/editar', [AsociacionesController::class, 'editarAsociacion']);
 
 // --- ADMINISTRADORES DE PROYECTO ---
 Route::get('/admin/administradores/index', [AdministradoresController::class,'index'])->name('admin.administradores.index');

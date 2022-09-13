@@ -323,6 +323,30 @@
                             </a>
                         </li>
                         @endcan
+                        @can('sidebar.adescos')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.adescos.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Adescos</p>
+                            </a>
+                        </li>
+                        @endcan
+                        @can('sidebar.equipos')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.equipos.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Equipos</p>
+                            </a>
+                        </li>
+                        @endcan 
+                        @can('sidebar.asociaciones')
+                        <li class="nav-item">
+                            <a href="{{ route('admin.asociaciones.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Asociaciones</p>
+                            </a>
+                        </li>
+                        @endcan
 
                         @can('sidebar.administradores')
                         <li class="nav-item">

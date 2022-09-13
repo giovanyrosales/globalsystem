@@ -41,7 +41,14 @@ class ControlController extends Controller
         else  if($user->hasPermissionTo('sidebar.estadisticas')){
             $ruta = 'admin.estadisticas.index';
         }
-
+         // UACI UNIDAD
+         else  if($user->hasRole('uaciunidad')){
+            $ruta = 'admin.estadisticas.index';
+        }
+         // UNIDAD
+         else  if($user->hasRole('unidad')){
+            $ruta = 'admin.estadisticas.index';
+        }
         else{
             // no tiene ningun permiso de vista, redirigir a pantalla sin permisos
             $ruta = 'no.permisos.index';
