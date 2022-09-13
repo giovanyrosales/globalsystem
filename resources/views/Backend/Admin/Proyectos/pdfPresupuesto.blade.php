@@ -340,26 +340,12 @@
     @can('boton.aprobar.presupuesto')
         @if($preAprobado)
         <!-- sera visible solamente si no esta aprobado aun -->
-        <button type="button" class="btn btn-primary" id="btnAprobarPresupuesto" style="visibility: hidden" onclick="btnAprobarPresupuesto()">Aprobar</button>
+        <button type="button" class="btn btn-primary" id="btnAprobarPresupuesto"  onclick="btnAprobarPresupuesto()">Aprobar</button>
         @endcan
     @endcan
 
 </div>
 
-<script type="text/php">
-       if (isset($pdf)) {
-        $x = 270;
-        $y = 750;
-        $text = "Página {PAGE_NUM}/{PAGE_COUNT}";
-        $font = null;
-        $size = 9;
-        $color = array(0,0,0);
-        $word_space = 0.0;  //  default
-        $char_space = 0.0;  //  default
-        $angle = 0.0;   //  default
-        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-    }
-</script>
 
 </body>
 </html>

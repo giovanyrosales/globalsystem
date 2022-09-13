@@ -92,8 +92,6 @@
                               @endcan
                           @endif
 
-
-
                       </div>
 
                       <div class="card-body">
@@ -1245,7 +1243,7 @@
             formData.append('fecha', fecha);
             formData.append('destino', destino);
             formData.append('necesidad', necesidad);
-            formData.append('id', id);
+            formData.append('id', id); // id proyecto
 
             axios.post(url+'/proyecto/vista/requisicion/nuevo', formData, {
             })
@@ -1258,9 +1256,28 @@
                         limpiarRequisicion(response.data.contador);
                     }
 
+                    else if(response.data.success === 3){
 
+                        let fila = response.data.fila;
+                        let disponible = response.data.disponible;
+                        let obj = response.data.obj;
 
+                        colorRojoTablaRequisicion(fila);
 
+                        Swal.fire({
+                            title: 'Cantidad No Disponible',
+                            text: "Fila #" + (fila+1) + ", el objeto específico de código: " + obj + ", tiene Saldo disponible $" + disponible,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
 
                     else{
                         toastr.error('error al crear requisición');

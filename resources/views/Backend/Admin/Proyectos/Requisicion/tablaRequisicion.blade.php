@@ -7,8 +7,9 @@
                         <table id="tabla-requisicion" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 10%">Número</th>
+                                <th style="width: 4%">#</th>
                                 <th style="width: 10%">Fecha</th>
+                                <th style="width: 10%">Estado</th>
                                 <th style="width: 18%">Opciones</th>
                             </tr>
                             </thead>
@@ -16,8 +17,9 @@
 
                             @foreach($listaRequisicion as $dato)
                                 <tr>
-                                    <td style="width: 10%">{{ $dato->numero }}</td>
+                                    <td style="width: 4%">{{ $dato->numero }}</td>
                                     <td style="width: 10%">{{ $dato->fecha }}</td>
+                                    <td style="width: 10%">Pendiente</td>
                                     <td>
                                         @can('boton.cotizar.requisicion')
                                         <button type="button" class="btn btn-success btn-xs" onclick="vistaCotizacion({{ $dato->id }})">

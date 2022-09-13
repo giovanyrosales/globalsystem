@@ -80,12 +80,21 @@
     <tbody>
     <tr>
         <td width="10%">Código</td>
-        <td width="30%">Nombre</td>
-        <td width="20%">Saldo Inicial.</td>
-        <td width="20%">Saldo Inicial.</td>
+        <td width="30%">Objeto</td>
+        <td width="20%">Saldo Inicial</td>
+        <td width="20%">Saldo Restante</td>
     </tr>
 
+    @foreach($presupuesto as $dd)
 
+        <tr>
+            <td width="10%">{{ $dd->codigo }}</td>
+            <td width="30%">{{ $dd->nombre }}</td>
+            <td width="20%">${{ $dd->saldo_inicial }}</td>
+            <td width="20%">${{ $dd->saldo_restante }}</td>
+        </tr>
+
+    @endforeach
 
     </tbody>
 
@@ -95,22 +104,10 @@
 <br>
 <br>
 <!-- partida de mano de obra -->
+<div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+</div>
 
-
-<script type="text/php">
-       if (isset($pdf)) {
-        $x = 270;
-        $y = 750;
-        $text = "Página {PAGE_NUM}/{PAGE_COUNT}";
-        $font = null;
-        $size = 9;
-        $color = array(0,0,0);
-        $word_space = 0.0;  //  default
-        $char_space = 0.0;  //  default
-        $angle = 0.0;   //  default
-        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-    }
-</script>
 
 </body>
 </html>

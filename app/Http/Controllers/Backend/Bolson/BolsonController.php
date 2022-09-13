@@ -43,7 +43,7 @@ class BolsonController extends Controller
 
         if($request->get('query')){
             $query = $request->get('query');
-            $data = Cuenta::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
+            $data = Cuenta::where('nombre', 'LIKE', "%{$query}%")->get();
 
             $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
             $tiene = true;
@@ -81,7 +81,7 @@ class BolsonController extends Controller
 
         if($request->get('query')){
             $query = $request->get('query');
-            $data = Cuenta::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
+            $data = Cuenta::where('nombre', 'LIKE', "%{$query}%")->get();
 
             $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
             $tiene = true;

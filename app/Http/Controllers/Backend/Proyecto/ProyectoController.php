@@ -15,9 +15,11 @@ use App\Models\FuenteFinanciamiento;
 use App\Models\FuenteRecursos;
 use App\Models\LineaTrabajo;
 use App\Models\Naturaleza;
+use App\Models\ObjEspecifico;
 use App\Models\Partida;
 use App\Models\PartidaDetalle;
 use App\Models\Presupuesto;
+use App\Models\PresupuestoDetalle;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
@@ -582,6 +584,8 @@ class ProyectoController extends Controller
             $ll->numero = $numero;
         }
 
+
+
         return view('Backend.Admin.Proyectos.Requisicion.tablaRequisicion', compact('listaRequisicion'));
     }
 
@@ -610,14 +614,44 @@ class ProyectoController extends Controller
             $r->estado = 0; // 0- no autorizado 1- autorizado
             $r->save();
 
-            if($request->cantidad != null) {
-                for ($i = 0; $i < count($request->cantidad); $i++) {
+            for ($i = 0; $i < count($request->cantidad); $i++) {
 
+                $infom = CatalogoMateriales::where('id', $request->datainfo[$i])->first();
+                $infoobj = ObjEspecifico::where('id', $infom->id_objespecifico)->first();
 
-                    // hay que verificar cantidad disponible
+                // verificar el presupuesto detalle para el obj especifico de este material
+                // obtener el saldo inicial - total de salidas y esto dara cuanto tengo en caja
 
+                $infoP = Presupuesto::where('proyecto_id', $request->id)
+                    ->where('objespeci_id', $infom->id_objespecifico)
+                    ->first();
 
+                $salidaDetalle = PresupuestoDetalle::where('presupuesto_id', $infoP->id)
+                    ->where('tipo', 0) // salida
+                    ->sum('dinero');
 
+                $entradaDetalle = PresupuestoDetalle::where('presupuesto_id', $infoP->id)
+                    ->where('tipo', 1) // entrada
+                    ->sum('dinero');
+
+                // esto es lo que hay de saldo restante en detalle para el obj especi.
+                $saldoRestante = $infoP->saldo_inicial - ($salidaDetalle - $entradaDetalle);
+
+                // verificar cantidad * dinero del material nuevo
+                $saldoMaterial = $request->cantidad[$i] * $infom->pu;
+
+                // verificar si alcanza el saldo para guardar la cotizacion
+                if($saldoRestante < $saldoMaterial){
+                    // retornar que no alcanza el saldo
+
+                    $saldoRestante = number_format((float)$saldoRestante, 2, '.', ',');
+
+                    return ['success' => 3, 'fila' => $i,
+                        'obj' => $infoobj->codigo, 'disponible' => $saldoRestante];
+                }else{
+
+                    // si hay saldo para este material
+                    // guardar detalle cotizacion e ingresar una salida de dinero
 
                     $rDetalle = new RequisicionDetalle();
                     $rDetalle->requisicion_id = $r->id;
@@ -625,6 +659,12 @@ class ProyectoController extends Controller
                     $rDetalle->cantidad = $request->cantidad[$i];
                     $rDetalle->estado = 0;
                     $rDetalle->save();
+
+                    $rSalida = new PresupuestoDetalle();
+                    $rSalida->presupuesto_id = $infoP->id;
+                    $rSalida->tipo = 0; // salida
+                    $rSalida->dinero = $saldoMaterial;
+                    $rSalida->save();
                 }
             }
 
@@ -635,6 +675,7 @@ class ProyectoController extends Controller
             return ['success' => 1, 'contador' => $contador];
 
         }catch(\Throwable $e){
+            //Log::info('eerror' . $e);
             DB::rollback();
             return ['success' => 2];
         }
@@ -774,8 +815,6 @@ class ProyectoController extends Controller
 
     public function buscadorMaterial(Request $request){
 
-            //idpro
-
         if($request->get('query')){
             $query = $request->get('query');
 
@@ -789,10 +828,9 @@ class ProyectoController extends Controller
 
             $data = DB::table('partida_detalle AS pd')
                 ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
-                ->select('pd.id', 'm.nombre', 'm.id_unidadmedida')
+                ->select('m.id', 'm.nombre', 'm.id_unidadmedida')
                 ->whereIn('pd.partida_id', $pila)
                 ->where('m.nombre', 'LIKE', "%{$query}%")
-                ->take(25)
                 ->get();
 
             //$data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
@@ -840,7 +878,7 @@ class ProyectoController extends Controller
 
         if($request->get('query')){
             $query = $request->get('query');
-            $data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
+            $data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->get();
 
             foreach ($data as $dd){
                 if($info = UnidadMedida::where('id', $dd->id_unidadmedida)->first()){
@@ -887,7 +925,7 @@ class ProyectoController extends Controller
 
         if($request->get('query')){
             $query = $request->get('query');
-            $data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->take(25)->get();
+            $data = CatalogoMateriales::where('nombre', 'LIKE', "%{$query}%")->get();
 
             foreach ($data as $dd){
                 $info = UnidadMedida::where('id', $dd->id_unidadmedida)->first();
@@ -1437,9 +1475,9 @@ class ProyectoController extends Controller
         $imprevisto = "$" . number_format((float)$imprevisto, 2, '.', ',');
         $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
 
-        $preAprobado = true;
-        if($infoPro->presu_aprobado != 0){
-            $preAprobado = false;
+        $preAprobado = false;
+        if($infoPro->presu_aprobado == 0){
+            $preAprobado = true;
         }
 
         return view('Backend.Admin.Proyectos.pdfPresupuesto', compact('partida1',
@@ -1493,9 +1531,9 @@ class ProyectoController extends Controller
                        // obtener sumatoria de los materiales
                        foreach ($info as $dato){
                            if($dato->duplicado > 0){
-                               $suma = ($dato->cantidad * $dato->pu) * $dato->duplicado;
+                               $suma = $suma + (($dato->cantidad * $dato->duplicado) * $dato->pu);
                            }else{
-                               $suma = ($dato->cantidad * $dato->pu);
+                               $suma = $suma + ($dato->cantidad * $dato->pu);
                            }
                        }
 
@@ -1503,7 +1541,6 @@ class ProyectoController extends Controller
                        $presu = new Presupuesto();
                        $presu->proyecto_id = $request->id;
                        $presu->objespeci_id = $det->id_objespecifico;
-                       $presu->saldo = $suma;
                        $presu->saldo_inicial = $suma;
                        $presu->save();
                    }
@@ -1511,7 +1548,7 @@ class ProyectoController extends Controller
                     DB::commit();
                     return ['success' => 1];
                 }catch(\Throwable $e){
-                    Log::info('error: ' . $e);
+                    //Log::info('error: ' . $e);
                     DB::rollback();
                     return ['success' => 2];
                 }
@@ -1522,17 +1559,31 @@ class ProyectoController extends Controller
         }
     }
 
-    // informacion para presupuesto para uaci
+    // mostrara saldo restante calculado.
     public function infoTablaSaldoProyecto($id){
 
+        // presupuesto
         $presupuesto = DB::table('presupuesto AS p')
             ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
-            ->select('p.saldo_inicial', 'obj.nombre', 'obj.codigo')
+            ->select('obj.nombre', 'obj.id AS idcodigo', 'obj.codigo', 'p.id', 'p.saldo_inicial')
             ->where('p.proyecto_id', $id)
             ->get();
 
         foreach ($presupuesto as $pp){
-            $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
+
+            // dinero de salida
+            $salidaDetalle = PresupuestoDetalle::where('presupuesto_id', $pp->id)
+                ->where('tipo', 0) // salida
+                ->sum('dinero');
+
+            // dinero de entrada
+            $entradaDetalle = PresupuestoDetalle::where('presupuesto_id', $pp->id)
+                ->where('tipo', 1) // entrada
+                ->sum('dinero');
+
+            $total = $pp->saldo_inicial - ($salidaDetalle - $entradaDetalle);
+
+            $pp->saldo_restante = number_format((float)$total, 2, '.', ',');
         }
 
         return view('backend.admin.proyectos.modal.modalsaldo', compact('presupuesto'));
