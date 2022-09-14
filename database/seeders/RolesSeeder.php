@@ -66,7 +66,7 @@ class RolesSeeder extends Seeder
 
             Permission::create(['name' => 'boton.agregar.requisicion', 'description' => 'sidebar seccion proyecto - boton agregar nueva requisicion'])->syncRoles($roleAdministrador);
             Permission::create(['name' => 'boton.editar.requisicion', 'description' => 'sidebar seccion proyecto - boton editar requisicion'])->syncRoles($roleAdministrador);
-            Permission::create(['name' => 'boton.ver.presupuesto', 'description' => 'sidebar seccion proyecto - boton ver presupuesto'])->syncRoles($rolePresupuesto, $roleAdministrador, $roleJefeUaci, $roleSecretaria);
+            Permission::create(['name' => 'boton.ver.presupuesto', 'description' => 'sidebar seccion proyecto - boton ver presupuesto'])->syncRoles($roleUaci);
             Permission::create(['name' => 'boton.cotizar.requisicion', 'description' => 'sidebar seccion proyecto - boton cotizar requisicion'])->syncRoles($roleUaci);
             Permission::create(['name' => 'boton.ver.planilla', 'description' => 'sidebar seccion proyecto - boton ver planilla'])->syncRoles($roleUaci);
             Permission::create(['name' => 'boton.ver.presupuesto.administrador', 'description' => 'sidebar seccion proyecto - boton ver presupuesto por administrador, solo ver'])->syncRoles($roleAdministrador);

@@ -48,7 +48,7 @@
                                         @can('boton.ver.presupuesto')
                                             <br><br>
                                             <button type="button" class="btn btn-info btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
-                                                <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
+                                                <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Aprobar Presupuesto
                                             </button>
                                         @endcan
 
@@ -71,7 +71,7 @@
                                         @can('boton.ver.presupuesto.lista')
                                         <br><br>
                                         <button type="button" class="btn btn-info btn-xs" onclick="verPresupuestoPorAdministrador({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto
+                                            <i class="fas fa-eye" title="Presupuesto"></i>&nbsp; Presupuesto PDF
                                         </button>
                                         @endcan
 

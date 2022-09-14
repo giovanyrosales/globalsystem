@@ -292,18 +292,18 @@
     </tr>
 
     <tr>
+        <td width="20%">ALQUILER DE MAQUINARIA</td>
+        <td width="12%">{{ $totalAlquilerMaquinaria }}</td>
+    </tr>
+
+    <tr>
         <td width="20%">MANO DE OBRA (POR ADMINISTRACIÓN)</td>
         <td width="12%">{{ $totalManoObra }}</td>
     </tr>
 
     <tr>
-        <td width="20%">APORTE MANO DE OBRA</td>
-        <td width="12%">{{ $totalAporteManoObra }}</td>
-    </tr>
-
-    <tr>
-        <td width="20%">ALQUILER DE MAQUINARIA</td>
-        <td width="12%">{{ $totalAlquilerMaquinaria }}</td>
+        <td width="20%">APORTE MANO DE OBRA (PATRONAL)</td>
+        <td width="12%">{{ $totalDescuento }}</td>
     </tr>
 
     <tr>
@@ -336,13 +336,17 @@
 
 <div class="modal-footer justify-content-between">
     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-    <!-- boton aprobar solo sera visible para x usuarios, y solo aparecera si no esta aprobado -->
-    @can('boton.aprobar.presupuesto')
+    <!-- boton aprobar solo sera visible para x usuarios, y solo aparecera si no esta aprobado,
+    porque otros usuarios pueden ver esta vista
+
+    boton.aprobar.presupuesto
+    -->
+
         @if($preAprobado)
         <!-- sera visible solamente si no esta aprobado aun -->
         <button type="button" class="btn btn-primary" id="btnAprobarPresupuesto"  onclick="btnAprobarPresupuesto()">Aprobar</button>
         @endcan
-    @endcan
+
 
 </div>
 
