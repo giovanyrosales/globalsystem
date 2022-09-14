@@ -325,7 +325,7 @@ class ProyectoController extends Controller
         if($proyecto->presu_aprobado == 1){
             $preaprobacion = "Aprobado " . date("d-m-Y", strtotime($proyecto->fecha_aprobado));;
         }else{
-            $preaprobacion = "Sin Aprobación";
+            $preaprobacion = "Aprobación pendiente";
         }
 
         return view('Backend.Admin.Proyectos.vistaProyecto', compact('proyecto', 'id',
@@ -1253,16 +1253,16 @@ class ProyectoController extends Controller
         // 6- Transporte de Concreto Fresco
 
         $partida1 = Partida::where('proyecto_id', $id)
-            ->whereIn('tipo_partida', [1, 2])
+            ->whereIn('tipo_partida', [1, 2, 5])
             ->orderBy('id', 'ASC')
             ->get();
 
         $infoPro = Proyecto::where('id', $id)->first();
         $nombrepro = $infoPro->nombre;
+        $fuenter = "";
+
         if($infoFuenteR = FuenteRecursos::where('id', $infoPro->id_fuenter)->first()){
             $fuenter = $infoFuenteR->nombre;
-        }else{
-            $fuenter = "";
         }
 
         $resultsBloque = array();
@@ -1309,7 +1309,11 @@ class ProyectoController extends Controller
                 $lista->subtotal = "$" . number_format((float)$multi, 2, '.', ',');
 
                 $total = $total + $multi;
-                $sumaMateriales = $sumaMateriales + $multi;
+
+                // suma de materiales
+                if($secciones->tipo_partida == 1){
+                    $sumaMateriales = $sumaMateriales + $multi;
+                }
             }
 
             $secciones->total = "$" . number_format((float)$total, 2, '.', ',');
@@ -1440,30 +1444,30 @@ class ProyectoController extends Controller
             }
         }
 
-        $afp =  $totalManoObra * 0.0675;
-        $isss = $totalManoObra * 0.075;
-        $insaforp = $totalManoObra * 0.1;
+        $afp =  ($totalManoObra * 7.75) / 100;
+        $isss = ($totalManoObra * 7.5) / 100;
+        $insaforp = ($totalManoObra * 1) / 100;
 
-        $totalDescuento = $totalManoObra - ($afp + $isss + $insaforp);
+        $totalDescuento = $afp + $isss + $insaforp;
 
         $afp = "$" . number_format((float)$afp, 2, '.', ',');
         $isss = "$" . number_format((float)$isss, 2, '.', ',');
         $insaforp = "$" . number_format((float)$insaforp, 2, '.', ',');
 
-        $totalDescuento = "$" . number_format((float)$totalDescuento, 2, '.', ',');
-
-        $herramienta2Porciento = $sumaMateriales * 0.02;
+        $herramienta2Porciento = ($sumaMateriales * 2) / 100;
 
         // subtotal del presupuesto partida
-        $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalAporteManoObra
+        $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalDescuento
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
+
         // imprevisto del 5%
-        $imprevisto = $subtotalPartida * 0.05;
+        $imprevisto = ($subtotalPartida * 5) / 100;
 
         // total de la partida final
         $totalPartidaFinal = $subtotalPartida + $imprevisto;
 
+        $totalDescuento = "$" . number_format((float)$totalDescuento, 2, '.', ',');
         $sumaMateriales = "$" . number_format((float)$sumaMateriales, 2, '.', ',');
         $herramienta2Porciento = "$" . number_format((float)$herramienta2Porciento, 2, '.', ',');
         $totalManoObra = "$" . number_format((float)$totalManoObra, 2, '.', ',');
@@ -1496,11 +1500,37 @@ class ProyectoController extends Controller
 
                     Proyecto::where('id', $request->id)->update([
                         'fecha_aprobado' => Carbon::now('America/El_Salvador'),
-                        'presu_aprobado' => 1]);
+                        'presu_aprobado' => 0]);
 
                     $partidas = Partida::where('proyecto_id', $request->id)
                         ->orderBy('id')
                         ->get();
+
+
+                    $manoobra = Partida::where('proyecto_id', $request->id)
+                        ->where('tipo_partida', 3)
+                        ->orderBy('id', 'ASC')
+                        ->get();
+
+                    $totalManoObra = 0;
+
+                    foreach ($manoobra as $secciones3) {
+                        $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+                        foreach ($detalle3 as $lista) {
+                            $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                            $multi = $lista->cantidad * $infomaterial->pu;
+                            if ($lista->duplicado != 0) {
+                                $multi = $multi * $lista->duplicado;
+                            }
+
+                            $totalManoObra = $totalManoObra + $multi;
+                        }
+                    }
+
+                    $afp = ($totalManoObra * 7.75) / 100;
+                    $isss = ($totalManoObra * 7.5) / 100;
+                    $insaforp = ($totalManoObra * 1) / 100;
 
                     $pila = array();
 
@@ -1522,17 +1552,29 @@ class ProyectoController extends Controller
                        // obtener lista de materiales
                        $info = DB::table('partida_detalle AS pd')
                            ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
-                           ->select('m.id_objespecifico', 'pd.cantidad', 'pd.duplicado', 'm.pu')
+                           ->join('obj_especifico AS obj', 'm.id_objespecifico', '=', 'obj.id')
+                           ->select('m.id_objespecifico', 'pd.cantidad', 'pd.duplicado', 'm.pu', 'obj.codigo')
                            ->where('m.id_objespecifico', $det->id_objespecifico)
                            ->get();
 
                        $suma = 0;
+                       $aporte = false;
 
                        // obtener sumatoria de los materiales
-                       foreach ($info as $dato){
-                           if($dato->duplicado > 0){
+                       foreach ($info as $dato) {
+
+                           // suma de isss + afp
+                           if($dato->codigo == 51402){
+                               $suma = $isss + $insaforp;
+                               break;
+                           }else if($dato->codigo == 51502){
+                               $suma = $afp;
+                               break;
+                           }
+
+                           if ($dato->duplicado > 0) {
                                $suma = $suma + (($dato->cantidad * $dato->duplicado) * $dato->pu);
-                           }else{
+                           } else {
                                $suma = $suma + ($dato->cantidad * $dato->pu);
                            }
                        }
@@ -1548,7 +1590,7 @@ class ProyectoController extends Controller
                     DB::commit();
                     return ['success' => 1];
                 }catch(\Throwable $e){
-                    //Log::info('error: ' . $e);
+                    Log::info('error: ' . $e);
                     DB::rollback();
                     return ['success' => 2];
                 }

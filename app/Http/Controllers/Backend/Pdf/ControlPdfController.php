@@ -29,7 +29,7 @@ class ControlPdfController extends Controller
         // 6- Transporte de Concreto Fresco
 
         $partida1 = Partida::where('proyecto_id', $id)
-            ->whereIn('tipo_partida', [1, 2])
+            ->whereIn('tipo_partida', [1, 2, 5])
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -226,26 +226,23 @@ class ControlPdfController extends Controller
         $isss = ($totalManoObra * 7.5) / 100;
         $insaforp = ($totalManoObra * 1) / 100;
 
-        $totalDescuento = $totalManoObra - ($afp + $isss + $insaforp);
-
-        $afp = "$" . number_format((float)$afp, 2, '.', ',');
-        $isss = "$" . number_format((float)$isss, 2, '.', ',');
-        $insaforp = "$" . number_format((float)$insaforp, 2, '.', ',');
-
-        $totalDescuento = "$" . number_format((float)$totalDescuento, 2, '.', ',');
-
+        $totalDescuento = ($afp + $isss + $insaforp);
         $herramienta2Porciento = ($sumaMateriales * 2) / 100;
 
         // subtotal del presupuesto partida
-        $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalAporteManoObra
+        $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalDescuento
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
         // imprevisto del 5%
         $imprevisto = ($subtotalPartida * 5) / 100;
 
         // total de la partida final
-        $totalPartidaFinal = $imprevisto;
+        $totalPartidaFinal = $subtotalPartida + $imprevisto;
 
+        $totalDescuento = "$" . number_format((float)$totalDescuento, 2, '.', ',');
+        $afp = "$" . number_format((float)$afp, 2, '.', ',');
+        $isss = "$" . number_format((float)$isss, 2, '.', ',');
+        $insaforp = "$" . number_format((float)$insaforp, 2, '.', ',');
         $sumaMateriales = "$" . number_format((float)$sumaMateriales, 2, '.', ',');
         $herramienta2Porciento = "$" . number_format((float)$herramienta2Porciento, 2, '.', ',');
         $totalManoObra = "$" . number_format((float)$totalManoObra, 2, '.', ',');
@@ -470,25 +467,24 @@ class ControlPdfController extends Controller
     </tr>
 
     <tr>
-        <td width='20%'>MANO DE OBRA (POR ADMINISTRACIÓN)</td>
-        <td width='12%'>$totalManoObra</td>
-    </tr>
-
-    <tr>
-        <td width='20%'>APORTE MANO DE OBRA</td>
-        <td width='12%'>$totalAporteManoObra</td>
-    </tr>
-
-    <tr>
         <td width='20%'>ALQUILER DE MAQUINARIA</td>
         <td width='12%'>$totalAlquilerMaquinaria</td>
     </tr>
 
     <tr>
+        <td width='20%'>MANO DE OBRA (POR ADMINISTRACIÓN)</td>
+        <td width='12%'>$totalManoObra</td>
+    </tr>
+
+     <tr>
+        <td width='20%'>APORTE MANO DE OBRA (PATRONAL)</td>
+        <td width='12%'>$totalDescuento</td>
+    </tr>
+
+     <tr>
         <td width='20%'>TRANSPORTE DE CONCRETO FRESCO</td>
         <td width='12%'>$totalTransportePesado</td>
     </tr>
-
 
     <tr>
         <td width='20%' style='font-weight: bold'>SUB TOTAL</td>
