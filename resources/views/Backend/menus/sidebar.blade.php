@@ -120,7 +120,31 @@
                         </ul>
                     </li>
                 @endcan
+                @can('sidebar.seccion.requerimientosunidad')
+                    <li class="nav-item">
 
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Requerimientos de Unidad
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            @can('sidebar.requerimientosunidad.listar')
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.listar.requerimientosunidad.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Listar Requerimientos Unidad</p>
+                                    </a>
+                                </li>
+                            @endcan
+
+                        </ul>
+                    </li>
+                @endcan
 
                 @can('sidebar.seccion.cotizaciones')
                 <li class="nav-item">
@@ -261,7 +285,7 @@
                         </li>
                         @endcan
 
-                        @can('sidebar.calificaciones')
+                        @can('sidebar.clasificaciones')
                         <li class="nav-item">
                             <a href="{{ route('admin.clasificaciones.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>

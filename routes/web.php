@@ -27,6 +27,10 @@ use App\Http\Controllers\Backend\Bolson\BolsonController;
 use App\Http\Controllers\Backend\Cuenta\CuentaProyectoController;
 use App\Http\Controllers\Backend\Recursos\RecursosController;
 use App\Http\Controllers\Backend\Pdf\ControlPdfController;
+use App\Http\Controllers\Backend\Uaciunidades\Requrimientos\RequerimientoController;
+//use App\Http\Controllers\Backend\Uaciunidades\Cotizaciones\CotizacionController;
+//use App\Http\Controllers\Backend\Uaciunidades\Ordenes\OrdenController;
+
 
 Route::get('/', [LoginController::class,'index'])->name('login');
 
@@ -109,6 +113,20 @@ Route::post('/admin/proyecto/vista/requisicion/nuevo', [ProyectoController::clas
 Route::post('/admin/proyecto/vista/requisicion/informacion', [ProyectoController::class, 'informacionRequisicion']);
 Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::class, 'editarRequisicion']);
 
+// --- REQUISICION desde UNIDAD ---
+//Route::get('/admin/departamento/vista/requisicion/{id}', [RequerimientoController::class,'tablaDepartamentoListaRequisicion']);
+//Route::post('/admin/departamento/vista/requisicion/nuevo', [RequerimientoController::class, 'nuevoRequisicion']);
+//Route::post('/admin/departamento/vista/requisicion/informacion', [RequerimientoController::class, 'informacionRequisicion']);
+//Route::post('/admin/departamento/vista/requisicion/editar', [RequerimientoController::class, 'editarRequisicion']);
+
+// --- REQUERIMIENTOS de unidad desde uaci ---
+Route::get('/admin/listar/requerimientos/index', [CotizacionController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientos.index');
+Route::get('/admin/listar/requerimientos/tabla', [CotizacionController::class,'indexTablaListarRequerimientos']);
+Route::get('/admin/requerimientos/listado/{id}', [CotizacionController::class,'listadoRequerimientoPorProyecto']);
+Route::get('/admin/requerimientos/listado/tabla/{id}', [CotizacionController::class,'tablaRequerimientosIndividual']);
+Route::post('/admin/requerimientos/informacion', [CotizacionController::class, 'informacionRequerimiento']);
+Route::post('/admin/requerimientos/verificar', [CotizacionController::class, 'verificarRequerimiento']);
+Route::post('/admin/requerimientos/cotizacion/guardar', [CotizacionController::class, 'guardarNuevaCotizacion']);
 
 //** INGENIERIA */
 // --- Presupuesto de Proyecto ---

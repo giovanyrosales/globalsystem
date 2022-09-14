@@ -125,9 +125,13 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'sidebar.equipos', 'description' => 'sidebar seccion equipos'])->syncRoles($roleUaciUnidad);
             Permission::create(['name' => 'sidebar.asociaciones', 'description' => 'sidebar seccion asociaciones'])->syncRoles($roleUaciUnidad);
 
-        // REQUERIMIENTOS
+        // REQUERIMIENTOS PROYECTO
         Permission::create(['name' => 'sidebar.seccion.requerimientos', 'description' => 'sidebar seccion requerimientos'])->syncRoles($roleUaci);
         Permission::create(['name' => 'sidebar.requerimientos.listar', 'description' => 'sidebar seccion requerimientos - listar requerimientos'])->syncRoles($roleUaci);
+
+        // REQUERIMIENTOS UNIDAD
+        Permission::create(['name' => 'sidebar.seccion.requerimientosunidad', 'description' => 'sidebar seccion requerimientos de unidad'])->syncRoles($roleUaciUnidad);
+        Permission::create(['name' => 'sidebar.requerimientosunidad.listar', 'description' => 'sidebar seccion requerimientos - listar requerimientos de unidad'])->syncRoles($roleUaciUnidad);
 
 
         Permission::create(['name' => 'texto.presupuesto.aprobado', 'description' => 'usuarios que pueden ver que el presupuesto esta aprobado'])->syncRoles($roleUaci, $roleIng);
