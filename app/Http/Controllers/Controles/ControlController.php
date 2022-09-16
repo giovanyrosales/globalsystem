@@ -31,7 +31,7 @@ class ControlController extends Controller
         }
 
         //INGENIERIA
-        else  if($user->hasRole('sidebar.estadisticas')){
+        else  if($user->hasRole('formulador')){
             $ruta = 'admin.estadisticas.index';
         }
 

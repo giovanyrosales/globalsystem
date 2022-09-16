@@ -73,7 +73,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Nombre para Imagen</label>
+                                        <label>Nombre para Documento</label>
                                         <input type="text" maxlength="300" class="form-control" id="nombre-bitacora-doc-nuevo">
                                     </div>
 
@@ -125,7 +125,7 @@
 
         function modalBorrar(id){
             Swal.fire({
-                title: 'Borrar Imagen',
+                title: 'Borrar Documento',
                 text: "",
                 icon: 'info',
                 showCancelButton: true,
@@ -176,16 +176,16 @@
 
             if(documento.files && documento.files[0]){ // si trae doc
                 if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png')){
-                    toastr.error('formato para Imagen permitido: .png .jpg .jpeg');
+                    toastr.error('formato para Documento permitido: .png .jpg .jpeg');
                     return;
                 }
             }else{
-                toastr.error('Imagen es requerida');
+                toastr.error('Documento es requerida');
                 return;
             }
 
             if(nombreDocumento.length > 300){
-                toastr.error('Nombre para Imagen máximo 300 caracteres');
+                toastr.error('Documento para Documento máximo 300 caracteres');
                 return;
             }
 

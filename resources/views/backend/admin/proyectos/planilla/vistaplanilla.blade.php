@@ -18,7 +18,7 @@
 
     <section class="content-header">
         <div class="col-sm-11">
-            <h4>Proyecto: {{ $nombre }}</h4>
+            <h4>Proyecto: {{ $datos }}</h4>
         </div>
         <br>
         <button type="button" style="margin-left: 10px" onclick="modalAgregar()" class="btn btn-success btn-sm">

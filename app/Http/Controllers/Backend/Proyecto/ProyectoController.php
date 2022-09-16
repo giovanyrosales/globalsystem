@@ -135,7 +135,7 @@ class ProyectoController extends Controller
     }
 
     public function indexProyectoLista(){
-        return view('Backend.Admin.Proyectos.vistaListaProyecto');
+        return view('backend.admin.proyectos.listaproyectos.vistalistaproyecto');
     }
 
     public function tablaProyectoLista(){
@@ -154,9 +154,7 @@ class ProyectoController extends Controller
             }
         }
 
-
-
-        return view('Backend.Admin.Proyectos.tablaListaProyecto', compact('lista'));
+        return view('backend.admin.proyectos.listaproyectos.tablalistaproyecto', compact('lista'));
     }
 
     public function informacionProyecto(Request $request){
@@ -322,13 +320,12 @@ class ProyectoController extends Controller
 
         $estado = $proyecto->presu_aprobado;
 
-        if($proyecto->presu_aprobado == 1){
-            $preaprobacion = "Aprobado " . date("d-m-Y", strtotime($proyecto->fecha_aprobado));;
-        }else{
-            $preaprobacion = "Aprobación pendiente";
+        $preaprobacion = '';
+        if($proyecto->presu_aprobado == 2){
+            $preaprobacion = "Presupuesto Aprobado   " . date("d-m-Y", strtotime($proyecto->fecha_aprobado));;
         }
 
-        return view('Backend.Admin.Proyectos.vistaProyecto', compact('proyecto', 'id',
+        return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id',
             'conteo', 'conteoPartida', 'estado', 'preaprobacion'));
     }
 
@@ -344,7 +341,7 @@ class ProyectoController extends Controller
             $ll->numero = $numero;
         }
 
-        return view('Backend.Admin.Proyectos.Bitacoras.tablaBitacoras', compact('listaBitacora'));
+        return view('backend.admin.proyectos.bitacoras.tablabitacoras', compact('listaBitacora'));
     }
 
     // registrar nueva bitacora
@@ -1479,12 +1476,9 @@ class ProyectoController extends Controller
         $imprevisto = "$" . number_format((float)$imprevisto, 2, '.', ',');
         $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
 
-        $preAprobado = false;
-        if($infoPro->presu_aprobado == 0){
-            $preAprobado = true;
-        }
+        $preAprobado = $infoPro->presu_aprobado;
 
-        return view('Backend.Admin.Proyectos.pdfPresupuesto', compact('partida1',
+        return view('backend.admin.proyectos.modal.pdfpresupuesto', compact('partida1',
             'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento',
             'sumaMateriales', 'herramienta2Porciento', 'totalManoObra', 'totalAporteManoObra', 'totalAlquilerMaquinaria',
             'totalTransportePesado', 'subtotalPartida', 'imprevisto', 'totalPartidaFinal', 'preAprobado'));
@@ -1494,13 +1488,22 @@ class ProyectoController extends Controller
 
         if($pro = Proyecto::where('id', $request->id)->first()){
 
-            if($pro->presu_aprobado == 0){
                 DB::beginTransaction();
                 try {
 
+                    if($pro->presu_aprobado != 1){
+                        // presupuesto cambio estado y esta en desarrollo
+                        return ['success' => 1];
+                    }
+
+                    if($pro->presu_aprobado === 2){
+                        // presupuesto ya aprobado y no hacer nada
+                        return ['success' => 2];
+                    }
+
                     Proyecto::where('id', $request->id)->update([
                         'fecha_aprobado' => Carbon::now('America/El_Salvador'),
-                        'presu_aprobado' => 0]);
+                        'presu_aprobado' => 2]); // estado aprobado
 
                     $partidas = Partida::where('proyecto_id', $request->id)
                         ->orderBy('id')
@@ -1587,18 +1590,16 @@ class ProyectoController extends Controller
                        $presu->save();
                    }
 
-                    DB::commit();
-                    return ['success' => 1];
+                    //DB::commit();
+                    return ['success' => 2];
                 }catch(\Throwable $e){
                     Log::info('error: ' . $e);
                     DB::rollback();
-                    return ['success' => 2];
+                    return ['success' => 3];
                 }
-            }
-            return ['success' => 1];
-        }else{
-            return ['success' => 2];
         }
+
+        return ['success' => 3];
     }
 
     // mostrara saldo restante calculado.
@@ -1632,6 +1633,23 @@ class ProyectoController extends Controller
     }
 
 
+    // cambiar estado de presupuesto ingenieria para que lo apruebe uaci
+    public function cambiarEstadoPresupuesto(Request $request){
+
+        // el presupuesto ya tiene estado 2: aprobado
+        if(Proyecto::where('id', $request->id)
+            ->where('presu_aprobado', 2)
+            ->first()){
+            return ['success' => 1];
+        }
+
+        // cambiar estado al 0 o 1
+        Proyecto::where('id', $request->id)->update([
+            'presu_aprobado' => $request->estado,
+        ]);
+
+        return ['success' => 2];
+    }
 
 
 }

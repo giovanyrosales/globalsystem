@@ -92,6 +92,10 @@ Route::post('/admin/proyecto/aprobar/presupuesto', [ProyectoController::class, '
 // ver saldo para presupuesto de proyecto
 Route::get('/admin/ver/presupuesto/saldo/{id}', [ProyectoController::class,'infoTablaSaldoProyecto']);
 
+// cambiar estado de presupuesto ingenieria para que lo apruebe uaci
+Route::post('/admin/proyecto/estado/presupuesto', [ProyectoController::class, 'cambiarEstadoPresupuesto']);
+
+
 
 
 // --- VISTA DE PROYECTO ---

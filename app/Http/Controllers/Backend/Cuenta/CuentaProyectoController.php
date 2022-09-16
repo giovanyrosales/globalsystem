@@ -326,9 +326,13 @@ class CuentaProyectoController extends Controller
     public function indexPlanilla($id){
 
         $info = Proyecto::where('id', $id)->first();
-        $nombre = $info->codigo . " - " . $info->nombre;
+        if($info->codigo != null) {
+            $datos = $info->codigo . " - " . $info->nombre;
+        }else{
+            $datos = $info->nombre;
+        }
 
-        return view('Backend.Admin.Planilla.vistaPlanilla', compact('id','nombre'));
+        return view('backend.admin.proyectos.planilla.vistaplanilla', compact('id','datos'));
     }
 
     public function tablaPlanilla($id){
@@ -350,7 +354,7 @@ class CuentaProyectoController extends Controller
             $ll->insaforp = number_format((float)$ll->insaforp, 2, '.', ',');
         }
 
-        return view('Backend.Admin.Planilla.tablaPlanilla', compact('lista'));
+        return view('backend.admin.proyectos.planilla.tablaplanilla', compact('lista'));
     }
 
     public function nuevaPlanilla(Request $request){

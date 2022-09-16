@@ -119,10 +119,24 @@
                         <h3 class="card-title"><strong>Presupuesto de Proyecto</strong></h3>
                         <br>
                         <br>
-                        @if($proyecto->presu_aprobado == 1)
-                            <span class="badge bg-success">{{ $preaprobacion }}</span>
+
+                        <!-- Estado para que revise el presupuesto UACI -->
+
+                        @if($proyecto->presu_aprobado == 2)
+                            <span class="badge bg-success" style="font-size: 14px">{{ $preaprobacion }}</span>
                         @else
-                            <span class="badge bg-warning">{{ $preaprobacion }}</span>
+                            <div class="form-group">
+                                <label>Estado Presupuesto:</label>
+                                <select class="form-control" id="select-estado" onchange="cambiarEstado()" style="width: 45%">
+                                    @if($estado == 0)
+                                        <option value="0" selected>Presupuesto Pendiente</option>
+                                        <option value="1">Listo para Aprobación</option>
+                                    @else
+                                        <option value="0">Presupuesto Pendiente</option>
+                                        <option value="1" selected>Listo para Aprobación</option>
+                                    @endif
+                                </select>
+                            </div>
 
                             <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
                                 Agregar Partida
@@ -667,7 +681,6 @@
                     trigger: 'hover'
                 });
             });
-
         });
     </script>
 
@@ -2468,6 +2481,62 @@
                     element.disabled = false;
                 }
             }
+        }
+
+        // cambiar estado de presupuesto ingenieria para ser aprobado
+        function cambiarEstado(){
+            openLoading();
+            let estado = document.getElementById('select-estado').value;
+            let id = {{ $id }};
+
+            let formData = new FormData();
+            formData.append('estado', estado);
+            formData.append('id', id);
+
+            axios.post(url+'/proyecto/estado/presupuesto', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'Presupuesto Ya Aprobado',
+                            text: "El presupuesto ya se encontraba Aprobado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
+                        Swal.fire({
+                            title: 'Estado Actualizado',
+                            text: "",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
+                    else{
+                        toastr.error('error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al actualizar');
+                    closeLoading();
+                });
         }
 
 

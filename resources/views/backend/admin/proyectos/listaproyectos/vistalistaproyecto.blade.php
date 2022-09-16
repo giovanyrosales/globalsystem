@@ -12,6 +12,9 @@
         /*Ajustar tablas*/
         table-layout:fixed;
     }
+
+    .modal-xl { max-width: 90% !important; }
+
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -47,8 +50,7 @@
         </div>
     </section>
 
-
-    <div class="modal fade" id="modalEditar">
+    <div class="modal fade" id="modalEditar" style="overflow-y: auto">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -241,6 +243,79 @@
         </div>
     </div>
 
+
+    <!-- modal opciones de proyecto -->
+    <div class="modal fade" id="modalOpcion">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Opciones</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <!-- ID del proyecto -->
+                                <input type="hidden" id="id-proyecto">
+
+                                @can('boton.ver.proyecto')
+                                    <div class="form-group">
+                                        <button type="button" style="width: 100%" class="btn btn-warning" onclick="vista()">
+                                            <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver Información
+                                        </button>
+                                    </div>
+                                @endcan
+
+                                @can('boton.editar.proyecto')
+                                    <div class="form-group">
+                                        <button type="button" style="width: 100%" class="btn btn-info" onclick="informacion()">
+                                            <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar Proyecto
+                                        </button>
+                                    </div>
+                                @endcan
+
+
+                            <!-- este el presupuesto mostrado en un modal, aquí aparece botón para aprobar -->
+                                @can('boton.ver.presupuesto.modal')
+
+                                    <div class="form-group" id="btnpresuaprobar" style="display: none">
+                                        <button type="button" style="width: 100%;" class="btn btn-success" onclick="informacionPresupuesto()">
+                                            <i class="fas fa-list-alt" title="Presupuesto"></i>&nbsp; Presupuesto
+                                        </button>
+                                    </div>
+                                @endcan
+
+                                @can('boton.ver.planilla')
+                                        <div class="form-group">
+                                    <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionPlanilla()">
+                                        <i class="fas fa-eye" title="Planilla"></i>&nbsp; Planilla
+                                    </button>
+                                        </div>
+                                @endcan
+
+                                @can('boton.dinero.presupuesto')
+                                        <div class="form-group">
+                                            <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionSaldo()">
+                                                <i class="fas fa-list-alt" title="Saldos"></i>&nbsp; Saldos
+                                            </button>
+                                        </div>
+                                @endcan
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- modal presupuesto para aprobacion-->
     <div class="modal fade" id="modalPresupuesto">
         <div class="modal-dialog modal-xl">
@@ -256,9 +331,8 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <input type="hidden" id="idpreaprobar">
-
                                 <div id="tablaPre">
+
                                 </div>
                             </div>
                         </div>
@@ -329,7 +403,9 @@
             $('#tablaDatatable').load(ruta);
         }
 
-        function informacion(id){
+        function informacion(){
+            var id = document.getElementById('id-proyecto').value;
+            $('#modalOpcion').modal('hide');
             openLoading();
             document.getElementById("formulario-editar").reset();
 
@@ -340,6 +416,14 @@
                     closeLoading();
                     if(response.data.success === 1){
                         $('#modalEditar').modal({backdrop: 'static', keyboard: false})
+
+                        $("#modalEditar").on("show", function () {
+                            $("body").addClass("modal-open");
+                        }).on("hidden", function () {
+                            $("body").removeClass("modal-open")
+                        });
+
+
                         $('#id-editar').val(response.data.info.id);
                         $('#codigo').val(response.data.info.codigo);
                         $('#nombre').val(response.data.info.nombre);
@@ -659,19 +743,39 @@
             })
         }
 
-        function vista(id){
+        // modal para varias opciones de proyecto
+        function modalOpciones(id, estado){
+
+            $('#id-proyecto').val(id);
+            // para poder mostrar el botón ver presupuesto modal cuando sea necesario
+            if(estado === 1){
+                // verificar que se tenga el Permiso el usuario. y si lo tiene si mostrara el boton
+                // aprobar presupuesto de ingenieria
+                if (document.getElementById('btnpresuaprobar') !== null) {
+                    document.getElementById("btnpresuaprobar").style.display = "block";
+                }
+            }
+
+            $('#id-estado-proyecto').val(id);
+            $('#modalOpcion').modal('show');
+        }
+
+
+        function vista(){
+            $('#modalOpcion').modal('hide');
+            var id = document.getElementById('id-proyecto').value;
             window.location.href="{{ url('/admin/proyecto/vista/index') }}/" + id;
         }
 
-        function informacionPlanilla(id){
+        function informacionPlanilla(){
+            var id = document.getElementById('id-proyecto').value;
             window.location.href="{{ url('/admin/planilla/lista') }}/" + id;
         }
 
         // cargar modal con todos el presupuesto
-        function informacionPresupuesto(id){
+        function informacionPresupuesto(){
 
-            $('#idpreaprobar').val(id);
-
+            var id = document.getElementById('id-proyecto').value;
             var ruta = "{{ URL::to('/admin/ver/presupuesto/uaci') }}/" + id;
             $('#tablaPre').load(ruta);
             $('#modalPresupuesto').modal('show');
@@ -704,8 +808,8 @@
         }
 
         function aprobarPresupuesto(){
-
-            var id = document.getElementById('idpreaprobar').value;
+            var id = document.getElementById('id-proyecto').value;
+            $('#modalOpcion').modal('hide');
 
             axios.post(url+'/proyecto/aprobar/presupuesto', {
                 'id' : id
@@ -713,16 +817,27 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
+                        // el estado ha cambiado para su aprobación
                         $('#modalPresupuesto').modal('hide');
-                        recargar();
-
                         Swal.fire({
-                            position: 'center',
-                            icon: 'success',
-                            title: 'Presupuesto Aprobado',
-                            showConfirmButton: false,
-                            timer: 2000
+                            title: 'Estado Cambio',
+                            text: "El presupuesto se encuentra en desarrollo",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                recargar();
+                            }
                         })
+                    }
+                    else if(response.data.success === 2){
+                        $('#modalPresupuesto').modal('hide');
+                        toastr.success('Presupuesto Aprobado')
+                        recargar();
                     }
                     else{
                         toastr.error('error al aprobar');
@@ -734,8 +849,8 @@
                 });
         }
 
-        function verPresupuestoPorAdministrador(id){
-
+        function verPresupuestoPorAdministrador(){
+            var id = document.getElementById('id-proyecto').value;
             axios.post(url+'/proyecto/partida/manoobra/existe', {
                 'id' : id
             })

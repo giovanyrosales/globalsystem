@@ -66,7 +66,7 @@ class RolesSeeder extends Seeder
 
             Permission::create(['name' => 'boton.agregar.requisicion', 'description' => 'sidebar seccion proyecto - boton agregar nueva requisicion'])->syncRoles($roleAdministrador);
             Permission::create(['name' => 'boton.editar.requisicion', 'description' => 'sidebar seccion proyecto - boton editar requisicion'])->syncRoles($roleAdministrador);
-            Permission::create(['name' => 'boton.ver.presupuesto', 'description' => 'sidebar seccion proyecto - boton ver presupuesto'])->syncRoles($roleUaci);
+            Permission::create(['name' => 'boton.ver.presupuesto.modal', 'description' => 'sidebar seccion proyecto - boton ver presupuesto modal para aprobar'])->syncRoles($roleUaci);
             Permission::create(['name' => 'boton.cotizar.requisicion', 'description' => 'sidebar seccion proyecto - boton cotizar requisicion'])->syncRoles($roleUaci);
             Permission::create(['name' => 'boton.ver.planilla', 'description' => 'sidebar seccion proyecto - boton ver planilla'])->syncRoles($roleUaci);
             Permission::create(['name' => 'boton.ver.presupuesto.administrador', 'description' => 'sidebar seccion proyecto - boton ver presupuesto por administrador, solo ver'])->syncRoles($roleAdministrador);
@@ -91,7 +91,6 @@ class RolesSeeder extends Seeder
 
             Permission::create(['name' => 'boton.cotizacion.generar.orden', 'description' => 'sidebar seccion cotizacion - boton para generar orden de compra'])->syncRoles($roleUaci);
 
-        Permission::create(['name' => 'boton.ver.presupuesto.lista', 'description' => 'ver boton, generar presupuesto en la tabla listado de proyectos'])->syncRoles($roleUaci);
 
 
 
@@ -134,8 +133,7 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'sidebar.requerimientosunidad.listar', 'description' => 'sidebar seccion requerimientos - listar requerimientos de unidad'])->syncRoles($roleUaciUnidad);
 
 
-        Permission::create(['name' => 'texto.presupuesto.aprobado', 'description' => 'usuarios que pueden ver que el presupuesto esta aprobado'])->syncRoles($roleUaci, $roleIng);
-        Permission::create(['name' => 'boton.aprobar.presupuesto', 'description' => 'boton para aprobar presupuesto'])->syncRoles($roleUaci);
+        Permission::create(['name' => 'boton.aprobar.presupuesto', 'description' => 'boton para aprobar presupuesto, mostrado en modal'])->syncRoles($roleUaci);
         Permission::create(['name' => 'boton.dinero.presupuesto', 'description' => 'boton para mostrar cuanto dinero le queda a un proyecto del presupuesto'])->syncRoles($roleAdministrador);
 
 
