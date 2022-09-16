@@ -76,15 +76,12 @@ class PermisoController extends Controller
 
             $usuario = Usuario::find($request->id);
             $usuario->nombre = $request->nombre;
-            $usuario->apellido = $request->apellido;
             $usuario->usuario = $request->usuario;
             $usuario->activo = $request->toggle;
 
             if($request->password != null){
                 $usuario->password = bcrypt($request->password);
             }
-
-            //$usuario->assignRole($request->rol); asigna un rol extra
 
             //elimina el rol existente y agrega el nuevo.
             $usuario->syncRoles($request->rol);

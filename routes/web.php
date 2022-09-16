@@ -27,11 +27,11 @@ use App\Http\Controllers\Backend\Bolson\BolsonController;
 use App\Http\Controllers\Backend\Cuenta\CuentaProyectoController;
 use App\Http\Controllers\Backend\Recursos\RecursosController;
 use App\Http\Controllers\Backend\Pdf\ControlPdfController;
-use App\Http\Controllers\Backend\Uaciunidades\Requrimientos\RequerimientoController;
+use App\Http\Controllers\Backend\Uaciunidades\Requerimientos\RequerimientoController;
 //use App\Http\Controllers\Backend\Uaciunidades\Cotizaciones\CotizacionController;
 //use App\Http\Controllers\Backend\Uaciunidades\Ordenes\OrdenController;
 
-
+// --- LOGIN ---
 Route::get('/', [LoginController::class,'index'])->name('login');
 
 Route::post('admin/login', [LoginController::class, 'login']);
@@ -68,13 +68,18 @@ Route::post('/admin/editar-perfil/actualizar', [PerfilController::class, 'editar
 // --- SIN PERMISOS VISTA 403 ---
 Route::get('sin-permisos', [ControlController::class,'indexSinPermiso'])->name('no.permisos.index');
 
-// --- VISTA ESTADISTICAS ---
+// ********** ESTADÍSTICAS **********
+
+// --- ESTADÍSTICAS ---
 Route::get('/admin/inicio/index', [InicioController::class,'index'])->name('admin.estadisticas.index');
 
 
-// --- PROYECTO ---
+// ********** PROYECTOS **********
+
+// --- NUEVO PROYECTO ---
 Route::get('/admin/proyecto/nuevo/index', [ProyectoController::class,'index'])->name('admin.nuevo.proyecto.index');
 Route::post('/admin/proyecto/nuevo', [ProyectoController::class, 'nuevoProyecto']);
+
 
 // --- LISTA DE PROYECTOS ---
 Route::get('/admin/proyecto/lista/index', [ProyectoController::class,'indexProyectoLista'])->name('admin.lista.proyectos.index');
@@ -84,7 +89,7 @@ Route::post('/admin/proyecto/lista/editar', [ProyectoController::class, 'editarP
 Route::get('/admin/ver/presupuesto/uaci/{id}', [ProyectoController::class,'informacionPresupuestoParaAprobacion']);
 Route::post('/admin/proyecto/aprobar/presupuesto', [ProyectoController::class, 'aprobarPresupuesto']);
 
-// ver saldo
+// ver saldo para presupuesto de proyecto
 Route::get('/admin/ver/presupuesto/saldo/{id}', [ProyectoController::class,'infoTablaSaldoProyecto']);
 
 
@@ -225,6 +230,7 @@ Route::post('/admin/ordenes/generar/acta',  [OrdenController::class,'generarActa
 Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenController::class,'reporteActaGenerada']);
 
 
+// ********** CONFIGURACION **********
 
 // --- UNIDAD MEDIDA ---
 Route::get('/admin/unidadmedida/index', [UnidadMedidaController::class,'index'])->name('admin.unidadmedida.index');
@@ -233,12 +239,19 @@ Route::post('/admin/unidadmedida/nuevo', [UnidadMedidaController::class, 'nuevaU
 Route::post('/admin/unidadmedida/informacion', [UnidadMedidaController::class, 'informacionUnidadMedida']);
 Route::post('/admin/unidadmedida/editar', [UnidadMedidaController::class, 'editarUnidadMedida']);
 
-// --- CLASIFICACIONES ---
-Route::get('/admin/clasificaciones/index', [ClasificacionesController::class,'index'])->name('admin.clasificaciones.index');
-Route::get('/admin/clasificaciones/tabla/index', [ClasificacionesController::class,'tabla']);
-Route::post('/admin/clasificaciones/nuevo', [ClasificacionesController::class, 'nuevaClasificacion']);
-Route::post('/admin/clasificaciones/informacion', [ClasificacionesController::class, 'informacionClasificacion']);
-Route::post('/admin/clasificaciones/editar', [ClasificacionesController::class, 'editarClasificacion']);
+// --- PROVEEDORES ---
+Route::get('/admin/proveedores/index', [ProveedoresController::class,'index'])->name('admin.proveedores.index');
+Route::get('/admin/proveedores/tabla/index', [ProveedoresController::class,'tabla']);
+Route::post('/admin/proveedores/nuevo', [ProveedoresController::class, 'nuevoProveedor']);
+Route::post('/admin/proveedores/informacion', [ProveedoresController::class, 'informacionProveedor']);
+Route::post('/admin/proveedores/editar', [ProveedoresController::class, 'editarProveedor']);
+
+// --- ADMINISTRADORES DE PROYECTO ---
+Route::get('/admin/administradores/index', [AdministradoresController::class,'index'])->name('admin.administradores.index');
+Route::get('/admin/administradores/tabla/index', [AdministradoresController::class,'tabla']);
+Route::post('/admin/administradores/nuevo', [AdministradoresController::class, 'nuevoAdministrador']);
+Route::post('/admin/administradores/informacion', [AdministradoresController::class, 'informacionAdministrador']);
+Route::post('/admin/administradores/editar', [AdministradoresController::class, 'editarAdministrador']);
 
 // --- CATALOGO DE MATERIALES ---
 Route::get('/admin/catalogo/materiales/index', [MaterialesController::class,'index'])->name('admin.catalogo.materiales.index');
@@ -246,6 +259,20 @@ Route::get('/admin/catalogo/materiales/tabla/index', [MaterialesController::clas
 Route::post('/admin/catalogo/materiales/nuevo', [MaterialesController::class, 'nuevoMaterial']);
 Route::post('/admin/catalogo/materiales/informacion', [MaterialesController::class, 'informacion']);
 Route::post('/admin/catalogo/materiales/editar', [MaterialesController::class, 'editarMaterial']);
+
+
+
+
+
+
+// --- CLASIFICACIONES ---
+Route::get('/admin/clasificaciones/index', [ClasificacionesController::class,'index'])->name('admin.clasificaciones.index');
+Route::get('/admin/clasificaciones/tabla/index', [ClasificacionesController::class,'tabla']);
+Route::post('/admin/clasificaciones/nuevo', [ClasificacionesController::class, 'nuevaClasificacion']);
+Route::post('/admin/clasificaciones/informacion', [ClasificacionesController::class, 'informacionClasificacion']);
+Route::post('/admin/clasificaciones/editar', [ClasificacionesController::class, 'editarClasificacion']);
+
+
 
 // --- LÍNEA DE TRABAJO ---
 Route::get('/admin/linea/trabajo/index', [LineaTrabajoController::class,'index'])->name('admin.linea.de.trabajo.index');
@@ -275,12 +302,7 @@ Route::post('/admin/areagestion/nuevo', [AreaGestionController::class, 'nuevaAre
 Route::post('/admin/areagestion/informacion', [AreaGestionController::class, 'informacionArea']);
 Route::post('/admin/areagestion/editar', [AreaGestionController::class, 'editarArea']);
 
-// --- PROVEEDORES ---
-Route::get('/admin/proveedores/index', [ProveedoresController::class,'index'])->name('admin.proveedores.index');
-Route::get('/admin/proveedores/tabla/index', [ProveedoresController::class,'tabla']);
-Route::post('/admin/proveedores/nuevo', [ProveedoresController::class, 'nuevoProveedor']);
-Route::post('/admin/proveedores/informacion', [ProveedoresController::class, 'informacionProveedor']);
-Route::post('/admin/proveedores/editar', [ProveedoresController::class, 'editarProveedor']);
+
 
 // --- ADESCOS ---
 Route::get('/admin/adescos/index', [AdescosController::class,'index'])->name('admin.adescos.index');
@@ -303,12 +325,7 @@ Route::post('/admin/asociaciones/nuevo', [AsociacionesController::class, 'nuevoA
 Route::post('/admin/asociaciones/informacion', [AsociacionesController::class, 'informacionAsociacion']);
 Route::post('/admin/asociaciones/editar', [AsociacionesController::class, 'editarAsociacion']);
 
-// --- ADMINISTRADORES DE PROYECTO ---
-Route::get('/admin/administradores/index', [AdministradoresController::class,'index'])->name('admin.administradores.index');
-Route::get('/admin/administradores/tabla/index', [AdministradoresController::class,'tabla']);
-Route::post('/admin/administradores/nuevo', [AdministradoresController::class, 'nuevoAdministrador']);
-Route::post('/admin/administradores/informacion', [AdministradoresController::class, 'informacionAdministrador']);
-Route::post('/admin/administradores/editar', [AdministradoresController::class, 'editarAdministrador']);
+
 
 
 // --- RECURSOS HUMANOS ---

@@ -11,8 +11,9 @@ class InicioController extends Controller
         $this->middleware('auth');
     }
 
+    // vista para estadísticas
     public function index(){
-        return view('Backend.Admin.Inicio.vistaInicio');
+        return view('backend.admin.estadisticas.vistaestadisticas');
     }
 
 

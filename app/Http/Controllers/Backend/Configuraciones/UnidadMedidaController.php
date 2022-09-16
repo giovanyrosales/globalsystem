@@ -13,13 +13,14 @@ class UnidadMedidaController extends Controller
         $this->middleware('auth');
     }
 
+    // vista para agregar unidades de medida
     public function index(){
-        return view('Backend.Admin.Configuraciones.UnidadMedida.vistaUnidadMedida');
+        return view('backend.admin.configuraciones.unidadmedida.vistaunidadmedida');
     }
 
     public function tabla(){
         $lista = UnidadMedida::orderBy('medida', 'ASC')->get();
-        return view('Backend.Admin.Configuraciones.UnidadMedida.tablaUnidadMedida', compact('lista'));
+        return view('backend.admin.configuraciones.unidadmedida.tablaunidadmedida', compact('lista'));
     }
 
     public function nuevaUnidadMedida(Request $request){
@@ -31,6 +32,10 @@ class UnidadMedidaController extends Controller
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()){ return ['success' => 0];}
+
+        if(UnidadMedida::where('medida', $request->medida)->first()){
+            return ['success' => 3];
+        }
 
         $dato = new UnidadMedida();
         $dato->medida = $request->medida;
@@ -73,6 +78,11 @@ class UnidadMedidaController extends Controller
         if ($validar->fails()){ return ['success' => 0];}
 
         if(UnidadMedida::where('id', $request->id)->first()){
+
+            if(UnidadMedida::where('id', '!=', $request->id)
+                ->where('medida', $request->medida)->first()){
+                return ['success' => 3];
+            }
 
             UnidadMedida::where('id', $request->id)->update([
                 'medida' => $request->medida

@@ -18,12 +18,13 @@ class MaterialesController extends Controller
         $this->middleware('auth');
     }
 
+    // vista para registrar un nuevo material
     public function index(){
         $lClasificacion = Clasificaciones::orderBy('nombre', 'ASC')->get();
         $lUnidad = UnidadMedida::orderBy('medida', 'ASC')->get();
         $lObjEspeci = ObjEspecifico::orderBy('nombre', 'ASC')->get();
 
-        return view('Backend.Admin.Configuraciones.Materiales.vistaCatalogoMateriales', compact('lClasificacion',
+        return view('backend.admin.configuraciones.materiales.vistacatalogomateriales', compact('lClasificacion',
         'lUnidad', 'lObjEspeci'));
     }
 
@@ -53,7 +54,7 @@ class MaterialesController extends Controller
             $item->objespecifico = $objespecifico;
         }
 
-        return view('Backend.Admin.Configuraciones.Materiales.tablaCatalogoMateriales', compact('lista'));
+        return view('backend.admin.configuraciones.materiales.tablacatalogomateriales', compact('lista'));
     }
 
     public function nuevoMaterial(Request $request){
@@ -66,6 +67,14 @@ class MaterialesController extends Controller
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()){ return ['success' => 0];}
+
+        if(CatalogoMateriales::where('id_objespecifico', $request->objespecifico)
+            ->where('nombre', $request->nombre)
+            ->where('id_unidadmedida', $request->unidad)
+            ->where('id_clasificacion', $request->clasificacion)
+            ->first()){
+            return ['success' => 3];
+        }
 
         $dato = new CatalogoMateriales();
         $dato->id_clasificacion = $request->clasificacion;
@@ -112,6 +121,7 @@ class MaterialesController extends Controller
     public function editarMaterial(Request $request){
 
         $regla = array(
+            'id' => 'required',
             'nombre' => 'required',
             'precio' => 'required'
         );
@@ -119,6 +129,15 @@ class MaterialesController extends Controller
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()){ return ['success' => 0];}
+
+        if(CatalogoMateriales::where('id', '!=', $request->id)
+            ->where('id_objespecifico', $request->codigo)
+            ->where('nombre', $request->nombre)
+            ->where('id_unidadmedida', $request->unidad)
+            ->where('id_clasificacion', $request->clasificacion)
+            ->first()){
+            return ['success' => 3];
+        }
 
         CatalogoMateriales::where('id', $request->id)->update([
             'id_clasificacion' => $request->clasificacion,

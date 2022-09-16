@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Controles;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 
 class ControlController extends Controller
 {
@@ -17,28 +15,28 @@ class ControlController extends Controller
 
         $user = Auth::user();
 
-        // ADMINISTRADOR
-        if($user->hasPermissionTo('sidebar.roles.y.permisos')){
-            $ruta = 'admin.estadisticas.index';
+        // ADMINISTRADOR SISTEMA
+        if($user->hasRole('admin')){
+            $ruta = 'admin.roles.index';
         }
 
         // UACI
-        else  if($user->hasPermissionTo('sidebar.estadisticas')){
+        else  if($user->hasRole('uaci')){
             $ruta = 'admin.estadisticas.index';
         }
 
         //PRESUPUESTO
-        else  if($user->hasPermissionTo('sidebar.estadisticas')){
+        else  if($user->hasRole('sidebar.estadisticas')){
             $ruta = 'admin.estadisticas.index';
         }
 
         //INGENIERIA
-        else  if($user->hasPermissionTo('sidebar.estadisticas')){
+        else  if($user->hasRole('sidebar.estadisticas')){
             $ruta = 'admin.estadisticas.index';
         }
 
         // JEFE UACI
-        else  if($user->hasPermissionTo('sidebar.estadisticas')){
+        else  if($user->hasRole('sidebar.estadisticas')){
             $ruta = 'admin.estadisticas.index';
         }
          // UACI UNIDAD
