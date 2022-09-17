@@ -17,12 +17,13 @@ class CreatePartidaTable extends Migration
             $table->id();
 
             $table->bigInteger('proyecto_id')->unsigned()->nullable();
+            $table->bigInteger('id_tipopartida')->unsigned()->nullable();
 
-            $table->integer('tipo_partida');
             $table->string('nombre', 600);
             $table->string('cantidadp', 50)->nullable(); // cantidad partida
 
             $table->foreign('proyecto_id')->references('id')->on('proyectos');
+            $table->foreign('id_tipopartida')->references('id')->on('tipo_partida');
         });
     }
 

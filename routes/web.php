@@ -264,9 +264,13 @@ Route::post('/admin/catalogo/materiales/nuevo', [MaterialesController::class, 'n
 Route::post('/admin/catalogo/materiales/informacion', [MaterialesController::class, 'informacion']);
 Route::post('/admin/catalogo/materiales/editar', [MaterialesController::class, 'editarMaterial']);
 
-
-
-
+// --- SOLICITUD DE MATERIAL POR PARTE DE INGENIERIA
+Route::get('/admin/solicitud/material/ing/index', [MaterialesController::class,'indexSolicitudMaterialIng'])->name('admin.solicitud.material.ing.index');
+Route::get('/admin/solicitud/material/ing/tabla', [MaterialesController::class,'tablaSolicitudMaterialIng']);
+Route::post('/admin/solicitud/material/ing/nuevo', [MaterialesController::class, 'nuevoSolicitudMaterialIng']);
+Route::post('/admin/solicitud/material/ing/informacion', [MaterialesController::class, 'informacionSolicitudMaterialIng']);
+Route::post('/admin/solicitud/material/ing/borrar', [MaterialesController::class, 'borrarSolicitudMaterialIng']);
+Route::post('/admin/solicitud/material/ing/agregar', [MaterialesController::class, 'agregarSolicitudMaterialIng']);
 
 
 // --- CLASIFICACIONES ---

@@ -118,6 +118,10 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'sidebar.rubro', 'description' => 'sidebar seccion rubro'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'sidebar.cuenta', 'description' => 'sidebar seccion cuenta'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'sidebar.obj.especifico', 'description' => 'sidebar objeto específico'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'sidebar.solicitud.material.uaci', 'description' => 'sidebar solicitud de materiales presupuesto ingenieria'])->syncRoles($roleUaci, $roleIng);
+
+
+
 
             //nuevos
             Permission::create(['name' => 'sidebar.adescos', 'description' => 'sidebar seccion adescos'])->syncRoles($roleUaciUnidad);

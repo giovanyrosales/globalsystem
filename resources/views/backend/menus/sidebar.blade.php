@@ -362,7 +362,7 @@
                                 <p>Equipos</p>
                             </a>
                         </li>
-                        @endcan 
+                        @endcan
                         @can('sidebar.asociaciones')
                         <li class="nav-item">
                             <a href="{{ route('admin.asociaciones.index') }}" target="frameprincipal" class="nav-link">
@@ -373,12 +373,21 @@
                         @endcan
 
                         @can('sidebar.administradores')
-                        <li class="nav-item">
-                            <a href="{{ route('admin.administradores.index') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Administradores</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.administradores.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Administradores</p>
+                                </a>
+                            </li>
+                        @endcan
+
+                        @can('sidebar.solicitud.material.uaci')
+                            <li class="nav-item">
+                                <a href="{{ route('admin.solicitud.material.ing.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Solicitud Material ING</p>
+                                </a>
+                            </li>
                         @endcan
 
                     </ul>

@@ -24,6 +24,7 @@ use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
 use App\Models\RequisicionDetalle;
+use App\Models\TipoPartida;
 use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -325,8 +326,10 @@ class ProyectoController extends Controller
             $preaprobacion = "Presupuesto Aprobado   " . date("d-m-Y", strtotime($proyecto->fecha_aprobado));;
         }
 
+        $tipospartida = TipoPartida::orderBy('id', 'ASC')->get();
+
         return view('backend.admin.proyectos.vistaproyecto', compact('proyecto', 'id',
-            'conteo', 'conteoPartida', 'estado', 'preaprobacion'));
+            'conteo', 'conteoPartida', 'estado', 'preaprobacion', 'tipospartida'));
     }
 
     public function tablaProyectoListaBitacora($id){
@@ -1590,7 +1593,7 @@ class ProyectoController extends Controller
                        $presu->save();
                    }
 
-                    //DB::commit();
+                    DB::commit();
                     return ['success' => 2];
                 }catch(\Throwable $e){
                     Log::info('error: ' . $e);

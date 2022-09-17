@@ -20,6 +20,9 @@
         width: 75%;
     }
 
+
+    .modal-xl { max-width: 95% !important; }
+
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -122,25 +125,30 @@
 
                         <!-- Estado para que revise el presupuesto UACI -->
 
-                        @if($proyecto->presu_aprobado == 2)
-                            <span class="badge bg-success" style="font-size: 14px">{{ $preaprobacion }}</span>
-                        @else
+                        @if($proyecto->presu_aprobado == 0 || $proyecto->presu_aprobado == 1)
+
                             <div class="form-group">
                                 <label>Estado Presupuesto:</label>
                                 <select class="form-control" id="select-estado" onchange="cambiarEstado()" style="width: 45%">
                                     @if($estado == 0)
                                         <option value="0" selected>Presupuesto Pendiente</option>
-                                        <option value="1">Listo para Aprobación</option>
+                                        <option value="1">Listo para Revisión</option>
                                     @else
                                         <option value="0">Presupuesto Pendiente</option>
-                                        <option value="1" selected>Listo para Aprobación</option>
+                                        <option value="1" selected>Listo para Revisión</option>
                                     @endif
                                 </select>
                             </div>
 
-                            <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
-                                Agregar Partida
-                            </button>
+                            @if($proyecto->presu_aprobado == 0)
+                                <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
+                                    Agregar Partida
+                                </button>
+                            @endif
+
+                        @else
+                            <!-- estado 2. presupuesto ya aprobado -->
+                                <span class="badge bg-success" style="font-size: 14px">{{ $preaprobacion }}</span>
                         @endif
 
                     </div>
@@ -444,7 +452,7 @@
 <!-- ****** INGENIERIA MODALES ******* !-->
 <!-- modal agregar nuevo presupuesto -->
 <div class="modal fade" id="modalAgregarPresupuesto" tabindex="-1">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl" >
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Agregar Presupuesto de Proyecto</h4>
@@ -461,14 +469,13 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Tipo Partida:</label>
+
                                     <select id="select-partida-nuevo" class="form-control" onchange="verificarPartidaSelect()">
-                                        <option value="1">Materiales</option>
-                                        <option value="2">Herramientas (2% de Materiales)</option>
-                                        <option value="3">Mano de obra (Por Administración)</option>
-                                        <option value="4">Aporte Mano de Obra</option>
-                                        <option value="5">Alquiler de Maquinaria</option>
-                                        <option value="6">Transporte de Concreto Fresco</option>
+                                        @foreach($tipospartida as $dd)
+                                            <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
+                                        @endforeach
                                     </select>
+
                                 </div>
                             </div>
                         </div>
@@ -1543,6 +1550,9 @@
 
             $("#matriz-presupuesto tbody tr").remove();
 
+            // habilitar select tipo partida
+            document.getElementById("select-partida-nuevo").disabled = false;
+
             $('#modalAgregarPresupuesto').css('overflow-y', 'auto');
             $('#modalAgregarPresupuesto').modal({backdrop: 'static', keyboard: false})
         }
@@ -1552,9 +1562,15 @@
             var nFilas = $('#matriz-presupuesto >tbody >tr').length;
             nFilas += 1;
 
+            // ******* DETECCIÓN MANUAL PARA EL TIPO DE PARTIDA *******
+
             var tipopartida = document.getElementById('select-partida-nuevo').value;
 
+            // desactivar select porque ya eligio el tipo de partida
+            document.getElementById("select-partida-nuevo").disabled = true;
+
             // Esto para desactivar el input 'cantidad' si esta seleccionado Aporte Patronal
+            // APORTE MANO DE OBRA
             if(tipopartida == '4') {
 
                 var markup = "<tr>" +
@@ -1633,6 +1649,13 @@
                 conteo +=1;
                 var element = table.rows[r].cells[0].children[0];
                 document.getElementById(element.id).innerHTML = ""+conteo;
+            }
+
+            // activar tipo partida hasta que no haya filas
+            var nRegistro = $('#matriz-presupuesto > tbody >tr').length;
+            if (nRegistro <= 0){
+                // activar select porque ya no hay filas
+                document.getElementById("select-partida-nuevo").disabled = false;
             }
         }
 
@@ -2519,12 +2542,13 @@
                             text: "",
                             icon: 'info',
                             showCancelButton: false,
+                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                location.reload();
                             }
                         })
                     }
