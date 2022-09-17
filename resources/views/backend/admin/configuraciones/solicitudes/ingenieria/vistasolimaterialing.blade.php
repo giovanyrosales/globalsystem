@@ -4,7 +4,8 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
 @stop
 
 <style>
@@ -18,12 +19,16 @@
 
     <section class="content-header">
         <div class="row mb-2">
+
             <div class="col-sm-6">
+                @can('boton.solicitar.material.ing')
                 <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
                     <i class="fas fa-pencil-alt"></i>
                     Nueva Solicitud
                 </button>
+                @endcan
             </div>
+
 
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -91,7 +96,7 @@
     </div>
 
 
-    <div class="modal fade" id="modalEditar">
+    <div class="modal fade" id="modalNuevoMaterial">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -111,6 +116,11 @@
                             <div class="form-group">
                                 <label>Unidad de Medida Solicitada</label>
                                 <input type="text" disabled class="form-control" id="medida-editar" autocomplete="off">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Material Solicitado</label>
+                                <input type="text" disabled class="form-control" id="material-solicitado" autocomplete="off">
                             </div>
 
                             <div class="row">
@@ -191,6 +201,7 @@
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+    <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
 
     <script type="text/javascript">
         $(document).ready(function(){
@@ -198,6 +209,34 @@
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
+
+
+            $('#select-codigo-nuevo').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-clasi-nuevo').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-unidad-nuevo').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
 
         });
     </script>
@@ -290,11 +329,10 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
-                        $('#modalEditar').modal('show');
+                        $('#modalNuevoMaterial').modal('show');
                         $('#id-editar').val(id);
                         $('#medida-editar').val(response.data.info.medida);
-
-
+                        $('#material-solicitado').val(response.data.info.nombre);
 
                     }else{
                         toastr.error('Información no encontrada');
@@ -327,63 +365,103 @@
                 });
         }
 
-        function editar(){
+        function verificarGuardar(){
+            Swal.fire({
+                title: 'Guardar Material?',
+                text: "",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    nuevoMaterial();
+                }
+            })
+        }
+
+        function nuevoMaterial(){
+
+            // id de material solicitado para borrarlo cuando se agregue al catalogo
             var id = document.getElementById('id-editar').value;
-            var nombre = document.getElementById('nombre-editar').value;
-            var telefono = document.getElementById('telefono-editar').value;
-            var nit = document.getElementById('nit-editar').value;
-            var nrc = document.getElementById('nrc-editar').value;
+            var codigo = document.getElementById('select-codigo-nuevo').value; // nullable
+            var nombre = document.getElementById('nombre-nuevo').value;
+            var precio = document.getElementById('precio-nuevo').value;
+            var unidad = document.getElementById('select-unidad-nuevo').value; // nullable
+            var clasificacion = document.getElementById('select-clasi-nuevo').value; // nullable
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
                 return;
             }
 
-            if(nombre.length > 150){
-                toastr.error('Nombre máximo 150 caracteres');
+            if(nombre.length > 300){
+                toastr.error('Nombre máximo 300 caracteres');
                 return;
             }
 
-            if(telefono.length > 20){
-                toastr.error('Teléfono máximo 20 caracteres');
+            if(precio === ''){
+                toastr.error('Precio unitario es requerido');
                 return;
             }
 
-            if(nit.length > 25){
-                toastr.error('Nit máximo 25 caracteres');
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+            if (!precio.match(reglaNumeroDecimal)) {
+                toastr.error('Precio debe ser número Decimal y no Negativo');
                 return;
             }
 
-            if(nrc.length > 50){
-                toastr.error('NRC máximo 50 caracteres');
+            if (precio < 0) {
+                toastr.error('Precio no permite números negativos');
+                return;
+            }
+
+            if (precio.length > 10) {
+                toastr.error('Precio máximo 10 dígitos de límite');
                 return;
             }
 
             openLoading();
             var formData = new FormData();
-            formData.append('id', id);
+            formData.append('objespecifico', codigo);
             formData.append('nombre', nombre);
-            formData.append('telefono', telefono);
-            formData.append('nit', nit);
-            formData.append('nrc', nrc);
+            formData.append('precio', precio);
+            formData.append('unidad', unidad);
+            formData.append('clasificacion', clasificacion);
+            formData.append('id', id);
 
-            axios.post(url+'/proveedores/editar', formData, {
+            axios.post(url+'/solicitud/material/ing/agregar', formData, {
             })
                 .then((response) => {
                     closeLoading();
-
                     if(response.data.success === 1){
-                        toastr.success('Actualizado correctamente');
-                        $('#modalEditar').modal('hide');
+                        toastr.success('Registrado correctamente');
+                        $('#modalNuevoMaterial').modal('hide');
                         recargar();
                     }
-                    else {
-                        toastr.error('Error al actualizar');
-                    }
+                    else if(response.data.success === 3){
+                        Swal.fire({
+                            title: 'Material Repetido',
+                            text: "El objeto específico, la clasificación, el nombre, y la unidad de medida están repetidos. Revisar Catálogo",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
 
+                            }
+                        })
+                    }
+                    else {
+                        toastr.error('Error al registrar');
+                    }
                 })
                 .catch((error) => {
-                    toastr.error('Error al actualizar');
+                    toastr.error('Error al registrar');
                     closeLoading();
                 });
         }

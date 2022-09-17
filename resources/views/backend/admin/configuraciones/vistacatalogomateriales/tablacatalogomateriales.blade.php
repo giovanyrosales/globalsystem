@@ -7,28 +7,23 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Material</th>
-                                <th>Medida</th>
-                                <th>Opciones</th>
+                                <th style="width: 15%">Cod. Especifico</th>
+                                <th style="width: 20%">Nombre</th>
+                                <th style="width: 8%">Medida</th>
+                                <th style="width: 15%">Clasificación</th>
+                                <th style="width: 10%">Precio U.</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($lista as $dato)
                                 <tr>
+                                    <td>{{ $dato->objespecifico }}</td>
                                     <td>{{ $dato->nombre }}</td>
-                                    <td>{{ $dato->medida }}</td>
-                                    <td>
-                                        @can('boton.agregar.material.solicitado.ing')
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionSoli({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Agregar"></i>&nbsp; Agregar
-                                        </button>
-                                        @endcan
+                                    <td>{{ $dato->unidadmedida }}</td>
+                                    <td>{{ $dato->clasificacion }}</td>
+                                    <td>${{ $dato->pu }}</td>
 
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="informacionBorrar({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Borrar"></i>&nbsp; Borrar
-                                        </button>
-                                    </td>
                                 </tr>
                             @endforeach
 

@@ -155,7 +155,22 @@
             toastr.error('contraseña incorrecta');
         } else if (response.data.success === 3) {
             toastr.error('usuario no encontrado')
-        } else {
+        } else if (response.data.success === 5) {
+            Swal.fire({
+                title: 'Usuario Bloqueado',
+                text: "Contactar a la administración",
+                icon: 'info',
+                showCancelButton: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                }
+            })
+        }
+        else {
             toastr.error('error al iniciar sesión');
         }
     }

@@ -272,6 +272,12 @@ Route::post('/admin/solicitud/material/ing/informacion', [MaterialesController::
 Route::post('/admin/solicitud/material/ing/borrar', [MaterialesController::class, 'borrarSolicitudMaterialIng']);
 Route::post('/admin/solicitud/material/ing/agregar', [MaterialesController::class, 'agregarSolicitudMaterialIng']);
 
+// CATALOGO DE MATERIALES PARA QUE INGENIERIA VEA LA LISTA DE LO QUE HAY
+Route::get('/admin/vista/catalogo/material/index', [MaterialesController::class,'indexVistaCatalogoMaterial'])->name('admin.vista.catalogo.material.index');
+Route::get('/admin/vista/catalogo/material/tabla', [MaterialesController::class,'tablaVistaCatalogoMaterial']);
+
+
+
 
 // --- CLASIFICACIONES ---
 Route::get('/admin/clasificaciones/index', [ClasificacionesController::class,'index'])->name('admin.clasificaciones.index');

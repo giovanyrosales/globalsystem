@@ -226,4 +226,81 @@ class MaterialesController extends Controller
     }
 
 
+    // agregar material solicitado por ingenieria y borrar el material
+    public function agregarSolicitudMaterialIng(Request $request){
+
+        $regla = array(
+            'nombre' => 'required',
+            'precio' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(CatalogoMateriales::where('id_objespecifico', $request->objespecifico)
+            ->where('nombre', $request->nombre)
+            ->where('id_unidadmedida', $request->unidad)
+            ->where('id_clasificacion', $request->clasificacion)
+            ->first()){
+            return ['success' => 3];
+        }
+
+        $dato = new CatalogoMateriales();
+        $dato->id_clasificacion = $request->clasificacion;
+        $dato->id_unidadmedida = $request->unidad;
+        $dato->id_objespecifico = $request->objespecifico;
+        $dato->nombre = $request->nombre;
+        $dato->pu = $request->precio;
+
+        if($dato->save()){
+            // borrar material solicitado, ya que fue agregado
+            if(SoliMaterialIng::where('id', $request->id)->first()){
+                SoliMaterialIng::where('id', $request->id)->delete();
+            }
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+    public function indexVistaCatalogoMaterial(){
+        return view('backend.admin.configuraciones.vistacatalogomateriales.vistacatalogomateriales');
+    }
+
+    public function tablaVistaCatalogoMaterial(){
+        $lista = CatalogoMateriales::orderBy('nombre', 'ASC')->get();
+
+        foreach ($lista as $item) {
+
+            $clasificacion = '';
+            $unidadmedida = '';
+            $objespecifico = '';
+
+            if($dataClasi = Clasificaciones::where('id', $item->id_clasificacion)->first()){
+                $clasificacion = $dataClasi->nombre;
+            }
+
+            if($dataUnidad = UnidadMedida::where('id', $item->id_unidadmedida)->first()){
+                $unidadmedida = $dataUnidad->medida;
+            }
+
+            if($dataObj = ObjEspecifico::where('id', $item->id_objespecifico)->first()){
+                $objespecifico = $dataObj->codigo . ' - ' . $dataObj->nombre;
+            }
+
+            $item->clasificacion = $clasificacion;
+            $item->unidadmedida = $unidadmedida;
+            $item->objespecifico = $objespecifico;
+        }
+
+        return view('backend.admin.configuraciones.vistacatalogomateriales.tablacatalogomateriales', compact('lista'));
+    }
+
+
+
+
+
 }

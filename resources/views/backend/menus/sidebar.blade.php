@@ -390,6 +390,16 @@
                             </li>
                         @endcan
 
+                            <!-- es una vista del catalogo de materiales, para que ingeniería busque un material -->
+                        @can('sidebar.vista.catalogo.materiales.ing')
+                            <li class="nav-item">
+                                <a href="{{ route('admin.vista.catalogo.material.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Catálogo de Materiales</p>
+                                </a>
+                            </li>
+                        @endcan
+
                     </ul>
                 </li>
                 @endcan

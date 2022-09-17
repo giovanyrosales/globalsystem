@@ -37,7 +37,12 @@ class LoginController extends Controller
             return ['success'=> 1, 'ruta'=> route('admin.panel')];
         }
 
-        if(Usuario::where('usuario', $request->usuario)->first()){
+        if($info = Usuario::where('usuario', $request->usuario)->first()){
+
+            if($info->activo == 0){
+                return ['success' => 5];
+            }
+
             if(Auth::attempt(['usuario' => $request->usuario, 'password' => $request->password])) {
 
                 return ['success'=> 1, 'ruta'=> route('admin.panel')];

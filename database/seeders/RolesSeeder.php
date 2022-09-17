@@ -104,7 +104,7 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'sidebar.cuentabolson.movimiento', 'description' => 'sidebar seccion cuenta bolson - movimiento'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleJefeUaci);
 
         // CONFIGURACIONES
-        Permission::create(['name' => 'sidebar.seccion.configuraciones', 'description' => 'sidebar seccion configuraciones'])->syncRoles($roleUaci, $rolePresupuesto, $roleUaciUnidad);
+        Permission::create(['name' => 'sidebar.seccion.configuraciones', 'description' => 'sidebar seccion configuraciones'])->syncRoles($roleUaci, $roleIng, $rolePresupuesto, $roleUaciUnidad);
 
             Permission::create(['name' => 'sidebar.fuente.financiamiento', 'description' => 'sidebar seccion fuente de financiamiento'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'sidebar.area.gestion', 'description' => 'sidebar seccion area de gestion'])->syncRoles($rolePresupuesto);
@@ -119,8 +119,11 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'sidebar.cuenta', 'description' => 'sidebar seccion cuenta'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'sidebar.obj.especifico', 'description' => 'sidebar objeto específico'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'sidebar.solicitud.material.uaci', 'description' => 'sidebar solicitud de materiales presupuesto ingenieria'])->syncRoles($roleUaci, $roleIng);
+            Permission::create(['name' => 'sidebar.vista.catalogo.materiales.ing', 'description' => 'sidebar vista catalogo de materiales para ver lista por parte de ing'])->syncRoles($roleIng);
 
 
+            Permission::create(['name' => 'boton.solicitar.material.ing', 'description' => 'boton para solicitar nuevo material por parte de ing'])->syncRoles($roleIng);
+            Permission::create(['name' => 'boton.agregar.material.solicitado.ing', 'description' => 'boton para agregar el material solicitado por ing'])->syncRoles($roleUaci);
 
 
             //nuevos
