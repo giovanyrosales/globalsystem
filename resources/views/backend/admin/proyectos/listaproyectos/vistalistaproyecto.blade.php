@@ -836,8 +836,47 @@
                     }
                     else if(response.data.success === 2){
                         $('#modalPresupuesto').modal('hide');
-                        toastr.success('Presupuesto Aprobado')
-                        recargar();
+                        toastr.success('Presupuesto Aprobado');
+                    }
+
+                    else if(response.data.success === 3){
+                        $('#modalPresupuesto').modal('hide');
+
+                        Swal.fire({
+                            title: 'Falta Información',
+                            text: "El presupuesto no tiene APORTE MANO DE OBRA (POR ADMINISTRACIÓN)",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 4){
+                       let conteo = response.data.conteo;
+
+                        document.getElementById('modalPresupuesto').style.overflowY = 'auto';
+
+                        Swal.fire({
+                            title: 'Materiales Incompleto',
+                            text: "Hay " + conteo + " Materiales que no tiene asignado un Objeto Específico",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
                     }
                     else{
                         toastr.error('error al aprobar');

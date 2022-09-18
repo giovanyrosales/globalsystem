@@ -94,17 +94,18 @@
 
             <tr>
                 <td colspan="1" width="10%">Item</td>
-                <td colspan="3" width="30%">Partida</td>
+                <td colspan="4" width="30%">Partida</td>
                 <td colspan="2" width="20%">Cantidad P.</td>
             </tr>
 
             <tr>
                 <td colspan="1" width="10%">{{ $dd->item }}</td>
-                <td colspan="3" width="30%">{{ $dd->nombre }}</td>
+                <td colspan="4" width="30%">{{ $dd->nombre }}</td>
                 <td colspan="2" width="20%">{{ $dd->cantidadp }}</td>
             </tr>
 
             <tr>
+                <td width="10%">Objeto Específico.</td>
                 <td width="15%">Material</td>
                 <td width="11">U/M</td>
                 <td width="12%">Cantidad</td>
@@ -116,8 +117,21 @@
             @foreach($dd->bloque1 as $gg)
 
                 <tr>
+                    @if($gg->objespecifico == null)
+                        <td width="10%" style="background: red"></td>
+                    @else
+                        <td width="10%">{{ $gg->objespecifico }}</td>
+                    @endif
+
+
                     <td width="15%">{{ $gg->material }}</td>
-                    <td width="10%">{{ $gg->medida }}</td>
+
+                    @if($gg->medida == null)
+                        <td width="10%" style="background: red"></td>
+                    @else
+                        <td width="10%">{{ $gg->medida }}</td>
+                    @endif
+
                     <td width="10%">{{ $gg->cantidad }}</td>
                     <td width="10%">{{ $gg->pu }}</td>
                     <td width="12%">{{ $gg->subtotal }}</td>
@@ -126,6 +140,7 @@
 
                 @if($loop->last)
                     <tr>
+                        <td width="10%"></td>
                         <td width="15%"></td>
                         <td width="10%"></td>
                         <td width="10%"></td>
@@ -159,22 +174,23 @@
         @endif
 
         <tr>
-            <td colspan="6">MANO DE OBRA POR ADMINISTRACIÓN</td>
+            <td colspan="7">MANO DE OBRA POR ADMINISTRACIÓN</td>
         </tr>
 
         <tr>
             <td colspan="1" width="10%">Item</td>
-            <td colspan="3" width="30%">Partida</td>
+            <td colspan="4" width="30%">Partida</td>
             <td colspan="2" width="20%">Cantidad P.</td>
         </tr>
 
         <tr>
             <td colspan="1" width="10%">{{ $dd->item }}</td>
-            <td colspan="3" width="30%">{{ $dd->nombre }}</td>
+            <td colspan="4" width="30%">{{ $dd->nombre }}</td>
             <td colspan="2" width="20%">{{ $dd->cantidadp }}</td>
         </tr>
 
         <tr>
+            <td width="10%">Objeto Específico.</td>
             <td width="15%">Material</td>
             <td width="11">U/M</td>
             <td width="12%">Cantidad</td>
@@ -186,8 +202,20 @@
         @foreach($dd->bloque3 as $gg)
 
             <tr>
+
+                @if($gg->objespecifico == null)
+                    <td width="10%" style="background: red"></td>
+                @else
+                    <td width="10%">{{ $gg->objespecifico }}</td>
+                @endif
+
                 <td width="15%">{{ $gg->material }}</td>
-                <td width="10%">{{ $gg->medida }}</td>
+                    @if($gg->medida == null)
+                        <td width="10%" style="background: red"></td>
+                    @else
+                        <td width="10%">{{ $gg->medida }}</td>
+                    @endif
+
                 <td width="10%">{{ $gg->cantidad }}</td>
                 <td width="10%">{{ $gg->pu }}</td>
                 <td width="12%">{{ $gg->subtotal }}</td>
@@ -196,6 +224,7 @@
 
             @if($loop->last)
                 <tr>
+                    <td width="10%"></td>
                     <td width="15%"></td>
                     <td width="10%"></td>
                     <td width="10%"></td>

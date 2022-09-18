@@ -140,7 +140,7 @@ Route::post('/admin/requerimientos/cotizacion/guardar', [CotizacionController::c
 //** INGENIERIA */
 // --- Presupuesto de Proyecto ---
 Route::get('/admin/proyecto/vista/presupuesto/{id}', [ProyectoController::class,'tablaProyectoListaPresupuesto']);
-Route::post('/admin/proyecto/agregar/presupuesto',  [ProyectoController::class,'agregarPresupuesto']);
+Route::post('/admin/proyecto/agregar/presupuesto',  [ProyectoController::class,'agregarPresupuestoPartida']);
 Route::post('/admin/proyecto/vista/presupuesto/informacion', [ProyectoController::class, 'informacionPresupuesto']);
 Route::post('/admin/proyecto/vista/presupuesto/editar', [ProyectoController::class, 'editarPresupuesto']);
 Route::post('/admin/proyecto/vista/presupuesto/borrar', [ProyectoController::class, 'borrarPresupuesto']);

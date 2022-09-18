@@ -560,14 +560,13 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Tipo Partida:</label>
-                                    <select id="select-partida-editar" class="form-control" onchange="verificarPartidaSelectEditar()">
-                                        <option value="1">Materiales</option>
-                                        <option value="2">Herramientas (2% de Materiales)</option>
-                                        <option value="3">Mano de obra (Por Administración)</option>
-                                        <option value="4">Aporte Mano de Obra</option>
-                                        <option value="5">Alquiler de Maquinaria</option>
-                                        <option value="6">Transporte de Concreto Fresco</option>
+
+                                    <select id="select-partida-editar" disabled class="form-control">
+                                        @foreach($tipospartida as $dd)
+                                            <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
+                                        @endforeach
                                     </select>
+
                                 </div>
                             </div>
                         </div>
@@ -601,8 +600,8 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <br>
-                                        <button type="button" onclick="addAgregarFilaPresupuestoEditar()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
-                                            <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
+                                            <button type="button" onclick="addAgregarFilaPresupuestoEditar()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                                <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                     </div>
                                 </div>
                             @endif
@@ -673,6 +672,7 @@
             var rutaP = "{{ URL::to('/admin/proyecto/vista/presupuesto') }}/" + id;
             $('#tablaDatatablePresupuesto').load(rutaP);
 
+            // para el numero de item
             window.contadorGlobal = {{ $conteoPartida }};
 
             $(document).click(function(){
@@ -893,7 +893,7 @@
             // verificar estado del proyecto
             var estado = {{ $estado }};
 
-            if(estado === 0){ // priorizado
+            if(estado !== 2){ // priorizado
                 alertaEstado('Información', 'No puede agregar Bitácoras, porque el Presupuesto no ha sido Aprobado');
                 return;
             }
@@ -1889,36 +1889,58 @@
                     closeLoading();
 
                     if(response.data.success === 1) {
+                        $('#modalAgregarPresupuesto').modal('hide');
+
+                        Swal.fire({
+                            title: 'En Revisión',
+                            text: "El presupuesto esta en modo Revisión",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            allowOutsideClick: false,
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+
+                    if(response.data.success === 1) {
+                        $('#modalAgregarPresupuesto').modal('hide');
 
                         Swal.fire({
                             title: 'No Guardado',
-                            text: "El presupuesto ya fue Aprobado",
+                            text: "El presupuesto ya había sido Aprobado",
                             icon: 'info',
-                            showCancelButton: true,
+                            showCancelButton: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
-                            confirmButtonText: 'Sí',
-                            cancelButtonText: 'Cancelar'
+                            allowOutsideClick: false,
+                            confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                verificarPresupuesto();
+                                location.reload();
                             }
                         })
+                    }
 
-                    }if(response.data.success === 2){
+                    if(response.data.success === 3){
                         $('#modalAgregarPresupuesto').modal('hide');
                         toastr.success('Registrado correctamente');
 
                         window.contadorGlobal = response.data.contador;
 
-                        recargarPresupuesto();
-                        limpiarPresupuesto();
+                        recargarPresupuesto(); // recarga la tabla
+                        limpiarPresupuesto(); // limpia la tabla
                     }
                     else{
                         toastr.error('error al crear presupuesto');
                     }
                 })
                 .catch((error) => {
+                    console.log(error)
                     toastr.error('error al crear presupuesto');
                     closeLoading();
                 });
@@ -1935,6 +1957,7 @@
         }
 
         function informacionPresupuesto(id, numero){
+            // habilitar boton
 
             openLoading();
             document.getElementById("formulario-presupuesto-editar").reset();
@@ -1953,10 +1976,12 @@
 
                         $('#conteo-partida-editar').val(numero);
 
-                        document.getElementById("select-partida-editar").value = response.data.info.tipo_partida;
+                        document.getElementById("select-partida-editar").value = response.data.info.id_tipopartida;
+
                         var infodetalle = response.data.detalle;
 
-                        if(response.data.info.tipo_partida === 4){
+                        // APORTE MANO DE OBRA... NO LLEVA CANTIDAD
+                        if(response.data.info.id_tipopartida === 4){
 
                             for (var i = 0; i < infodetalle.length; i++) {
 
@@ -1977,18 +2002,25 @@
 
                                     "<td>" +
                                     "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='" + infodetalle[i].duplicado + "' class='form-control' type='number'>" +
-                                    "</td>" +
+                                    "</td>";
 
-                                    "<td>" +
-                                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>" +
-                                    "</td>" +
+                                // PRESUPUESTO EN DESARROLLO
+                                if(response.data.estado === 0){
+                                    markup += "<td>" +
+                                        "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>" +
+                                        "</td>" +
 
-                                    "</tr>";
+                                        "</tr>";
+                                }else{
+                                    markup += "<td>" +"</tr>";
+                                }
 
                                 $("#matriz-presupuesto-editar tbody").append(markup);
                             }
 
                         }else{
+
+                            // TODOS LOS DEMÁS TIPOS DE PARTIDA
 
                             for (var i = 0; i < infodetalle.length; i++) {
 
@@ -2009,17 +2041,23 @@
 
                                     "<td>" +
                                     "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='" + infodetalle[i].duplicado + "' class='form-control' type='number'>" +
-                                    "</td>" +
+                                    "</td>";
 
-                                    "<td>" +
-                                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>" +
-                                    "</td>" +
+                                // PRESUPUESTO EN DESARROLLO
+                                if(response.data.estado === 0){
+                                    markup += "<td>" +
+                                        "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>" +
+                                        "</td>" +
 
-                                    "</tr>";
+                                        "</tr>";
+                                }else{
+                                    markup += "<td>" +"</tr>";
+                                }
 
                                 $("#matriz-presupuesto-editar tbody").append(markup);
                             }
                         }
+
 
                         $('#modalEditarPresupuesto').css('overflow-y', 'auto');
                         $('#modalEditarPresupuesto').modal({backdrop: 'static', keyboard: false})
@@ -2388,20 +2426,37 @@
                     if(response.data.success === 1){
 
                         Swal.fire({
-                            title: 'Error al Editar',
-                            text: "El Presupuesto ya fue Aprobado",
+                            title: 'No Actualizado',
+                            text: "El Presupuesto esta en modo revisión",
                             icon: 'info',
                             showCancelButton: false,
+                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                location.reload();
                             }
                         })
                     }
                     else if(response.data.success === 2){
+                        Swal.fire({
+                            title: 'No Actualizado',
+                            text: "El Presupuesto ya fue Aprobado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 3){
                         toastr.success('Actualizado correctamente');
                         recargarPresupuesto();
                         $('#modalEditarPresupuesto').modal('hide');
@@ -2487,24 +2542,7 @@
             }
         }
 
-        function verificarPartidaSelectEditar(){
-            var tipopartida = document.getElementById('select-partida-editar').value;
-            var table = document.getElementById('matriz-presupuesto-editar');
 
-            if(tipopartida == '4'){
-                for (var r = 1, n = table.rows.length; r < n; r++) {
-                    var element = table.rows[r].cells[1].children[0];
-                    element.value = '';
-                    element.disabled = true;
-                }
-            }else{
-                for (var r = 1, n = table.rows.length; r < n; r++) {
-                    var element = table.rows[r].cells[1].children[0];
-                    element.value = '';
-                    element.disabled = false;
-                }
-            }
-        }
 
         // cambiar estado de presupuesto ingenieria para ser aprobado
         function cambiarEstado(){

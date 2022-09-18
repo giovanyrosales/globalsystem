@@ -49,7 +49,7 @@ class ProyectoController extends Controller
         $arrayFuenteFinanciamiento = FuenteFinanciamiento::orderBy('codigo')->get();
         $arrayFuenteRecursos = FuenteRecursos::orderBy('codigo')->get();
 
-        return view('Backend.Admin.Proyectos.vistaNuevoProyecto', compact('arrayNaturaleza',
+        return view('backend.admin.proyectos.nuevo.vistanuevoproyecto', compact('arrayNaturaleza',
         'arrayAreaGestion', 'arrayLineaTrabajo', 'arrayFuenteFinanciamiento', 'arrayFuenteRecursos'));
     }
 
@@ -1034,7 +1034,7 @@ class ProyectoController extends Controller
         return view('Backend.Admin.Proyectos.tablaListaPresupuesto', compact('partida', 'presuaprobado'));
     }
 
-    public function agregarPresupuesto(Request $request){
+    public function agregarPresupuestoPartida(Request $request){
 
         $rules = array(
             'nombrepartida' => 'required',
@@ -1047,8 +1047,16 @@ class ProyectoController extends Controller
         }
 
         if($infop = Proyecto::where('id', $request->id)->first()){
+            //0: presupuesto en desarrollo
+            //1: listo para revision
+            //2: aprobado
+
             if ($infop->presu_aprobado == 1){
                 return ['success' => 1];
+            }
+
+            if ($infop->presu_aprobado == 2){
+                return ['success' => 2];
             }
         }
 
@@ -1060,7 +1068,7 @@ class ProyectoController extends Controller
             $r->proyecto_id = $request->id;
             $r->nombre = $request->nombrepartida;
             $r->cantidadp = $request->cantidadpartida;
-            $r->tipo_partida = $request->tipopartida;
+            $r->id_tipopartida = $request->tipopartida;
             $r->save();
 
             $conteoPartida = Partida::where('proyecto_id', $request->id)->count();
@@ -1086,11 +1094,11 @@ class ProyectoController extends Controller
             }
 
             DB::commit();
-            return ['success' => 2, 'contador' => $conteoPartida];
+            return ['success' => 3, 'contador' => $conteoPartida];
 
         }catch(\Throwable $e){
             DB::rollback();
-            return ['success' => 3];
+            return ['success' => 4];
         }
     }
 
@@ -1107,6 +1115,10 @@ class ProyectoController extends Controller
 
         if($info = Partida::where('id', $request->id)->first()){
 
+            $infoPro = Proyecto::where('id', $info->proyecto_id)->first();
+
+            $presuaprobado = $infoPro->presu_aprobado;
+
             $detalle = PartidaDetalle::where('partida_id', $request->id)
                 ->orderBy('id', 'ASC')
                 ->get();
@@ -1121,7 +1133,7 @@ class ProyectoController extends Controller
                 }
             }
 
-            return ['success' => 1, 'info' => $info, 'detalle' => $detalle];
+            return ['success' => 1, 'info' => $info, 'detalle' => $detalle, 'estado' => $presuaprobado];
         }
         return ['success' => 2];
     }
@@ -1135,8 +1147,15 @@ class ProyectoController extends Controller
             if($infopa = Partida::where('id', $request->idpartida)->first()) {
 
                 if ($proy = Proyecto::where('id', $infopa->proyecto_id)->first()) {
+
+                    // Modo revision
                     if ($proy->presu_aprobado == 1) {
                         return ['success' => 1];
+                    }
+
+                    // presupuesto aprobado
+                    if ($proy->presu_aprobado == 2) {
+                        return ['success' => 2];
                     }
                 }
             }
@@ -1145,7 +1164,7 @@ class ProyectoController extends Controller
             Partida::where('id', $request->idpartida)->update([
                 'cantidadp' => $request->cantidadpartida,
                 'nombre' => $request->nombrepartida,
-                'tipo_partida' => $request->tipopartida
+                'id_tipopartida' => $request->tipopartida
             ]);
 
                 // agregar id a pila
@@ -1188,11 +1207,11 @@ class ProyectoController extends Controller
                 }
 
             DB::commit();
-            return ['success' => 2];
+            return ['success' => 3];
 
         }catch(\Throwable $e){
             DB::rollback();
-            return ['success' => 3];
+            return ['success' => 99];
         }
     }
 
@@ -1234,7 +1253,8 @@ class ProyectoController extends Controller
     // para crear pdf se debe verificar que exista esta partida
     public function verificarPartidaManoObra(Request $request){
 
-        if(Partida::where('proyecto_id', $request->id)->where('tipo_partida', 3)->first()){
+        // TIPO PARTIDA 3: Mano de obra (Por Administración)
+        if(Partida::where('proyecto_id', $request->id)->where('id_tipopartida', 3)->first()){
             return ['success' => 1];
         }
         return ['success' => 2];
@@ -1244,7 +1264,7 @@ class ProyectoController extends Controller
     // informacion para presupuesto para uaci
     public function informacionPresupuestoParaAprobacion($id){
 
-        // obtener todas los presupuesto por tipo_partida
+        // obtener todas los presupuesto por tipo partida
         // 1- Materiales
         // 2- Herramientas (2% de Materiales)
         // 3- Mano de obra (Por Administración)
@@ -1252,8 +1272,9 @@ class ProyectoController extends Controller
         // 5- Alquiler de Maquinaria
         // 6- Transporte de Concreto Fresco
 
+        // MATERIALES, HERRAMIENTAS (2% DE MATERIALES), ALQUILER DE MAQUINARIA
         $partida1 = Partida::where('proyecto_id', $id)
-            ->whereIn('tipo_partida', [1, 2, 5])
+            ->whereIn('id_tipopartida', [1, 2, 5])
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -1293,9 +1314,20 @@ class ProyectoController extends Controller
             foreach ($detalle1 as $lista){
 
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
+                $objespecifico = null;
+                if($infoobjeto = ObjEspecifico::where('id', $infomaterial->id_objespecifico)->first()){
+                    $objespecifico = $infoobjeto->codigo;
+                }
 
-                $lista->medida = $infomedida->medida;
+                $lista->objespecifico = $objespecifico;
+
+                $medida = '';
+                if($infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first()){
+                   $medida = $infomedida->medida;
+                }
+
+                $lista->medida = $medida;
+
                 if($lista->duplicado != 0){
                     $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
                 }else{
@@ -1311,7 +1343,7 @@ class ProyectoController extends Controller
                 $total = $total + $multi;
 
                 // suma de materiales
-                if($secciones->tipo_partida == 1){
+                if($secciones->id_tipopartida == 1){
                     $sumaMateriales = $sumaMateriales + $multi;
                 }
             }
@@ -1323,7 +1355,7 @@ class ProyectoController extends Controller
         }
 
         $manoobra = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 3)
+            ->where('id_tipopartida', 3)
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -1343,9 +1375,21 @@ class ProyectoController extends Controller
             foreach ($detalle3 as $lista){
 
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
 
-                $lista->medida = $infomedida->medida;
+                $objespecifico = null;
+                if($infoobjeto = ObjEspecifico::where('id', $infomaterial->id_objespecifico)->first()){
+                    $objespecifico = $infoobjeto->codigo;
+                }
+
+                $lista->objespecifico = $objespecifico;
+
+                $medida = '';
+                if($infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first()){
+                    $medida = $infomedida->medida;
+                }
+
+                $lista->medida = $medida;
+
                 if($lista->duplicado != 0){
                     $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
                 }else{
@@ -1375,7 +1419,7 @@ class ProyectoController extends Controller
         // APORTE DE MANO DE OBRA
 
         $aporteManoObra = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 4)
+            ->where('id_tipopartida', 4)
             ->get();
 
         $totalAporteManoObra = 0;
@@ -1402,7 +1446,7 @@ class ProyectoController extends Controller
         // ALQUILER DE MAQUINARIA
 
         $alquilerMaquinaria = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 5)
+            ->where('id_tipopartida', 5)
             ->get();
 
         $totalAlquilerMaquinaria = 0;
@@ -1425,7 +1469,7 @@ class ProyectoController extends Controller
         // TRANSPORTE CONCRETO FRESCO
 
         $trasportePesado = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 6)
+            ->where('id_tipopartida', 6)
             ->get();
 
         $totalTransportePesado = 0;
@@ -1494,32 +1538,64 @@ class ProyectoController extends Controller
                 DB::beginTransaction();
                 try {
 
-                    if($pro->presu_aprobado != 1){
-                        // presupuesto cambio estado y esta en desarrollo
+                    if ($pro->presu_aprobado != 1) {
+                        // presupuesto cambio estado y está en desarrollo
                         return ['success' => 1];
                     }
 
-                    if($pro->presu_aprobado === 2){
+                    if ($pro->presu_aprobado === 2) {
                         // presupuesto ya aprobado y no hacer nada
                         return ['success' => 2];
                     }
 
+                    // MANO DE OBRA POR ADMINISTRACION, APARTE PARA CALCULAR ISSS, AFP, INSAFORP
+                    $manoobra = Partida::where('proyecto_id', $request->id)
+                        ->where('id_tipopartida', 3)
+                        ->orderBy('id', 'ASC')
+                        ->get();
+
+                    // el presupuesto no tiene APORTE MANO DE OBRA (POR ADMINISTRACIÓN)
+                    if (sizeof($manoobra) <= 0) {
+                        return ['success' => 3];
+                    }
+
+                    // pasar a modo aprobado
                     Proyecto::where('id', $request->id)->update([
                         'fecha_aprobado' => Carbon::now('America/El_Salvador'),
-                        'presu_aprobado' => 2]); // estado aprobado
+                        'presu_aprobado' => 2]);
+
 
                     $partidas = Partida::where('proyecto_id', $request->id)
                         ->orderBy('id')
                         ->get();
 
+                    $pilaDetalle = array();
 
-                    $manoobra = Partida::where('proyecto_id', $request->id)
-                        ->where('tipo_partida', 3)
-                        ->orderBy('id', 'ASC')
+                    foreach ($partidas as $pp){
+                        array_push($pilaDetalle, $pp->id);
+                    }
+
+                    // verificar cada detalle de la partida para ver si tiene objeto especifico
+                    $todoDetalle = DB::table('partida_detalle AS p')
+                        ->join('materiales AS m', 'p.material_id', '=', 'm.id')
+                        ->select('m.id_objespecifico', 'm.nombre')
+                        ->whereIn('p.partida_id', $pilaDetalle)
                         ->get();
+
+                    $conteo = 0;
+                    foreach ($todoDetalle as $tt){
+                        if($tt->id_objespecifico == null){
+                            $conteo = $conteo + 1;
+                        }
+                    }
+
+                    if($conteo > 0){
+                        return ['success' => 4, 'conteo' => $conteo];
+                    }
 
                     $totalManoObra = 0;
 
+                    // CALCULAR LA MANO DE OBRA (POR ADMINISTRACIÓN)
                     foreach ($manoobra as $secciones3) {
                         $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
 
@@ -1534,6 +1610,7 @@ class ProyectoController extends Controller
                         }
                     }
 
+                    // cálculos
                     $afp = ($totalManoObra * 7.75) / 100;
                     $isss = ($totalManoObra * 7.5) / 100;
                     $insaforp = ($totalManoObra * 1) / 100;
@@ -1544,7 +1621,7 @@ class ProyectoController extends Controller
                         array_push($pila, $dd->id);
                     }
 
-                    // agrupando para obtener solo los ID de objetos especificos.
+                    // agrupando para obtener solo los ID de objetos específicos.
                     $detalles = DB::table('partida_detalle AS pd')
                         ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
                         ->select('m.id_objespecifico')
@@ -1552,7 +1629,7 @@ class ProyectoController extends Controller
                         ->groupBy('m.id_objespecifico')
                         ->get();
 
-                    // recorrer lista de objetos especificos
+                    // recorrer lista de objetos específicos
                    foreach ($detalles as $det){
 
                        // obtener lista de materiales
@@ -1564,16 +1641,19 @@ class ProyectoController extends Controller
                            ->get();
 
                        $suma = 0;
-                       $aporte = false;
 
                        // obtener sumatoria de los materiales
                        foreach ($info as $dato) {
 
-                           // suma de isss + afp
+                           // SUMA DE ISSS Y AFP
+                           // LOS CÓDIGOS FIJOS
+                           //51402: POR REMUNERACIONES EVENTUALES
                            if($dato->codigo == 51402){
                                $suma = $isss + $insaforp;
                                break;
-                           }else if($dato->codigo == 51502){
+                           }
+                           // 51502: POR REMUNERACIONES EVENTUALES (igual al de arriba)
+                           else if($dato->codigo == 51502){
                                $suma = $afp;
                                break;
                            }
@@ -1585,7 +1665,7 @@ class ProyectoController extends Controller
                            }
                        }
 
-                       // guardar registro
+                       // GUARDAR REGISTRO
                        $presu = new Presupuesto();
                        $presu->proyecto_id = $request->id;
                        $presu->objespeci_id = $det->id_objespecifico;
@@ -1598,11 +1678,11 @@ class ProyectoController extends Controller
                 }catch(\Throwable $e){
                     Log::info('error: ' . $e);
                     DB::rollback();
-                    return ['success' => 3];
+                    return ['success' => 99];
                 }
         }
 
-        return ['success' => 3];
+        return ['success' => 99];
     }
 
     // mostrara saldo restante calculado.

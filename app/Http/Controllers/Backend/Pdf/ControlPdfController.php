@@ -20,7 +20,7 @@ class ControlPdfController extends Controller
 
     public function generarPrespuestoPdf($id){
 
-        // obtener todas los presupuesto por tipo_partida
+        // obtener todas los presupuesto por id_tipopartida
         // 1- Materiales
         // 2- Herramientas (2% de Materiales)
         // 3- Mano de obra (Por Administración)
@@ -29,7 +29,7 @@ class ControlPdfController extends Controller
         // 6- Transporte de Concreto Fresco
 
         $partida1 = Partida::where('proyecto_id', $id)
-            ->whereIn('tipo_partida', [1, 2, 5])
+            ->whereIn('id_tipopartida', [1, 2, 5])
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -69,9 +69,17 @@ class ControlPdfController extends Controller
             foreach ($detalle1 as $lista) {
 
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
 
-                $lista->medida = $infomedida->medida;
+                $lista->objespecifico = $infomaterial->id_objespecifico;
+
+                $medida = '';
+                if($infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first()){
+                    $medida = $infomedida->medida;
+                }
+
+                $lista->medida = $medida;
+
+
                 if ($lista->duplicado != 0) {
                     $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
                 } else {
@@ -89,7 +97,7 @@ class ControlPdfController extends Controller
                 $lista->subtotal = "$" . number_format((float)$multi, 2, '.', ',');
 
                 // se sumara solo materiales
-                if($secciones->tipo_partida == 1){
+                if($secciones->id_tipopartida == 1){
                     $sumaMateriales = $sumaMateriales + $multi;
                 }
 
@@ -103,7 +111,7 @@ class ControlPdfController extends Controller
         }
 
         $manoobra = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 3)
+            ->where('id_tipopartida', 3)
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -123,9 +131,14 @@ class ControlPdfController extends Controller
             foreach ($detalle3 as $lista) {
 
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
 
-                $lista->medida = $infomedida->medida;
+                $medida = '';
+                if($infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first()){
+                    $medida = $infomedida->medida;
+                }
+
+                $lista->medida = $medida;
+
                 if ($lista->duplicado != 0) {
                     $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
                 } else {
@@ -154,7 +167,7 @@ class ControlPdfController extends Controller
         // APORTE DE MANO DE OBRA
 
         $aporteManoObra = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 4)
+            ->where('id_tipopartida', 4)
             ->get();
 
         $totalAporteManoObra = 0;
@@ -181,7 +194,7 @@ class ControlPdfController extends Controller
         // ALQUILER DE MAQUINARIA
 
         $alquilerMaquinaria = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 5)
+            ->where('id_tipopartida', 5)
             ->get();
 
         $totalAlquilerMaquinaria = 0;
@@ -203,7 +216,7 @@ class ControlPdfController extends Controller
         // TRANSPORTE CONCRETO FRESCO
 
         $trasportePesado = Partida::where('proyecto_id', $id)
-            ->where('tipo_partida', 6)
+            ->where('id_tipopartida', 6)
             ->get();
 
         $totalTransportePesado = 0;
@@ -247,7 +260,6 @@ class ControlPdfController extends Controller
         $herramienta2Porciento = "$" . number_format((float)$herramienta2Porciento, 2, '.', ',');
         $totalManoObra = "$" . number_format((float)$totalManoObra, 2, '.', ',');
 
-        $totalAporteManoObra = "$" . number_format((float)$totalAporteManoObra, 2, '.', ',');
         $totalAlquilerMaquinaria = "$" . number_format((float)$totalAlquilerMaquinaria, 2, '.', ',');
         $totalTransportePesado = "$" . number_format((float)$totalTransportePesado, 2, '.', ',');
         $subtotalPartida = "$" . number_format((float)$subtotalPartida, 2, '.', ',');

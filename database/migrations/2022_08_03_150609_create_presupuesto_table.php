@@ -17,9 +17,8 @@ class CreatePresupuestoTable extends Migration
             $table->id();
             $table->bigInteger('proyecto_id')->unsigned();
             $table->bigInteger('objespeci_id')->unsigned(); // objeto especifico
-            $table->decimal('saldo_resta', 10,2); //saldo calculado, en cada orden de compra cambiara
             $table->decimal('saldo_inicial', 10,2); // no cambia nunca, mismo
-            // con el que se creo el presupuesto el total.
+
 
             $table->foreign('proyecto_id')->references('id')->on('proyectos');
             $table->foreign('objespeci_id')->references('id')->on('obj_especifico');
