@@ -35,6 +35,11 @@ class ControlController extends Controller
             $ruta = 'admin.estadisticas.index';
         }
 
+        // ADMINISTRADOR QUE HACE REQUERIMIENTOS
+        else  if($user->hasRole('administrador')){
+            $ruta = 'admin.estadisticas.index';
+        }
+
         // JEFE UACI
         else  if($user->hasRole('sidebar.estadisticas')){
             $ruta = 'admin.estadisticas.index';

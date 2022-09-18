@@ -813,7 +813,8 @@ class ProyectoController extends Controller
         return ['success' => 1, 'lista' => $lista];
     }
 
-    public function buscadorMaterial(Request $request){
+    // MUESTRA MATERIALES SOLO DEL PRESUPUESTO DEL PROYECTO
+    public function buscadorMaterialRequisicion(Request $request){
 
         if($request->get('query')){
             $query = $request->get('query');
@@ -1709,6 +1710,7 @@ class ProyectoController extends Controller
 
             $total = $pp->saldo_inicial - ($salidaDetalle - $entradaDetalle);
 
+            $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
             $pp->saldo_restante = number_format((float)$total, 2, '.', ',');
         }
 
@@ -1732,6 +1734,37 @@ class ProyectoController extends Controller
         ]);
 
         return ['success' => 2];
+    }
+
+
+    public function verCatalogoMaterialRequisicion($id){
+
+        $lista = Partida::where('proyecto_id', $id)->get();
+        $pila = array();
+
+        foreach ($lista as $dd){
+            array_push($pila, $dd->id);
+        }
+
+        // presupuesto
+        $presupuesto = DB::table('partida_detalle AS p')
+            ->join('materiales AS m', 'p.material_id', '=', 'm.id')
+            ->select('m.nombre', 'p.cantidad', 'm.id_unidadmedida')
+            ->whereIn('p.partida_id', $pila)
+            ->orderBy('m.nombre', 'ASC')
+            ->get();
+
+        foreach ($presupuesto as $pp){
+
+            $medida = '';
+            if($info = UnidadMedida::where('id', $pp->id_unidadmedida)->first()){
+                $medida = $info->medida;
+            }
+
+            $pp->medida = $medida;
+        }
+
+        return view('backend.admin.proyectos.modal.modalcatalogomaterial', compact('presupuesto'));
     }
 
 

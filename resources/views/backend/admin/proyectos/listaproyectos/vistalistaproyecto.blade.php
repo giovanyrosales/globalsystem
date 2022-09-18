@@ -299,7 +299,7 @@
                                 @endcan
 
                                 @can('boton.dinero.presupuesto')
-                                        <div class="form-group">
+                                        <div class="form-group" id="divContenedorSaldos" style="display: none">
                                             <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionSaldo()">
                                                 <i class="fas fa-list-alt" title="Saldos"></i>&nbsp; Saldos
                                             </button>
@@ -748,11 +748,19 @@
 
             $('#id-proyecto').val(id);
             // para poder mostrar el botón ver presupuesto modal cuando sea necesario
+            // 1: LISTO PARA APROBACIÓN
             if(estado === 1){
                 // verificar que se tenga el Permiso el usuario. y si lo tiene si mostrara el boton
                 // aprobar presupuesto de ingenieria
                 if (document.getElementById('btnpresuaprobar') !== null) {
                     document.getElementById("btnpresuaprobar").style.display = "block";
+                }
+            }
+
+            // PRESUPUESTO ESTA APROBADO
+            if(estado === 2){
+                if (document.getElementById('divContenedorSaldos') !== null) {
+                    document.getElementById("divContenedorSaldos").style.display = "block";
                 }
             }
 
@@ -782,8 +790,8 @@
         }
 
         // cargar modal con el saldo del proyecto
-        function informacionSaldo(id){
-
+        function informacionSaldo(){
+            var id = document.getElementById('id-proyecto').value;
             var ruta = "{{ URL::to('/admin/ver/presupuesto/saldo') }}/" + id;
             $('#tablaSaldo').load(ruta);
             $('#modalSaldo').modal('show');

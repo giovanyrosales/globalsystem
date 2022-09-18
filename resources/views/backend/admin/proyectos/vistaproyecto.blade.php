@@ -84,12 +84,19 @@
                       <div class="card-header">
                           <h3 class="card-title"><strong>Requisiciones de Proyecto</strong></h3>
 
-                          @if($proyecto->presu_aprobado == 0)
+                          @if($proyecto->presu_aprobado !== 2)
                               <br><br>
                               <span class="badge bg-warning">Esperando aprobación de Presupuesto</span>
                           @else
+                              <br>
+                              <div class="form-group">
+                                  <button type="button" class="btn btn-secondary" onclick="vistaCatalogoMaterial()">
+                                      <i class="fas fa-list-alt" title="Catálogo"></i>&nbsp; Catálogo
+                                  </button>
+                              </div>
+
                               @can('boton.agregar.requisicion')
-                                  <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-secondary btn-sm">
+                                  <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-success btn-sm">
                                       Agregar Requisición
                                   </button>
                               @endcan
@@ -638,6 +645,37 @@
 </div>
 
 
+<!-- ****** USUARIO HACE REQUISICIONES ****** !-->
+
+<!-- catalogo de materiales para que hacer requerimiento -->
+<div class="modal fade" id="modalCatalogoMaterial">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Catálogo</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="tablaCatalogoMaterial">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
 
 @extends('backend.menus.footerjs')
 @section('archivos-js')
@@ -694,7 +732,7 @@
     <script type="text/javascript">
 
         // para modal agregar Requisicion por parte de administradora
-        function buscarMaterial(e){
+        function buscarMaterialRequisicion(e){
 
             // seguro para evitar errores de busqueda continua
             if(seguroBuscador){
@@ -713,7 +751,7 @@
                     $(e).attr('data-info', 0);
                 }
 
-                axios.post(url+'/proyecto/buscar/material', {
+                axios.post(url+'/buscar/material/soloproyecto', {
                     'query' : texto,
                     'idpro' : idpro
                 })
@@ -747,7 +785,7 @@
                     $(e).attr('data-info', 0);
                 }
 
-                axios.post(url+'/proyecto/buscar/material', {
+                axios.post(url+'/buscar/material/soloproyecto', {
                     'query' : texto
                 })
                     .then((response) => {
@@ -792,7 +830,7 @@
                 "</td>"+
 
                 "<td>"+
-                "<input name='descripcionarray[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterial(this)' maxlength='400'  type='text'>"+
+                "<input name='descripcionarray[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterialRequisicon(this)' maxlength='400'  type='text'>"+
                 "<div class='droplista' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
                 "</td>"+
 
@@ -2600,6 +2638,16 @@
                     closeLoading();
                 });
         }
+
+        // ver catalogo de materiales por parte de quien hace requisiciones
+        function vistaCatalogoMaterial(){
+
+            let id = {{ $id }};
+            var ruta = "{{ URL::to('/admin/ver/materiales/admin/requisicion') }}/" + id;
+            $('#tablaCatalogoMaterial').load(ruta);
+            $('#modalCatalogoMaterial').modal('show');
+        }
+
 
 
     </script>

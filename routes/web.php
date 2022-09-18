@@ -190,17 +190,22 @@ Route::get('/admin/movicuentaproy/documento/{id}',  [CuentaProyectoController::c
 Route::post('/admin/movicuentaproy/informacion',  [CuentaProyectoController::class,'informacionMoviCuentaProy']);
 Route::post('/admin/movicuentaproy/editar',  [CuentaProyectoController::class,'editarMoviCuentaProy']);
 
-
 // --- VISTA GENERAR COTIZACION ---
 Route::get('/admin/proyecto/vista/cotizacion/{id}', [ProyectoController::class,'indexCotizacion']);
 Route::post('/admin/proyecto/lista/cotizaciones',  [ProyectoController::class,'obtenerListaCotizaciones']);
-Route::post('/admin/proyecto/buscar/material',  [ProyectoController::class,'buscadorMaterial']);
+
+// busca materiales solo del presupuesto proyecto
+Route::post('/admin/buscar/material/soloproyecto',  [ProyectoController::class,'buscadorMaterialRequisicion']);
 
 // utilizado para un usuario tipo ingenieria
 Route::post('/admin/proyecto/buscar/material-presupuesto',  [ProyectoController::class,'buscadorMaterialPresupuesto']);
 Route::post('/admin/proyecto/buscar/material-presupuesto-editar',  [ProyectoController::class,'buscadorMaterialPresupuestoEditar']);
 
 Route::post('/admin/proyecto/cotizacion/nuevo',  [ProyectoController::class,'nuevaCotizacion']);
+
+// muestra catalogo de materiales al usuario admmin que hace requisiciones para ver que pedir
+Route::get('/admin/ver/materiales/admin/requisicion/{id}', [ProyectoController::class,'verCatalogoMaterialRequisicion']);
+
 
 // --- VISTA COTIZACIONES PENDIENTES ---
 Route::get('/admin/cotizacion/pendiente/index', [CotizacionController::class,'indexPendiente'])->name('cotizaciones.pendientes.index');
