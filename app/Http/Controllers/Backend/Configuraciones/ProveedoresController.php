@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Backend\Configuraciones;
 
 use App\Http\Controllers\Controller;
+use App\Models\P_AnioPresupuesto;
+use App\Models\P_Departamento;
+use App\Models\P_UnidadMedida;
 use App\Models\Proveedores;
 use App\Models\Rubro;
 use Illuminate\Http\Request;
@@ -15,13 +18,11 @@ class ProveedoresController extends Controller
     }
 
     public function index(){
-
         return view('backend.admin.configuraciones.proveedores.vistaproveedor');
     }
 
     public function tabla(){
         $lista = Proveedores::orderBy('nombre', 'ASC')->get();
-
         return view('backend.admin.configuraciones.proveedores.tablaproveedor', compact('lista'));
     }
 
@@ -171,6 +172,222 @@ class ProveedoresController extends Controller
             return ['success' => 2];
         }
     }
+
+
+    // ******************  PRESUPUESTO DE LOS DEPARTAMENTOS  *******************************
+
+    public function indexAnioPresupuesto(){
+        return view('backend.admin.presupuestounidad.configuracion.aniopresupuesto.vistaaniopresupuesto');
+    }
+
+    public function tablaAnioPresupuesto(){
+        $lista = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+        return view('backend.admin.presupuestounidad.configuracion.aniopresupuesto.tablaaniopresupuesto', compact('lista'));
+    }
+
+    public function nuevoAnioPresupuesto(Request $request){
+        $regla = array(
+            'nombre' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        $dato = new P_AnioPresupuesto();
+        $dato->nombre = $request->nombre;
+
+        if($dato->save()){
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+
+    }
+
+    public function informacionAnioPresupuesto(Request $request){
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($lista = P_AnioPresupuesto::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'lista' => $lista];
+        }else{
+            return ['success' => 2];
+        }
+
+    }
+
+    public function editarAnioPresupuesto(Request $request){
+        $regla = array(
+            'id' => 'required',
+            'nombre' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(P_AnioPresupuesto::where('id', $request->id)->first()){
+
+            P_AnioPresupuesto::where('id', $request->id)->update([
+                'nombre' => $request->nombre,
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+    //*************************************************
+
+    public function indexDepartamentos(){
+        return view('backend.admin.presupuestounidad.configuracion.departamentos.vistadepartamentopresupuesto');
+    }
+
+    public function tablaDepartamentos(){
+        $lista = P_Departamento::orderBy('nombre', 'ASC')->get();
+        return view('backend.admin.presupuestounidad.configuracion.departamentos.tabladepartamentopresupuesto', compact('lista'));
+    }
+
+    public function nuevoDepartamentos(Request $request){
+        $regla = array(
+            'nombre' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        $dato = new P_Departamento();
+        $dato->nombre = $request->nombre;
+
+        if($dato->save()){
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+
+    }
+
+    public function informacionDepartamentos(Request $request){
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($lista = P_Departamento::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'lista' => $lista];
+        }else{
+            return ['success' => 2];
+        }
+
+    }
+
+    public function editarDepartamentos(Request $request){
+        $regla = array(
+            'id' => 'required',
+            'nombre' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(P_Departamento::where('id', $request->id)->first()){
+
+            P_Departamento::where('id', $request->id)->update([
+                'nombre' => $request->nombre,
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+    ///*********************************************************************
+
+
+    public function indexUnidadMedida(){
+        return view('backend.admin.presupuestounidad.configuracion.unidadmedida.vistaunidadmedida');
+    }
+
+    public function tablaUnidadMedida(){
+        $lista = P_UnidadMedida::orderBy('nombre', 'ASC')->get();
+        return view('backend.admin.presupuestounidad.configuracion.unidadmedida.tablaunidadmedida', compact('lista'));
+    }
+
+    public function nuevoUnidadMedida(Request $request){
+        $regla = array(
+            'nombre' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        $dato = new P_UnidadMedida();
+        $dato->nombre = $request->nombre;
+
+        if($dato->save()){
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    public function informacionUnidadMedida(Request $request){
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($lista = P_UnidadMedida::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'lista' => $lista];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    public function editarUnidadMedida(Request $request){
+        $regla = array(
+            'id' => 'required',
+            'nombre' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(P_UnidadMedida::where('id', $request->id)->first()){
+
+            P_UnidadMedida::where('id', $request->id)->update([
+                'nombre' => $request->nombre,
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
 
 
 

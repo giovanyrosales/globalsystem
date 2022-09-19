@@ -404,6 +404,50 @@
                 </li>
                 @endcan
 
+
+
+
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Modificando
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('p.admin.anio.presupuesto.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Año Presupuesto</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('p.admin.departamentos.presupuesto.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Departamentos</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('p.admin.unidadmedida.presupuesto.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Unidad Medida</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+
+
+
+
+
+
             </ul>
         </nav>
 

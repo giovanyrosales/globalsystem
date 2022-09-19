@@ -383,6 +383,30 @@ Route::post('/admin/requerimientos/informacion', [CotizacionController::class, '
 Route::post('/admin/requerimientos/cotizacion/guardar', [CotizacionController::class, 'guardarNuevaCotizacion']);*/
 
 
+// ****************** PRESUPUESTO DE UNIDADES ***********************
+
+// --- AÑO DE PRESUPUESTO ---
+Route::get('/admin/p/anio/presupuesto/index', [ProveedoresController::class,'indexAnioPresupuesto'])->name('p.admin.anio.presupuesto.index');
+Route::get('/admin/p/anio/presupuesto/tabla', [ProveedoresController::class,'tablaAnioPresupuesto']);
+Route::post('/admin/p/anio/presupuesto/nuevo', [ProveedoresController::class, 'nuevoAnioPresupuesto']);
+Route::post('/admin/p/anio/presupuesto/informacion', [ProveedoresController::class, 'informacionAnioPresupuesto']);
+Route::post('/admin/p/anio/presupuesto/editar', [ProveedoresController::class, 'editarAnioPresupuesto']);
+
+// --- NOMBRE DE LOS DEPARTAMENTOS / UNIDAES ---
+Route::get('/admin/p/departamentos/index', [ProveedoresController::class,'indexDepartamentos'])->name('p.admin.departamentos.presupuesto.index');
+Route::get('/admin/p/departamentos/tabla', [ProveedoresController::class,'tablaDepartamentos']);
+Route::post('/admin/p/departamentos/nuevo', [ProveedoresController::class, 'nuevoDepartamentos']);
+Route::post('/admin/p/departamentos/informacion', [ProveedoresController::class, 'informacionDepartamentos']);
+Route::post('/admin/p/departamentos/editar', [ProveedoresController::class, 'editarDepartamentos']);
+
+
+// --- UNIDAD DE MEDIDA ---
+Route::get('/admin/p/unidadmedida/index', [ProveedoresController::class,'indexUnidadMedida'])->name('p.admin.unidadmedida.presupuesto.index');
+Route::get('/admin/p/unidadmedida/tabla', [ProveedoresController::class,'tablaUnidadMedida']);
+Route::post('/admin/p/unidadmedida/nuevo', [ProveedoresController::class, 'nuevoUnidadMedida']);
+Route::post('/admin/p/unidadmedida/informacion', [ProveedoresController::class, 'informacionUnidadMedida']);
+Route::post('/admin/p/unidadmedida/editar', [ProveedoresController::class, 'editarUnidadMedida']);
+
 
 
 
