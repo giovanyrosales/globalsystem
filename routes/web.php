@@ -121,6 +121,8 @@ Route::get('/admin/proyecto/vista/requisicion/{id}', [ProyectoController::class,
 Route::post('/admin/proyecto/vista/requisicion/nuevo', [ProyectoController::class, 'nuevoRequisicion']);
 Route::post('/admin/proyecto/vista/requisicion/informacion', [ProyectoController::class, 'informacionRequisicion']);
 Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::class, 'editarRequisicion']);
+Route::post('/admin/proyecto/requisicion/borrar/todo', [ProyectoController::class, 'borrarRequisicion']);
+
 
 // --- REQUISICION desde UNIDAD ---
 //Route::get('/admin/departamento/vista/requisicion/{id}', [RequerimientoController::class,'tablaDepartamentoListaRequisicion']);
@@ -128,7 +130,7 @@ Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::cla
 //Route::post('/admin/departamento/vista/requisicion/informacion', [RequerimientoController::class, 'informacionRequisicion']);
 //Route::post('/admin/departamento/vista/requisicion/editar', [RequerimientoController::class, 'editarRequisicion']);
 
-// --- REQUERIMIENTOS de unidad desde uaci ---
+// --- REQUERIMIENTOS PRESUPUESTO INGENIERIA para unidad de uaci ---
 Route::get('/admin/listar/requerimientos/index', [CotizacionController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientos.index');
 Route::get('/admin/listar/requerimientos/tabla', [CotizacionController::class,'indexTablaListarRequerimientos']);
 Route::get('/admin/requerimientos/listado/{id}', [CotizacionController::class,'listadoRequerimientoPorProyecto']);
@@ -373,13 +375,12 @@ Route::post('/admin/objespecifico/editar', [CodigoEspecifController::class, 'edi
 
 
 // --- REQUERIMIENTOS ---
-Route::get('/admin/listar/requerimientos/index', [CotizacionController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientos.index');
+/*Route::get('/admin/listar/requerimientos/index', [CotizacionController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientos.index');
 Route::get('/admin/listar/requerimientos/tabla', [CotizacionController::class,'indexTablaListarRequerimientos']);
 Route::get('/admin/requerimientos/listado/{id}', [CotizacionController::class,'listadoRequerimientoPorProyecto']);
 Route::get('/admin/requerimientos/listado/tabla/{id}', [CotizacionController::class,'tablaRequerimientosIndividual']);
 Route::post('/admin/requerimientos/informacion', [CotizacionController::class, 'informacionRequerimiento']);
-Route::post('/admin/requerimientos/verificar', [CotizacionController::class, 'verificarRequerimiento']);
-Route::post('/admin/requerimientos/cotizacion/guardar', [CotizacionController::class, 'guardarNuevaCotizacion']);
+Route::post('/admin/requerimientos/cotizacion/guardar', [CotizacionController::class, 'guardarNuevaCotizacion']);*/
 
 
 

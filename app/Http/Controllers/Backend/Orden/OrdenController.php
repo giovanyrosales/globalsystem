@@ -90,9 +90,9 @@ class OrdenController extends Controller
                 }
 
                 // buscar codigo para descontar
-                if($data = DB::table('presupuesto AS p')
+                /*if($data = DB::table('presupuesto AS p')
                     ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
-                    ->select('p.id', 'p.saldo')
+                    ->select('p.id', 'p.saldo_inicial')
                     ->where('p.proyecto_id', $infoRequisicion->id_proyecto)
                     ->where('obj.codigo', $dd->cod_presup)
                     ->first()){
@@ -103,14 +103,14 @@ class OrdenController extends Controller
                     Presupuesto::where('id', $data->id)->update([
                         'saldo' => $resta,
                     ]);
-                }
+                }*/
             }
 
             DB::commit();
             return ['success' => 1, 'id' => $or->id];
 
         }catch(\Throwable $e){
-           // Log::info('error: ' . $e);
+            Log::info('error: ' . $e);
             DB::rollback();
             return ['success' => 2];
         }

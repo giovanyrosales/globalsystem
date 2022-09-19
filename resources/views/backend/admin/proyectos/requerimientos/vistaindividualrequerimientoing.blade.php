@@ -69,6 +69,7 @@
                                     <div class="form-group">
                                         <label>Destino</label>
                                         <input type="text" class="form-control" id="destino" disabled>
+                                        <!-- ES EL ID DE REQUISICION -->
                                         <input id="idcotizar" type="hidden" class="form-control">
                                     </div>
                                     <div class="form-group">
@@ -140,7 +141,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Detalles Cotizacion</h4>
+                    <h4 class="modal-title">Detalle Cotización</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -220,6 +221,7 @@
     <script>
 
         function recargar(){
+            let id = {{ $id }};
             var ruta = "{{ URL::to('/admin/requerimientos/listado/tabla') }}/"+id;
             $('#tablaDatatable').load(ruta);
         }
@@ -241,6 +243,7 @@
 
                     if(response.data.success === 1){
                         $('#modalCotizar').modal('show');
+                        // ID: es el id de REQUISICION
                         $('#idcotizar').val(id);
                         $('#destino').val(response.data.info.destino);
                         $('#necesidad').val(response.data.info.necesidad);
@@ -248,6 +251,7 @@
                         var fecha = new Date();
                         document.getElementById('fecha-cotizacion').value = fecha.toJSON().slice(0,10);
 
+                        // ID ES DE: REQUISICION_DETALLE
                         $.each(response.data.listado, function( key, val ){
                             $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.nombre+'</option>');
                         });
@@ -266,19 +270,27 @@
         function detalleCotizacion(){
 
             var fecha = document.getElementById('fecha-cotizacion').value;
-            $("#matriz-requisicion tbody tr").remove();
+            var proveedor = document.getElementById('select-proveedor').value;
 
             if(fecha === ''){
                 toastr.error('Fecha es requerido');
                 return;
             }
 
+            if(proveedor === ''){
+                toastr.error('Proveedor es requerido');
+                return;
+            }
+
+            $("#matriz-requisicion tbody tr").remove();
+
             var formData = new FormData();
             var hayLista = true;
 
             $("#mySideToSideSelect_to option").each(function(){
                 hayLista = false;
-                formData.append('lista[]', $(this).val());
+                let dato = $(this).val();
+                formData.append('lista[]', dato);
             });
 
             if(hayLista){
@@ -306,7 +318,24 @@
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1){
+                    if(response.data.success === 1) {
+
+                        Swal.fire({
+                            title: 'Material Borrado',
+                            text: "Un Material a Cotizar o el Requerimiento fue borrado por el Administrador.",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Recargar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
 
                         var infodetalle = response.data.lista;
 
@@ -331,11 +360,11 @@
                                 "</td>"+
 
                                 "<td>"+
-                                "<input value='"+infodetalle[i].pu+"' disabled class='form-control'>"+
+                                "<input value='$"+infodetalle[i].pu+"' disabled class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
-                                "<input value='"+infodetalle[i].multiTotal+"' disabled class='form-control'>"+
+                                "<input value='$"+infodetalle[i].multiTotal+"' disabled class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
@@ -368,11 +397,15 @@
                             "</td>"+
 
                             "<td>"+
-                            "<input value='"+response.data.totalPrecio+"' disabled class='form-control'>"+
+                            "<input value='$"+response.data.totalPrecio+"' disabled class='form-control'>"+
                             "</td>"+
 
                             "<td>"+
-                            "<input value='"+response.data.totalMulti+"' disabled class='form-control'>"+
+                            "<input value='$"+response.data.totalMulti+"' disabled class='form-control'>"+
+                            "</td>"+
+
+                            "<td>"+
+                            "<input value='' disabled class='form-control'>"+
                             "</td>"+
 
                             "</tr>";
@@ -416,8 +449,10 @@
             var formData = new FormData();
             formData.append('fecha', fecha);
             formData.append('proveedor', proveedor);
+            // ES EL ID DE REQUISICION
             formData.append('idcotizar', $('#idcotizar').val());
 
+            // EN LA LISTA VA EL ID: REQUISICION_DETALLE
             $("#mySideToSideSelect_to option").each(function(){
                 hayLista = false;
                 formData.append('lista[]', $(this).val());
@@ -432,13 +467,45 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'Material Fue Borrado',
+                            text: "El Administrador elimino el Material a Cotizar",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    if(response.data.success === 2){
+                        Swal.fire({
+                            title: 'Material Ya Cotizado',
+                            text: "Un Material ya había sido Cotizado.",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 3){
                         $('#modalCotizar').modal('hide');
                         $('#modalDetalle').modal('hide');
 
                         recargar();
 
-                        toastr.success('guardado');
-                    }else{
+                        toastr.success('Cotización Guardada');
+                    }
+                    else{
                         toastr.error('Error al guardar');
                     }
                 })

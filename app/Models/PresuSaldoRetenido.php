@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Proveedores extends Model
+class PresuSaldoRetenido extends Model
 {
     use HasFactory;
-    protected $table = 'proveedores';
+    protected $table = 'presupuesto_saldo_retenido';
     public $timestamps = false;
 
 }

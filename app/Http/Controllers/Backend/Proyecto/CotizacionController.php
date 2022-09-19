@@ -30,7 +30,7 @@ class CotizacionController extends Controller
 
     public function indexPendiente(){
 
-        return view('Backend.Admin.Cotizaciones.Pendiente.vistaCotizacionPendiente');
+        return view('backend.admin.proyectos.cotizaciones.pendiente.vistacotizacionpendienteing');
     }
 
     public function indexPendienteTabla(){
@@ -51,7 +51,7 @@ class CotizacionController extends Controller
             $dd->codigoproyecto = $infoProyecto->codigo;
         }
 
-        return view('Backend.Admin.Cotizaciones.Pendiente.tablaCotizacionPendiente', compact('lista'));
+        return view('backend.admin.proyectos.cotizaciones.pendiente.tablacotizacionpendienteing', compact('lista'));
     }
 
     public function indexCotizacion($id){ // id de cotizacion
@@ -93,7 +93,7 @@ class CotizacionController extends Controller
         $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
         $totalTotal = number_format((float)$totalTotal, 2, '.', ',');
 
-        return view('Backend.Admin.Cotizaciones.Individual.vistaCotizacionIndividual', compact('id', 'info',
+        return view('backend.admin.proyectos.cotizaciones.individual.vistacotizacionindividualing', compact('id', 'info',
             'proveedor', 'detalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
     }
 
@@ -118,7 +118,7 @@ class CotizacionController extends Controller
     public function indexAutorizadas(){
         $contrato = Administradores::orderBy('nombre')->get();
 
-        return view('Backend.Admin.Cotizaciones.Procesada.vistaCotizacionProcesada', compact('contrato'));
+        return view('backend.admin.proyectos.cotizaciones.procesada.vistacotizacionprocesadaing', compact('contrato'));
     }
 
     public function indexAutorizadasTabla(){
@@ -157,11 +157,11 @@ class CotizacionController extends Controller
             }
         }
 
-        return view('Backend.Admin.Cotizaciones.Procesada.tablaCotizacionProcesada', compact('lista'));
+        return view('backend.admin.proyectos.cotizaciones.procesada.tablacotizacionprocesadaing', compact('lista'));
     }
 
     public function indexDenegadas(){
-        return view('Backend.Admin.Cotizaciones.Denegadas.vistaCotizacionDenegada');
+        return view('backend.admin.proyectos.cotizaciones.denegadas.vistacotizaciondenegadaing');
     }
 
     public function indexDenegadasTabla(){
@@ -181,12 +181,12 @@ class CotizacionController extends Controller
             $dd->codigoproyecto = $infoProyecto->codigo;
         }
 
-        return view('Backend.Admin.Cotizaciones.Denegadas.tablaCotizacionDenegada', compact('lista'));
+        return view('backend.admin.proyectos.cotizaciones.denegadas.tablacotizaciondenegadaing', compact('lista'));
     }
 
     // vista listar requerimientos para que sea visible para UACI
     public function indexListarRequerimientos(){
-        return view('Backend.Admin.requerimientos.vistarequerimientos');
+        return view('backend.admin.proyectos.requerimientos.vistarequerimientosing');
     }
 
     public function indexTablaListarRequerimientos(){
@@ -212,7 +212,7 @@ class CotizacionController extends Controller
             $ll->fecha = date("d-m-Y", strtotime($ll->fecha));
         }
 
-        return view('Backend.Admin.requerimientos.tablarequerimientos', compact('lista'));
+        return view('backend.admin.proyectos.requerimientos.tablarequerimientosing', compact('lista'));
     }
 
     // mostrar la vista de requerimientos pendiente para x proyecto
@@ -220,7 +220,7 @@ class CotizacionController extends Controller
 
         $proveedores = Proveedores::orderBy('nombre')->get();
 
-        return view('Backend.Admin.requerimientos.vistaindividualrequerimiento', compact('id', 'proveedores'));
+        return view('backend.admin.proyectos.requerimientos.vistaindividualrequerimientoing', compact('id', 'proveedores'));
     }
 
     public function tablaRequerimientosIndividual($id){
@@ -244,7 +244,7 @@ class CotizacionController extends Controller
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
         }
 
-        return view('Backend.Admin.requerimientos.tablaindividualrequerimiento', compact('lista'));
+        return view('backend.admin.proyectos.requerimientos.tablaindividualrequerimientoing', compact('lista'));
     }
 
     public function informacionRequerimiento(Request $request){
@@ -277,10 +277,21 @@ class CotizacionController extends Controller
         }
     }
 
-    // obtener listado de materiales de requisicion, para mostrar detalle
+    // obtener listado de materiales de requisición, para mostrar detalle a UACI
     public function verificarRequerimiento(Request $request){
 
-        $lista = RequisicionDetalle::whereIn('requisicion_id', $request->lista)
+        // La lista de ID que llega son de requisicion_detalle
+
+        // VERIFICAR QUE EXISTAN TODOS LOS MATERIALES A COTIZAR EN REQUISICIÓN DETALLE
+        for ($i = 0; $i < count($request->lista); $i++) {
+
+            // SI NO LA ENCUENTRA, EL ADMINISTRADOR BORRO EL MATERIAL A COTIZAR
+            if(!RequisicionDetalle::where('id', $request->lista[$i])->first()){
+                return ['success' => 1];
+            }
+        }
+
+        $info = RequisicionDetalle::whereIn('id', $request->lista)
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -288,8 +299,7 @@ class CotizacionController extends Controller
         $totalPrecio = 0;
         $totalMulti = 0;
 
-        foreach ($lista as $dd){
-
+        foreach ($info as $dd){
             $infoCatalogo = CatalogoMateriales::where('id', $dd->material_id)->first();
             $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
             $infoCodigo = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
@@ -312,7 +322,7 @@ class CotizacionController extends Controller
         $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
         $totalMulti = number_format((float)$totalMulti, 2, '.', ',');
 
-        return ['success' => 1, 'lista' => $lista,
+        return ['success' => 2, 'lista' => $info,
             'totalCantidad' => $totalCantidad,
             'totalPrecio' => $totalPrecio,
             'totalMulti' => $totalMulti];
@@ -325,19 +335,35 @@ class CotizacionController extends Controller
 
         try {
 
+            // VERIFICAR QUE EXISTAN TODOS LOS MATERIALES A COTIZAR EN REQUISICIÓN DETALLE
+            for ($i = 0; $i < count($request->lista); $i++) {
+
+                // SI NO LA ENCUENTRA, EL ADMINISTRADOR BORRO EL MATERIAL A COTIZAR
+                if(!RequisicionDetalle::where('id', $request->lista[$i])->first()){
+                    return ['success' => 1];
+                }
+            }
+
             // crear cotizacion
             $coti = new Cotizacion();
             $coti->proveedor_id = $request->proveedor;
             $coti->requisicion_id = $request->idcotizar;
             $coti->fecha = $request->fecha;
+            $coti->fecha_estado = null;
             $coti->estado = 0;
             $coti->save();
 
-            $lista = RequisicionDetalle::whereIn('requisicion_id', $request->lista)
+            $lista = RequisicionDetalle::whereIn('id', $request->lista)
                 ->orderBy('id', 'ASC')
                 ->get();
 
             foreach ($lista as $dd){
+
+                if(CotizacionDetalle::where('id_requidetalle', $dd->id)
+                    ->first()){
+                    // YA ESTABA UN MATERIAL COTIZADO
+                    return ['success' => 2];
+                }
 
                 $infoCatalogo = CatalogoMateriales::where('id', $dd->material_id)->first();
                 $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
@@ -345,6 +371,7 @@ class CotizacionController extends Controller
 
                 $detalle = new CotizacionDetalle();
                 $detalle->cotizacion_id = $coti->id;
+                $detalle->id_requidetalle = $dd->id;
                 $detalle->material_id = $dd->material_id;
                 $detalle->nombre = $infoCatalogo->nombre;
                 $detalle->medida = $infoUnidad->medida;
@@ -361,11 +388,11 @@ class CotizacionController extends Controller
             }
 
             DB::commit();
-            return ['success' => 1];
+            return ['success' => 3];
         }catch(\Throwable $e){
-
+            //Log::info('ee' . $e);
             DB::rollback();
-            return ['success' => 2];
+            return ['success' => 99];
         }
     }
 
@@ -410,7 +437,7 @@ class CotizacionController extends Controller
         $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
         $totalTotal = number_format((float)$totalTotal, 2, '.', ',');
 
-        return view('Backend.Admin.Cotizaciones.Individual.vistacotizaciondetalle', compact('id', 'info',
+        return view('backend.admin.proyectos.cotizaciones.individual.vistacotizaciondetalleing', compact('id', 'info',
             'proveedor', 'detalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
     }
 

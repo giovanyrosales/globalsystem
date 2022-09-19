@@ -86,7 +86,7 @@
                                     <div class="row">
                                         <div class="form-group col-md-6">
                                             <label class="col-md-12">Hora de la acta</label>
-                                            <input class="col-md-6" type="time" id="horaacta" min="09:00" max="18:00" value="<?php echo date('h:i'); ?>">
+                                            <input class="col-md-6" type="time" id="horaacta" value="<?php echo date('h:i'); ?>">
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>Fecha de la Acta</label>
@@ -106,9 +106,6 @@
             </div>
         </div>
     </div>
-
-
-
 
 </div>
 

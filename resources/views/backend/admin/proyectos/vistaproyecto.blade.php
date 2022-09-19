@@ -420,13 +420,7 @@
                                     <textarea class="form-control" id="necesidad-requisicion-editar" maxlength="15000" rows="2"></textarea>
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <div class="form-group">
-                                    <br>
-                                    <button type="button" onclick="addAgregarFilaNuevaEditar()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
-                                        <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
-                                </div>
-                            </div>
+
                         </div>
                         <div class="row">
                             <table class="table" id="matriz-requisicion-editar"  data-toggle="table">
@@ -830,7 +824,7 @@
                 "</td>"+
 
                 "<td>"+
-                "<input name='descripcionarray[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterialRequisicon(this)' maxlength='400'  type='text'>"+
+                "<input name='descripcionarray[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterialRequisicion(this)' maxlength='400'  type='text'>"+
                 "<div class='droplista' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
                 "</td>"+
 
@@ -841,36 +835,6 @@
                 "</tr>";
 
             $("#matriz-requisicion tbody").append(markup);
-        }
-
-        function addAgregarFilaNuevaEditar(){
-
-            var nFilas = $('#matriz-requisicion-editar >tbody >tr').length;
-            nFilas += 1;
-
-            // el id 0 significa que sera un nuevo registro a la hora de editar
-            var markup = "<tr id='0'>"+
-
-                "<td>"+
-                "<p id='fila"+(nFilas)+"' class='form-control' style='max-width: 65px'>"+(nFilas)+"</p>"+
-                "</td>"+
-
-                "<td>"+
-                "<input name='cantidadarrayeditar[]' maxlength='10' class='form-control' type='number'>"+
-                "</td>"+
-
-                "<td>"+
-                "<input name='descripcionarrayeditar[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterialEditar(this)' maxlength='400'  type='text'>"+
-                "<div class='droplistaeditar' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
-                "</td>"+
-
-                "<td>"+
-                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
-                "</td>"+
-
-                "</tr>";
-
-            $("#matriz-requisicion-editar tbody").append(markup);
         }
 
         // borrar fila para tabla nueva requisicion material
@@ -963,9 +927,7 @@
         function verModalRequisicion(){
             document.getElementById("formulario-requisicion-nuevo").reset();
 
-            let nombre = "{{ $proyecto->nombre }}";
-            $("#destino-requisicion-nuevo").val(nombre);
-
+            colorBlancoTablaRequisicion();
             $('#modalAgregarRequisicion').css('overflow-y', 'auto');
             $('#modalAgregarRequisicion').modal({backdrop: 'static', keyboard: false})
         }
@@ -1317,14 +1279,24 @@
                     else if(response.data.success === 3){
 
                         let fila = response.data.fila;
-                        let disponible = response.data.disponible;
-                        let obj = response.data.obj;
+                        let disponibleFormat = response.data.disponibleFormat;
+                        let retenidoFormat = response.data.retenidoFormat;
+                        let obj = response.data.obj; // codigo especifico
+                        let retenido = response.data.retenido;
 
                         colorRojoTablaRequisicion(fila);
 
+                        var texto = '';
+                        if(retenido > 0){
+                            texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj +
+                                ", Tiene Saldo Disponible $" + disponibleFormat + ", y Saldo RETENIDO $" + retenidoFormat;
+                        }else{
+                            texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj + ", Tiene Saldo Disponible $" + disponibleFormat;
+                        }
+
                         Swal.fire({
                             title: 'Cantidad No Disponible',
-                            text: "Fila #" + (fila+1) + ", el objeto específico de código: " + obj + ", tiene Saldo disponible $" + disponible,
+                            text: texto,
                             icon: 'info',
                             showCancelButton: false,
                             confirmButtonColor: '#28a745',
@@ -1400,6 +1372,10 @@
                         $('#necesidad-requisicion-editar').val(response.data.info.necesidad);
 
                         var infodetalle = response.data.detalle;
+
+
+                        // VERIFICAMOS SI PODEMOS BORRAR EL MATERIAL SINO HA SIDO COTIZADO.
+                        // QUITAMOS EL BOTON BORRAR
                         for (var i = 0; i < infodetalle.length; i++) {
 
                             var markup = "<tr id='"+infodetalle[i].id+"'>"+
@@ -1415,13 +1391,18 @@
                                 "<td>"+
                                 "<input name='descripcionarrayeditar[]' disabled class='form-control' data-info='"+infodetalle[i].material_id+"' value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
                                 "<div class='droplistaeditar' style='position: absolute; z-index: 9;'></div>"+
-                                "</td>"+
+                                "</td>";
 
-                                "<td>"+
-                                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
-                                "</td>"+
+                                if(infodetalle[i].cotizado){
+                                    markup += "<td>"+
+                                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
+                                    "</td>"+
 
-                                "</tr>";
+                                    "</tr>";
+                                }else{
+                                    markup += "<td></td>"+
+                                        "</tr>";
+                                }
 
                             $("#matriz-requisicion-editar tbody").append(markup);
                         }
@@ -1472,7 +1453,10 @@
             var nRegistro = $('#matriz-requisicion-editar >tbody >tr').length;
             let formData = new FormData();
 
-            if (nRegistro > 0){
+            if (nRegistro <= 0){
+                toastr.error('Detalle Requisición es requerida');
+                return;
+            }
 
                 var cantidad = $("input[name='cantidadarrayeditar[]']").map(function(){return $(this).val();}).get();
                 var descripcion = $("input[name='descripcionarrayeditar[]']").map(function(){return $(this).val();}).get();
@@ -1541,11 +1525,7 @@
                     formData.append('cantidad[]', cantidad[p]);
                 }
 
-                hayRegistro = 1;
-            }
-
             openLoading();
-            formData.append('hayregistro', hayRegistro);
             formData.append('fecha', fecha);
             formData.append('destino', destino);
             formData.append('necesidad', necesidad);
@@ -2648,7 +2628,66 @@
             $('#modalCatalogoMaterial').modal('show');
         }
 
+        // preguntar si quiere borrar una requisicion, solo aparece el boton, sino ha sido
+        // cotizado ningun de sus materiales
+        function modalBorrarRequisicion(id){
+            Swal.fire({
+                title: 'Borrar Requisición',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    borrarRequisicion(id);
+                }
+            })
+        }
 
+        function borrarRequisicion(id){
+
+            openLoading();
+            let formData = new FormData();
+            formData.append('id', id);
+
+            axios.post(url+'/proyecto/requisicion/borrar/todo', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        Swal.fire({
+                            title: 'Ya hay Cotización',
+                            text: "Uno o todos los materiales ya tiene una cotización",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // quitara el boton borrar de la requisición
+                                recargarRequisicion();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
+                     // cotización borrada
+                        toastr.success('Cotización Borrada');
+                        recargarRequisicion();
+                    }
+                    else{
+                        toastr.error('error al borrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al borrar');
+                    closeLoading();
+                });
+        }
 
     </script>
 

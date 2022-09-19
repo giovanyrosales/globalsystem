@@ -23,7 +23,7 @@ class CreateCotizacionTable extends Migration
             $table->date('fecha');
 
             // fecha cuando se modifica su estado
-            $table->dateTime('fecha_estado');
+            $table->dateTime('fecha_estado')->nullable();
 
             // 0: defecto
             // 1: aprobada por jefe uaci

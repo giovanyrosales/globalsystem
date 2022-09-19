@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreatePresupuestoDetalleTable extends Migration
 {
     /**
-     * Run the migrations.
+     * ESTA ES CREADA AL GENERAR ORDEN DE COMPRA
      *
      * @return void
      */
@@ -19,7 +19,12 @@ class CreatePresupuestoDetalleTable extends Migration
             //0 salida
             //1 entrada
             $table->boolean('tipo');
-            $table->decimal('dinero', 10,2);
+
+            //0: LA ORDEN DE COMPRA ES VALIDA.
+            //1: LA ORDEN DE COMPRA FUE CANCELADA
+
+            $table->integer('estado');
+
 
             $table->foreign('presupuesto_id')->references('id')->on('presupuesto');
         });

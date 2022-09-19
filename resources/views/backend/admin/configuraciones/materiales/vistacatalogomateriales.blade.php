@@ -414,6 +414,11 @@
         }
 
         function informacion(id){
+
+            document.getElementById("select-codigo-editar").disabled = false;
+            document.getElementById("nombre-editar").disabled = false;
+            document.getElementById("select-unidad-editar").disabled = false;
+
             openLoading();
             document.getElementById("formulario-editar").reset();
 
@@ -476,6 +481,13 @@
                                 $('#select-class-editar').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
                             }
                         });
+
+                        // BLOQUEAR SI EN PARTIDA_DETALLE YA ESTA ESTE MATERIAL
+                        if(response.data.bloqueo){
+                            document.getElementById("select-codigo-editar").disabled = true;
+                            document.getElementById("nombre-editar").disabled = true;
+                            document.getElementById("select-unidad-editar").disabled = true;
+                        }
 
                     }else{
                         toastr.error('Información no encontrada');
@@ -558,16 +570,29 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
-                        toastr.success('Actualizado correctamente');
-                        $('#modalEditar').modal('hide');
-                        recargar();
+                        // UN DATO CAMBIO Y NO TENDRÍA QUE HABER CAMBIADO
+
+                        Swal.fire({
+                            title: 'Material Bloqueado',
+                            text: "La información no puede ser Actualizada porque ya esta utilizado en una Partida",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
                     }
-                    else if(response.data.success === 3){
+                    else if(response.data.success === 2){
                         Swal.fire({
                             title: 'Material Repetido',
                             text: "El objeto específico, la clasificación, el nombre, y la unidad de medida están repetidos",
                             icon: 'info',
                             showCancelButton: false,
+                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
@@ -575,6 +600,11 @@
 
                             }
                         })
+                    }
+                    else if(response.data.success === 3){
+                        toastr.success('Actualizado correctamente');
+                        $('#modalEditar').modal('hide');
+                        recargar();
                     }
                     else {
                         toastr.error('Error al registrar');

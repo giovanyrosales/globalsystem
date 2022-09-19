@@ -83,8 +83,8 @@
                                     <td><p id="fila{{$dd->conteo}}" class='form-control'>{{$dd->conteo}}</p></td>
                                     <td><input disabled class="form-control" value="{{$dd->cantidad}}"></td>
                                     <td><input disabled class="form-control" type="text" value="{{$dd->descripcion}}"></td>
-                                    <td><input disabled class="form-control" value="{{$dd->precio_u }}"></td>
-                                    <td><input disabled class="form-control" value="{{$dd->total }}"></td>
+                                    <td><input disabled class="form-control" value="${{$dd->precio_u }}"></td>
+                                    <td><input disabled class="form-control" value="${{$dd->total }}"></td>
                                     <td><input disabled class="form-control" value="{{$dd->cod_presup }}"></td>
                                 </tr>
                             @endforeach
@@ -93,8 +93,8 @@
                                 <td><p class='form-control'>Total</p></td>
                                 <td><input disabled class="form-control" type="text" value="{{$totalCantidad}}"></td>
                                 <td><input disabled class="form-control" type="text"></td>
-                                <td><input disabled class="form-control" value="{{$totalPrecio }}"></td>
-                                <td><input disabled class="form-control" value="{{$totalTotal }}"></td>
+                                <td><input disabled class="form-control" value="${{$totalPrecio }}"></td>
+                                <td><input disabled class="form-control" value="${{$totalTotal }}"></td>
                                 <td><input disabled class="form-control"></td>
                             </tr>
 
@@ -109,7 +109,7 @@
 
                         <div class="col-md-8">
                             <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
-                                <i title="Cancelar"></i> Cancelar </a>
+                                <i title="Cancelar"></i> Atras </a>
                         </div>
 
                         <div class="col-md-4" style="float: right">

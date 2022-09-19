@@ -41,7 +41,7 @@ class ControlController extends Controller
         }
 
         // JEFE UACI
-        else  if($user->hasRole('sidebar.estadisticas')){
+        else  if($user->hasRole('jefeuaci')){
             $ruta = 'admin.estadisticas.index';
         }
          // UACI UNIDAD

@@ -7,6 +7,7 @@ use App\Models\CatalogoMateriales;
 use App\Models\Clasificaciones;
 use App\Models\ObjEspecifico;
 use App\Models\Cuenta;
+use App\Models\PartidaDetalle;
 use App\Models\SoliMaterialIng;
 use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
@@ -113,7 +114,14 @@ class MaterialesController extends Controller
                 "idclasifi" => $lista->id_clasificacion
             ];
 
-            return ['success' => 1, 'registro' => $lista, 'clasificacion' => $arrayClasificacion,
+            // SI ESTE MATERIAL YA TIENE UN PRESUPUESTO NO SE PODRA EDITAR
+            // OBJETO ESPECIFICO, NOMBRE, UNIDAD MEDIDA
+            $bloqueo = false;
+            if(PartidaDetalle::where('material_id', $request->id)->first()){
+                $bloqueo = true;
+            }
+
+            return ['success' => 1, 'registro' => $lista, 'bloqueo' => $bloqueo, 'clasificacion' => $arrayClasificacion,
                 'unidad' => $arrayUnidad, 'codigo' => $arrayCodiEspec, 'arraydatos' => $arrayDatos];
         }else{
             return ['success' => 2];
@@ -132,15 +140,37 @@ class MaterialesController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
+        // VERIFICAR QUE LOS DATOS NO HAYAN CAMBIADO SI YA ESTABA AGREGADO EN UNA PARTIDA DETALLE
+        if(PartidaDetalle::where('material_id', $request->id)->first()){
+
+            $infoCatalogo = CatalogoMateriales::where('id', '=', $request->id)->first();
+
+            // MISMOS RETORNOS QUE UN DATO HA CAMBIADO
+
+            if($infoCatalogo->nombre !== $request->nombre){
+                return ['success' => 1];
+            }
+
+            if($infoCatalogo->id_objespecifico !== $request->codigo){
+                return ['success' => 1];
+            }
+
+            if($infoCatalogo->id_unidadmedida !== $request->unidad){
+                return ['success' => 1];
+            }
+        }
+
+        // VERIFICAR MATERIAL REPETIDO
         if(CatalogoMateriales::where('id', '!=', $request->id)
             ->where('id_objespecifico', $request->codigo)
             ->where('nombre', $request->nombre)
             ->where('id_unidadmedida', $request->unidad)
             ->where('id_clasificacion', $request->clasificacion)
             ->first()){
-            return ['success' => 3];
+            return ['success' => 2];
         }
 
+        // MATERIAL ACTUALIZADO
         CatalogoMateriales::where('id', $request->id)->update([
             'id_clasificacion' => $request->clasificacion,
             'id_unidadmedida' => $request->unidad,
@@ -149,7 +179,7 @@ class MaterialesController extends Controller
             'pu' => $request->precio
         ]);
 
-        return ['success' => 1];
+        return ['success' => 3];
     }
 
 

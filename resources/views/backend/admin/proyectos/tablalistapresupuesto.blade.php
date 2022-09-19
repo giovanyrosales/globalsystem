@@ -33,6 +33,8 @@
                                                 <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
                                             </button>
                                         @endif
+
+
                                     </td>
                                 </tr>
                             @endforeach

@@ -149,6 +149,11 @@
             var admin = document.getElementById('select-administrador').value;
             var idcoti = document.getElementById('id-coti').value;
 
+            if(admin === ''){
+                toastr.error('Seleccionar Administrador');
+                return;
+            }
+
             if(fecha === ''){
                 toastr.error('Fecha para es requerida');
                 return;

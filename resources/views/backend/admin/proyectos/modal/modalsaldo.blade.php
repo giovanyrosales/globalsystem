@@ -83,6 +83,7 @@
         <td width="30%">Objeto</td>
         <td width="20%">Saldo Inicial</td>
         <td width="20%">Saldo Restante</td>
+        <td width="20%">Saldo Retenido <i class="fas fa-question-circle" onclick="infoSaldoRetenido()"></i></td>
     </tr>
 
     @foreach($presupuesto as $dd)
@@ -92,6 +93,7 @@
             <td width="30%">{{ $dd->nombre }}</td>
             <td width="20%">${{ $dd->saldo_inicial }}</td>
             <td width="20%">${{ $dd->saldo_restante }}</td>
+            <td width="20%">${{ $dd->total_retenido }}</td>
         </tr>
 
     @endforeach
@@ -108,6 +110,26 @@
     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
 </div>
 
+<script>
+
+    function infoSaldoRetenido(){
+        Swal.fire({
+            title: 'Saldo Retenido',
+            text: "Se retiene el Saldo al hacer una requisición. Se libera el Saldo al borrar el requerimiento completo o un material",
+            icon: 'question',
+            showCancelButton: false,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Aceptar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+            }
+        })
+    }
+
+
+</script>
 
 </body>
 </html>

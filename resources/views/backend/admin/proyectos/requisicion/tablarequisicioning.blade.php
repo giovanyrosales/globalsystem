@@ -32,6 +32,16 @@
                                             <i class="fas fa-pen-alt" title="Editar"></i>&nbsp; Editar
                                         </button>
                                         @endcan
+
+                                        @can('boton.borrar.requisicion')
+                                            <!-- solo se borara si no hay ningún material cotizado -->
+                                            @if($dato->haycotizacion)
+                                                <button type="button" class="btn btn-danger btn-xs" onclick="modalBorrarRequisicion({{ $dato->id }})">
+                                                    <i class="fas fa-trash-alt" title="Borrar"></i>&nbsp; Borrar
+                                                </button>
+                                            @endif
+                                        @endcan
+
                                     </td>
                                 </tr>
                             @endforeach
