@@ -17,6 +17,7 @@ class CreateRequisicionDetalleTable extends Migration
             $table->bigInteger('material_id')->unsigned();
 
             $table->decimal('cantidad', 12, 2);
+            $table->decimal('dinero', 10, 2);
 
             //0: defecto
             //1: material cotizado

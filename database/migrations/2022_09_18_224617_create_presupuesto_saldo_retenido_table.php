@@ -16,9 +16,10 @@ class CreatePresupuestoSaldoRetenidoTable extends Migration
         Schema::create('presupuesto_saldo_retenido', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_requi_detalle')->unsigned();
-
+            $table->bigInteger('id_presupuesto')->unsigned();
 
             $table->foreign('id_requi_detalle')->references('id')->on('requisicion_detalle');
+            $table->foreign('id_presupuesto')->references('id')->on('presupuesto');
         });
     }
 

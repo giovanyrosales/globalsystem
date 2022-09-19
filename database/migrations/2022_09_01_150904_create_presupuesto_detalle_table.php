@@ -16,6 +16,8 @@ class CreatePresupuestoDetalleTable extends Migration
         Schema::create('presupuesto_detalle', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('presupuesto_id')->unsigned();
+            $table->bigInteger('id_requi_detalle')->unsigned();
+
             //0 salida
             //1 entrada
             $table->boolean('tipo');
@@ -25,8 +27,8 @@ class CreatePresupuestoDetalleTable extends Migration
 
             $table->integer('estado');
 
-
             $table->foreign('presupuesto_id')->references('id')->on('presupuesto');
+            $table->foreign('id_requi_detalle')->references('id')->on('requisicion_detalle');
         });
     }
 

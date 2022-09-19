@@ -17,6 +17,7 @@ class CreateCotizacionDetalleTable extends Migration
             $table->id();
 
             $table->bigInteger('cotizacion_id')->unsigned();
+            $table->bigInteger('id_requidetalle')->unsigned();
             $table->bigInteger('material_id')->unsigned();
 
             // copia de seguridad para nombre, en dado caso cambia algo en }
@@ -32,6 +33,7 @@ class CreateCotizacionDetalleTable extends Migration
             $table->integer('estado');
 
             $table->foreign('cotizacion_id')->references('id')->on('cotizacion');
+            $table->foreign('id_requidetalle')->references('id')->on('requisicion_detalle');
             $table->foreign('material_id')->references('id')->on('materiales');
         });
     }
