@@ -10,7 +10,6 @@
                                 <th style="width: 15%">Cod. Especifico</th>
                                 <th style="width: 20%">Nombre</th>
                                 <th style="width: 8%">Medida</th>
-                                <th style="width: 15%">Clasificación</th>
                                 <th style="width: 10%">Precio U.</th>
 
                                 <th style="width: 10%">Opciones</th>
@@ -21,9 +20,8 @@
                             @foreach($lista as $dato)
                                 <tr>
                                     <td>{{ $dato->objespecifico }}</td>
-                                    <td>{{ $dato->nombre }}</td>
+                                    <td>{{ $dato->descripcion }}</td>
                                     <td>{{ $dato->unidadmedida }}</td>
-                                    <td>{{ $dato->clasificacion }}</td>
                                     <td>${{ $dato->costo }}</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">

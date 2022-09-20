@@ -19,11 +19,11 @@ class CreatePMaterialesTable extends Migration
             $table->bigInteger('id_objespecifico')->nullable()->unsigned();
             $table->bigInteger('id_unidadmedida')->nullable()->unsigned();
 
-            $table->string('descripcion', 800);
+            $table->string('descripcion', 300);
             $table->decimal('costo', 10, 2);
 
             $table->foreign('id_objespecifico')->references('id')->on('obj_especifico');
-            $table->foreign('id_unidadmedida')->references('id')->on('unidad_medida');
+            $table->foreign('id_unidadmedida')->references('id')->on('p_unidadmedida');
         });
     }
 

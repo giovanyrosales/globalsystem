@@ -439,6 +439,13 @@
                                 </a>
                             </li>
 
+                            <li class="nav-item">
+                                <a href="{{ route('p.admin.materiales.presupuesto.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Catálogo de Materiales</p>
+                                </a>
+                            </li>
+
                         </ul>
                     </li>
 

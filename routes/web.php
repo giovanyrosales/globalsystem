@@ -399,7 +399,6 @@ Route::post('/admin/p/departamentos/nuevo', [ProveedoresController::class, 'nuev
 Route::post('/admin/p/departamentos/informacion', [ProveedoresController::class, 'informacionDepartamentos']);
 Route::post('/admin/p/departamentos/editar', [ProveedoresController::class, 'editarDepartamentos']);
 
-
 // --- UNIDAD DE MEDIDA ---
 Route::get('/admin/p/unidadmedida/index', [ProveedoresController::class,'indexUnidadMedida'])->name('p.admin.unidadmedida.presupuesto.index');
 Route::get('/admin/p/unidadmedida/tabla', [ProveedoresController::class,'tablaUnidadMedida']);
@@ -407,7 +406,12 @@ Route::post('/admin/p/unidadmedida/nuevo', [ProveedoresController::class, 'nuevo
 Route::post('/admin/p/unidadmedida/informacion', [ProveedoresController::class, 'informacionUnidadMedida']);
 Route::post('/admin/p/unidadmedida/editar', [ProveedoresController::class, 'editarUnidadMedida']);
 
-
+// --- CATALOGO DE MATERIALES PARA DEPARTAMENTOS ---
+Route::get('/admin/p/materiales/index', [ProveedoresController::class,'indexMaterialesPresupuesto'])->name('p.admin.materiales.presupuesto.index');
+Route::get('/admin/p/materiales/tabla/index', [ProveedoresController::class,'tablaMaterialesPresupuesto']);
+Route::post('/admin/p/materiales/nuevo', [ProveedoresController::class, 'nuevoMaterialesPresupuesto']);
+Route::post('/admin/p/materiales/informacion', [ProveedoresController::class, 'informacionMaterialesPresupuesto']);
+Route::post('/admin/p/materiales/editar', [ProveedoresController::class, 'editarMaterialesPresupuesto']);
 
 
 
