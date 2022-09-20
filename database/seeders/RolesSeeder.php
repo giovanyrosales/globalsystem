@@ -146,7 +146,5 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'boton.dinero.presupuesto', 'description' => 'boton para mostrar cuanto dinero le queda a un proyecto del presupuesto'])->syncRoles($roleAdministrador);
 
 
-
-
     }
 }

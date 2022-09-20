@@ -120,31 +120,6 @@
                         </ul>
                     </li>
                 @endcan
-                @can('sidebar.seccion.requerimientosunidad')
-                    <li class="nav-item">
-
-                        <a href="#" class="nav-link nav-">
-                            <i class="far fa-edit"></i>
-                            <p>
-                                Requerimientos de Unidad
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-
-                        <ul class="nav nav-treeview">
-
-                            @can('sidebar.requerimientosunidad.listar')
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.listar.requerimientosunidad.index') }}" target="frameprincipal" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Listar Requerimientos Unidad</p>
-                                    </a>
-                                </li>
-                            @endcan
-
-                        </ul>
-                    </li>
-                @endcan
 
                 @can('sidebar.seccion.cotizaciones')
                 <li class="nav-item">
@@ -233,6 +208,85 @@
 
                     </ul>
                 </li>  -->
+                @endcan
+                
+                @can('sidebar.seccion.requerimientosunidad')
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Requerimientos de Unidad
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            @can('sidebar.requerimientosunidad.listar')
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.listar.requerimientosunidad.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Listar Requerimientos Unidad</p>
+                                    </a>
+                                </li>
+                            @endcan
+
+                        </ul>
+                    </li>
+                @endcan
+                @can('sidebar.seccion.cotizacionesunidad')
+                <li class="nav-item">
+
+                    <a href="#" class="nav-link nav-">
+                        <i class="fas fa-tasks"></i>
+                        <p>
+                            Cotizaciones
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+                        @can('sidebar.cotizacionunidad.pendiente')
+                        <li class="nav-item">
+                            <a href="{{ route('cotizaciones.pendientesunidad.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Cotización Pendiente</p>
+                            </a>
+                        </li>
+                        @endcan
+
+                        @can('sidebar.cotizacionunidad.procesada')
+                        <li class="nav-item">
+                            <a href="{{ route('cotizaciones.autorizadasunidad.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Cotización Procesada</p>
+                            </a>
+                        </li>
+                        @endcan
+
+                        @can('sidebar.cotizacionunidad.denegada')
+                        <li class="nav-item">
+                            <a href="{{ route('cotizaciones.denegadasunidad.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Cotización Denegadas</p>
+                            </a>
+                        </li>
+                        @endcan
+
+                    </ul>
+                </li>
+                @endcan
+
+                @can('sidebar.seccion.ordenescompraunidad')
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('ordenes.comprasunidad.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="nav-icon fas fa-list"></i>
+                        <p>
+                            Ordenes de Compra
+                        </p>
+                    </a>
+                </li>
                 @endcan
 
 

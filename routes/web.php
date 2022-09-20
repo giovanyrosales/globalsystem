@@ -123,13 +123,6 @@ Route::post('/admin/proyecto/vista/requisicion/informacion', [ProyectoController
 Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::class, 'editarRequisicion']);
 Route::post('/admin/proyecto/requisicion/borrar/todo', [ProyectoController::class, 'borrarRequisicion']);
 
-
-// --- REQUISICION desde UNIDAD ---
-//Route::get('/admin/departamento/vista/requisicion/{id}', [RequerimientoController::class,'tablaDepartamentoListaRequisicion']);
-//Route::post('/admin/departamento/vista/requisicion/nuevo', [RequerimientoController::class, 'nuevoRequisicion']);
-//Route::post('/admin/departamento/vista/requisicion/informacion', [RequerimientoController::class, 'informacionRequisicion']);
-//Route::post('/admin/departamento/vista/requisicion/editar', [RequerimientoController::class, 'editarRequisicion']);
-
 // --- REQUERIMIENTOS PRESUPUESTO INGENIERIA para unidad de uaci ---
 Route::get('/admin/listar/requerimientos/index', [CotizacionController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientos.index');
 Route::get('/admin/listar/requerimientos/tabla', [CotizacionController::class,'indexTablaListarRequerimientos']);
@@ -374,16 +367,48 @@ Route::post('/admin/objespecifico/informacion', [CodigoEspecifController::class,
 Route::post('/admin/objespecifico/editar', [CodigoEspecifController::class, 'editarObjEspecifico']);
 
 
-// --- REQUERIMIENTOS ---
-/*Route::get('/admin/listar/requerimientos/index', [CotizacionController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientos.index');
-Route::get('/admin/listar/requerimientos/tabla', [CotizacionController::class,'indexTablaListarRequerimientos']);
-Route::get('/admin/requerimientos/listado/{id}', [CotizacionController::class,'listadoRequerimientoPorProyecto']);
-Route::get('/admin/requerimientos/listado/tabla/{id}', [CotizacionController::class,'tablaRequerimientosIndividual']);
-Route::post('/admin/requerimientos/informacion', [CotizacionController::class, 'informacionRequerimiento']);
-Route::post('/admin/requerimientos/cotizacion/guardar', [CotizacionController::class, 'guardarNuevaCotizacion']);*/
+// ************************************************** REQUERIMIENTOS, COTIZACIONES Y ORDENES DE LAS UNIDADES O DEPARTAMENTOS ***********************
+
+// --- REQUERIMIENTOS de una unidad mostrados en usuario de uaciunidad---
+Route::get('/admin/listar/requerimientosunidad/index', [RequerimientoController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientosunidad.index');
+Route::get('/admin/listar/requerimientosunidad/tabla', [RequerimientoController::class,'indexTablaListarRequerimientosUnidad']);
+Route::get('/admin/requerimientosunidad/listado/{id}', [RequerimientoController::class,'listadoRequerimientoPorUnidad']);
+Route::get('/admin/requerimientosunidad/listado/tabla/{id}', [RequerimientoController::class,'tablaRequerimientosUnidadIndividual']);
+Route::post('/admin/requerimientosunidad/informacion', [RequerimientoController::class, 'informacionRequerimientoUnidad']);
+Route::post('/admin/requerimientosunidad/cotizacion/guardar', [RequerimientoController::class, 'guardarNuevaCotizacionUnidad']);
+
+// --- VISTA COTIZACIONES PENDIENTES DE LOS DEPARTAMENTOS ---
+Route::get('/admin/cotizacion/pendiente/index', [CotizacionController::class,'indexPendiente'])->name('cotizaciones.pendientes.index');
+Route::get('/admin/cotizacion/pendiente/tabla-index', [CotizacionController::class,'indexPendienteTabla']);
+
+Route::get('/admin/cotizacion/individual/index/{id}', [CotizacionController::class,'indexCotizacion']);
+Route::post('/admin/cotizacion/autorizar',  [CotizacionController::class,'autorizarCotizacion']);
+Route::post('/admin/cotizacion/denegar',  [CotizacionController::class,'denegarCotizacion']);
+
+// vista de cotizacion detalle DE DEPARTAMENTOS para procesadas o denegadas
+Route::get('/admin/cotizacion/detalle/{id}', [CotizacionController::class,'vistaDetalleCotizacion']);
 
 
-// ****************** PRESUPUESTO DE UNIDADES ***********************
+// --------------- VISTA COTIZACIONES DE DEPARTAMENTOS AUTORIZADAS -----------------------------
+Route::get('/admin/cotizacion/autorizadas/index', [CotizacionController::class,'indexAutorizadas'])->name('cotizaciones.autorizadas.index');
+Route::get('/admin/cotizacion/autorizadas/tabla-index', [CotizacionController::class,'indexAutorizadasTabla']);
+
+// ------------ VISTA COTIZACIONES DE DEPARTAMENTOS DENEGADAS ---------------------------------
+Route::get('/admin/cotizacion/denegadas/index', [CotizacionController::class,'indexDenegadas'])->name('cotizaciones.denegadas.index');
+Route::get('/admin/cotizacion/denegadas/tabla-index', [CotizacionController::class,'indexDenegadasTabla']);
+
+// ------------ ORDENES DE DEPARTAMENTOS--------------------------------------------------
+Route::post('/admin/ordenes/generar/nuevo',  [OrdenController::class,'generarOrden']);
+Route::get('/admin/ordenes/pdf/{id}', [OrdenController::class,'vistaPdfOrden']);
+
+// --------------- ORDENES DE COMPRAS DE DEPARTAMENTOS -------------------------------------
+Route::get('/admin/ordenes/compras/index', [OrdenController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
+Route::get('/admin/ordenes/compras/tabla-index', [OrdenController::class,'tablaOrdenesCompras']);
+Route::post('/admin/ordenes/anular/compra',  [OrdenController::class,'anularCompra']);
+Route::post('/admin/ordenes/generar/acta',  [OrdenController::class,'generarActa']);
+Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenController::class,'reporteActaGenerada']);
+
+// ************************************** PRESUPUESTO DE UNIDADES **********************************************************************************
 
 // --- AÑO DE PRESUPUESTO ---
 Route::get('/admin/p/anio/presupuesto/index', [ProveedoresController::class,'indexAnioPresupuesto'])->name('p.admin.anio.presupuesto.index');
