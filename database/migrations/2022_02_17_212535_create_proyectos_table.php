@@ -19,7 +19,6 @@ class CreateProyectosTable extends Migration
             $table->bigInteger('id_linea')->nullable()->unsigned();
             $table->bigInteger('id_fuentef')->nullable()->unsigned();
             $table->bigInteger('id_fuenter')->nullable()->unsigned();
-            $table->bigInteger('id_bolson')->nullable()->unsigned();
             $table->bigInteger('id_areagestion')->nullable()->unsigned();
             $table->bigInteger('id_naturaleza')->nullable()->unsigned();
             $table->bigInteger('id_estado')->nullable()->unsigned();
@@ -47,7 +46,6 @@ class CreateProyectosTable extends Migration
             $table->foreign('id_linea')->references('id')->on('linea');
             $table->foreign('id_fuentef')->references('id')->on('fuentef');
             $table->foreign('id_fuenter')->references('id')->on('fuenter');
-            $table->foreign('id_bolson')->references('id')->on('bolson');
             $table->foreign('id_areagestion')->references('id')->on('areagestion');
             $table->foreign('id_naturaleza')->references('id')->on('naturaleza');
             $table->foreign('id_estado')->references('id')->on('estado_proyecto');

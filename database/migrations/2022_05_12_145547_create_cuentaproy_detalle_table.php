@@ -4,18 +4,19 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePresupuestoDetalleTable extends Migration
+class CreateCuentaproyDetalleTable extends Migration
 {
     /**
-     * ESTA ES CREADA AL GENERAR ORDEN DE COMPRA
+     * GUARDA UN REGISTRO AL GENERAR ORDEN DE COMPRA, ASI BAJARA EL
+     * SALDO RESTANTE
      *
      * @return void
      */
     public function up()
     {
-        Schema::create('presupuesto_detalle', function (Blueprint $table) {
+        Schema::create('cuentaproy_detalle', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('presupuesto_id')->unsigned();
+            $table->bigInteger('id_cuentaproy')->unsigned();
             $table->bigInteger('id_requi_detalle')->unsigned();
 
             //0 salida
@@ -27,7 +28,7 @@ class CreatePresupuestoDetalleTable extends Migration
 
             $table->integer('estado');
 
-            $table->foreign('presupuesto_id')->references('id')->on('presupuesto');
+            $table->foreign('id_cuentaproy')->references('id')->on('cuentaproy');
             $table->foreign('id_requi_detalle')->references('id')->on('requisicion_detalle');
         });
     }
@@ -39,6 +40,6 @@ class CreatePresupuestoDetalleTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('presupuesto_detalle');
+        Schema::dropIfExists('cuentaproy_detalle');
     }
 }

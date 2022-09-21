@@ -7,22 +7,20 @@ use Illuminate\Support\Facades\Schema;
 class CreateCuentaproyTable extends Migration
 {
     /**
-     * Run the migrations.
+     * GUARDA LOS CODIGOS CON EL SALDO INICIAL, Y SALDO RESTANTE ES CALCULADO
      *
      * @return void
      */
-    public function up()
-    {
+    public function up(){
+
         Schema::create('cuentaproy', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('proyecto_id')->unsigned();
-            $table->bigInteger('cuenta_id')->unsigned();
-            $table->decimal('montoini', 10, 2);
-            $table->decimal('saldo', 10, 2);
-            $table->integer('estado');
+            $table->bigInteger('objespeci_id')->unsigned(); // objeto especifico
+            $table->decimal('saldo_inicial', 10,2); // no cambia nunca, mismo
 
             $table->foreign('proyecto_id')->references('id')->on('proyectos');
-            $table->foreign('cuenta_id')->references('id')->on('cuenta');
+            $table->foreign('objespeci_id')->references('id')->on('obj_especifico');
         });
     }
 
