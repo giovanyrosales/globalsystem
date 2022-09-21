@@ -298,6 +298,11 @@
                                         </div>
                                 @endcan
 
+                                <!-- EL USUARIO CON EL PERMISO PUEDE VER EL BOTON SALDO -->
+                                <!-- Cada vez que se abre el modal, se verifica si el el presupuesto esta Aprobado, y se muestra el
+                                     boton. solo se mostrara si el usuario tiene permiso ya que CREA el codigo del boton, y se
+                                     se verifica que no sea NULL para que muestre el botón-->
+
                                 @can('boton.dinero.presupuesto')
                                         <div class="form-group" id="divContenedorSaldos" style="display: none">
                                             <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionSaldo()">
@@ -844,7 +849,21 @@
                     }
                     else if(response.data.success === 2){
                         $('#modalPresupuesto').modal('hide');
-                        toastr.success('Presupuesto Aprobado');
+
+                        Swal.fire({
+                            title: 'Presupuesto Aprobado',
+                            text: "",
+                            icon: 'success',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
                     }
 
                     else if(response.data.success === 3){

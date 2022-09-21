@@ -428,6 +428,8 @@
                                 <tr>
                                     <th style="width: 3%">#</th>
                                     <th style="width: 6%">Cantidad</th>
+                                    <th style="width: 6%">Precio</th>
+                                    <th style="width: 6%">Código</th>
                                     <th style="width: 15%">Descripción</th>
                                     <th style="width: 5%">Opciones</th>
                                 </tr>
@@ -1269,6 +1271,7 @@
             })
                 .then((response) => {
                     closeLoading();
+
                     if(response.data.success === 1){
                         $('#modalAgregarRequisicion').modal('hide');
                         toastr.success('Registrado correctamente');
@@ -1283,15 +1286,18 @@
                         let retenidoFormat = response.data.retenidoFormat;
                         let obj = response.data.obj; // codigo especifico
                         let retenido = response.data.retenido;
+                        let solicita = response.data.solicita;
 
                         colorRojoTablaRequisicion(fila);
 
                         var texto = '';
                         if(retenido > 0){
                             texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj +
-                                ", Tiene Saldo Disponible $" + disponibleFormat + ", y Saldo RETENIDO $" + retenidoFormat;
+                                ", Tiene Saldo Disponible $" + disponibleFormat + ", y Saldo RETENIDO $" + retenidoFormat +
+                                "Y se esta solicitando $" + solicita;
                         }else{
-                            texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj + ", Tiene Saldo Disponible $" + disponibleFormat;
+                            texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj + ", Tiene Saldo Disponible $" + disponibleFormat +
+                            " Y se esta solicitando $" + solicita;
                         }
 
                         Swal.fire({
@@ -1373,19 +1379,33 @@
 
                         var infodetalle = response.data.detalle;
 
-
                         // VERIFICAMOS SI PODEMOS BORRAR EL MATERIAL SINO HA SIDO COTIZADO.
-                        // QUITAMOS EL BOTON BORRAR
+                        // QUITAMOS EL BOTÓN BORRAR
                         for (var i = 0; i < infodetalle.length; i++) {
 
-                            var markup = "<tr id='"+infodetalle[i].id+"'>"+
+                            var markup = '';
 
-                                "<td>"+
+                            if(infodetalle[i].alcanza){
+                                // ESTA FILA, MATERIAL NO COTIZADO Y NO ALCANZA EL SALDO
+                                markup = "<tr id='"+infodetalle[i].id+"' style='background: #F1948A'>";
+                            }else {
+                                markup = "<tr id='"+infodetalle[i].id+"'>";
+                            }
+
+                            markup += "<td>"+
                                 "<p id='fila"+(i+1)+"' class='form-control' style='max-width: 65px'>"+(i+1)+"</p>"+
                                 "</td>"+
 
                                 "<td>"+
                                 "<input name='cantidadarrayeditar[]' value='"+infodetalle[i].cantidad+"' maxlength='10' class='form-control' type='number'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input value='$"+infodetalle[i].dinero+"' disabled class='form-control'>"+
+                                "</td>"+
+
+                                "<td>"+
+                                "<input value='"+infodetalle[i].codigo+"' disabled class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
@@ -2576,7 +2596,25 @@
             })
                 .then((response) => {
                     closeLoading();
+
                     if(response.data.success === 1){
+                        document.getElementById('select-estado').value = '0';
+                        Swal.fire({
+                            title: 'Partida Requerida',
+                            text: "Se debe crear la Partida para Mano de Obra (por Administración) para cambiar de Estado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
+                    else if(response.data.success === 2){
 
                         Swal.fire({
                             title: 'Presupuesto Ya Aprobado',
@@ -2592,7 +2630,7 @@
                             }
                         })
                     }
-                    else if(response.data.success === 2){
+                    else if(response.data.success === 3){
                         Swal.fire({
                             title: 'Estado Actualizado',
                             text: "",

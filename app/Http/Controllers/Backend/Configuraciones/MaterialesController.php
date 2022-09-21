@@ -12,6 +12,7 @@ use App\Models\SoliMaterialIng;
 use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use phpDocumentor\Reflection\Types\Array_;
 
@@ -143,19 +144,19 @@ class MaterialesController extends Controller
         // VERIFICAR QUE LOS DATOS NO HAYAN CAMBIADO SI YA ESTABA AGREGADO EN UNA PARTIDA DETALLE
         if(PartidaDetalle::where('material_id', $request->id)->first()){
 
-            $infoCatalogo = CatalogoMateriales::where('id', '=', $request->id)->first();
+            $infoCatalogo = CatalogoMateriales::where('id', $request->id)->first();
 
             // MISMOS RETORNOS QUE UN DATO HA CAMBIADO
 
-            if($infoCatalogo->nombre !== $request->nombre){
+            if($infoCatalogo->nombre != $request->nombre){
                 return ['success' => 1];
             }
 
-            if($infoCatalogo->id_objespecifico !== $request->codigo){
+            if($infoCatalogo->id_objespecifico != $request->codigo){
                 return ['success' => 1];
             }
 
-            if($infoCatalogo->id_unidadmedida !== $request->unidad){
+            if($infoCatalogo->id_unidadmedida != $request->unidad){
                 return ['success' => 1];
             }
         }

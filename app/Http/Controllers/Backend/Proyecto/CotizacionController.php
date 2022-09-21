@@ -9,6 +9,7 @@ use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
 use App\Models\ObjEspecifico;
 use App\Models\Orden;
+use App\Models\Presupuesto;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
@@ -353,6 +354,8 @@ class CotizacionController extends Controller
             $coti->estado = 0;
             $coti->save();
 
+            $infoRequisicion = Requisicion::where('id', $request->idcotizar)->first();
+
             $lista = RequisicionDetalle::whereIn('id', $request->lista)
                 ->orderBy('id', 'ASC')
                 ->get();
@@ -365,32 +368,126 @@ class CotizacionController extends Controller
                     return ['success' => 2];
                 }
 
+                // VERIFICACIÓN DE SALDOS
+
                 $infoCatalogo = CatalogoMateriales::where('id', $dd->material_id)->first();
-                $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
-                $infoCodigo = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
 
-                $detalle = new CotizacionDetalle();
-                $detalle->cotizacion_id = $coti->id;
-                $detalle->id_requidetalle = $dd->id;
-                $detalle->material_id = $dd->material_id;
-                $detalle->nombre = $infoCatalogo->nombre;
-                $detalle->medida = $infoUnidad->medida;
-                $detalle->cantidad = $dd->cantidad;
-                $detalle->precio_u = $infoCatalogo->pu;
-                $detalle->cod_presup = $infoCodigo->codigo;
-                $detalle->estado = 0;
-                $detalle->save();
-
-                // cambiar estado de requisiciones detalle porque ya fueron cotizadas
+                // ACTUALIZAR PRECIO DEL MATERIAL PRIMERAMENTE
                 RequisicionDetalle::where('id', $dd->id)->update([
-                    'estado' => 1,
+                    'dinero' => $infoCatalogo->pu
                 ]);
+
+                //*** GUARDAR ESTO SIEMPRE ***
+                DB::commit();
+
+
+                $infoObjeto = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
+                $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
+
+                // como siempre busco material que estaban en el presupuesto, siempre encontrara
+                // el proyecto ID y el ID de objeto específico
+                $infoPresupuesto = Presupuesto::where('proyecto_id', $infoRequisicion->id_proyecto)
+                    ->where('objespeci_id', $infoCatalogo->id_objespecifico)
+                    ->first();
+
+                $totalSalida = 0;
+                $totalEntrada = 0;
+                $totalRetenido = 0;
+
+                $infoSalidaDetalle = DB::table('presupuesto_detalle AS pd')
+                    ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                    ->select('rd.cantidad', 'rd.dinero')
+                    ->where('pd.presupuesto_id', $infoPresupuesto->id)
+                    ->where('pd.tipo', 0) // salidas
+                    ->get();
+
+                foreach ($infoSalidaDetalle as $dd){
+                    $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
+                }
+
+                $infoEntradaDetalle = DB::table('presupuesto_detalle AS pd')
+                    ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                    ->select('rd.cantidad', 'rd.dinero')
+                    ->where('pd.presupuesto_id', $infoPresupuesto->id)
+                    ->where('pd.tipo', 1) // entradas
+                    ->get();
+
+                foreach ($infoEntradaDetalle as $dd){
+                    $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
+                }
+
+                // esto es lo que hay de SALDO RESTANTE PARA EL OBJETO ESPECÍFICO
+                $saldoRestante = $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada);
+
+                // obtener cuanto saldo retenido tengo para el objeto específico
+                // y el dinero lo obtiene de LA REQUISICIÓN DETALLE
+
+                $infoSaldoRetenido = DB::table('presupuesto_saldo_retenido AS psr')
+                    ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                    ->select('rd.cantidad', 'rd.dinero')
+                    ->where('psr.id_presupuesto', $infoPresupuesto->id) // con esto obtengo solo del obj específico
+                    ->get();
+
+                foreach ($infoSaldoRetenido as $dd){
+                    $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
+                }
+
+                // verificar cantidad * dinero del material nuevo
+                $saldoMaterial = $dd->cantidad * $infoCatalogo->pu; // EL PRECIO YA ESTA ACTUALIZADO EN LA REQUISICION_DETALLE
+
+                $sumaSaldos = $saldoMaterial + $totalRetenido;
+
+
+                // verificar si alcanza el saldo para guardar la cotización
+                if($saldoRestante < $sumaSaldos){
+                    // retornar que no alcanza el saldo
+
+                    // SALDO RESTANTE Y SALDO RETENIDO FORMATEADOS
+                    $saldoRestanteFormat = number_format((float)$saldoRestante, 2, '.', ',');
+                    $saldoRetenidoFormat = number_format((float)$totalRetenido, 2, '.', ',');
+
+
+                    $costoFormat = number_format((float)$infoCatalogo->pu, 2, '.', ',');
+
+                    // disponible - retenido
+                    // PASAR A NUMERO POSITIVO
+                    $totalActualFormat = abs($saldoRestante - $totalRetenido);
+                    $totalActualFormat = number_format((float)$totalActualFormat, 2, '.', ',');
+
+                    return ['success' => 3, 'fila' => $i,
+                        'obj' => $infoObjeto->codigo,
+                        'disponibleFormat' => $saldoRestanteFormat, // esto va formateado
+                        'retenidoFormat' => $saldoRetenidoFormat, // esto va formateado
+                        'material' => $infoCatalogo,
+                        'unidad' => $infoUnidad->medida,
+                        'costo' => $costoFormat,
+                        'totalactual' => $totalActualFormat
+                    ];
+                }else {
+
+                    $detalle = new CotizacionDetalle();
+                    $detalle->cotizacion_id = $coti->id;
+                    $detalle->id_requidetalle = $dd->id;
+                    $detalle->material_id = $dd->material_id;
+                    $detalle->nombre = $infoCatalogo->nombre;
+                    $detalle->medida = $infoUnidad->medida;
+                    $detalle->cantidad = $dd->cantidad;
+                    $detalle->precio_u = $infoCatalogo->pu;
+                    $detalle->cod_presup = $infoObjeto->codigo;
+                    $detalle->estado = 0;
+                    $detalle->save();
+
+                    // cambiar estado de requisiciones detalle porque ya fueron cotizadas
+                    RequisicionDetalle::where('id', $dd->id)->update([
+                        'estado' => 1,
+                    ]);
+                }
             }
 
             DB::commit();
-            return ['success' => 3];
+            return ['success' => 4];
         }catch(\Throwable $e){
-            //Log::info('ee' . $e);
+            Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 99];
         }

@@ -466,6 +466,8 @@
                 .then((response) => {
                     closeLoading();
 
+                    console.log(response)
+
                     if(response.data.success === 1){
 
                         Swal.fire({
@@ -497,7 +499,38 @@
                             }
                         })
                     }
-                    else if(response.data.success === 3){
+                    if(response.data.success === 3){
+
+                        let nombre = response.data.material.nombre;
+                        let unidad = response.data.unidad;
+                        let costo = response.data.costo;
+                        let codigo = response.data.obj;
+                        let disponible = response.data.disponibleFormat;
+                        let retenido = response.data.retenidoFormat;
+                        let totalactual = response.data.totalactual;
+
+                        Swal.fire({
+                            title: 'Saldo Insuficiente',
+                            html: "El material " + nombre + " - " + unidad + ", Solicita $" + costo + ". Pero el Código " + codigo
+                            + " Tiene Saldo. " + "<br>"
+                                + "Disponible $" + disponible + "<br>"
+                                + "Retenido $" + retenido + "<br>"
+                                + "Presupuesto Faltante $" + totalactual + "<br>"
+                            ,
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
+
+                    else if(response.data.success === 4){
                         $('#modalCotizar').modal('hide');
                         $('#modalDetalle').modal('hide');
 

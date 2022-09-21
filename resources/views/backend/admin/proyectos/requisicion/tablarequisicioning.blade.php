@@ -16,10 +16,20 @@
                             <tbody>
 
                             @foreach($listaRequisicion as $dato)
-                                <tr>
+                                @if($dato->alcanza)
+                                    <tr style="background: #F1948A">
+                                @else
+                                    <tr>
+                                @endif
+
                                     <td style="width: 4%">{{ $dato->numero }}</td>
                                     <td style="width: 10%">{{ $dato->fecha }}</td>
-                                    <td style="width: 10%">Pendiente</td>
+                                    @if($dato->completado)
+                                        <td style="width: 10%"><span class="badge bg-warning"> {{ $dato->infoestado }}</span></td>
+                                    @else
+                                       <td style="width: 10%">{{ $dato->infoestado }}</td>
+                                    @endif
+
                                     <td>
                                         @can('boton.cotizar.requisicion')
                                         <button type="button" class="btn btn-success btn-xs" onclick="vistaCotizacion({{ $dato->id }})">

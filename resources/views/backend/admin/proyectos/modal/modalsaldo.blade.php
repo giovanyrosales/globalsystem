@@ -79,21 +79,27 @@
 
     <tbody>
     <tr>
-        <td width="10%">Código</td>
-        <td width="30%">Objeto</td>
-        <td width="20%">Saldo Inicial</td>
-        <td width="20%">Saldo Restante</td>
-        <td width="20%">Saldo Retenido <i class="fas fa-question-circle" onclick="infoSaldoRetenido()"></i></td>
+        <td width="10%" style="font-weight: bold">Código</td>
+        <td width="30%" style="font-weight: bold">Objeto</td>
+        <td width="20%" style="font-weight: bold">Saldo Inicial</td>
+        <td width="20%" style="font-weight: bold">Saldo Restante</td>
+        <td width="20%" style="font-weight: bold">Saldo Retenido <i class="fas fa-question-circle" onclick="infoSaldoRetenido()"></i></td>
     </tr>
 
     @foreach($presupuesto as $dd)
 
         <tr>
-            <td width="10%">{{ $dd->codigo }}</td>
-            <td width="30%">{{ $dd->nombre }}</td>
-            <td width="20%">${{ $dd->saldo_inicial }}</td>
-            <td width="20%">${{ $dd->saldo_restante }}</td>
-            <td width="20%">${{ $dd->total_retenido }}</td>
+            <td width="10%" style="font-weight: bold">{{ $dd->codigo }}</td>
+            <td width="30%" style="font-weight: bold">{{ $dd->nombre }}</td>
+            <td width="20%" style="font-weight: bold">${{ $dd->saldo_inicial }}</td>
+            @if($dd->total_retenido >= $dd->saldo_restante)
+                <td width="20%" style="font-weight: bold; color: white; background: red">${{ $dd->saldo_restante }}</td>
+                <td width="20%" style="font-weight: bold; color: white; background: red">${{ $dd->total_retenido }}</td>
+            @else
+                <td width="20%" style="font-weight: bold">${{ $dd->saldo_restante }}</td>
+                <td width="20%" style="font-weight: bold">${{ $dd->total_retenido }}</td>
+            @endif
+
         </tr>
 
     @endforeach

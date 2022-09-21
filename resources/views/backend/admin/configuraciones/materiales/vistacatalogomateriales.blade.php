@@ -569,6 +569,7 @@
             })
                 .then((response) => {
                     closeLoading();
+
                     if(response.data.success === 1){
                         // UN DATO CAMBIO Y NO TENDRÍA QUE HABER CAMBIADO
 

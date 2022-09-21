@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 class UnidadMedidaSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * unidad de medida para PROYECTOS
      *
      * @return void
      */
@@ -182,5 +182,23 @@ class UnidadMedidaSeeder extends Seeder
         UnidadMedida::create([
             'medida' => 'TON',
         ]);
+
+        UnidadMedida::create([
+            'medida' => 'DIA',
+        ]);
+
+        UnidadMedida::create([
+            'medida' => 'M3',
+        ]);
+
+        UnidadMedida::create([
+            'medida' => 'VRS',
+        ]);
+
+        UnidadMedida::create([
+            'medida' => 'UND',
+        ]);
+
+
     }
 }
