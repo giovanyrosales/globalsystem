@@ -7,32 +7,29 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Proyecto</th>
+                                <th>Código</th>
                                 <th>Cuenta</th>
-                                <th>Aumenta</th>
-                                <th>Disminuye</th>
-                                <th>Reforma</th>
+                                <th>Saldo Inicial</th>
+                                <th>Saldo Restante</th>
+                                <th>Saldo Retenido</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($cuenta as $dato)
+                            @foreach($presupuesto as $dato)
 
-                                    <td>{{ $dato->proyecto }}</td>
-                                    <td>{{ $dato->cuenta }}</td>
-                                    <td>{{ $dato->aumenta }}</td>
-                                    <td>{{ $dato->disminuye }}</td>
+                                    <td>{{ $dato->codigo }}</td>
+                                    <td>{{ $dato->nombre }}</td>
+                                    <td>{{ $dato->saldo_inicial }}</td>
+                                    <td>{{ $dato->saldo_restante }}</td>
+                                    <td>{{ $dato->total_retenido }}</td>
+
                                     <td>
-                                        @if($dato->reforma != null)
-                                            <a class="btn btn-primary btn-xs" href="{{ url('/admin/movicuentaproy/documento/'.$dato->id) }}">
-                                                <i class="fas fa-file" title="Documento"></i> Documento </a>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionAgregar({{ $dato->id }})">
+                                            <i class="fas fa-plus-square" title="Agregar"></i>&nbsp; Agregar
                                         </button>
+
                                     </td>
                                 </tr>
                             @endforeach

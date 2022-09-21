@@ -143,7 +143,8 @@ class RolesSeeder extends Seeder
 
 
         Permission::create(['name' => 'boton.aprobar.presupuesto', 'description' => 'boton para aprobar presupuesto, mostrado en modal'])->syncRoles($roleUaci);
-        Permission::create(['name' => 'boton.dinero.presupuesto', 'description' => 'boton para mostrar cuanto dinero le queda a un proyecto del presupuesto'])->syncRoles($roleAdministrador);
+        Permission::create(['name' => 'boton.dinero.presupuesto', 'description' => 'boton para mostrar MODAL cuanto dinero le queda a un proyecto del presupuesto'])->syncRoles($roleAdministrador);
+        Permission::create(['name' => 'boton.movimiento.cuenta.proyecto', 'description' => 'botón para redirigir a movimiento cuenta proyecto'])->syncRoles($roleAdministrador);
 
 
     }

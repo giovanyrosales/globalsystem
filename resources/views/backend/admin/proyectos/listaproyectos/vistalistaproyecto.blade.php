@@ -310,6 +310,13 @@
                                             </button>
                                         </div>
                                 @endcan
+                                @can('boton.movimiento.cuenta.proyecto')
+                                    <div class="form-group" id="divContenedorMovimiento" style="display: none">
+                                        <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionMovimiento()">
+                                            <i class="fas fa-list-alt" title="Movimiento Cuenta"></i>&nbsp; Movimiento Cuenta
+                                        </button>
+                                    </div>
+                                @endcan
 
                             </div>
                         </div>
@@ -767,6 +774,10 @@
                 if (document.getElementById('divContenedorSaldos') !== null) {
                     document.getElementById("divContenedorSaldos").style.display = "block";
                 }
+
+                if (document.getElementById('divContenedorMovimiento') !== null) {
+                    document.getElementById("divContenedorMovimiento").style.display = "block";
+                }
             }
 
             $('#id-estado-proyecto').val(id);
@@ -800,6 +811,12 @@
             var ruta = "{{ URL::to('/admin/ver/presupuesto/saldo') }}/" + id;
             $('#tablaSaldo').load(ruta);
             $('#modalSaldo').modal('show');
+        }
+
+        // carga otra vista para manejar los movimiento de cuenta
+        function informacionMovimiento(){
+            var id = document.getElementById('id-proyecto').value;
+            window.location.href="{{ url('/admin/movicuentaproy/indexmovicuentaproy') }}/"+id;
         }
 
         function btnAprobarPresupuesto(){

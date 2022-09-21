@@ -10,10 +10,12 @@ use App\Models\Bolson;
 use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
+use App\Models\CuentaProy;
 use App\Models\EstadoProyecto;
 use App\Models\FuenteFinanciamiento;
 use App\Models\FuenteRecursos;
 use App\Models\LineaTrabajo;
+use App\Models\MoviCuentaProy;
 use App\Models\Naturaleza;
 use App\Models\ObjEspecifico;
 use App\Models\Partida;
@@ -1951,7 +1953,7 @@ class ProyectoController extends Controller
                        }
 
                        // GUARDAR REGISTRO
-                       $presu = new Presupuesto();
+                       $presu = new CuentaProy();
                        $presu->proyecto_id = $request->id;
                        $presu->objespeci_id = $det->id_objespecifico;
                        $presu->saldo_inicial = $suma;
@@ -1974,7 +1976,7 @@ class ProyectoController extends Controller
     public function infoTablaSaldoProyecto($id){
 
         // presupuesto
-        $presupuesto = DB::table('presupuesto AS p')
+        $presupuesto = DB::table('cuentaproy AS p')
             ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
             ->select('obj.nombre', 'obj.id AS idcodigo', 'obj.codigo', 'p.id', 'p.saldo_inicial')
             ->where('p.proyecto_id', $id)
@@ -1986,12 +1988,22 @@ class ProyectoController extends Controller
             $totalEntrada = 0;
             $totalRetenido = 0;
 
+            // SUMA Y RESTA DE MOVIMIENTO DE CÓDIGOS
+            // suma de saldo
+             $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $pp->id)
+                 ->sum('aumento');
+
+            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $pp->id)
+                ->sum('disminuye');
+
+            $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
+
             // POR AQUI SE VALIDARA SI NO FUE CANSELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
             // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
-            $infoSalidaDetalle = DB::table('presupuesto_detalle AS pd')
+            $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
-                ->where('pd.presupuesto_id', $pp->id)
+                ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 0) // salidas
                 ->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
@@ -2000,10 +2012,10 @@ class ProyectoController extends Controller
                 $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
             }
 
-            $infoEntradaDetalle = DB::table('presupuesto_detalle AS pd')
+            $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
-                ->where('pd.presupuesto_id', $pp->id)
+                ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 1) // entradas
                 ->get();
 
@@ -2013,20 +2025,22 @@ class ProyectoController extends Controller
 
             // SALDOS RETENIDOS
 
-            $infoSaldoRetenido = DB::table('presupuesto_saldo_retenido AS psr')
+            $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
-                ->where('psr.id_presupuesto', $pp->id)
+                ->where('psr.id_cuentaproy', $pp->id)
                 ->get();
 
             foreach ($infoSaldoRetenido as $dd){
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
-            $total = $pp->saldo_inicial - ($totalSalida - $totalEntrada);
+            // SUMAR LOS MOVIMIENTOS DE CUENTA
+            $totalRestante =  $totalMoviCuenta;
+            $totalRestante += $pp->saldo_inicial - ($totalSalida - $totalEntrada);
 
             $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
-            $pp->saldo_restante = number_format((float)$total, 2, '.', ',');
+            $pp->saldo_restante = number_format((float)$totalRestante, 2, '.', ',');
             $pp->total_retenido = number_format((float)$totalRetenido, 2, '.', ',');
         }
 

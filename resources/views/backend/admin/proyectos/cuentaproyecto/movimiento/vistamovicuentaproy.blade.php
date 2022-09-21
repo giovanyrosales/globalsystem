@@ -14,11 +14,6 @@
         table-layout:fixed;
     }
 
-    .dropdown-menu {
-        max-height: 280px;
-        overflow-y: auto;
-        width: 100%;
-    }
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -28,9 +23,9 @@
             <div class="row mb-6">
                 <div class="col-sm-5">
                     <h1>Movimiento Cuenta de Proyecto</h1>
-                    <button type="button" style="margin-top: 15px" onclick="abrirModalAgregar()" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus-square"></i>
-                        Nuevo Movimiento de Cuenta
+                    <button type="button" style="margin-top: 15px" onclick="verHistorico()" class="btn btn-primary btn-sm">
+                        <i class="fas fa-list-alt"></i>
+                        Histórico
                     </button>
                 </div>
 
@@ -75,9 +70,7 @@
                                         <label>Proyecto *:</label>
                                         <select class="form-control" id="select-proyecto" onchange="verificar()" style="width: 100%">
                                             <option value="">Seleccionar Proyecto</option>
-                                            @foreach($proyecto as $dd)
-                                                <option value="{{ $dd->id }}"> {{ $dd->nombre }} - {{ $dd->codigo }}</option>
-                                            @endforeach
+
                                         </select>
                                     </div>
 
@@ -108,17 +101,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label class="col-sm-3 col-form-label">Reforma:</label>
-                                        <div class="col-sm-8">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="fas fa-file"></i></span>
-                                                </div>
-                                                <input type="file" style="color:#191818; width: 80%" id="documento" accept="image/jpeg, image/jpg, image/png, .pdf"/>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                 </div>
                             </div>
@@ -211,6 +193,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 @extends('backend.menus.footerjs')
@@ -227,8 +210,10 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/movicuentaproy/tablamovicuentaproy') }}";
+            let id = {{ $id }}; // id proyecto
+            var ruta = "{{ URL::to('/admin/movicuentaproy/tablamovicuentaproy') }}/" + id;
             $('#tablaDatatable').load(ruta);
+
 
             $('#select-proyecto').select2({
                 theme: "bootstrap-5",
@@ -277,6 +262,12 @@
             var ruta = "{{ url('/admin/movicuentaproy/tablamovicuentaproy') }}";
             $('#tablaDatatable').load(ruta);
         }
+
+        function verHistorico(){
+            let id = {{ $id }}; // id proyecto
+            window.location.href="{{ url('/admin/movicuentaproy/historico') }}/" + id;
+        }
+
 
         function verificar(){
 

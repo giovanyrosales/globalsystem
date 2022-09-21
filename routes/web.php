@@ -152,7 +152,7 @@ Route::post('/admin/proyecto/partida/manoobra/existe', [ProyectoController::clas
 
 
 // --- CUENTA BOLSON ---
-Route::get('/admin/bolson/cuenta/index', [BolsonController::class,'indexCuenta'])->name('admin.bolson.cuenta.index');
+/*Route::get('/admin/bolson/cuenta/index', [BolsonController::class,'indexCuenta'])->name('admin.bolson.cuenta.index');
 Route::get('/admin/bolson/cuenta/indextabla', [BolsonController::class,'tablaCuenta']);
 Route::post('/admin/bolson/buscar/cuenta', [BolsonController::class, 'buscarNombreCuenta']);
 Route::post('/adm/proyecto/agregar/presupuestoin/bolson/buscar/cuenta-editar', [BolsonController::class, 'buscarNombreCuentaEditar']);
@@ -166,7 +166,7 @@ Route::get('/admin/bolson/movimiento/tabla', [BolsonController::class,'tablaMovi
 Route::post('/admin/bolson/movimiento/nuevo',  [BolsonController::class,'nuevoMovimiento']);
 Route::post('/admin/bolson/movimiento/informacion',  [BolsonController::class,'informacionMovimiento']);
 Route::post('/admin/bolson/movimiento/editar',  [BolsonController::class,'editarMovimiento']);
-
+*/
 
 // --- CUENTA PROYECTO ----
 Route::get('/admin/cuentaproy/cuenta/{id}', [CuentaProyectoController::class,'indexCuenta']);
@@ -183,9 +183,13 @@ Route::post('/admin/planilla/informacion',  [CuentaProyectoController::class,'in
 Route::post('/admin/planilla/editar',  [CuentaProyectoController::class,'editarPlanilla']);
 
 // --- MOVIMIENTO CUENTA PROYECTO ----
-Route::get('/admin/movicuentaproy/indexmovicuentaproy', [CuentaProyectoController::class,'indexMoviCuentaProy'])->name('admin.movi.cuenta.proy.index');
-Route::get('/admin/movicuentaproy/tablamovicuentaproy', [CuentaProyectoController::class,'indexTablaMoviCuentaProy']);
-Route::post('/admin/movicuentaproy/buscador',  [CuentaProyectoController::class,'buscadorCuentaProy']);
+Route::get('/admin/movicuentaproy/indexmovicuentaproy/{id}', [CuentaProyectoController::class,'indexMoviCuentaProy']);
+Route::get('/admin/movicuentaproy/tablamovicuentaproy/{id}', [CuentaProyectoController::class,'indexTablaMoviCuentaProy']);
+
+Route::get('/admin/movicuentaproy/historico/{id}', [CuentaProyectoController::class,'indexTablaMoviCuentaProyHistorico']);
+Route::get('/admin/movicuentaproy/tablahistorico/{id}', [CuentaProyectoController::class,'indexTablaMoviCuentaProyHistorico']);
+
+
 Route::post('/admin/movicuentaproy/nuevo',  [CuentaProyectoController::class,'nuevaMoviCuentaProy']);
 Route::get('/admin/movicuentaproy/documento/{id}',  [CuentaProyectoController::class,'descargarReforma']);
 Route::post('/admin/movicuentaproy/informacion',  [CuentaProyectoController::class,'informacionMoviCuentaProy']);

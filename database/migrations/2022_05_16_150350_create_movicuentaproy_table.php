@@ -15,7 +15,6 @@ class CreateMovicuentaproyTable extends Migration
 
         Schema::create('movicuentaproy', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('cuentaproy_id')->unsigned();
             $table->bigInteger('id_cuentaproy')->unsigned();
 
             $table->decimal('aumento', 10, 2);

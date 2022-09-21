@@ -123,52 +123,88 @@ class CuentaProyectoController extends Controller
     }
 
 
-    public function indexMoviCuentaProy(){
-        $proyecto = Proyecto::orderBy('nombre')->get();
-        return view('Backend.Admin.CuentaProyecto.Movimiento.vistaMoviCuentaProy', compact('proyecto'));
+    public function indexMoviCuentaProy($id){
+        // ID: PROYECTO
+        return view('backend.admin.proyectos.cuentaproyecto.movimiento.vistamovicuentaproy', compact('id'));
     }
 
-    public function indexTablaMoviCuentaProy(){
-
-        $cuenta = MoviCuentaProy::orderBy('id')->get();
-
-        foreach ($cuenta as $dd){
-
-            $infoProyecto = Proyecto::where('id', $dd->proyecto_id)->first();
-            $infoCuentaProy = CuentaProy::where('id', $dd->cuentaproy_id)->first();
-            $infoCuenta = Cuenta::where('id', $infoCuentaProy->cuenta_id)->first();
-
-            $dd->proyecto = $infoProyecto->nombre . " - " . $infoProyecto->codigo;
-            $dd->cuenta = $infoCuenta->nombre . " - " . $infoCuenta->codigo;
-
-            $dd->aumenta = number_format((float)$dd->aumenta, 2, '.', ',');
-            $dd->disminuye = number_format((float)$dd->disminuye, 2, '.', ',');
-            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
-        }
-
-        return view('Backend.Admin.CuentaProyecto.Movimiento.tablaMoviCuentaProy', compact('cuenta'));
+    // VER HISTORICOS
+    public function indexTablaMoviCuentaProyHistorico($id){
+        // ID: PROYECTO
+        return view('backend.admin.proyectos.cuentaproyecto.historico.vistamovicuentahistorico', compact('id'));
     }
 
-    public function buscadorCuentaProy(Request $request){
-            // id proyecto
-        $regla = array(
-            'id' => 'required',
-        );
+    public function indexTablaMoviCuentaProy($id){
 
-        $validar = Validator::make($request->all(), $regla);
+        $presupuesto = DB::table('cuentaproy AS p')
+            ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
+            ->select('obj.nombre', 'obj.id AS idcodigo', 'obj.codigo', 'p.id', 'p.saldo_inicial')
+            ->where('p.proyecto_id', $id)
+            ->get();
 
-        if ($validar->fails()){ return ['success' => 0];}
+        foreach ($presupuesto as $pp){
 
-        $cuentaproy = CuentaProy::where('proyecto_id', $request->id)->get();
+            $totalSalida = 0;
+            $totalEntrada = 0;
+            $totalRetenido = 0;
 
-        foreach ($cuentaproy as $cp){
+            // SUMA Y RESTA DE MOVIMIENTO DE CÓDIGOS
+            // suma de saldo
+            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $pp->id)
+                ->sum('aumento');
 
-            $infoCuenta = Cuenta::where('id', $cp->cuenta_id)->first();
+            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $pp->id)
+                ->sum('disminuye');
 
-            $cp->nomcuenta = $infoCuenta->nombre . ' - ' . $infoCuenta->codigo;
+            $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
+
+            // POR AQUI SE VALIDARA SI NO FUE CANSELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
+            // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
+            $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
+                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero')
+                ->where('pd.id_cuentaproy', $pp->id)
+                ->where('pd.tipo', 0) // salidas
+                ->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                ->get();
+
+            foreach ($infoSalidaDetalle as $dd){
+                $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
+            }
+
+            $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
+                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero')
+                ->where('pd.id_cuentaproy', $pp->id)
+                ->where('pd.tipo', 1) // entradas
+                ->get();
+
+            foreach ($infoEntradaDetalle as $dd){
+                $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
+            }
+
+            // SALDOS RETENIDOS
+
+            $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
+                ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero')
+                ->where('psr.id_cuentaproy', $pp->id)
+                ->get();
+
+            foreach ($infoSaldoRetenido as $dd){
+                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
+            }
+
+            // SUMAR LOS MOVIMIENTOS DE CUENTA
+            $totalRestante =  $totalMoviCuenta;
+            $totalRestante += $pp->saldo_inicial - ($totalSalida - $totalEntrada);
+
+            $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
+            $pp->saldo_restante = number_format((float)$totalRestante, 2, '.', ',');
+            $pp->total_retenido = number_format((float)$totalRetenido, 2, '.', ',');
         }
 
-        return ['success' => 1, 'cuentaproy' => $cuentaproy];
+        return view('backend.admin.proyectos.cuentaproyecto.movimiento.tablamovicuentaproy', compact('presupuesto'));
     }
 
     public function nuevaMoviCuentaProy(Request $request){
