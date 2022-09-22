@@ -55,7 +55,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nueva Cuenta Proyecto</h4>
+                    <h4 class="modal-title">Nuevo Movimiento</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -69,6 +69,10 @@
                                     <div class="form-group">
                                         <input type="hidden" class="form-control" id="id-editar">
                                     </div>
+
+                                    <label>Cuenta a Aumentar</label>
+                                    <hr style="height:1px;border:none;color:#333;background-color:#333;">
+
 
                                     <div class="col-md-8">
                                         <div class="form-group">
@@ -93,13 +97,12 @@
 
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Saldo a Modificar</label>
+                                            <label>Aumento Saldo</label>
                                             <input type="text" class="form-control" placeholder="0.00" id="saldo-modificar">
                                         </div>
                                     </div>
 
                                     <hr style="height:1px;border:none;color:#333;background-color:#333;">
-
 
                                     <div class="form-group">
                                         <label>Cuenta a Modificar para Disminuir Saldo</label>
@@ -114,7 +117,7 @@
                                         </div>
 
                                         <div class="form-group col-md-6">
-                                            <label style="font-weight: bold">Saldo Restante:</label>
+                                            <label style="font-weight: bold">Saldo Actual:</label>
                                             <input type="text" disabled class="form-control" id="restante">
                                         </div>
                                     </div>
@@ -171,7 +174,6 @@
 
 
             document.getElementById("divcontenedor").style.display = "block";
-
         });
     </script>
 
@@ -218,9 +220,9 @@
             })
                 .then((response) => {
                     closeLoading();
+
                     if(response.data.success === 1){
                         $('#modalAgregar').modal('show');
-                        document.getElementById('select-tipo').value = '0';
 
                         $('#id-editar').val(id);
 
@@ -238,11 +240,7 @@
                         $('#select-cuentaproy').append('<option value="0">Seleccionar Opción</option>');
 
                         $.each(response.data.arraycuentaproy, function( key, val ){
-                            if(response.data.info.objespeci_id == val.id){
-                                $('#select-cuentaproy').append('<option value="' +val.id +'" selected="selected">'+val.codigo + ' - ' + val.nombre +'</option>');
-                            }else{
-                                $('#select-cuentaproy').append('<option value="' +val.id +'">'+val.codigo + ' - ' + val.nombre +'</option>');
-                            }
+                            $('#select-cuentaproy').append('<option value="' +val.id +'">'+val.codigo + ' - ' + val.nombre +'</option>');
                         });
 
                     }else{
