@@ -201,8 +201,8 @@ class CuentaProyectoController extends Controller
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $pp->id)
-                ->where('pd.tipo', 0) // salidas
-                ->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                ->where('pd.tipo', 0) // salidas. y la orden es valido
+                //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
 
             foreach ($infoSalidaDetalle as $dd){
@@ -213,7 +213,7 @@ class CuentaProyectoController extends Controller
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $pp->id)
-                ->where('pd.tipo', 1) // entradas
+                ->where('pd.tipo', 1) // entradas. // la orden fue cancelada
                 ->get();
 
             foreach ($infoEntradaDetalle as $dd){
@@ -268,16 +268,15 @@ class CuentaProyectoController extends Controller
 
             $totalMoviCuenta2 = $moviSumaSaldo2 - $moviRestaSaldo2;
 
-            // POR AQUI SE VALIDARA SI NO FUE CANSELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
+            // POR AQUI SE VALIDARA SI NO FUE CANCELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
             // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
-
 
             $infoSalidaDetalle2 = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $infoSaldo2->id)
-                ->where('pd.tipo', 0) // salidas
-                ->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                ->where('pd.tipo', 0) // salidas. la orden es valida
+                //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
 
             foreach ($infoSalidaDetalle2 as $dd){
@@ -288,13 +287,12 @@ class CuentaProyectoController extends Controller
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $infoSaldo2->id)
-                ->where('pd.tipo', 1) // entradas
+                ->where('pd.tipo', 1) // entradas. la orden fue cancelada
                 ->get();
 
             foreach ($infoEntradaDetalle2 as $dd){
                 $totalEntrada2 = $totalEntrada2 + ($dd->cantidad * $dd->dinero);
             }
-
 
             // SALDOS RETENIDOS
 
@@ -308,7 +306,10 @@ class CuentaProyectoController extends Controller
                 $totalRetenido2 = $totalRetenido2 + ($dd->cantidad * $dd->dinero);
             }
 
-            $totalRestanteSaldo2 =  $totalMoviCuenta2;
+            // total de los cambios movimientos que se han hecho.
+            $totalRestanteSaldo2 = $totalMoviCuenta2; // 0
+
+            // da 59, saldo restante
             $totalRestanteSaldo2 += $infoSaldo2->saldo_inicial - ($totalSalida2 - $totalEntrada2);
 
             // VALIDACIONES.
@@ -317,12 +318,18 @@ class CuentaProyectoController extends Controller
 
             $totalRestanteSaldo2 = ($totalRestanteSaldo2 - $request->saldomodi);
 
+            // aqui tenemos saldo restante - el saldo retenido.
+            $totalBloque2 = $totalRestanteSaldo2 - $totalRetenido2;
+
             // comprobaciones.
-            // VERIFICAR SOLO BLOQUE 2 PORQUE ES UNA RESTA
-            if($totalRestanteSaldo2 < 0){
+            // VERIFICAR SOLO BLOQUE 2 PORQUE ES UNA RESTA.
+            // saldo restante se RESTA TAMBIEN EL SALDO RETENIDO Y EL SALDO A QUITARLE.
+            // NO DEBE QUEDAR MENOR A 0
+            if($totalBloque2 < 0){
                 // saldo insuficiente para hacer este movimiento, ya que queda NEGATIVO
-                $totalRestanteSaldo2 = number_format((float)$totalRestanteSaldo2, 2, '.', ',');
-                return ['success' => 1, 'saldo' => $totalRestanteSaldo2, 'unido' => $unidoBloque2];
+
+                $totalBloque2 = number_format((float)$totalBloque2, 2, '.', ',');
+                return ['success' => 1, 'saldo' => $totalBloque2, 'unido' => $unidoBloque2];
             }
 
             // PASADO VALIDACIÓN, SE PUEDE GUARDAR
@@ -344,7 +351,7 @@ class CuentaProyectoController extends Controller
 
                     $co = new MoviCuentaProy();
                     $co->id_cuentaproy = $request->id;
-                    $co->aumento = $request->saldomodificar;
+                    $co->aumento = $request->saldomodi;
                     $co->disminuye = 0;
                     $co->fecha = $request->fecha;
                     $co->reforma = $nomDocumento;
@@ -355,7 +362,7 @@ class CuentaProyectoController extends Controller
                     $co = new MoviCuentaProy();
                     $co->id_cuentaproy = $request->selectcuenta;
                     $co->aumento = 0;
-                    $co->disminuye = $request->saldomodificar;
+                    $co->disminuye = $request->saldomodi;
                     $co->fecha = $request->fecha;
                     $co->reforma = $nomDocumento;
                     $co->save();
@@ -372,7 +379,7 @@ class CuentaProyectoController extends Controller
 
                 $co = new MoviCuentaProy();
                 $co->id_cuentaproy = $request->id;
-                $co->aumento = $request->saldomodificar;
+                $co->aumento = $request->saldomodi;
                 $co->disminuye = 0;
                 $co->fecha = $request->fecha;
                 $co->reforma = null;
@@ -383,7 +390,7 @@ class CuentaProyectoController extends Controller
                 $co = new MoviCuentaProy();
                 $co->id_cuentaproy = $request->selectcuenta;
                 $co->aumento = 0;
-                $co->disminuye = $request->saldomodificar;
+                $co->disminuye = $request->saldomodi;
                 $co->fecha = $request->fecha;
                 $co->reforma = null;
                 $co->save();
@@ -392,9 +399,16 @@ class CuentaProyectoController extends Controller
                 return ['success' => 2];
             }
         }catch(\Throwable $e){
+            //Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 99];
         }
+    }
+
+
+    function redondear_dos_decimal($valor) {
+        $float_redondeado=round($valor * 100) / 100;
+        return $float_redondeado;
     }
 
     public function descargarReforma($id){
@@ -507,8 +521,8 @@ class CuentaProyectoController extends Controller
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $lista->id)
-                ->where('pd.tipo', 0) // salidas
-                ->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                ->where('pd.tipo', 0) // salidas. la orden es valida
+                //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
 
             foreach ($infoSalidaDetalle as $dd){
@@ -586,8 +600,8 @@ class CuentaProyectoController extends Controller
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $lista->id)
-                ->where('pd.tipo', 0) // salidas
-                ->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                ->where('pd.tipo', 0) // salidas. la orden es valida
+                //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
 
             foreach ($infoSalidaDetalle as $dd){

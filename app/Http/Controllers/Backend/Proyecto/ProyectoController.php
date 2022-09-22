@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\AreaGestion;
 use App\Models\Bitacora;
 use App\Models\BitacoraDetalle;
-use App\Models\Bolson;
 use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
 use App\Models\CuentaProy;
+use App\Models\CuentaProyRetenido;
 use App\Models\EstadoProyecto;
 use App\Models\FuenteFinanciamiento;
 use App\Models\FuenteRecursos;
@@ -20,9 +20,6 @@ use App\Models\Naturaleza;
 use App\Models\ObjEspecifico;
 use App\Models\Partida;
 use App\Models\PartidaDetalle;
-use App\Models\Presupuesto;
-use App\Models\PresupuestoDetalle;
-use App\Models\PresuSaldoRetenido;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
@@ -589,7 +586,7 @@ class ProyectoController extends Controller
             $ll->numero = $contador;
             $ll->fecha = date("d-m-Y", strtotime($ll->fecha));
 
-            $alcanza = false;
+            $alcanza = true;
 
             // verificar que no haya un material cotizado, para no poder borrar requisición
             $hayCotizacion = true;
@@ -605,8 +602,6 @@ class ProyectoController extends Controller
 
             $infoEstado = "Pendiente";
 
-            $unaVezEstado = true;
-
             foreach ($infoRequiDetalle as $dd){
 
                 // VERIFICAR SI UN MATERIAL ESTA FALTO DE SALDO.
@@ -621,7 +616,7 @@ class ProyectoController extends Controller
 
                 // como siempre busco material que estaban en el presupuesto, siempre encontrara
                 // el proyecto ID y el ID de objeto específico
-                $infoPresupuesto = Presupuesto::where('proyecto_id', $ll->id_proyecto)
+                $infoPresupuesto = CuentaProy::where('proyecto_id', $ll->id_proyecto)
                     ->where('objespeci_id', $infoCatalogo->id_objespecifico)
                     ->first();
 
@@ -629,10 +624,10 @@ class ProyectoController extends Controller
                 $totalEntrada = 0;
                 $totalRetenido = 0;
 
-                $infoSalidaDetalle = DB::table('presupuesto_detalle AS pd')
+                $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.presupuesto_id', $infoPresupuesto->id)
+                    ->where('pd.id_cuentaproy', $infoPresupuesto->id)
                     ->where('pd.tipo', 0) // salidas
                     ->get();
 
@@ -640,10 +635,10 @@ class ProyectoController extends Controller
                     $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
                 }
 
-                $infoEntradaDetalle = DB::table('presupuesto_detalle AS pd')
+                $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.presupuesto_id', $infoPresupuesto->id)
+                    ->where('pd.id_cuentaproy', $infoPresupuesto->id)
                     ->where('pd.tipo', 1) // entradas
                     ->get();
 
@@ -651,16 +646,29 @@ class ProyectoController extends Controller
                     $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
                 }
 
+                // Bloque de movimiento de cuentas
+
+                $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
+                    ->sum('aumento');
+
+                $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
+                    ->sum('disminuye');
+
+                $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
+
+                $saldoRestante = $totalMoviCuenta;
+
                 // esto es lo que hay de SALDO RESTANTE PARA EL OBJETO ESPECÍFICO
-                $saldoRestante = $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada);
+                $saldoRestante += $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada);
+
 
                 // obtener cuanto saldo retenido tengo para el objeto específico
                 // y el dinero lo obtiene de LA REQUISICIÓN DETALLE
 
-                $infoSaldoRetenido = DB::table('presupuesto_saldo_retenido AS psr')
+                $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                     ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('psr.id_presupuesto', $infoPresupuesto->id) // con esto obtengo solo del obj específico
+                    ->where('psr.id_cuentaproy', $infoPresupuesto->id) // con esto obtengo solo del obj específico
                     ->get();
 
                 foreach ($infoSaldoRetenido as $dd){
@@ -668,15 +676,13 @@ class ProyectoController extends Controller
                 }
 
                 // verificar si alcanza el saldo para guardar la cotización
-                if($saldoRestante < $totalRetenido){
-                   // HAY UN MATERIAL QUE NO ALCANZA EL DINERO
-                    if($unaVezEstado) {
-                        $unaVezEstado = false;
-                        $infoEstado = "Saldo Insuficiente";
-                    }
-                    $alcanza = true;
+                if($this->redondear_dos_decimal($totalRetenido) > $this->redondear_dos_decimal($saldoRestante)){
+
+                    // HAY UN MATERIAL QUE NO ALCANZA EL DINERO
+                    $infoEstado = "Saldo Insuficiente";
+                    $alcanza = false;
                 }
-            }
+            } // end foreach 2
 
            $completa = false;
            // Es decir, que todos sus materiales estan cotizados
@@ -688,11 +694,16 @@ class ProyectoController extends Controller
            $ll->infoestado = $infoEstado;
            $ll->completado = $completa;
 
-            // SI ES TRUE, HAY UN MATERIAL NO COTIZADO QUE NO ALCANZA EL DINERO A SU CÓDIGO
-            $ll->alcanza = $alcanza;
-        }
+           // SI ES TRUE, HAY UN MATERIAL NO COTIZADO QUE NO ALCANZA EL DINERO A SU CÓDIGO
+           $ll->alcanza = $alcanza;
+        } // end foreach 1
 
         return view('backend.admin.proyectos.requisicion.tablarequisicioning', compact('listaRequisicion'));
+    }
+
+    function redondear_dos_decimal($valor) {
+        $float_redondeado=round($valor * 100) / 100;
+        return $float_redondeado;
     }
 
     // NUEVO REQUERIMIENTO
@@ -735,7 +746,7 @@ class ProyectoController extends Controller
 
                 // como siempre busco material que estaban en el presupuesto, siempre encontrara
                 // el proyecto ID y el ID de objeto específico
-                $infoPresupuesto = Presupuesto::where('proyecto_id', $request->id)
+                $infoPresupuesto = CuentaProy::where('proyecto_id', $request->id)
                     ->where('objespeci_id', $infoCatalogo->id_objespecifico)
                     ->first();
 
@@ -743,38 +754,59 @@ class ProyectoController extends Controller
                 $totalEntrada = 0;
                 $totalRetenido = 0;
 
-                $infoSalidaDetalle = DB::table('presupuesto_detalle AS pd')
+                //*********
+
+                $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.presupuesto_id', $infoPresupuesto->id)
-                    ->where('pd.tipo', 0) // salidas
+                    ->where('pd.id_cuentaproy', $infoPresupuesto->id)
+                    ->where('pd.tipo', 0) // salidas. la orden es valida
                     ->get();
 
                 foreach ($infoSalidaDetalle as $dd){
                     $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
                 }
 
-                $infoEntradaDetalle = DB::table('presupuesto_detalle AS pd')
+                $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.presupuesto_id', $infoPresupuesto->id)
-                    ->where('pd.tipo', 1) // entradas
+                    ->where('pd.id_cuentaproy', $infoPresupuesto->id)
+                    ->where('pd.tipo', 1) // entradas. la orden es cancelada
                     ->get();
 
                 foreach ($infoEntradaDetalle as $dd){
                     $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
                 }
 
+                //********* end
+
+                // OBTENER SALDO RESTANTE POR LOS MOVIMIENTO DE CUENTAS
+
+                $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
+                    ->sum('aumento');
+
+                $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
+                    ->sum('disminuye');
+
+                $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
+
+                //INICIO DE VERIFICACIÓN DE CUANTO SALDO RESTANTE ME QUEDA
+
+                // hoy obtener cuanto me queda por los movimientos de cuenta
+                $saldoRestante = $totalMoviCuenta;
+
                 // esto es lo que hay de SALDO RESTANTE PARA EL OBJETO ESPECÍFICO
-                $saldoRestante = $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada); // 59
+                // total salida y entrada son de cuentaproy_detalle para calcular ordenes de compra valida o rechazada
+                $saldoRestante = $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada);
+
 
                 // obtener cuanto saldo retenido tengo para el objeto específico
                 // y el dinero lo obtiene de LA REQUISICIÓN DETALLE
 
-                $infoSaldoRetenido = DB::table('presupuesto_saldo_retenido AS psr')
+                $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                     ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('psr.id_presupuesto', $infoPresupuesto->id) // con esto obtengo solo del obj específico
+                    ->where('psr.id_cuentaproy', $infoPresupuesto->id) // con esto obtengo solo del obj específico
                     ->get();
 
                 foreach ($infoSaldoRetenido as $dd){
@@ -786,8 +818,29 @@ class ProyectoController extends Controller
 
                 $sumaSaldos = $saldoMaterial + $totalRetenido; // 59.00
 
-                // verificar si alcanza el saldo para guardar la cotización
-                if($saldoRestante < $sumaSaldos){
+
+                if($saldoRestante >= $sumaSaldos){
+
+                    // si hay saldo para este material
+                    // guardar detalle cotización e ingresar una salida de dinero
+
+                    $rDetalle = new RequisicionDetalle();
+                    $rDetalle->requisicion_id = $r->id;
+                    $rDetalle->material_id = $request->datainfo[$i];
+                    $rDetalle->cantidad = $request->cantidad[$i];
+                    $rDetalle->estado = 0;
+                    $rDetalle->dinero = $infoCatalogo->pu; // lo que vale el material en ese momento
+                    $rDetalle->save();
+
+                    // guardar el SALDO RETENIDO
+                    $rRetenido = new CuentaProyRetenido();
+                    $rRetenido->id_requi_detalle = $rDetalle->id;
+                    $rRetenido->id_cuentaproy = $infoPresupuesto->id;
+
+                    $rRetenido->save();
+
+                }else{
+
                     // retornar que no alcanza el saldo
 
                     // SALDO RESTANTE Y SALDO RETENIDO FORMATEADOS
@@ -802,35 +855,7 @@ class ProyectoController extends Controller
                         'retenidoFormat' => $saldoRetenidoFormat, // esto va formateado
                         'retenido' => $totalRetenido,
                         'solicita' => $saldoMaterial, // el usuario solicita este dinero
-
                     ];
-                }else{
-
-                    // si hay saldo para este material
-                    // guardar detalle cotización e ingresar una salida de dinero
-
-                    $rDetalle = new RequisicionDetalle();
-                    $rDetalle->requisicion_id = $r->id;
-                    $rDetalle->material_id = $request->datainfo[$i];
-                    $rDetalle->cantidad = $request->cantidad[$i];
-                    $rDetalle->estado = 0;
-                    $rDetalle->dinero = $infoCatalogo->pu; // lo que vale el material en ese momento
-                    $rDetalle->save();
-
-                    // NO SE CREA AQUI, SINO HASTA QUE SE GENERA ORDEN DE COMPRA
-                    // SI LA ORDEN COMPRA ES CANCELADA, ENTONCES CAMBIA UN ESTADO Y NO SE VALIDA
-                    /*$rSalida = new PresupuestoDetalle();
-                    $rSalida->id_requi_detalle = $rDetalle->id;
-                    $rSalida->presupuesto_id = $infoPresupuesto->id;
-                    $rSalida->tipo = 0; // salida
-                    $rSalida->save();*/
-
-                    // guardar el SALDO RETENIDO
-                    $rRetenido = new PresuSaldoRetenido();
-                    $rRetenido->id_requi_detalle = $rDetalle->id;
-                    $rRetenido->id_presupuesto = $infoPresupuesto->id;
-
-                    $rRetenido->save();
                 }
             }
 
@@ -841,7 +866,7 @@ class ProyectoController extends Controller
             return ['success' => 1, 'contador' => $contador];
 
         }catch(\Throwable $e){
-            Log::info('eerror' . $e);
+            Log::info('ERROR ' . $e);
             DB::rollback();
             return ['success' => 2];
         }
@@ -894,7 +919,7 @@ class ProyectoController extends Controller
 
                     // como siempre busco material que estaban en el presupuesto, siempre encontrara
                     // el proyecto ID y el ID de objeto específico
-                    $infoPresupuesto = Presupuesto::where('proyecto_id', $infoProyecto->id)
+                    $infoPresupuesto = CuentaProy::where('proyecto_id', $infoProyecto->id)
                         ->where('objespeci_id', $infoCatalogo->id_objespecifico)
                         ->first();
 
@@ -902,38 +927,50 @@ class ProyectoController extends Controller
                     $totalEntrada = 0;
                     $totalRetenido = 0;
 
-                    $infoSalidaDetalle = DB::table('presupuesto_detalle AS pd')
+                    $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                         ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                         ->select('rd.cantidad', 'rd.dinero')
-                        ->where('pd.presupuesto_id', $infoPresupuesto->id)
-                        ->where('pd.tipo', 0) // salidas
+                        ->where('pd.id_cuentaproy', $infoPresupuesto->id)
+                        ->where('pd.tipo', 0) // salidas. orden compra valida
                         ->get();
 
                     foreach ($infoSalidaDetalle as $dd){
                         $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
                     }
 
-                    $infoEntradaDetalle = DB::table('presupuesto_detalle AS pd')
+                    $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                         ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                         ->select('rd.cantidad', 'rd.dinero')
-                        ->where('pd.presupuesto_id', $infoPresupuesto->id)
-                        ->where('pd.tipo', 1) // entradas
+                        ->where('pd.id_cuentaproy', $infoPresupuesto->id)
+                        ->where('pd.tipo', 1) // entradas. orden de compra cancelada
                         ->get();
 
                     foreach ($infoEntradaDetalle as $dd){
                         $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
                     }
 
+                    // Bloque de movimiento de cuentas
+
+                    $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
+                        ->sum('aumento');
+
+                    $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
+                        ->sum('disminuye');
+
+                    $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
+                    $saldoRestante = $totalMoviCuenta;
+
                     // esto es lo que hay de SALDO RESTANTE PARA EL OBJETO ESPECÍFICO
-                    $saldoRestante = $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada);
+                    $saldoRestante += $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada);
+
 
                     // obtener cuanto saldo retenido tengo para el objeto específico
                     // y el dinero lo obtiene de LA REQUISICIÓN DETALLE
 
-                    $infoSaldoRetenido = DB::table('presupuesto_saldo_retenido AS psr')
+                    $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                         ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                         ->select('rd.cantidad', 'rd.dinero')
-                        ->where('psr.id_presupuesto', $infoPresupuesto->id) // con esto obtengo solo del obj específico
+                        ->where('psr.id_cuentaproy', $infoPresupuesto->id) // con esto obtengo solo del obj específico
                         ->get();
 
                     foreach ($infoSaldoRetenido as $dd){
@@ -944,7 +981,6 @@ class ProyectoController extends Controller
                     if($totalRetenido > $saldoRestante){
                         // HAY UN MATERIAL QUE NO ALCANZA EL DINERO
                         $alcanza = true;
-
                     }
                 }
 
@@ -952,7 +988,7 @@ class ProyectoController extends Controller
                 $deta->alcanza = $alcanza;
             }
 
-            Log::info($detalle);
+
 
             return ['success' => 1, 'info' => $info, 'detalle' => $detalle];
         }
@@ -2004,8 +2040,8 @@ class ProyectoController extends Controller
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $pp->id)
-                ->where('pd.tipo', 0) // salidas
-                ->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                ->where('pd.tipo', 0) // salidas. la orden es valida
+                //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
 
             foreach ($infoSalidaDetalle as $dd){
@@ -2016,7 +2052,7 @@ class ProyectoController extends Controller
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $pp->id)
-                ->where('pd.tipo', 1) // entradas
+                ->where('pd.tipo', 1) // entradas. la orden fue cancelada
                 ->get();
 
             foreach ($infoEntradaDetalle as $dd){
@@ -2085,7 +2121,7 @@ class ProyectoController extends Controller
         // presupuesto
         $presupuesto = DB::table('partida_detalle AS p')
             ->join('materiales AS m', 'p.material_id', '=', 'm.id')
-            ->select('m.nombre', 'p.cantidad', 'm.id_unidadmedida')
+            ->select('m.nombre', 'm.id', 'p.cantidad', 'm.id_objespecifico', 'm.id_unidadmedida')
             ->whereIn('p.partida_id', $pila)
             ->orderBy('m.nombre', 'ASC')
             ->get();
@@ -2096,8 +2132,15 @@ class ProyectoController extends Controller
             if($info = UnidadMedida::where('id', $pp->id_unidadmedida)->first()){
                 $medida = $info->medida;
             }
-
             $pp->medida = $medida;
+
+            $infoObjeto = ObjEspecifico::where('id', $pp->id_objespecifico)->first();
+
+            $pp->objcodigo = $infoObjeto->codigo;
+            $pp->objnombre = $infoObjeto->nombre;
+
+            $infoCatalogo = CatalogoMateriales::where('id', $pp->id)->first();
+            $pp->actual = number_format((float)$infoCatalogo->pu, 2, '.', ',');
         }
 
         return view('backend.admin.proyectos.modal.modalcatalogomaterial', compact('presupuesto'));

@@ -333,7 +333,7 @@
             })
                 .then((response) => {
                     closeLoading();
-
+                    console.log(response)
                     if(response.data.success === 1){
 
                         let saldo = response.data.saldo;
@@ -341,13 +341,15 @@
 
                         Swal.fire({
                             title: 'Movimiento Inválido',
-                            text: "La Cuenta a Modificar con el Código " + unido + ". Queda con Saldo Negativo $" + saldo,
+                            html: "La Cuenta a Modificar con el Código " + unido +"<br>"
+                                + "Tiene Saldo Restante $" + saldo + "<br>"
+                                + "Se verificó que (Saldo a Restar - Saldo Restante - Saldo Retenido) No sea menor a $0.00"
+                            ,
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar'
+                            confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
 
@@ -355,9 +357,7 @@
                         })
                     }
 
-
-
-                    if(response.data.success === 1){
+                    if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();

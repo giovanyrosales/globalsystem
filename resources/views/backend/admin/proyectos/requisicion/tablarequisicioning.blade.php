@@ -17,9 +17,9 @@
 
                             @foreach($listaRequisicion as $dato)
                                 @if($dato->alcanza)
-                                    <tr style="background: #F1948A">
-                                @else
                                     <tr>
+                                @else
+                                    <tr style="background: #F1948A">
                                 @endif
 
                                     <td style="width: 4%">{{ $dato->numero }}</td>

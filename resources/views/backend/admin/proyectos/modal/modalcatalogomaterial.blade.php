@@ -75,17 +75,23 @@
 
     <tbody>
     <tr>
+        <td width="15%">Código</td>
+        <td width="15%">Obj. Espec.</td>
         <td width="30%">Material</td>
         <td width="15%">Medida</td>
         <td width="10%">Cantidad</td>
+        <td width="15%">Precio Actual</td>
     </tr>
 
     @foreach($presupuesto as $dd)
 
         <tr>
+            <td width="15%">{{ $dd->objcodigo }}</td>
+            <td width="15%">{{ $dd->objnombre }}</td>
             <td width="30%">{{ $dd->nombre }}</td>
             <td width="15%">{{ $dd->medida }}</td>
             <td width="10%">{{ $dd->cantidad }}</td>
+            <td width="15%">${{ $dd->actual }}</td>
         </tr>
 
     @endforeach
