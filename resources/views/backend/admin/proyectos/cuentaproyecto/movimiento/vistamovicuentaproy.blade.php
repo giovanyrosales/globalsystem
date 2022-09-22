@@ -67,117 +67,62 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Proyecto *:</label>
-                                        <select class="form-control" id="select-proyecto" onchange="verificar()" style="width: 100%">
-                                            <option value="">Seleccionar Proyecto</option>
-
-                                        </select>
+                                        <input type="hidden" class="form-control" id="id-editar">
                                     </div>
+
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label>Código y Objeto Específico</label>
+                                            <input type="text" disabled class="form-control" id="codigo">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label>Cuenta</label>
+                                            <input type="text" disabled class="form-control" id="cuenta">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Saldo Restante</label>
+                                            <input type="text" disabled placeholder="0.00" class="form-control" id="saldo-restante">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Saldo a Modificar</label>
+                                            <input type="text" class="form-control" placeholder="0.00" id="saldo-modificar">
+                                        </div>
+                                    </div>
+
+                                    <hr style="height:1px;border:none;color:#333;background-color:#333;">
+
 
                                     <div class="form-group">
-                                        <label>Cuenta Proyecto *:</label>
-                                        <select class="form-control" id="select-cuentaproy"  style="width: 100%">
+                                        <label>Cuenta a Modificar para Disminuir Saldo</label>
+                                        <select class="form-control" id="select-cuentaproy" onchange="buscarSaldoRestante()" style="width: 100%">
                                         </select>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Aumenta:</label>
-                                            <input type="text" class="form-control" id="aumenta-nuevo">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Disminuye:</label>
-                                            <input type="text" class="form-control" id="disminuye-nuevo">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
+                                    <div class="col-md-12 row">
+                                        <div class="form-group col-md-6">
                                             <label>Fecha:</label>
                                             <input type="date" class="form-control" id="fecha-nuevo">
                                         </div>
-                                    </div>
 
-
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="nuevo()">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- modal editar -->
-    <div class="modal fade" id="modalEditar">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Editar Cuenta Proyecto</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <div class="modal-body">
-                    <form id="formulario-editar">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-
-                                    <div class="form-group">
-                                        <input type="hidden" id="id-editar">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Proyecto *:</label>
-                                        <select class="form-control" id="select-proyecto-editar" onchange="verificar()" style="width: 100%">
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Cuenta Proyecto *:</label>
-                                        <select class="form-control" id="select-cuentaproy-editar"  style="width: 100%">
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Aumenta:</label>
-                                            <input type="text" class="form-control" id="aumenta-editar">
+                                        <div class="form-group col-md-6">
+                                            <label style="font-weight: bold">Saldo Restante:</label>
+                                            <input type="text" disabled class="form-control" id="restante">
                                         </div>
                                     </div>
 
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Disminuye:</label>
-                                            <input type="text" class="form-control" id="disminuye-editar">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Fecha:</label>
-                                            <input type="date" class="form-control" id="fecha-editar">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="col-sm-3 col-form-label">Reforma:</label>
-                                        <div class="col-sm-8">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text"><i class="fas fa-file"></i></span>
-                                                </div>
-                                                <input type="file" style="color:#191818; width: 80%" id="documento-editar" accept="image/jpeg, image/jpg, image/png, .pdf"/>
-                                            </div>
+                                            <label>Reforma</label>
+                                            <input type="file" id="documento" class="form-control" accept="image/jpeg, image/jpg, image/png, .pdf"/>
                                         </div>
                                     </div>
 
@@ -188,11 +133,12 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                    <button type="button" class="btn btn-primary" onclick="verificar()">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
+
 
 </div>
 
@@ -210,10 +156,9 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            let id = {{ $id }}; // id proyecto
+            let id = {{ $id }}; // id PROYECTO
             var ruta = "{{ URL::to('/admin/movicuentaproy/tablamovicuentaproy') }}/" + id;
             $('#tablaDatatable').load(ruta);
-
 
             $('#select-proyecto').select2({
                 theme: "bootstrap-5",
@@ -224,32 +169,6 @@
                 },
             });
 
-            $('#select-cuentaproy').select2({
-                theme: "bootstrap-5",
-                "language": {
-                    "noResults": function(){
-                        return "Busqueda no encontrada";
-                    }
-                },
-            });
-
-            $('#select-proyecto-editar').select2({
-                theme: "bootstrap-5",
-                "language": {
-                    "noResults": function(){
-                        return "Busqueda no encontrada";
-                    }
-                },
-            });
-
-            $('#select-cuentaproy-editar').select2({
-                theme: "bootstrap-5",
-                "language": {
-                    "noResults": function(){
-                        return "Busqueda no encontrada";
-                    }
-                },
-            });
 
             document.getElementById("divcontenedor").style.display = "block";
 
@@ -264,123 +183,151 @@
         }
 
         function verHistorico(){
-            let id = {{ $id }}; // id proyecto
+            let id = {{ $id }}; // ID PROYECTO
             window.location.href="{{ url('/admin/movicuentaproy/historico') }}/" + id;
+        }
+
+        function buscarSaldoRestante(){
+            let id = document.getElementById('select-cuentaproy').value;
+            openLoading();
+
+            axios.post(url+'/movicuentaproy/info/saldo',{
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+
+                        $('#restante').val(response.data.restante);
+                    }else{
+                        toastr.error('Información no encontrada');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Información no encontrada');
+                });
+        }
+
+        function informacionAgregar(id){
+            openLoading();
+            document.getElementById("formulario-nuevo").reset();
+
+            axios.post(url+'/movicuentaproy/informacion',{
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        $('#modalAgregar').modal('show');
+                        document.getElementById('select-tipo').value = '0';
+
+                        $('#id-editar').val(id);
+
+                        let objeto = response.data.objeto;
+
+                        $('#codigo').val(objeto.codigo + " - " + objeto.nombre);
+                        $('#cuenta').val(response.data.cuenta);
+                        $('#saldo-restante').val(response.data.restante);
+
+                        var fecha = new Date();
+                        $('#fecha-editar').val(fecha.toJSON().slice(0,10));
+
+                        document.getElementById("select-cuentaproy").options.length = 0;
+
+                        $('#select-cuentaproy').append('<option value="0">Seleccionar Opción</option>');
+
+                        $.each(response.data.arraycuentaproy, function( key, val ){
+                            if(response.data.info.objespeci_id == val.id){
+                                $('#select-cuentaproy').append('<option value="' +val.id +'" selected="selected">'+val.codigo + ' - ' + val.nombre +'</option>');
+                            }else{
+                                $('#select-cuentaproy').append('<option value="' +val.id +'">'+val.codigo + ' - ' + val.nombre +'</option>');
+                            }
+                        });
+
+                    }else{
+                        toastr.error('Información no encontrada');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Información no encontrada');
+                });
         }
 
 
         function verificar(){
-
-            var id = document.getElementById('select-proyecto').value;
-
-            if(id !== ''){
-                openLoading();
-                document.getElementById("formulario-editar").reset();
-
-                axios.post(url+'/movicuentaproy/buscador',{
-                    'id': id
-                })
-                    .then((response) => {
-                        closeLoading();
-
-                        if(response.data.success === 1){
-
-                            document.getElementById("select-cuentaproy").options.length = 0;
-
-                            $('#select-cuentaproy').append('<option value="" selected="selected">Seleccionar Cuenta</option>');
-                            $.each(response.data.cuentaproy, function( key, val ){
-                                $('#select-cuentaproy').append('<option value="' +val.id +'">'+ val.nomcuenta +'</option>');
-                            });
-
-                        }else{
-                            toastr.error('Información no encontrada');
-                        }
-                    })
-                    .catch((error) => {
-                        closeLoading();
-                        toastr.error('Información no encontrada');
-                    });
-            }else{
-                document.getElementById("select-cuentaproy").options.length = 0;
-            }
-        }
-
-        function abrirModalAgregar(){
-            document.getElementById("formulario-nuevo").reset();
-            $('#modalAgregar').modal('show');
+            Swal.fire({
+                title: 'Guardar Movimiento',
+                text: "",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                   nuevo();
+                }
+            })
         }
 
         function nuevo(){
-            var proyecto = document.getElementById('select-proyecto').value;
-            var cuenta = document.getElementById('select-cuentaproy').value;
-            var documento = document.getElementById('documento');
-            var aumenta = document.getElementById('aumenta-nuevo').value;
-            var disminuye = document.getElementById('disminuye-nuevo').value;
+
+            // ID CUENTAPROY
+            var id = document.getElementById('id-editar').value;
+
+            var saldomodificar = document.getElementById('saldo-modificar').value;
+
+            var selectcuenta = document.getElementById('select-cuentaproy').value;
             var fecha = document.getElementById('fecha-nuevo').value;
-
-            if(proyecto === ''){
-                toastr.error('Nombre de Proyecto es Requerido');
-                return;
-            }
-
-            if(cuenta === ''){
-                toastr.error('Cuenta Proyecto es Requerido');
-                return;
-            }
+            var documento = document.getElementById('documento');
 
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
-            if(aumenta.length > 0){
-                if(!aumenta.match(reglaNumeroDecimal)) {
-                    toastr.error('Aumenta debe ser decimal y no negativo');
-                    return;
-                }
-
-                if(aumenta < 0){
-                    toastr.error('Aumenta no debe ser negativo');
-                    return;
-                }
-
-                if(aumenta.length > 10){
-                    toastr.error('Aumenta debe tener máximo 10 caracteres');
-                    return;
-                }
-            }else{
-                aumenta = 0;
+            if(saldomodificar === ''){
+                toastr.error('Saldo a modificar es requerido');
+                return;
             }
 
-            if(disminuye.length > 0){
-                if(!disminuye.match(reglaNumeroDecimal)) {
-                    toastr.error('Disminuye debe ser decimal y no negativo');
-                    return;
-                }
+            if(!saldomodificar.match(reglaNumeroDecimal)) {
+                toastr.error('Saldo a modificar debe ser decimal y no negativo');
+                return;
+            }
 
-                if(disminuye < 0){
-                    toastr.error('Disminuye no debe ser negativo');
-                    return;
-                }
+            if(saldomodificar < 0){
+                toastr.error('Saldo a modificar no debe ser negativo');
+                return;
+            }
 
-                if(disminuye.length > 10){
-                    toastr.error('Disminuye debe tener máximo 10 caracteres');
-                    return;
-                }
-            }else{
-                disminuye = 0;
+            if(saldomodificar.length > 10){
+                toastr.error('Saldo a modificar debe tener máximo 10 caracteres');
+                return;
+            }
+
+            if(selectcuenta === '0'){
+                toastr.error('Cuenta a Modificar es requerido');
+                return;
+            }
+
+            if(fecha === ''){
+                toastr.error('Fecha es requerido');
+                return;
             }
 
             if(documento.files && documento.files[0]){ // si trae doc
-                if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png|pdf')){
-                    toastr.error('formato de documento permitido: .png .jpg .jpeg .pdf');
+                if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png|.pdf')){
+                    toastr.error('formato permitidos: .png .jpg .jpeg .pdf');
                     return;
                 }
             }
 
             openLoading();
             var formData = new FormData();
-            formData.append('proyecto', proyecto);
-            formData.append('cuenta', cuenta);
-            formData.append('aumenta', aumenta);
-            formData.append('disminuye', disminuye);
+            formData.append('id', id);
+            formData.append('saldomodi', saldomodificar);
+            formData.append('selectcuenta', selectcuenta);
             formData.append('fecha', fecha);
             formData.append('documento', documento.files[0]);
 
@@ -388,6 +335,30 @@
             })
                 .then((response) => {
                     closeLoading();
+
+                    if(response.data.success === 1){
+
+                        let saldo = response.data.saldo;
+                        let unido = response.data.unido;
+
+                        Swal.fire({
+                            title: 'Movimiento Inválido',
+                            text: "La Cuenta a Modificar con el Código " + unido + ". Queda con Saldo Negativo $" + saldo,
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
+
+
                     if(response.data.success === 1){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
@@ -403,51 +374,7 @@
                 });
         }
 
-        function informacion(id){
-            openLoading();
-            document.getElementById("formulario-editar").reset();
 
-            axios.post(url+'/movicuentaproy/informacion',{
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        $('#modalEditar').modal('show');
-
-                        $('#id-editar').val(id);
-                        $('#aumenta-editar').val(response.data.info.aumenta);
-                        $('#disminuye-editar').val(response.data.info.disminuye);
-                        $('#fecha-editar').val(response.data.info.fecha);
-
-                        document.getElementById("select-proyecto-editar").options.length = 0;
-                        document.getElementById("select-cuentaproy-editar").options.length = 0;
-
-                        $.each(response.data.proyecto, function( key, val ){
-                            if(response.data.idproyecto == val.id){
-                                $('#select-proyecto-editar').append('<option value="' +val.id +'" selected="selected">'+ val.nombrecod +'</option>');
-                            }else{
-                                $('#select-proyecto-editar').append('<option value="' +val.id +'">'+ val.nombrecod +'</option>');
-                            }
-                        });
-
-                        $.each(response.data.cuentaproy, function( key, val ){
-                            if(response.data.idcuentaproy == val.id){
-                                $('#select-cuentaproy-editar').append('<option value="' +val.id +'" selected="selected">'+ val.nombrecod +'</option>');
-                            }else{
-                                $('#select-cuentaproy-editar').append('<option value="' +val.id +'">'+ val.nombrecod +'</option>');
-                            }
-                        });
-
-                    }else{
-                        toastr.error('Información no encontrada');
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Información no encontrada');
-                });
-        }
 
         function editar(){
             var id = document.getElementById('id-editar').value;

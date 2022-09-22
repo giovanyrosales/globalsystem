@@ -81,14 +81,6 @@
                         </li>
                         @endcan
 
-                        @can('sidebar.movimiento.cuenta')
-                        <li class="nav-item">
-                            <a href="{{ route('admin.movi.cuenta.proy.index') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Movimiento Cuenta Proyecto</p>
-                            </a>
-                        </li>
-                        @endcan
 
                     </ul>
                 </li>
@@ -175,41 +167,6 @@
                 </li>
                 @endcan
 
-                @can('sidebar.seccion.cuentabolson')
-               <!-- <li class="nav-item">
-
-                    <a href="#" class="nav-link nav-">
-                        <i class="far fa-edit"></i>
-                        <p>
-                            Cuentas Bolsón
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-
-
-                    <ul class="nav nav-treeview">
-                        @can('sidebar.cuentabolson.cuenta')
-                        <li class="nav-item">
-                            <a href="{{ route('admin.bolson.cuenta.index') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Cuenta</p>
-                            </a>
-                        </li>
-                        @endcan
-
-                        @can('sidebar.cuentabolson.movimiento')
-                        <li class="nav-item">
-                            <a href="{{ route('admin.movimiento.bolson.index') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Movimiento</p>
-                            </a>
-                        </li>
-                        @endcan
-
-                    </ul>
-                </li>  -->
-                @endcan
-                
                 @can('sidebar.seccion.requerimientosunidad')
                     <li class="nav-item">
 

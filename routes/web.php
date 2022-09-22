@@ -186,13 +186,17 @@ Route::post('/admin/planilla/editar',  [CuentaProyectoController::class,'editarP
 Route::get('/admin/movicuentaproy/indexmovicuentaproy/{id}', [CuentaProyectoController::class,'indexMoviCuentaProy']);
 Route::get('/admin/movicuentaproy/tablamovicuentaproy/{id}', [CuentaProyectoController::class,'indexTablaMoviCuentaProy']);
 
-Route::get('/admin/movicuentaproy/historico/{id}', [CuentaProyectoController::class,'indexTablaMoviCuentaProyHistorico']);
-Route::get('/admin/movicuentaproy/tablahistorico/{id}', [CuentaProyectoController::class,'indexTablaMoviCuentaProyHistorico']);
+Route::get('/admin/movicuentaproy/historico/{id}', [CuentaProyectoController::class,'indexMoviCuentaProyHistorico']);
+Route::get('/admin/movicuentaproy/tablahistorico/{id}', [CuentaProyectoController::class,'tablaMoviCuentaProyHistorico']);
 
 
 Route::post('/admin/movicuentaproy/nuevo',  [CuentaProyectoController::class,'nuevaMoviCuentaProy']);
 Route::get('/admin/movicuentaproy/documento/{id}',  [CuentaProyectoController::class,'descargarReforma']);
+Route::post('/admin/movicuentaproy/documento/guardar',  [CuentaProyectoController::class,'guardarDocumentoReforma']);
 Route::post('/admin/movicuentaproy/informacion',  [CuentaProyectoController::class,'informacionMoviCuentaProy']);
+
+// al mover el select de Cuenta a modificar, quiero ver el saldo restante
+Route::post('/admin/movicuentaproy/info/saldo',  [CuentaProyectoController::class,'infoSaldoRestanteCuenta']);
 Route::post('/admin/movicuentaproy/editar',  [CuentaProyectoController::class,'editarMoviCuentaProy']);
 
 // --- VISTA GENERAR COTIZACION ---

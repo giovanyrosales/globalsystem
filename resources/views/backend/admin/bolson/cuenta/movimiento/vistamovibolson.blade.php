@@ -15,11 +15,6 @@
         table-layout:fixed;
     }
 
-    .dropdown-menu {
-        max-height: 280px;
-        overflow-y: auto;
-        width: 100%;
-    }
 </style>
 
 <div id="divcontenedor" style="display: none">

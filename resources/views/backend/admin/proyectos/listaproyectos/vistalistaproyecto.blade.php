@@ -757,7 +757,7 @@
 
         // modal para varias opciones de proyecto
         function modalOpciones(id, estado){
-
+            // VIENE ID PROYECTO
             $('#id-proyecto').val(id);
             // para poder mostrar el botón ver presupuesto modal cuando sea necesario
             // 1: LISTO PARA APROBACIÓN
@@ -815,6 +815,7 @@
 
         // carga otra vista para manejar los movimiento de cuenta
         function informacionMovimiento(){
+            // ID PROYECTO
             var id = document.getElementById('id-proyecto').value;
             window.location.href="{{ url('/admin/movicuentaproy/indexmovicuentaproy') }}/"+id;
         }

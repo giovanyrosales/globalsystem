@@ -8,7 +8,7 @@
                             <thead>
                             <tr>
                                 <th>Código</th>
-                                <th>Cuenta</th>
+                                <th>Obj Específico</th>
                                 <th>Saldo Inicial</th>
                                 <th>Saldo Restante</th>
                                 <th>Saldo Retenido</th>
@@ -21,13 +21,13 @@
 
                                     <td>{{ $dato->codigo }}</td>
                                     <td>{{ $dato->nombre }}</td>
-                                    <td>{{ $dato->saldo_inicial }}</td>
-                                    <td>{{ $dato->saldo_restante }}</td>
-                                    <td>{{ $dato->total_retenido }}</td>
+                                    <td>${{ $dato->saldo_inicial }}</td>
+                                    <td>${{ $dato->saldo_restante }}</td>
+                                    <td>${{ $dato->total_retenido }}</td>
 
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacionAgregar({{ $dato->id }})">
-                                            <i class="fas fa-plus-square" title="Agregar"></i>&nbsp; Agregar
+                                            <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aumentar
                                         </button>
 
                                     </td>

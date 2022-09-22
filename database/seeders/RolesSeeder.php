@@ -81,8 +81,6 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'modulo.agregar.partida.proyecto', 'description' => 'sidebar seccion proyecto - modulo para agregar partidas'])->syncRoles($roleIng);
 
 
-        //Permission::create(['name' => 'sidebar.cuenta.proyecto', 'description' => 'sidebar seccion proyecto - cuenta de proyecto'])->syncRoles($roleUaci, $rolePresupuesto);
-        Permission::create(['name' => 'sidebar.movimiento.cuenta', 'description' => 'sidebar seccion proyecto - movimiento de cuenta'])->syncRoles($roleUaci, $rolePresupuesto);
 
         // COTIZACIONES
         Permission::create(['name' => 'sidebar.seccion.cotizaciones', 'description' => 'sidebar seccion cotizaciones'])->syncRoles($roleUaci, $roleJefeUaci);
@@ -99,11 +97,6 @@ class RolesSeeder extends Seeder
         // ORDENES DE COMPRAS
         Permission::create(['name' => 'sidebar.seccion.ordenescompra', 'description' => 'sidebar seccion ordenes de compra'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleJefeUaci);
 
-        // SECCION CUENTA BOLSON
-        Permission::create(['name' => 'sidebar.seccion.cuentabolson', 'description' => 'sidebar seccion cuenta bolson'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleJefeUaci);
-
-            Permission::create(['name' => 'sidebar.cuentabolson.cuenta', 'description' => 'sidebar seccion cuenta bolson - cuenta'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleJefeUaci);
-            Permission::create(['name' => 'sidebar.cuentabolson.movimiento', 'description' => 'sidebar seccion cuenta bolson - movimiento'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleJefeUaci);
 
         // CONFIGURACIONES
         Permission::create(['name' => 'sidebar.seccion.configuraciones', 'description' => 'sidebar seccion configuraciones'])->syncRoles($roleUaci, $roleIng, $rolePresupuesto, $roleUaciUnidad);
@@ -144,7 +137,7 @@ class RolesSeeder extends Seeder
 
         Permission::create(['name' => 'boton.aprobar.presupuesto', 'description' => 'boton para aprobar presupuesto, mostrado en modal'])->syncRoles($roleUaci);
         Permission::create(['name' => 'boton.dinero.presupuesto', 'description' => 'boton para mostrar MODAL cuanto dinero le queda a un proyecto del presupuesto'])->syncRoles($roleAdministrador);
-        Permission::create(['name' => 'boton.movimiento.cuenta.proyecto', 'description' => 'botón para redirigir a movimiento cuenta proyecto'])->syncRoles($roleAdministrador);
+        Permission::create(['name' => 'boton.movimiento.cuenta.proyecto', 'description' => 'botón para redirigir a movimiento cuenta proyecto'])->syncRoles($roleAdministrador, $roleUaci);
 
 
     }
