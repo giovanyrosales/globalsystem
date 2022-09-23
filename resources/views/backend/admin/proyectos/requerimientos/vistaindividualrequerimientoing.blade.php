@@ -82,8 +82,8 @@
 
                                         <label>Proveedor</label>
                                         <select class="form-control" id="select-proveedor">
-                                            @foreach($proveedores as $proveedor)
-                                                <option value="{{ $proveedor->id }}">{{ $proveedor->nombre }}</option>
+                                            @foreach($proveedores as $data)
+                                                <option value="{{ $data->id }}">{{ $data->nombre }}</option>
                                             @endforeach
                                         </select>
 
@@ -397,7 +397,7 @@
                             "</td>"+
 
                             "<td>"+
-                            "<input value='$"+response.data.totalPrecio+"' disabled class='form-control'>"+
+                            "<input value='' disabled class='form-control'>"+
                             "</td>"+
 
                             "<td>"+
@@ -506,16 +506,14 @@
                         let costo = response.data.costo;
                         let codigo = response.data.obj;
                         let disponible = response.data.disponibleFormat;
-                        let retenido = response.data.retenidoFormat;
                         let totalactual = response.data.totalactual;
 
                         Swal.fire({
                             title: 'Saldo Insuficiente',
                             html: "El material " + nombre + " - " + unidad + ", Solicita $" + costo + ". Pero el Código " + codigo
-                            + " Tiene Saldo. " + "<br>"
+                            + " Tiene Saldo actual. " + "<br>"
                                 + "Disponible $" + disponible + "<br>"
-                                + "Retenido $" + retenido + "<br>"
-                                + "Presupuesto Faltante $" + totalactual + "<br>"
+                                + "Saldo Faltante $" + totalactual + "<br>"
                             ,
                             icon: 'info',
                             showCancelButton: false,

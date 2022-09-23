@@ -127,7 +127,7 @@
                     <ul class="nav nav-treeview">
                         @can('sidebar.cotizacion.pendiente')
                         <li class="nav-item">
-                            <a href="{{ route('cotizaciones.pendientes.index') }}" target="frameprincipal" class="nav-link">
+                            <a href="{{ route('cotizaciones.pendientes.proyecto.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Cotización Pendiente</p>
                             </a>

@@ -16,18 +16,14 @@
                             <tbody>
 
                             @foreach($listaRequisicion as $dato)
-                                @if($dato->alcanza)
-                                    <tr>
-                                @else
-                                    <tr style="background: #F1948A">
-                                @endif
 
+                                    <tr>
                                     <td style="width: 4%">{{ $dato->numero }}</td>
                                     <td style="width: 10%">{{ $dato->fecha }}</td>
                                     @if($dato->completado)
-                                        <td style="width: 10%"><span class="badge bg-warning"> {{ $dato->infoestado }}</span></td>
+                                        <td style="width: 10%"><span class="badge bg-success"> {{ $dato->estado }}</span></td>
                                     @else
-                                       <td style="width: 10%">{{ $dato->infoestado }}</td>
+                                       <td style="width: 10%">{{ $dato->estado }}</td>
                                     @endif
 
                                     <td>

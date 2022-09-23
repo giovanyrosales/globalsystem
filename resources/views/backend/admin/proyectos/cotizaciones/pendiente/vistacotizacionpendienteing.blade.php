@@ -64,7 +64,7 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/cotizacion/pendiente/tabla-index') }}";
+            var ruta = "{{ URL::to('/admin/cotizacion/proyecto/pendiente/tabla') }}";
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -73,13 +73,8 @@
 
     <script>
 
-        function recargar(){
-            var ruta = "{{ url('/admin/cotizacion/pendiente/tabla-index') }}";
-            $('#tablaDatatable').load(ruta);
-        }
-
         function verPendientes(id){
-            window.location.href="{{ url('/admin/cotizacion/individual/index') }}/" + id;
+            window.location.href="{{ url('/admin/cotizacion/proyecto/individual/index') }}/" + id;
         }
 
     </script>

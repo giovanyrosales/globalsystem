@@ -92,7 +92,7 @@
             <td width="10%" style="font-weight: bold">{{ $dd->codigo }}</td>
             <td width="30%" style="font-weight: bold">{{ $dd->nombre }}</td>
             <td width="20%" style="font-weight: bold">${{ $dd->saldo_inicial }}</td>
-            @if($dd->total_retenido >= $dd->saldo_restante)
+            @if($dd->totalRetenido >= $dd->saldoRestante)
                 <td width="20%" style="font-weight: bold; color: white; background: red">${{ $dd->saldo_restante }}</td>
                 <td width="20%" style="font-weight: bold; color: white; background: red">${{ $dd->total_retenido }}</td>
             @else

@@ -309,12 +309,12 @@ class CuentaProyectoController extends Controller
             // total de los cambios movimientos que se han hecho.
             $totalRestanteSaldo2 = $totalMoviCuenta2; // 0
 
-            // da 59, saldo restante
+            // saldo restante
             $totalRestanteSaldo2 += $infoSaldo2->saldo_inicial - ($totalSalida2 - $totalEntrada2);
 
             // VALIDACIONES.
             // EL BLOQUE 1 SIEMPRE SERA UNA SUMA. ASI QUE NO LLEVA VALIDACIÓN.
-            // SOLO VALIDAR BLOQUE 2, QUE SERA LA CUENTA A DISMINUR SIMPRE
+            // SOLO VALIDAR BLOQUE 2, QUE SERA LA CUENTA A DISMINUR SIEMPRE
 
             $totalRestanteSaldo2 = ($totalRestanteSaldo2 - $request->saldomodi);
 

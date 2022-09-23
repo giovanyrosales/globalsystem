@@ -427,9 +427,10 @@
                                 <thead>
                                 <tr>
                                     <th style="width: 3%">#</th>
-                                    <th style="width: 6%">Cantidad</th>
-                                    <th style="width: 6%">Precio</th>
-                                    <th style="width: 6%">Código</th>
+                                    <th style="width: 4%">Cantidad</th>
+                                    <th style="width: 4%">Precio</th>
+                                    <th style="width: 4%">Total</th>
+                                    <th style="width: 7%">Código Específico</th>
                                     <th style="width: 15%">Descripción</th>
                                     <th style="width: 5%">Opciones</th>
                                 </tr>
@@ -1227,7 +1228,7 @@
 
                 if(datoCantidad <= 0){
                     colorRojoTablaRequisicion(a);
-                    toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
+                    toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo o igual a Cero');
                     return;
                 }
 
@@ -1293,16 +1294,17 @@
                         var texto = '';
                         if(retenido > 0){
                             texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj +
-                                ", Tiene Saldo Disponible $" + disponibleFormat + ", y Saldo RETENIDO $" + retenidoFormat +
-                                "Y se esta solicitando $" + solicita;
+                                ", Tiene Saldo Disponible $" + disponibleFormat + "<br>" + ",Saldo RETENIDO $" + retenidoFormat + "<br>" +
+                                " Y se esta solicitando $" + solicita;
                         }else{
-                            texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj + ", Tiene Saldo Disponible $" + disponibleFormat +
-                            " Y se esta solicitando $" + solicita;
+                            texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj + "<br>" +
+                                "Tiene Saldo Disponible $" + disponibleFormat + "<br>" +
+                            " Y se esta solicitando $" + solicita + "<br>";
                         }
 
                         Swal.fire({
                             title: 'Cantidad No Disponible',
-                            text: texto,
+                            html: texto,
                             icon: 'info',
                             showCancelButton: false,
                             confirmButtonColor: '#28a745',
@@ -1382,22 +1384,15 @@
                         // VERIFICAMOS SI PODEMOS BORRAR EL MATERIAL SINO HA SIDO COTIZADO.
                         // QUITAMOS EL BOTÓN BORRAR
                         for (var i = 0; i < infodetalle.length; i++) {
-
-                            var markup = '';
-
-                            if(infodetalle[i].alcanza){
-                                // ESTA FILA, MATERIAL NO COTIZADO Y NO ALCANZA EL SALDO
-                                markup = "<tr id='"+infodetalle[i].id+"' style='background: #F1948A'>";
-                            }else {
-                                markup = "<tr id='"+infodetalle[i].id+"'>";
-                            }
+                                // id requi detalle
+                            var markup = "<tr id='"+infodetalle[i].id+"'>";
 
                             markup += "<td>"+
                                 "<p id='fila"+(i+1)+"' class='form-control' style='max-width: 65px'>"+(i+1)+"</p>"+
                                 "</td>"+
 
-                                "<td>"+
-                                "<input name='cantidadarrayeditar[]' value='"+infodetalle[i].cantidad+"' maxlength='10' class='form-control' type='number'>"+
+                            "<td>"+
+                                "<input name='cantidadarrayeditar[]' disabled value='"+infodetalle[i].cantidad+"' class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
@@ -1405,22 +1400,25 @@
                                 "</td>"+
 
                                 "<td>"+
+                                "<input value='$"+infodetalle[i].multiplicado+"' disabled class='form-control'>"+
+                                "</td>"+
+
+                                "<td>"+
                                 "<input value='"+infodetalle[i].codigo+"' disabled class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
-                                "<input name='descripcionarrayeditar[]' disabled class='form-control' data-info='"+infodetalle[i].material_id+"' value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
-                                "<div class='droplistaeditar' style='position: absolute; z-index: 9;'></div>"+
+                                "<input class='form-control' disabled value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
                                 "</td>";
 
                                 if(infodetalle[i].cotizado){
-                                    markup += "<td>"+
-                                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
-                                    "</td>"+
-
-                                    "</tr>";
-                                }else{
                                     markup += "<td></td>"+
+                                        "</tr>";
+                                }else{
+                                    markup += "<td>"+
+                                        "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
+                                        "</td>"+
+
                                         "</tr>";
                                 }
 
@@ -1469,7 +1467,6 @@
                 return;
             }
 
-            var hayRegistro = 0;
             var nRegistro = $('#matriz-requisicion-editar >tbody >tr').length;
             let formData = new FormData();
 
@@ -1478,72 +1475,15 @@
                 return;
             }
 
-                var cantidad = $("input[name='cantidadarrayeditar[]']").map(function(){return $(this).val();}).get();
-                var descripcion = $("input[name='descripcionarrayeditar[]']").map(function(){return $(this).val();}).get();
-                var descripcionAtributo = $("input[name='descripcionarrayeditar[]']").map(function(){return $(this).attr("data-info");}).get();
-                var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var cantidad = $("input[name='cantidadarrayeditar[]']").map(function(){return $(this).val();}).get();
 
-                for(var a = 0; a < cantidad.length; a++){
-                    let detalle = descripcionAtributo[a];
-                    let datoCantidad = cantidad[a];
-
-                    // identifica si el 0 es tipo number o texto
-                    if(detalle == 0){
-                        colorRojoTablaRequisicionEditar(a);
-                        alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
-                        return;
-                    }
-
-                    if(datoCantidad === ''){
-                        colorRojoTablaRequisicionEditar(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
-                        return;
-                    }
-
-                    if(!datoCantidad.match(reglaNumeroDecimal)) {
-                        colorRojoTablaRequisicionEditar(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
-                        return;
-                    }
-
-                    if(datoCantidad <= 0){
-                        colorRojoTablaRequisicionEditar(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
-                        return;
-                    }
-
-                    if(datoCantidad.length > 10){
-                        colorRojoTablaRequisicionEditar(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
-                        return;
-                    }
-                }
-
-                for(var b = 0; b < descripcion.length; b++){
-
-                    var datoDescripcion = descripcion[b];
-
-                    if(datoDescripcion === ''){
-                        colorRojoTablaRequisicionEditar(b);
-                        toastr.error('Fila #' + (b+1) + ' la descripción es requerida');
-                        return;
-                    }
-
-                    if(datoDescripcion.length > 400){
-                        colorRojoTablaRequisicionEditar(b);
-                        toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
-                    }
-                }
-
-                // como tienen la misma cantidad de filas, podemos recorrer
-                // todas las filas de una vez
-                for(var p = 0; p < cantidad.length; p++){
-                    // obtener el id de la fila, si el id fila es 0, significa que sera nuevo registro
-                    var id = $("#matriz-requisicion-editar tr:eq("+(p+1)+")").attr('id');
-                    formData.append('idarray[]', id);
-                    formData.append('datainfo[]', descripcionAtributo[p]);
-                    formData.append('cantidad[]', cantidad[p]);
-                }
+            // como tienen la misma cantidad de filas, podemos recorrer
+            // todas las filas de una vez
+            for(var p = 0; p < cantidad.length; p++){
+                // obtener el id de la fila, si el id fila es 0, significa que sera nuevo registro
+                var id = $("#matriz-requisicion-editar tr:eq("+(p+1)+")").attr('id');
+                formData.append('idarray[]', id); // ID REQUI DETALLE
+            }
 
             openLoading();
             formData.append('fecha', fecha);
@@ -1555,7 +1495,27 @@
             })
                 .then((response) => {
                     closeLoading();
-                    if(response.data.success === 1){
+
+                    if(response.data.success === 1) {
+
+                        let nombre = response.data.nombre;
+
+                        Swal.fire({
+                            title: 'Material Ya Cotizado',
+                            text: "El material " + nombre + " Ya fue cotizado. Recargar Tabla",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Recargar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         recargarRequisicion();
                         $('#modalEditarRequisicion').modal('hide');

@@ -7,6 +7,8 @@ use App\Models\Administradores;
 use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
+use App\Models\CuentaProy;
+use App\Models\MoviCuentaProy;
 use App\Models\ObjEspecifico;
 use App\Models\Orden;
 use App\Models\Presupuesto;
@@ -30,7 +32,6 @@ class CotizacionController extends Controller
     }
 
     public function indexPendiente(){
-
         return view('backend.admin.proyectos.cotizaciones.pendiente.vistacotizacionpendienteing');
     }
 
@@ -308,7 +309,7 @@ class CotizacionController extends Controller
             $dd->nombre = $infoCatalogo->nombre;
             $dd->pu = $infoCatalogo->pu;
             $dd->medida = $infoUnidad->medida;
-            $dd->codigo = $infoCodigo->codigo;
+            $dd->codigo = $infoCodigo->codigo . " - " . $infoCodigo->nombre;
 
             $multi = $dd->cantidad * $infoCatalogo->pu;
             $totalMulti = $totalMulti + $multi;
@@ -360,9 +361,9 @@ class CotizacionController extends Controller
                 ->orderBy('id', 'ASC')
                 ->get();
 
-            foreach ($lista as $dd){
+            foreach ($lista as $datainfo){
 
-                if(CotizacionDetalle::where('id_requidetalle', $dd->id)
+                if(CotizacionDetalle::where('id_requidetalle', $datainfo->id)
                     ->first()){
                     // YA ESTABA UN MATERIAL COTIZADO
                     return ['success' => 2];
@@ -370,23 +371,19 @@ class CotizacionController extends Controller
 
                 // VERIFICACIÓN DE SALDOS
 
-                $infoCatalogo = CatalogoMateriales::where('id', $dd->material_id)->first();
+                $infoCatalogo = CatalogoMateriales::where('id', $datainfo->material_id)->first();
 
                 // ACTUALIZAR PRECIO DEL MATERIAL PRIMERAMENTE
-                RequisicionDetalle::where('id', $dd->id)->update([
+                RequisicionDetalle::where('id', $datainfo->id)->update([
                     'dinero' => $infoCatalogo->pu
                 ]);
-
-                //*** GUARDAR ESTO SIEMPRE ***
-                DB::commit();
-
 
                 $infoObjeto = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
                 $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
 
                 // como siempre busco material que estaban en el presupuesto, siempre encontrara
                 // el proyecto ID y el ID de objeto específico
-                $infoPresupuesto = Presupuesto::where('proyecto_id', $infoRequisicion->id_proyecto)
+                $infoPresupuesto = CuentaProy::where('proyecto_id', $infoRequisicion->id_proyecto)
                     ->where('objespeci_id', $infoCatalogo->id_objespecifico)
                     ->first();
 
@@ -394,10 +391,10 @@ class CotizacionController extends Controller
                 $totalEntrada = 0;
                 $totalRetenido = 0;
 
-                $infoSalidaDetalle = DB::table('presupuesto_detalle AS pd')
+                $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.presupuesto_id', $infoPresupuesto->id)
+                    ->where('pd.id_cuentaproy', $infoPresupuesto->id)
                     ->where('pd.tipo', 0) // salidas
                     ->get();
 
@@ -405,10 +402,10 @@ class CotizacionController extends Controller
                     $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
                 }
 
-                $infoEntradaDetalle = DB::table('presupuesto_detalle AS pd')
+                $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.presupuesto_id', $infoPresupuesto->id)
+                    ->where('pd.id_cuentaproy', $infoPresupuesto->id)
                     ->where('pd.tipo', 1) // entradas
                     ->get();
 
@@ -416,36 +413,35 @@ class CotizacionController extends Controller
                     $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
                 }
 
-                // esto es lo que hay de SALDO RESTANTE PARA EL OBJETO ESPECÍFICO
-                $saldoRestante = $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada);
-
                 // obtener cuanto saldo retenido tengo para el objeto específico
                 // y el dinero lo obtiene de LA REQUISICIÓN DETALLE
 
-                $infoSaldoRetenido = DB::table('presupuesto_saldo_retenido AS psr')
-                    ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero')
-                    ->where('psr.id_presupuesto', $infoPresupuesto->id) // con esto obtengo solo del obj específico
-                    ->get();
+                // OBTENER SALDO RESTANTE POR LOS MOVIMIENTO DE CUENTAS
 
-                foreach ($infoSaldoRetenido as $dd){
-                    $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-                }
+                $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
+                    ->sum('aumento');
+
+                $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
+                    ->sum('disminuye');
+
+                $saldoRestante = $moviSumaSaldo - $moviRestaSaldo;
+
+                // esto es lo que hay de SALDO RESTANTE PARA EL OBJETO ESPECÍFICO
+                $saldoRestante += $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada);
 
                 // verificar cantidad * dinero del material nuevo
-                $saldoMaterial = $dd->cantidad * $infoCatalogo->pu; // EL PRECIO YA ESTA ACTUALIZADO EN LA REQUISICION_DETALLE
+                $saldoMaterial = $datainfo->cantidad * $infoCatalogo->pu;
 
-                $sumaSaldos = $saldoMaterial + $totalRetenido;
-
+                // ************* NO SE SUMA EL SALDO RETENIDO. SOLO SE VERIFICA QUE HAYA SALDO RESTANTE.
+                $sumaSaldos = $saldoMaterial;
 
                 // verificar si alcanza el saldo para guardar la cotización
-                if($saldoRestante < $sumaSaldos){
+                if($this->redondear_dos_decimal($saldoRestante) < $this->redondear_dos_decimal($sumaSaldos)){
                     // retornar que no alcanza el saldo
 
                     // SALDO RESTANTE Y SALDO RETENIDO FORMATEADOS
                     $saldoRestanteFormat = number_format((float)$saldoRestante, 2, '.', ',');
                     $saldoRetenidoFormat = number_format((float)$totalRetenido, 2, '.', ',');
-
 
                     $costoFormat = number_format((float)$infoCatalogo->pu, 2, '.', ',');
 
@@ -467,22 +463,22 @@ class CotizacionController extends Controller
 
                     $detalle = new CotizacionDetalle();
                     $detalle->cotizacion_id = $coti->id;
-                    $detalle->id_requidetalle = $dd->id;
-                    $detalle->material_id = $dd->material_id;
+                    $detalle->id_requidetalle = $datainfo->id;
+                    $detalle->material_id = $datainfo->material_id;
                     $detalle->nombre = $infoCatalogo->nombre;
                     $detalle->medida = $infoUnidad->medida;
-                    $detalle->cantidad = $dd->cantidad;
+                    $detalle->cantidad = $datainfo->cantidad;
                     $detalle->precio_u = $infoCatalogo->pu;
                     $detalle->cod_presup = $infoObjeto->codigo;
                     $detalle->estado = 0;
                     $detalle->save();
 
                     // cambiar estado de requisiciones detalle porque ya fueron cotizadas
-                    RequisicionDetalle::where('id', $dd->id)->update([
+                    RequisicionDetalle::where('id', $datainfo->id)->update([
                         'estado' => 1,
                     ]);
                 }
-            }
+            } // end foreach
 
             DB::commit();
             return ['success' => 4];
@@ -493,6 +489,11 @@ class CotizacionController extends Controller
         }
     }
 
+
+    function redondear_dos_decimal($valor) {
+        $float_redondeado=round($valor * 100) / 100;
+        return $float_redondeado;
+    }
 
     public function vistaDetalleCotizacion($id){
         // id de cotizacion

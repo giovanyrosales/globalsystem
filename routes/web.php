@@ -150,30 +150,9 @@ Route::get('/admin/generar/pdf/presupuesto/{id}', [ControlPdfController::class,'
 // verifica si partida mano de obra existe
 Route::post('/admin/proyecto/partida/manoobra/existe', [ProyectoController::class, 'verificarPartidaManoObra']);
 
-
-// --- CUENTA BOLSON ---
-/*Route::get('/admin/bolson/cuenta/index', [BolsonController::class,'indexCuenta'])->name('admin.bolson.cuenta.index');
-Route::get('/admin/bolson/cuenta/indextabla', [BolsonController::class,'tablaCuenta']);
-Route::post('/admin/bolson/buscar/cuenta', [BolsonController::class, 'buscarNombreCuenta']);
-Route::post('/adm/proyecto/agregar/presupuestoin/bolson/buscar/cuenta-editar', [BolsonController::class, 'buscarNombreCuentaEditar']);
-Route::post('/admin/bolson/nuevo',  [BolsonController::class,'nuevoRegistro']);
-Route::post('/admin/bolson/informacion',  [BolsonController::class,'informacionBolson']);
-Route::post('/admin/bolson/editar',  [BolsonController::class,'editarRegistro']);
-
-// --- MOVIMIENTO BOLSON ---
-Route::get('/admin/bolson/movimiento/index', [BolsonController::class,'indexMovimiento'])->name('admin.movimiento.bolson.index');
-Route::get('/admin/bolson/movimiento/tabla', [BolsonController::class,'tablaMovimiento']);
-Route::post('/admin/bolson/movimiento/nuevo',  [BolsonController::class,'nuevoMovimiento']);
-Route::post('/admin/bolson/movimiento/informacion',  [BolsonController::class,'informacionMovimiento']);
-Route::post('/admin/bolson/movimiento/editar',  [BolsonController::class,'editarMovimiento']);
-*/
-
 // --- CUENTA PROYECTO ----
 Route::get('/admin/cuentaproy/cuenta/{id}', [CuentaProyectoController::class,'indexCuenta']);
 Route::get('/admin/cuentaproy/cuenta/indextabla/{id}', [CuentaProyectoController::class,'tablaCuenta']);
-//Route::post('/admin/cuentaproy/nuevo',  [CuentaProyectoController::class,'nuevaCuentaProy']);
-//Route::post('/admin/cuentaproy/informacion',  [CuentaProyectoController::class,'informacionCuentaProy']);
-//Route::post('/admin/cuentaproy/editar',  [CuentaProyectoController::class,'editarCuentaProy']);
 
 // --- PLANILLA ---
 Route::get('/admin/planilla/lista/{id}', [CuentaProyectoController::class,'indexPlanilla']);
@@ -216,16 +195,16 @@ Route::post('/admin/proyecto/cotizacion/nuevo',  [ProyectoController::class,'nue
 Route::get('/admin/ver/materiales/admin/requisicion/{id}', [ProyectoController::class,'verCatalogoMaterialRequisicion']);
 
 
-// --- VISTA COTIZACIONES PENDIENTES ---
-Route::get('/admin/cotizacion/pendiente/index', [CotizacionController::class,'indexPendiente'])->name('cotizaciones.pendientes.index');
-Route::get('/admin/cotizacion/pendiente/tabla-index', [CotizacionController::class,'indexPendienteTabla']);
+// --- VISTA COTIZACIONES PENDIENTES PARA PROYECTOS---
+Route::get('/admin/cotizacion/proyecto/pendiente/index', [CotizacionController::class,'indexPendiente'])->name('cotizaciones.pendientes.proyecto.index');
+Route::get('/admin/cotizacion/proyecto/pendiente/tabla', [CotizacionController::class,'indexPendienteTabla']);
 
-Route::get('/admin/cotizacion/individual/index/{id}', [CotizacionController::class,'indexCotizacion']);
-Route::post('/admin/cotizacion/autorizar',  [CotizacionController::class,'autorizarCotizacion']);
-Route::post('/admin/cotizacion/denegar',  [CotizacionController::class,'denegarCotizacion']);
+Route::get('/admin/cotizacion/proyecto/individual/index/{id}', [CotizacionController::class,'indexCotizacion']);
+Route::post('/admin/cotizacion/proyecto/autorizar',  [CotizacionController::class,'autorizarCotizacion']);
+Route::post('/admin/cotizacion/proyecto/denegar',  [CotizacionController::class,'denegarCotizacion']);
 
 // vista de cotizacion detalle para procesadas o denegadas
-Route::get('/admin/cotizacion/detalle/{id}', [CotizacionController::class,'vistaDetalleCotizacion']);
+Route::get('/admin/cotizacion/proyecto/detalle/{id}', [CotizacionController::class,'vistaDetalleCotizacion']);
 
 
 // --- VISTA COTIZACIONES AUTORIZADAS ---
