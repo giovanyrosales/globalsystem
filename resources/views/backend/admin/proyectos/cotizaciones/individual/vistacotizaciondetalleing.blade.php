@@ -83,8 +83,8 @@
                                     <td><p id="fila{{$dd->conteo}}" class='form-control'>{{$dd->conteo}}</p></td>
                                     <td><input disabled class="form-control" value="{{$dd->cantidad}}"></td>
                                     <td><input disabled class="form-control" type="text" value="{{$dd->descripcion}}"></td>
-                                    <td><input disabled class="form-control" value="{{$dd->precio_u }}"></td>
-                                    <td><input disabled class="form-control" value="{{$dd->total }}"></td>
+                                    <td><input disabled class="form-control" value="${{$dd->precio_u }}"></td>
+                                    <td><input disabled class="form-control" value="${{$dd->total }}"></td>
                                     <td><input disabled class="form-control" value="{{$dd->cod_presup }}"></td>
                                 </tr>
                             @endforeach
@@ -93,8 +93,8 @@
                                 <td><p class='form-control'>Total</p></td>
                                 <td><input disabled class="form-control" type="text" value="{{$totalCantidad}}"></td>
                                 <td><input disabled class="form-control" type="text"></td>
-                                <td><input disabled class="form-control" value="{{$totalPrecio }}"></td>
-                                <td><input disabled class="form-control" value="{{$totalTotal }}"></td>
+                                <td><input disabled class="form-control" value="${{$totalPrecio }}"></td>
+                                <td><input disabled class="form-control" value="${{$totalTotal }}"></td>
                                 <td><input disabled class="form-control"></td>
                             </tr>
 

@@ -209,15 +209,15 @@ Route::get('/admin/cotizacion/proyecto/detalle/{id}', [CotizacionController::cla
 
 // --- VISTA COTIZACIONES AUTORIZADAS ---
 Route::get('/admin/cotizacion/autorizadas/index', [CotizacionController::class,'indexAutorizadas'])->name('cotizaciones.autorizadas.index');
-Route::get('/admin/cotizacion/autorizadas/tabla-index', [CotizacionController::class,'indexAutorizadasTabla']);
+Route::get('/admin/cotizacion/proyecto/autorizadas/tabla-index', [CotizacionController::class,'indexAutorizadasTabla']);
 
 // --- VISTA COTIZACIONES DENEGADAS ---
-Route::get('/admin/cotizacion/denegadas/index', [CotizacionController::class,'indexDenegadas'])->name('cotizaciones.denegadas.index');
-Route::get('/admin/cotizacion/denegadas/tabla-index', [CotizacionController::class,'indexDenegadasTabla']);
+Route::get('/admin/cotizacion/proyecto/denegadas/index', [CotizacionController::class,'indexDenegadas'])->name('cotizaciones.denegadas.index');
+Route::get('/admin/cotizacion/proyecto/denegadas/tabla-index', [CotizacionController::class,'indexDenegadasTabla']);
 
 // --- ORDENES ---
-Route::post('/admin/ordenes/generar/nuevo',  [OrdenController::class,'generarOrden']);
-Route::get('/admin/ordenes/pdf/{id}', [OrdenController::class,'vistaPdfOrden']);
+Route::post('/admin/ordenes/proyecto/generar/nuevo',  [OrdenController::class,'generarOrden']);
+Route::get('/admin/ordenes/proyecto/pdf/{id}', [OrdenController::class,'vistaPdfOrden']);
 
 // --- ORDENES DE COMPRAS ---
 Route::get('/admin/ordenes/compras/index', [OrdenController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
@@ -371,34 +371,34 @@ Route::post('/admin/requerimientosunidad/informacion', [RequerimientoController:
 Route::post('/admin/requerimientosunidad/cotizacion/guardar', [RequerimientoController::class, 'guardarNuevaCotizacionUnidad']);
 
 // --- VISTA COTIZACIONES PENDIENTES DE LOS DEPARTAMENTOS ---
-Route::get('/admin/cotizacion/pendiente/index', [CotizacionUnidadController::class,'indexPendiente'])->name('cotizaciones.pendientes.index');
+/*Route::get('/admin/cotizacion/pendiente/index', [CotizacionUnidadController::class,'indexPendiente'])->name('cotizaciones.pendientes.index');
 Route::get('/admin/cotizacion/pendiente/tabla-index', [CotizacionUnidadController::class,'indexPendienteTabla']);
 Route::get('/admin/cotizacion/individual/index/{id}', [CotizacionUnidadController::class,'indexCotizacion']);
 Route::post('/admin/cotizacion/autorizar',  [CotizacionUnidadController::class,'autorizarCotizacion']);
-Route::post('/admin/cotizacion/denegar',  [CotizacionUnidadController::class,'denegarCotizacion']);
+Route::post('/admin/cotizacion/denegar',  [CotizacionUnidadController::class,'denegarCotizacion']);*/
 
 // vista de cotizacion detalle DE DEPARTAMENTOS para procesadas o denegadas
-Route::get('/admin/cotizacion/detalle/{id}', [CotizacionUnidadController::class,'vistaDetalleCotizacion']);
+//Route::get('/admin/cotizacion/detalle/{id}', [CotizacionUnidadController::class,'vistaDetalleCotizacion']);
 
 
 // --------------- VISTA COTIZACIONES DE DEPARTAMENTOS AUTORIZADAS -----------------------------
-Route::get('/admin/cotizacion/autorizadas/index', [CotizacionUnidadController::class,'indexAutorizadas'])->name('cotizaciones.autorizadas.index');
-Route::get('/admin/cotizacion/autorizadas/tabla-index', [CotizacionUnidadController::class,'indexAutorizadasTabla']);
+//Route::get('/admin/cotizacion/autorizadas/index', [CotizacionUnidadController::class,'indexAutorizadas'])->name('cotizaciones.autorizadas.index');
+//Route::get('/admin/cotizacion/autorizadas/tabla-index', [CotizacionUnidadController::class,'indexAutorizadasTabla']);
 
 // ------------ VISTA COTIZACIONES DE DEPARTAMENTOS DENEGADAS ---------------------------------
-Route::get('/admin/cotizacion/denegadas/index', [CotizacionUnidadController::class,'indexDenegadas'])->name('cotizaciones.denegadas.index');
-Route::get('/admin/cotizacion/denegadas/tabla-index', [CotizacionUnidadController::class,'indexDenegadasTabla']);
+//Route::get('/admin/cotizacion/denegadas/index', [CotizacionUnidadController::class,'indexDenegadas'])->name('cotizaciones.denegadas.index');
+//Route::get('/admin/cotizacion/denegadas/tabla-index', [CotizacionUnidadController::class,'indexDenegadasTabla']);
 
 // ------------ ORDENES DE DEPARTAMENTOS--------------------------------------------------
-Route::post('/admin/ordenes/generar/nuevo',  [OrdenUnidadController::class,'generarOrden']);
-Route::get('/admin/ordenes/pdf/{id}', [OrdenUnidadController::class,'vistaPdfOrden']);
+//Route::post('/admin/ordenes/generar/nuevo',  [OrdenUnidadController::class,'generarOrden']);
+//Route::get('/admin/ordenes/pdf/{id}', [OrdenUnidadController::class,'vistaPdfOrden']);
 
 // --------------- ORDENES DE COMPRAS DE DEPARTAMENTOS -------------------------------------
-Route::get('/admin/ordenes/compras/index', [OrdenUnidadController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
+/*Route::get('/admin/ordenes/compras/index', [OrdenUnidadController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
 Route::get('/admin/ordenes/compras/tabla-index', [OrdenUnidadController::class,'tablaOrdenesCompras']);
 Route::post('/admin/ordenes/anular/compra',  [OrdenUnidadController::class,'anularCompra']);
 Route::post('/admin/ordenes/generar/acta',  [OrdenUnidadController::class,'generarActa']);
-Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenUnidadController::class,'reporteActaGenerada']);
+Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenUnidadController::class,'reporteActaGenerada']);*/
 
 // ************************************** PRESUPUESTO DE UNIDADES **********************************************************************************
 

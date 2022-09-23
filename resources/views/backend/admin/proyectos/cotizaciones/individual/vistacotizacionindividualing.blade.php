@@ -112,10 +112,22 @@
                                 <i title="Cancelar"></i> Atras </a>
                         </div>
 
+                        <!-- JEFA DE UACI PUEDE DENEGAR O AUTORIZAR COTIZACION -->
+
+
+                        @role('jefeuaci')
                         <div class="col-md-4" style="float: right">
-                                <button type="button" class="btn btn-success float-right mt-3" onclick="autorizarCotizacion()">Autorizar Cotización</button>
-                                <button type="button"  class="btn btn-danger float-right mt-3" style="margin-right: 20px" onclick="denegarCotizacion()">Denegar Cotización</button>
+                            <button type="button" class="btn btn-success float-right mt-3" onclick="autorizarCotizacion()">Autorizar Cotización</button>
+                            <button type="button"  class="btn btn-danger float-right mt-3" style="margin-right: 20px" onclick="denegarCotizacion()">Denegar Cotización</button>
                         </div>
+                        @else
+                            <div class="col-md-4" style="float: right">
+                                <span class="badge bg-info" style="font-size: 18px">Esperando Aprobación por Jefatura</span>
+                            </div>
+                        @endrole
+
+
+
 
                     </div>
                 </div>
@@ -186,7 +198,7 @@
 
             openLoading();
 
-            axios.post(url+'/cotizacion/autorizar', {
+            axios.post(url+'/cotizacion/proyecto/autorizar', {
                 'id': id
             })
                 .then((response) => {
@@ -223,7 +235,7 @@
 
             openLoading();
 
-            axios.post(url+'/cotizacion/denegar', {
+            axios.post(url+'/cotizacion/proyecto/denegar', {
                 'id': id
             })
                 .then((response) => {
@@ -240,7 +252,7 @@
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href="{{ url('/admin/cotizacion/denegadas/index') }}";
+                                window.location.href="{{ url('/admin/cotizacion/proyecto/denegadas/index') }}";
                             }
                         })
                     }

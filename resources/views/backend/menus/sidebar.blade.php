@@ -226,7 +226,7 @@
                         <li class="nav-item">
                             <a href="{{ route('cotizaciones.denegadasunidad.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Cotización Denegadas</p>
+                                <p>Cotización Denegadasx</p>
                             </a>
                         </li>
                         @endcan

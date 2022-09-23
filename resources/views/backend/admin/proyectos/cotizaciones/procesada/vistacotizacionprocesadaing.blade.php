@@ -117,7 +117,7 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/cotizacion/autorizadas/tabla-index') }}";
+            var ruta = "{{ URL::to('/admin/cotizacion/proyecto/autorizadas/tabla-index') }}";
             $('#tablaDatatable').load(ruta);
 
             var fecha = new Date();
@@ -129,12 +129,12 @@
     <script>
 
         function recargar(){
-            var ruta = "{{ url('/admin/cotizacion/autorizadas/tabla-index') }}";
+            var ruta = "{{ url('/admin/cotizacion/proyecto/autorizadas/tabla-index') }}";
             $('#tablaDatatable').load(ruta);
         }
 
         function verProcesadas(id){
-            window.location.href="{{ url('/admin/cotizacion/detalle') }}/" + id;
+            window.location.href="{{ url('/admin/cotizacion/proyecto/detalle') }}/" + id;
         }
 
         function abrirModalOrden(id){
@@ -171,7 +171,7 @@
             formData.append('lugar', lugar);
             formData.append('admin', admin);
 
-            axios.post(url+'/ordenes/generar/nuevo', formData, {
+            axios.post(url+'/ordenes/proyecto/generar/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -181,7 +181,7 @@
                         toastr.success('Orden Generada');
                         recargar();
                         // vista pdf
-                        window.open("{{ URL::to('admin/ordenes/pdf') }}/" + response.data.id);
+                        window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + response.data.id);
                     }
                     else {
                         toastr.error('Error al crear orden');

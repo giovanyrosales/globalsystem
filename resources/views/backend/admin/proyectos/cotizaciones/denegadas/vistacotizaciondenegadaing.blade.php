@@ -62,7 +62,7 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/cotizacion/denegadas/tabla-index') }}";
+            var ruta = "{{ URL::to('/admin/cotizacion/proyecto/denegadas/tabla-index') }}";
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -72,7 +72,7 @@
     <script>
 
         function verInformacion(id){
-            window.location.href="{{ url('/admin/cotizacion/individual/index') }}/" + id;
+            window.location.href="{{ url('/admin/cotizacion/proyecto/individual/index') }}/" + id;
         }
 
     </script>

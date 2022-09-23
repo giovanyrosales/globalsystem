@@ -199,14 +199,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Cuenta Bolsón:</label>
-                                    <select id="select-bolson" class="form-control">
 
-                                    </select>
-                                </div>
-                            </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Monto de proyecto $:</label>
@@ -458,7 +451,6 @@
                         document.getElementById("select-naturaleza").options.length = 0;
                         document.getElementById("select-area-gestion").options.length = 0;
                         document.getElementById("select-linea").options.length = 0;
-                        document.getElementById("select-bolson").options.length = 0;
                         document.getElementById("select-estado").options.length = 0;
 
                         $.each(response.data.arrayNaturaleza, function( key, val ){
@@ -530,20 +522,7 @@
                             }
                         });
 
-                        // *** bolson
-                        if(response.data.info.id_bolson == null){
-                            $('#select-bolson').append('<option value="" selected="selected">Ninguna</option>');
-                        }else{
-                            $('#select-bolson').append('<option value="">Ninguna</option>');
-                        }
 
-                        $.each(response.data.arrayBolson, function( key, val ){
-                            if (response.data.info.id_fuenter == val.id) {
-                                $('#select-bolson').append('<option value="' + val.id + '" selected="selected">'+ val.nombre + '</option>');
-                            } else {
-                                $('#select-bolson').append('<option value="' + val.id + '">' + val.nombre + '</option>');
-                            }
-                        });
 
                         // *** estado de proyecto
                         if(response.data.info.id_estado == null){
@@ -606,7 +585,6 @@
             var formulador = document.getElementById('formulador').value; // null
             var supervisor = document.getElementById('supervisor').value; // null
             var encargado = document.getElementById('encargado').value; // null
-            var bolson = document.getElementById('select-bolson').value; // null
             var monto = document.getElementById('monto').value; // null
             var estado = document.getElementById('select-estado').value; // null
 
@@ -712,7 +690,6 @@
             formData.append('formulador', formulador);
             formData.append('supervisor', supervisor);
             formData.append('encargado', encargado);
-            formData.append('bolson', bolson);
             formData.append('monto', monto);
             formData.append('estado', estado);
 

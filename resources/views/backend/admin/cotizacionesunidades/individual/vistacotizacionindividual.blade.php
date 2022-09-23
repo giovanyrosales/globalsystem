@@ -240,7 +240,7 @@
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href="{{ url('/admin/cotizacion/denegadas/index') }}";
+                                window.location.href="{{ url('/admin/cotizacion/proyecto/denegadas/index') }}";
                             }
                         })
                     }

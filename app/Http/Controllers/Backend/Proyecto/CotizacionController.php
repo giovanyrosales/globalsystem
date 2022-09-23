@@ -163,6 +163,7 @@ class CotizacionController extends Controller
     }
 
     public function indexDenegadas(){
+
         return view('backend.admin.proyectos.cotizaciones.denegadas.vistacotizaciondenegadaing');
     }
 

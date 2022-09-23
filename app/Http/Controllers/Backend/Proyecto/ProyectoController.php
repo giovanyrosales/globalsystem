@@ -174,7 +174,6 @@ class ProyectoController extends Controller
             $arrayLineaTrabajo = LineaTrabajo::orderBy('codigo')->get();
             $arrayFuenteFinanciamiento = FuenteFinanciamiento::orderBy('codigo')->get();
             $arrayFuenteRecursos = FuenteRecursos::orderBy('codigo')->get();
-            $arrayBolson = Bolson::orderBy('nombre')->get();
             $arrayEstado = EstadoProyecto::orderBy('nombre')->get();
 
             // evitar null
@@ -205,7 +204,7 @@ class ProyectoController extends Controller
             return ['success' => 1, 'info' => $info, 'arrayNaturaleza' => $arrayNaturaleza,
                 'arrayAreaGestion' => $arrayAreaGestion, 'arrayLineaTrabajo' => $arrayLineaTrabajo,
                 'arrayFuenteFinanciamiento' => $arrayFuenteFinanciamiento,
-                'arrayFuenteRecursos' => $arrayFuenteRecursos, 'arrayBolson' => $arrayBolson,
+                'arrayFuenteRecursos' => $arrayFuenteRecursos,
                 'arrayEstado' => $arrayEstado];
         }else{
             return ['success' => 2];
@@ -262,7 +261,6 @@ class ProyectoController extends Controller
                     'formulador' => $request->formulador,
                     'supervisor' => $request->supervisor,
                     'encargado' => $request->encargado,
-                    'id_bolson' => $request->bolson,
                     'monto' => $request->monto,
                     'id_estado' => $request->estado,
                 ]);
@@ -293,7 +291,6 @@ class ProyectoController extends Controller
                 'formulador' => $request->formulador,
                 'supervisor' => $request->supervisor,
                 'encargado' => $request->encargado,
-                'id_bolson' => $request->bolson,
                 'monto' => $request->monto,
                 'id_estado' => $request->estado,
             ]);
