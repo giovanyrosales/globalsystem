@@ -63,7 +63,14 @@ class CotizacionController extends Controller
         $info = Requisicion::where('id', $cotizacion->requisicion_id)->first();
         $proveedor = Proveedores::where('id', $cotizacion->proveedor_id)->first();
 
-        $detalle = CotizacionDetalle::where('cotizacion_id', $id)->orderBy('cod_presup', 'ASC')->get();
+        $detalle = DB::table('cotizacion_detalle AS cd')
+            ->join('materiales AS m', 'cd.material_id', '=', 'm.id')
+            ->join('obj_especifico AS obj', 'm.id_objespecifico', '=', 'obj.id')
+            ->select('cd.id', 'm.nombre', 'cd.cantidad', 'cd.precio_u', 'obj.nombre AS objnombre',
+                        'obj.codigo')
+            ->orderBy('obj.codigo', 'ASC')
+            ->get();
+
         $conteo = 0;
 
         $fecha = date("d-m-Y", strtotime($cotizacion->fecha));
@@ -77,8 +84,6 @@ class CotizacionController extends Controller
             $conteo += 1;
             $de->conteo = $conteo;
 
-            $infoDescripcion = CatalogoMateriales::where('id', $de->material_id)->first();
-            $de->descripcion = $infoDescripcion->nombre;
             $multi = $de->cantidad * $de->precio_u;
 
             $totalCantidad = $totalCantidad + $de->cantidad;
@@ -87,16 +92,16 @@ class CotizacionController extends Controller
 
             $de->precio_u = number_format((float)$de->precio_u, 2, '.', ',');
             $de->total = number_format((float)$multi, 2, '.', ',');
-        }
 
-        $de->total = number_format((float)$multi, 2, '.', ',');
+            $de->objeto = $de->codigo . " - " . $de->objnombre;
+        }
 
         $totalCantidad = number_format((float)$totalCantidad, 2, '.', ',');
         $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
         $totalTotal = number_format((float)$totalTotal, 2, '.', ',');
 
         return view('backend.admin.proyectos.cotizaciones.individual.vistacotizacionindividualing', compact('id', 'info',
-            'proveedor', 'detalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
+            'proveedor', 'detalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal', 'cotizacion'));
     }
 
     public function autorizarCotizacion(Request $request){
@@ -109,12 +114,50 @@ class CotizacionController extends Controller
     }
 
     public function denegarCotizacion(Request $request){
-        Cotizacion::where('id', $request->id)->update([
-            'estado' => 2,
-            'fecha_estado' => Carbon::now('America/El_Salvador')
-        ]);
 
-        return ['success' => 1];
+        DB::beginTransaction();
+
+        try {
+
+            // COTIZACION DENEGADA
+
+            Cotizacion::where('id', $request->id)->update([
+                'estado' => 2,
+                'fecha_estado' => Carbon::now('America/El_Salvador')
+            ]);
+
+            $infoCotizacion = Cotizacion::where('id', $request->id)->first();
+
+            // VOLVER A CAMBIAR DE ESTADO LOS MATERIALES QUE FUERON COTIZADOS
+
+            $infoRequi = Requisicion::where('id', $infoCotizacion->requisicion_id)->first();
+
+            // si tenia 1, es que todos los materiales estaban cotizados. volver a 0
+            if($infoRequi->estado == 1){
+                Requisicion::where('id', $infoRequi->id)->update([
+                    'estado' => 0,
+                ]);
+            }
+
+            // hoy verificar cuales otros materiales fueron cotizados y volver a 0
+
+            $listado = CotizacionDetalle::where('cotizacion_id', $request->id)->get();
+
+            foreach ($listado as $ll){
+                RequisicionDetalle::where('id', $ll->id_requidetalle)->update([
+                    'estado' => 0,
+                ]);
+            }
+
+            DB::commit();
+            return ['success' => 1];
+
+        }catch(\Throwable $e){
+            Log::info('ee' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+
     }
 
     public function indexAutorizadas(){
@@ -470,7 +513,6 @@ class CotizacionController extends Controller
                     $detalle->medida = $infoUnidad->medida;
                     $detalle->cantidad = $datainfo->cantidad;
                     $detalle->precio_u = $infoCatalogo->pu;
-                    $detalle->cod_presup = $infoObjeto->codigo;
                     $detalle->estado = 0;
                     $detalle->save();
 
@@ -480,6 +522,22 @@ class CotizacionController extends Controller
                     ]);
                 }
             } // end foreach
+
+
+            // CAMBIAR DE ESTADO LA REQUISICIÓN COMPLETADO, SI YA NO HAY NADA QUE COTIZAR
+
+            $conteo = RequisicionDetalle::where('requisicion_id', $request->idcotizar)
+                ->where('estado', 0)
+                ->count();
+
+            if($conteo == 0){
+
+                // SE COMPLETO LA COTIZACION DE REQUISICION
+                Requisicion::where('id', $request->idcotizar)->update([
+                    'estado' => 1,
+                ]);
+            }
+
 
             DB::commit();
             return ['success' => 4];

@@ -82,10 +82,10 @@
                                 <tr>
                                     <td><p id="fila{{$dd->conteo}}" class='form-control'>{{$dd->conteo}}</p></td>
                                     <td><input disabled class="form-control" value="{{$dd->cantidad}}"></td>
-                                    <td><input disabled class="form-control" type="text" value="{{$dd->descripcion}}"></td>
+                                    <td><input disabled class="form-control" type="text" value="{{$dd->nombre}}"></td>
                                     <td><input disabled class="form-control" value="${{$dd->precio_u }}"></td>
                                     <td><input disabled class="form-control" value="${{$dd->total }}"></td>
-                                    <td><input disabled class="form-control" value="{{$dd->cod_presup }}"></td>
+                                    <td><input disabled class="form-control" value="{{$dd->objeto }}"></td>
                                 </tr>
                             @endforeach
 
@@ -109,25 +109,31 @@
 
                         <div class="col-md-8">
                             <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
-                                <i title="Cancelar"></i> Atras </a>
+                                <i title="Atras"></i> Atras </a>
                         </div>
 
                         <!-- JEFA DE UACI PUEDE DENEGAR O AUTORIZAR COTIZACION -->
 
+                        @can('boton.autorizar.denegar.cotizacion')
 
-                        @role('jefeuaci')
-                        <div class="col-md-4" style="float: right">
-                            <button type="button" class="btn btn-success float-right mt-3" onclick="autorizarCotizacion()">Autorizar Cotización</button>
-                            <button type="button"  class="btn btn-danger float-right mt-3" style="margin-right: 20px" onclick="denegarCotizacion()">Denegar Cotización</button>
-                        </div>
-                        @else
+                            @if($cotizacion->estado == 0)
+                                <div class="col-md-4" style="float: right">
+                                    <button type="button" class="btn btn-success float-right mt-3" onclick="autorizarCotizacion()">Autorizar Cotización</button>
+                                    <button type="button"  class="btn btn-danger float-right mt-3" style="margin-right: 20px" onclick="denegarCotizacion()">Denegar Cotización</button>
+                                </div>
+                            @endif
+
+                        @endcan
+
+                        <!-- EL TEXTO SOLO PUEDE VER LOS QUE TENGAN EL PERMISO -->
+
+                        @can('texto.esperando.aprobacion.cotizacion')
+                            @if($cotizacion->estado == 0)
                             <div class="col-md-4" style="float: right">
                                 <span class="badge bg-info" style="font-size: 18px">Esperando Aprobación por Jefatura</span>
                             </div>
-                        @endrole
-
-
-
+                            @endcan
+                        @endcan
 
                     </div>
                 </div>

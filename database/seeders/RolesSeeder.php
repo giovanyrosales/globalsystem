@@ -91,6 +91,11 @@ class RolesSeeder extends Seeder
 
             Permission::create(['name' => 'boton.cotizacion.generar.orden', 'description' => 'sidebar seccion cotizacion - boton para generar orden de compra'])->syncRoles($roleUaci);
 
+            Permission::create(['name' => 'boton.autorizar.denegar.cotizacion', 'description' => 'boton para autorizar o denegar cotización'])->syncRoles($roleJefeUaci);
+
+            // solo para mostrar texto, esperando aprobar o denegar cotizacion
+            Permission::create(['name' => 'texto.esperando.aprobacion.cotizacion', 'description' => 'texto esperando aprobacion o denegacion de cotización'])->syncRoles($roleUaci);
+
 
 
 

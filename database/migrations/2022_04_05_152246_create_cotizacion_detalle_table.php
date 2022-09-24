@@ -27,9 +27,8 @@ class CreateCotizacionDetalleTable extends Migration
 
             $table->decimal('cantidad', 10, 2);
             $table->decimal('precio_u', 10, 2);
-            $table->integer('cod_presup');
 
-            // 0: defecto y sin uso
+            // 0: SI USO POR EL MOMENTO
             $table->integer('estado');
 
             $table->foreign('cotizacion_id')->references('id')->on('cotizacion');

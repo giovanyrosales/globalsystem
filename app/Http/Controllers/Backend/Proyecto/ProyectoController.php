@@ -598,17 +598,13 @@ class ProyectoController extends Controller
             //------------------------------------------------------------------
 
             //------------------------------------------------------------------
-            // OBTENER INFORMACION DE LOS MATERIALES NO COTIZADOS.
-            $infoRequiDetalle = RequisicionDetalle::where('requisicion_id', $ll->id)
-                ->where('estado', 0) // NO COTIZADOS
-                ->count();
 
             $infoEstado = "Pendiente";
             $completado = false;
 
             // cotizacion finalizo
-            if($infoRequiDetalle == 0){
-                $infoEstado = "Completado";
+            if($ll->estado == 1){
+                $infoEstado = "Cotizado";
                 $completado = true;
             }
 
@@ -1135,7 +1131,7 @@ class ProyectoController extends Controller
         }
     }
 
-    public function nuevaCotizacion(Request $request){
+  /*  public function nuevaCotizacion(Request $request){
 
         $rules = array(
             'fecha' => 'required',
@@ -1179,7 +1175,7 @@ class ProyectoController extends Controller
             DB::rollback();
             return ['success' => 2];
         }
-    }
+    }*/
 
     // *** INGENIERIA ***
     public function tablaProyectoListaPresupuesto($id){

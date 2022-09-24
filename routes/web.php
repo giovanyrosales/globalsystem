@@ -189,7 +189,7 @@ Route::post('/admin/buscar/material/soloproyecto',  [ProyectoController::class,'
 Route::post('/admin/proyecto/buscar/material-presupuesto',  [ProyectoController::class,'buscadorMaterialPresupuesto']);
 Route::post('/admin/proyecto/buscar/material-presupuesto-editar',  [ProyectoController::class,'buscadorMaterialPresupuestoEditar']);
 
-Route::post('/admin/proyecto/cotizacion/nuevo',  [ProyectoController::class,'nuevaCotizacion']);
+//Route::post('/admin/proyecto/cotizacion/nuevo',  [ProyectoController::class,'nuevaCotizacion']);
 
 // muestra catalogo de materiales al usuario admmin que hace requisiciones para ver que pedir
 Route::get('/admin/ver/materiales/admin/requisicion/{id}', [ProyectoController::class,'verCatalogoMaterialRequisicion']);
