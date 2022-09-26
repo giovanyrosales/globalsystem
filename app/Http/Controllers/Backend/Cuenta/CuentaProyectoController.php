@@ -199,9 +199,10 @@ class CuentaProyectoController extends Controller
             // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
             $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 0) // salidas. y la orden es valido
+                ->where('rd.cancelado')
                 //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
 
@@ -211,9 +212,10 @@ class CuentaProyectoController extends Controller
 
             $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 1) // entradas. // la orden fue cancelada
+                ->where('rd.cancelado')
                 ->get();
 
             foreach ($infoEntradaDetalle as $dd){
@@ -224,8 +226,9 @@ class CuentaProyectoController extends Controller
 
             $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('psr.id_cuentaproy', $pp->id)
+                ->where('rd.cancelado')
                 ->get();
 
             foreach ($infoSaldoRetenido as $dd){
@@ -233,7 +236,7 @@ class CuentaProyectoController extends Controller
             }
 
             // SUMAR LOS MOVIMIENTOS DE CUENTA
-            $totalRestante =  $totalMoviCuenta;
+            $totalRestante = $totalMoviCuenta;
             $totalRestante += $pp->saldo_inicial - ($totalSalida - $totalEntrada);
 
             $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
@@ -273,9 +276,10 @@ class CuentaProyectoController extends Controller
 
             $infoSalidaDetalle2 = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $infoSaldo2->id)
                 ->where('pd.tipo', 0) // salidas. la orden es valida
+                ->where('rd.cancelado', 0)
                 //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
 
@@ -285,9 +289,10 @@ class CuentaProyectoController extends Controller
 
             $infoEntradaDetalle2 = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $infoSaldo2->id)
                 ->where('pd.tipo', 1) // entradas. la orden fue cancelada
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoEntradaDetalle2 as $dd){
@@ -298,8 +303,9 @@ class CuentaProyectoController extends Controller
 
             $infoSaldoRetenido2 = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('psr.id_cuentaproy', $infoSaldo2->id)
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoSaldoRetenido2 as $dd){

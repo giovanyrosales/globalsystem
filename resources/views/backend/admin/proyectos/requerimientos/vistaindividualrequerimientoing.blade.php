@@ -466,7 +466,6 @@
                 .then((response) => {
                     closeLoading();
 
-                    console.log(response)
 
                     if(response.data.success === 1){
 
@@ -527,8 +526,24 @@
                         })
                     }
 
+                    if(response.data.success === 4){
 
-                    else if(response.data.success === 4){
+                        Swal.fire({
+                            title: 'Material Cancelado',
+                            text: "El Administrador cancelo un material.",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+
+                    else if(response.data.success === 5){
                         $('#modalCotizar').modal('hide');
                         $('#modalDetalle').modal('hide');
 

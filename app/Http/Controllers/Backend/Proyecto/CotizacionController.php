@@ -241,6 +241,7 @@ class CotizacionController extends Controller
             ->join('requisicion_detalle AS d', 'd.requisicion_id', '=', 'r.id')
             ->select('r.id_proyecto')
             ->where('d.estado', 0)
+            ->where('d.cancelado', 0)
             ->groupBy('r.id_proyecto')
             ->get();
 
@@ -275,6 +276,7 @@ class CotizacionController extends Controller
             ->join('requisicion_detalle AS d', 'd.requisicion_id', '=', 'r.id')
             ->select('r.id')
             ->where('d.estado', 0)
+            ->where('d.cancelado', 0)
             ->groupBy('r.id')
             ->get();
 
@@ -307,6 +309,7 @@ class CotizacionController extends Controller
 
             $listado = RequisicionDetalle::where('requisicion_id', $request->id)
                 ->where('estado', 0)
+                ->where('cancelado', 0)
                 ->get();
 
             foreach ($listado as $l){
@@ -407,6 +410,10 @@ class CotizacionController extends Controller
 
             foreach ($lista as $datainfo){
 
+                if($datainfo->cancelado == 1){
+                    return ['success' => 4];
+                }
+
                 if(CotizacionDetalle::where('id_requidetalle', $datainfo->id)
                     ->first()){
                     // YA ESTABA UN MATERIAL COTIZADO
@@ -437,9 +444,10 @@ class CotizacionController extends Controller
 
                 $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('pd.id_cuentaproy', $infoPresupuesto->id)
                     ->where('pd.tipo', 0) // salidas
+                    ->where('rd.cancelado', 0)
                     ->get();
 
                 foreach ($infoSalidaDetalle as $dd){
@@ -448,9 +456,10 @@ class CotizacionController extends Controller
 
                 $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('pd.id_cuentaproy', $infoPresupuesto->id)
                     ->where('pd.tipo', 1) // entradas
+                    ->where('rd.cancelado', 0)
                     ->get();
 
                 foreach ($infoEntradaDetalle as $dd){
@@ -538,9 +547,8 @@ class CotizacionController extends Controller
                 ]);
             }
 
-
             DB::commit();
-            return ['success' => 4];
+            return ['success' => 5];
         }catch(\Throwable $e){
             Log::info('ee' . $e);
             DB::rollback();

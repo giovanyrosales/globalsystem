@@ -19,6 +19,11 @@ class CreateRequisicionDetalleTable extends Migration
             $table->decimal('cantidad', 12, 2);
             $table->decimal('dinero', 10, 2);
 
+            // CUANDO UN MATERIAL YA FUE COTIZADO, Y FUE CANCELADA, Y YA NO SE VOLVERA A COTIZAR.
+            // poner a estado 1: material cancelado
+
+            $table->boolean('cancelado');
+
             //0: defecto
             //1: material cotizado
 

@@ -671,9 +671,6 @@
     </div>
 </div>
 
-
-
-
 @extends('backend.menus.footerjs')
 @section('archivos-js')
 
@@ -1381,8 +1378,6 @@
 
                         var infodetalle = response.data.detalle;
 
-                        // VERIFICAMOS SI PODEMOS BORRAR EL MATERIAL SINO HA SIDO COTIZADO.
-                        // QUITAMOS EL BOTÓN BORRAR
                         for (var i = 0; i < infodetalle.length; i++) {
                                 // id requi detalle
                             var markup = "<tr id='"+infodetalle[i].id+"'>";
@@ -1411,16 +1406,32 @@
                                 "<input class='form-control' disabled value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
                                 "</td>";
 
-                                if(infodetalle[i].cotizado){
-                                    markup += "<td></td>"+
-                                        "</tr>";
+                                // si hay cotización
+                                if(infodetalle[i].haycoti){
+
+                                    // cotizacion aprobada, no se puede borrar
+                                    if(infodetalle[i].cotizado === 1){
+                                        markup += "<td></td>"+
+                                            "</tr>";
+
+                                        // cotizacion denegada, puede CANCELAR
+                                    }else if(infodetalle[i].cotizado === 2){
+                                        markup += "<td>"+
+                                            "<button type='button' class='btn btn-block btn-danger' onclick='cancelarFilaRequiEditar(this)'>Cancelar</button>"+
+                                            "</td>"+
+
+                                            "</tr>";
+                                    }
                                 }else{
+                                    // no tiene cotizacion, asi que puede BORRAR
                                     markup += "<td>"+
                                         "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
                                         "</td>"+
 
                                         "</tr>";
                                 }
+
+                                // cotizacion aprobada, no puede borrar
 
                             $("#matriz-requisicion-editar tbody").append(markup);
                         }
@@ -1436,6 +1447,13 @@
                     toastr.error('error buscar información');
                     closeLoading();
                 });
+        }
+
+        // cancelar un material si fue denegada la cotizacion
+        function cancelarFilaRequiEditar(e){
+            var row = $(e).closest('tr').attr('id');
+
+            console.log(row);
         }
 
         // ver modal para detalle requisicion editar

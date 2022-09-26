@@ -583,19 +583,18 @@ class ProyectoController extends Controller
             $ll->numero = $contador;
             $ll->fecha = date("d-m-Y", strtotime($ll->fecha));
 
-            //**** VERIFICACIONES PARA COLOCAR EN ROJO LA TABLA SINO ALCANZA EL SALDO
-
-
-            $alcanza = true;
-
             //------------------------------------------------------------------
-            // SI HAY MATERIAL COTIZADO, NO PODRA BORRAR REQUISICION YA
+            // SI HAY MATERIAL COTIZADO, NO PODRA BORRAR REQUISICIÓN YA
             $hayCotizacion = true;
             if(Cotizacion::where('requisicion_id', $ll->id)->first()){
                 $hayCotizacion = false;
             }
             $ll->haycotizacion = $hayCotizacion;
             //------------------------------------------------------------------
+
+
+
+
 
             //------------------------------------------------------------------
 
@@ -674,9 +673,10 @@ class ProyectoController extends Controller
 
                 $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('pd.id_cuentaproy', $infoPresupuesto->id)
                     ->where('pd.tipo', 0) // salidas. la orden es valida
+                    ->where('rd.cancelado', 0)
                     ->get();
 
                 foreach ($infoSalidaDetalle as $dd){
@@ -685,9 +685,10 @@ class ProyectoController extends Controller
 
                 $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('pd.id_cuentaproy', $infoPresupuesto->id)
                     ->where('pd.tipo', 1) // entradas. la orden es cancelada
+                    ->where('rd.cancelado', 0)
                     ->get();
 
                 foreach ($infoEntradaDetalle as $dd){
@@ -721,8 +722,9 @@ class ProyectoController extends Controller
 
                 $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                     ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('psr.id_cuentaproy', $infoPresupuesto->id) // con esto obtengo solo del obj específico
+                    ->where('rd.cancelado')
                     ->get();
 
                 foreach ($infoSaldoRetenido as $dd){
@@ -806,20 +808,40 @@ class ProyectoController extends Controller
 
             foreach ($detalle as $deta) {
 
-                $cotizado = false;
-
                 $multi = ($deta->cantidad * $deta->dinero);
                 $multi = number_format((float)$multi, 2, '.', ',');
                 $deta->multiplicado = $multi;
 
                 $infoCatalogo = CatalogoMateriales::where('id', $deta->material_id)->first();
 
-                // VERIFICAR QUE ESTE MATERIAL ESTE COTIZADO
-                if(CotizacionDetalle::where('id_requidetalle', $deta->id)
-                    ->first()){
-                    // MATERIAL YA COTIZADO. NO PODRA BORRAR REQUERIMIENTO
-                    $cotizado = true;
+                //-------------------------------------------
+
+                // VERIFICAR QUE ESTE MATERIAL ESTE COTIZADO. PARA NO BORRARLO O PARA CANCELAR SI YA NO LO VA A QUERER
+
+                $infoCotiDetalle = CotizacionDetalle::where('id_requidetalle', $deta->id)->get();
+                $pila = array();
+                $haycoti = false;
+                foreach ($infoCotiDetalle as $dd){
+                    $haycoti = true;
+                    array_push($pila, $dd->cotizacion_id);
                 }
+
+                // saber si ya fue aprobado alguna cotizacion o todas han sido denegadas
+                $infoCoti = Cotizacion::whereIn('id', $pila)
+                    ->where('estado', 1) // aprobados
+                    ->count();
+
+                if($infoCoti > 0){
+                    // COTI APROBADA, NO PUEDE BORRAR
+                    $infoEstado = 1;
+                }else{
+                    // COTI DENEGADA, PUEDE CANCELAR MATERIAL
+                    $infoEstado = 2;
+                }
+
+                $deta->cotizado = $infoEstado;
+                $deta->haycoti = $haycoti;
+                //-------------------------------------------------
 
                 $infoObjeto = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
                 $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
@@ -829,7 +851,7 @@ class ProyectoController extends Controller
 
                 $deta->descripcion = $unidoNombre;
                 $deta->codigo = $unidoCodigo;
-                $deta->cotizado = $cotizado;
+
 
             }// end foreach
 
@@ -1879,10 +1901,10 @@ class ProyectoController extends Controller
             // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
             $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 0) // salidas. la orden es valida
-                //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoSalidaDetalle as $dd){
@@ -1891,9 +1913,10 @@ class ProyectoController extends Controller
 
             $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 1) // entradas. la orden fue cancelada
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoEntradaDetalle as $dd){
@@ -1904,8 +1927,9 @@ class ProyectoController extends Controller
 
             $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('psr.id_cuentaproy', $pp->id)
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoSaldoRetenido as $dd){
