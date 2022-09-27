@@ -18,12 +18,6 @@ class CreateCotizacionDetalleTable extends Migration
 
             $table->bigInteger('cotizacion_id')->unsigned();
             $table->bigInteger('id_requidetalle')->unsigned();
-            $table->bigInteger('material_id')->unsigned();
-
-            // copia de seguridad para nombre, en dado caso cambia algo en }
-            // catalogo de materiales
-            $table->string('nombre', 300);
-            $table->string('medida', 100);
 
             $table->decimal('cantidad', 10, 2);
             $table->decimal('precio_u', 10, 2);

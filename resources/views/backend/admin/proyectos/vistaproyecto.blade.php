@@ -1426,7 +1426,9 @@
 
                                     // cotizacion aprobada, no se puede borrar
                                     if(infodetalle[i].cotizado === 1){
-                                        markup += "<td></td>"+
+                                        markup += "<td>" +
+                                            "<span class='badge bg-success'>Material Aprobado</span>"+
+                                            "</td>"+
                                             "</tr>";
 
                                         // cotizacion denegada, puede CANCELAR
@@ -1438,7 +1440,7 @@
                                                 "</td>"+
 
                                                 "</tr>";
-                                        }else {
+                                        }else { // cuando material esta cancelado
                                             markup += "<td>"+
                                                 "<span class='badge bg-danger'>Material Cancelado</span>"+
                                                 "</tr>";

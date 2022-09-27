@@ -137,7 +137,7 @@
         }
 
         function verProcesadas(id){
-            window.location.href="{{ url('/admin/cotizacion/detalle') }}/" + id;
+            window.location.href="{{ url('/admin/cotizacion/proyecto/detalle') }}/" + id;
         }
 
         function abrirModalAnular(id){
@@ -163,16 +163,35 @@
 
             openLoading();
 
-            axios.post(url+'/ordenes/anular/compra',{
+            axios.post(url+'/ordenes/proyecto/anular/compra',{
                 'id': id
             })
                 .then((response) => {
                    closeLoading();
 
                     if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'Acta Encontrada',
+                            text: "La orden de compra tiene un Acta Generada, no se puede Anular esta orden",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#808080',
+                            confirmButtonText: 'Recargar',
+                            reverseButtons: true,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Orden Anulada!')
                         recargar();
-                    }else{
+                    }
+                    else{
                         toastr.error('Error al Anular Orden');
                     }
                 })
@@ -207,7 +226,7 @@
             formData.append('horaacta', horaacta);
             formData.append('fechaacta', fechaacta);
 
-            axios.post(url+'/ordenes/generar/acta', formData, {
+            axios.post(url+'/ordenes/proyecto/generar/acta', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -232,7 +251,7 @@
         }
 
         function Imprimir(id){
-            window.open("{{ URL::to('admin/ordenes/pdf') }}/" + id);
+            window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + id);
         }
 
     </script>

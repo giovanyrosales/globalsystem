@@ -42,11 +42,11 @@
 
                             <div class="form-group">
                                 <label>Destino</label>
-                                <input type="text" value="{{ $info->destino }}" class="form-control" disabled>
+                                <input type="text" value="{{ $infoRequisicion->destino }}" class="form-control" disabled>
                             </div>
                             <div class="form-group">
                                 <label>Necesidad</label>
-                                <textarea class="form-control" rows="3" disabled>{{ $info->necesidad }}</textarea>
+                                <textarea class="form-control" rows="3" disabled>{{ $infoRequisicion->necesidad }}</textarea>
                             </div>
                         </div>
 
@@ -54,7 +54,7 @@
 
                             <div class="form-group">
                                 <label>Proveedor</label>
-                                <input type="text" value="{{ $proveedor->nombre }}" class="form-control" disabled>
+                                <input type="text" value="{{ $proveedor }}" class="form-control" disabled>
                             </div>
 
                             <div class="form-group">
@@ -78,14 +78,14 @@
                             </thead>
                             <tbody>
 
-                            @foreach($detalle as $dd)
+                            @foreach($infoCotiDetalle as $dd)
                                 <tr>
                                     <td><p id="fila{{$dd->conteo}}" class='form-control'>{{$dd->conteo}}</p></td>
                                     <td><input disabled class="form-control" value="{{$dd->cantidad}}"></td>
-                                    <td><input disabled class="form-control" type="text" value="{{$dd->descripcion}}"></td>
+                                    <td><input disabled class="form-control" type="text" value="{{$dd->nombrematerial}}"></td>
                                     <td><input disabled class="form-control" value="${{$dd->precio_u }}"></td>
                                     <td><input disabled class="form-control" value="${{$dd->total }}"></td>
-                                    <td><input disabled class="form-control" value="{{$dd->cod_presup }}"></td>
+                                    <td><input disabled class="form-control" value="{{$dd->objeto }}"></td>
                                 </tr>
                             @endforeach
 

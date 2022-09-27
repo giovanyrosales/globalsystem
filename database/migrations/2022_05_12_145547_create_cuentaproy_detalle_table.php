@@ -26,8 +26,6 @@ class CreateCuentaproyDetalleTable extends Migration
             //0: LA ORDEN DE COMPRA ES VALIDA.
             //1: LA ORDEN DE COMPRA FUE CANCELADA
 
-            //$table->integer('estado');
-
             $table->foreign('id_cuentaproy')->references('id')->on('cuentaproy');
             $table->foreign('id_requi_detalle')->references('id')->on('requisicion_detalle');
         });

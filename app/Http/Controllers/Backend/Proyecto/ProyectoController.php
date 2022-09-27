@@ -583,35 +583,16 @@ class ProyectoController extends Controller
             $ll->numero = $contador;
             $ll->fecha = date("d-m-Y", strtotime($ll->fecha));
 
-            $infoEstado = "";
+            $infoEstado = "Editar";
             //------------------------------------------------------------------
             // SI HAY MATERIAL COTIZADO, NO PODRA BORRAR REQUISICIÓN YA
             $hayCotizacion = true;
             if(Cotizacion::where('requisicion_id', $ll->id)->first()){
                 $hayCotizacion = false;
-                $infoEstado = "Pendiente"; // no tomar si esta default, aprobado, denegado
+                $infoEstado = "Información"; // no tomar si esta default, aprobado, denegado
             }
+
             $ll->haycotizacion = $hayCotizacion;
-            //------------------------------------------------------------------
-
-            // cotizacion finalizo
-            if($ll->estado == 1){
-                $infoEstado = "Completado";
-            }
-
-            // LOS ESTADOS SERÁN: PENDIENTE, COMPLETADO, REQUERIMIENTO CANCELADO.
-            // Pendiente: abarca cuando no tiene ninguna cotización
-            // Requeri Cancelado: abarca cuando todas las requi_detalle son cancelado = 1
-            // completado: abarca cando al menos 1 material este aprobado, y no importa si otro esta cancelado
-
-            if(RequisicionDetalle::where('requisicion_id', $ll->id)
-                ->where('cancelado', 0)
-                ->first()){
-                // aun no estan cancelado todos los materiales de esta requisición
-            }else{
-                $infoEstado = "Requi. Cancelada";
-            }
-
             $ll->estado = $infoEstado;
 
         } // end foreach

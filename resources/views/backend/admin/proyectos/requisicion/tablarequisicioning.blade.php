@@ -29,7 +29,7 @@
 
                                         @can('boton.editar.requisicion')
                                         <button type="button" class="btn btn-info btn-xs" onclick="vistaEditarRequisicion('{{ $dato->id }}', '{{ $dato->numero }}')">
-                                            <i class="fas fa-pen-alt" title="Editar"></i>&nbsp; Editar
+                                            <i class="fas fa-pen-alt" title="{{ $dato->estado }}"></i> {{ $dato->estado }}
                                         </button>
                                         @endcan
 
@@ -41,10 +41,6 @@
                                                 </button>
                                             @endif
                                         @endcan
-
-                                            <button type="button" class="btn btn-info btn-xs" onclick="modalInfoRequisicionCotizacion({{ $dato->id }})">
-                                                <i class="fas fa-pen-alt" title="Información Cotización"></i>&nbsp; Info Coti.
-                                            </button>
 
                                     </td>
                                 </tr>

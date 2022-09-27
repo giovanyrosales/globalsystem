@@ -183,6 +183,25 @@
                         // vista pdf
                         window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + response.data.id);
                     }
+                    else if(response.data.success === 2) {
+                        // la orden de compra con la cotización, no estaba aprobada.
+                        // solo por seguridad.
+
+                        Swal.fire({
+                            title: 'Cotización Pendiente',
+                            text: "Esta cotización no esta aprobada",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Recargar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
                     else {
                         toastr.error('Error al crear orden');
                     }

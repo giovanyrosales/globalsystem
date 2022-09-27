@@ -5,13 +5,17 @@ namespace App\Http\Controllers\Backend\Orden;
 use App\Http\Controllers\Controller;
 use App\Models\Acta;
 use App\Models\Administradores;
+use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
+use App\Models\CuentaProy;
+use App\Models\CuentaProyDetalle;
 use App\Models\Orden;
 use App\Models\Presupuesto;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
+use App\Models\RequisicionDetalle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +59,13 @@ class OrdenController extends Controller
             return ['success' => 1, 'id' => $info->id];
         }
 
+        if($infocoti = Cotizacion::where('id', $request->idcoti)->first()){
+            if($infocoti->estado != 1){
+                // por seguridad solo queremos cotizaciones aprobadas
+                return ['success' => 2];
+            }
+        }
+
         DB::beginTransaction();
         try {
 
@@ -64,55 +75,35 @@ class OrdenController extends Controller
             $or->fecha_orden = $request->fecha;
             $or->lugar = $request->lugar;
             $or->estado = 0;
+            $or->fecha_anulada = null;
             $or->save();
 
-            // DESCUENTO DE PRESUPUESTO
+            $infoCoti = Cotizacion::where('id', $request->idcoti)->first();
+            $infoRequi = Requisicion::where('id', $infoCoti->requisicion_id)->first();
+            $detalle = CotizacionDetalle::where('cotizacion_id', $request->idcoti)->get();
 
-            // obtener todos los detalles de la cotizacion
-            $infoDetalle = CotizacionDetalle::where('cotizacion_id', $request->idcoti)
-                ->select('cod_presup')
-                ->groupBy('cod_presup')
-                ->get();
+            foreach ($detalle as $dd){
 
-            $infoCotizacion = Cotizacion::where('id', $request->idcoti)->first();
-            $infoRequisicion = Requisicion::where('id', $infoCotizacion->requisicion_id)->first();
+                $infoRequiDeta = RequisicionDetalle::where('id', $dd->id_requidetalle)->first();
+                $infoMaterial = CatalogoMateriales::where('id', $infoRequiDeta->material_id)->first();
 
-            // sumar por codigo
-            foreach ($infoDetalle as $dd){
+                $infoCuenta = CuentaProy::where('proyecto_id', $infoRequi->id_proyecto)
+                    ->where('objespeci_id', $infoMaterial->id_objespecifico)
+                    ->first();
 
-                $detalle = CotizacionDetalle::where('cotizacion_id', $request->idcoti)
-                    ->where('cod_presup', $dd->cod_presup)
-                    ->get();
-
-                $multi = 0; // dinero a descontar por codigo
-                foreach ($detalle as $cd){
-                    $multi = $cd->cantidad * $cd->precio_u;
-                }
-
-                // buscar codigo para descontar
-                /*if($data = DB::table('presupuesto AS p')
-                    ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
-                    ->select('p.id', 'p.saldo_inicial')
-                    ->where('p.proyecto_id', $infoRequisicion->id_proyecto)
-                    ->where('obj.codigo', $dd->cod_presup)
-                    ->first()){
-
-                    // descuento
-                    $resta = $data->saldo - $multi;
-
-                    Presupuesto::where('id', $data->id)->update([
-                        'saldo' => $resta,
-                    ]);
-                }*/
+                $cuenta = new CuentaProyDetalle();
+                $cuenta->id_cuentaproy = $infoCuenta->id;
+                $cuenta->id_requi_detalle = $dd->id;
+                $cuenta->tipo = 1; // ENTRADA
             }
 
             DB::commit();
             return ['success' => 1, 'id' => $or->id];
 
         }catch(\Throwable $e){
-            Log::info('error: ' . $e);
+            //Log::info('error: ' . $e);
             DB::rollback();
-            return ['success' => 2];
+            return ['success' => 99];
         }
     }
 
@@ -185,12 +176,11 @@ class OrdenController extends Controller
         $customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper($customPaper)->setWarnings(false);
         return $pdf->stream('Orden_Compra.pdf');
-
     }
 
     public function indexOrdenesCompras(){
 
-        return view('Backend.Admin.Ordenes.vistaOrdenesCompra');
+        return view('backend.admin.proyectos.ordenes.vistaordenescompra');
     }
 
     public function tablaOrdenesCompras(){
@@ -211,15 +201,19 @@ class OrdenController extends Controller
                 $val->actaid = 0;
             }
 
-            $val->requisicion_id = $infoContizacion->requisicion_id;
             $val->requidestino = $infoRequisicion->destino;
             $val->nomproveedor = $infoProveedor->nombre;
         }
 
-        return view('Backend.Admin.Ordenes.tablaOrdenesCompra', compact('lista'));
+        return view('backend.admin.proyectos.ordenes.tablaordenescompra', compact('lista'));
     }
 
     public function anularCompra(Request $request){
+
+        // SOLO ANULAR SINO TIENE ACTA GENERADA
+        if(Acta::where('orden_id', $request->id)->first()){
+            return ['success' => 1];
+        }
 
         if($info = Orden::where('id', $request->id)->first()){
 
@@ -229,11 +223,15 @@ class OrdenController extends Controller
                     'estado' => 1,
                     'fecha_anulada' => Carbon::now('America/El_Salvador'),
                     ]);
+
+                // CAMBIAR DE ESTADO PARA VOLVER
+
+
             }
 
-            return ['success' => 1];
-        }else{
             return ['success' => 2];
+        }else{
+            return ['success' => 99];
         }
     }
 

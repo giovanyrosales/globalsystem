@@ -226,8 +226,8 @@ Route::get('/admin/ordenes/proyecto/pdf/{id}', [OrdenController::class,'vistaPdf
 // --- ORDENES DE COMPRAS ---
 Route::get('/admin/ordenes/compras/index', [OrdenController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
 Route::get('/admin/ordenes/compras/tabla-index', [OrdenController::class,'tablaOrdenesCompras']);
-Route::post('/admin/ordenes/anular/compra',  [OrdenController::class,'anularCompra']);
-Route::post('/admin/ordenes/generar/acta',  [OrdenController::class,'generarActa']);
+Route::post('/admin/ordenes/proyecto/anular/compra',  [OrdenController::class,'anularCompra']);
+Route::post('/admin/ordenes/proyecto/generar/acta',  [OrdenController::class,'generarActa']);
 Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenController::class,'reporteActaGenerada']);
 
 

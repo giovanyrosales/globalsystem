@@ -28,7 +28,7 @@ class CreateOrdenTable extends Migration
             $table->integer('estado');
 
             // fecha de orden Anulada
-            $table->date('fecha_anulada')->nullable();
+            $table->dateTime('fecha_anulada')->nullable();
 
             $table->foreign('admin_contrato_id')->references('id')->on('administradores');
             $table->foreign('cotizacion_id')->references('id')->on('cotizacion');

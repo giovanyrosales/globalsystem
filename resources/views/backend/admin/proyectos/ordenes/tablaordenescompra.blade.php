@@ -32,7 +32,7 @@
                                     <td>{{ $dato->nomproveedor }}</td>
                                     <td>
 
-                                        <!-- orden aun no anulada -->
+                                        <!-- ORDEN NO ANULADA -->
                                         @if($dato->estado == 0)
 
                                             <!-- acta aun no generada -->
@@ -50,16 +50,17 @@
                                             <br> <br>
                                             @if($dato->actaid == 0)
                                                 <button type="button" class="btn btn-warning btn-xs" onclick="abrirModalActa({{ $dato->id }})">
-                                                    <i class="fa fa-laptop" title="Generar Acta"></i>&nbsp; Generar Acta
+                                                    <i class="fa fa-file-pdf" title="Generar Acta"></i>&nbsp; Generar Acta
                                                 </button>
                                             @else
                                                 <button type="button" class="btn btn-info btn-xs" onclick="imprimirActa({{ $dato->actaid }})">
                                                     <i class="fas fa-print" title="Imprimir Acta"></i>&nbsp; Imprimir Acta
                                                 </button>
                                             @endif
+                                            <!-- ORDEN ANULADA -->
                                         @elseif($dato->estado == 1)
-                                            <button type="button" class="btn btn-primary btn-xs" onclick="verProcesadas({{ $dato->requisicion_id }})">
-                                                <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
+                                            <button type="button" class="btn btn-primary btn-xs" onclick="verProcesadas({{ $dato->cotizacion_id }})">
+                                                <i class="fas fa-list-alt" title="Detalle"></i>&nbsp; Detalle
                                             </button>
                                         @endif
 

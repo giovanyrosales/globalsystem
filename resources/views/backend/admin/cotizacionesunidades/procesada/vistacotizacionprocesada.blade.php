@@ -176,7 +176,7 @@
                         toastr.success('Orden Generada');
                         recargar();
                         // vista pdf
-                        window.open("{{ URL::to('admin/ordenes/pdf') }}/" + response.data.id);
+                        window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + response.data.id);
                     }
                     else {
                         toastr.error('Error al crear orden');
