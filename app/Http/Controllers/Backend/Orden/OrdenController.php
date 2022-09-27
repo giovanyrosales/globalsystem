@@ -224,9 +224,36 @@ class OrdenController extends Controller
                     'fecha_anulada' => Carbon::now('America/El_Salvador'),
                     ]);
 
-                // CAMBIAR DE ESTADO PARA VOLVER
+                // CAMBIAR DE ESTADO PARA QUE SE PUEDA COTIZAR DE NUEVO LOS MATERIALES
+                // SUMAR ENTRADA DE DINERO. PORQUE FUE ANULADA
 
+                $infoCoti = Cotizacion::where('id', $info->cotizacion_id)->first();
+                $infoRequi = Requisicion::where('id', $infoCoti->requisicion_id)->first();
+                $infoCotiDeta = CotizacionDetalle::where('cotizacion_id', $infoCoti->id)->get();
 
+                // setear por cada material cotizado
+
+                foreach ($infoCotiDeta as $dd){
+
+                    // para que pueda ser cotizado nuevamente
+                    RequisicionDetalle::where('id', $dd->id_requidetalle)->update([
+                        'estado' => 0,
+                    ]);
+
+                    $infoRequiDetalle = RequisicionDetalle::where('id', $dd->id_requidetalle)->first();
+                    $infoMaterial = CatalogoMateriales::where('id', $infoRequiDetalle->material_id)->first();
+
+                    $cuentaProy = CuentaProy::where('proyecto_id', $infoRequi->id_proyecto)
+                        ->where('objespeci_id', $infoMaterial->id_objespecifico)
+                        ->first();
+
+                    // para que vuelva el dinero a lo RESTANTE
+                    $cuenta = new CuentaProyDetalle();
+                    $cuenta->id_cuentaproy = $cuentaProy->id;
+                    $cuenta->id_requi_detalle = $dd->id;
+                    $cuenta->tipo = 1; // ENTRADA DE DINERO
+                    $cuenta->save();
+                }
             }
 
             return ['success' => 2];

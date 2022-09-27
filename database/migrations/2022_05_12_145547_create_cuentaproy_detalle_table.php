@@ -10,6 +10,8 @@ class CreateCuentaproyDetalleTable extends Migration
      * GUARDA UN REGISTRO AL GENERAR ORDEN DE COMPRA, ASI BAJARA EL
      * SALDO RESTANTE
      *
+     *
+     *
      * @return void
      */
     public function up()
