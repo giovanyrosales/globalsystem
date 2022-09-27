@@ -583,32 +583,36 @@ class ProyectoController extends Controller
             $ll->numero = $contador;
             $ll->fecha = date("d-m-Y", strtotime($ll->fecha));
 
+            $infoEstado = "";
             //------------------------------------------------------------------
             // SI HAY MATERIAL COTIZADO, NO PODRA BORRAR REQUISICIÓN YA
             $hayCotizacion = true;
             if(Cotizacion::where('requisicion_id', $ll->id)->first()){
                 $hayCotizacion = false;
+                $infoEstado = "Pendiente"; // no tomar si esta default, aprobado, denegado
             }
             $ll->haycotizacion = $hayCotizacion;
             //------------------------------------------------------------------
 
-
-
-
-
-            //------------------------------------------------------------------
-
-            $infoEstado = "Pendiente";
-            $completado = false;
-
             // cotizacion finalizo
             if($ll->estado == 1){
-                $infoEstado = "Cotizado";
-                $completado = true;
+                $infoEstado = "Completado";
+            }
+
+            // LOS ESTADOS SERÁN: PENDIENTE, COMPLETADO, REQUERIMIENTO CANCELADO.
+            // Pendiente: abarca cuando no tiene ninguna cotización
+            // Requeri Cancelado: abarca cuando todas las requi_detalle son cancelado = 1
+            // completado: abarca cando al menos 1 material este aprobado, y no importa si otro esta cancelado
+
+            if(RequisicionDetalle::where('requisicion_id', $ll->id)
+                ->where('cancelado', 0)
+                ->first()){
+                // aun no estan cancelado todos los materiales de esta requisición
+            }else{
+                $infoEstado = "Requi. Cancelada";
             }
 
             $ll->estado = $infoEstado;
-            $ll->completado = $completado;
 
         } // end foreach
 
@@ -644,9 +648,6 @@ class ProyectoController extends Controller
             $r->destino = $request->destino;
             $r->fecha = $request->fecha;
             $r->necesidad = $request->necesidad;
-            //0: default
-            //1: inicio cotización de este requerimiento
-            $r->estado = 0;
             $r->save();
 
             for ($i = 0; $i < count($request->cantidad); $i++) {
@@ -724,7 +725,7 @@ class ProyectoController extends Controller
                     ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('psr.id_cuentaproy', $infoPresupuesto->id) // con esto obtengo solo del obj específico
-                    ->where('rd.cancelado')
+                    ->where('rd.cancelado', 0)
                     ->get();
 
                 foreach ($infoSaldoRetenido as $dd){
@@ -855,7 +856,13 @@ class ProyectoController extends Controller
 
             }// end foreach
 
-            return ['success' => 1, 'info' => $info, 'detalle' => $detalle];
+            // conocer si hay una cotizacion hecha, asi no puede editar detalles como fecha, destino, necesidad
+            $btnEditar = false;
+            if(Cotizacion::where('requisicion_id', $info->id)->first()){
+                $btnEditar = true;
+            }
+
+            return ['success' => 1, 'info' => $info, 'detalle' => $detalle, 'btneditar' => $btnEditar];
         }
         return ['success' => 2];
     }
@@ -866,12 +873,14 @@ class ProyectoController extends Controller
 
         try {
 
-            // actualizar registros requisicion
-            Requisicion::where('id', $request->idrequisicion)->update([
-                'destino' => $request->destino,
-                'fecha' => $request->fecha,
-                'necesidad' => $request->necesidad,
-            ]);
+            // ACTUALIZAR SOLAMENTE SI NO TIENE COTIZACIÓN
+            if(!Cotizacion::where('requisicion_id', $request->idrequisicion)->first()){
+                Requisicion::where('id', $request->idrequisicion)->update([
+                    'destino' => $request->destino,
+                    'fecha' => $request->fecha,
+                    'necesidad' => $request->necesidad,
+                ]);
+            }
 
             // agregar id a pila
             $pila = array();
@@ -915,6 +924,39 @@ class ProyectoController extends Controller
             DB::rollback();
             return ['success' => 99];
         }
+    }
+
+    public function cancelarMaterialRequisicion(Request $request){
+
+        // verificar que este material no este cotizado con una autorizada.
+
+        // obtener todas las cotizacion id donde este cotizado
+        $lista = CotizacionDetalle::where('id_requidetalle', $request->id)->get();
+
+        $pila = array();
+        foreach ($lista as $dd){
+            array_push($pila, $dd->cotizacion_id);
+        }
+
+        // saber si hay una cotización autorizada. CON ESTE MATERIAL
+        // EL ESTADO 1, APROBADA, 2: DENEGADA
+        // ES DECIR, MIENTRAS EL ESTADO DE LA COTIZACION ESTA EN DEFAULT Y APROBADO.
+        // NO PODRA CANCELAR EL MATERIAL
+        $conteo = Cotizacion::whereIn('id', $pila)
+            ->whereIn('estado', [0, 1])
+            ->count();
+
+        if($conteo > 0){
+            // MATERIAL FUE APROBADO O ESPERANDO APROBACIÓN, NO SE PUEDE CANCELAR YA
+            return ['success' => 1];
+        }
+
+        // SE PUEDE CANCELAR, PORQUE NINGUNA COTI ESTA APROBADA
+        RequisicionDetalle::where('id', $request->id)->update([
+            'cancelado' => 1,
+        ]);
+
+        return ['success' => 2];
     }
 
     // BORRAR UNA REQUISICION COMPLETA, SOLO SINO HA SIDO COTIZADO NINGUN MATERIAL
@@ -1897,14 +1939,14 @@ class ProyectoController extends Controller
 
             $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
 
-            // POR AQUI SE VALIDARA SI NO FUE CANSELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
+            // POR AQUI SE VALIDARA SI NO FUE CANCELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
             // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
             $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 0) // salidas. la orden es valida
-                ->where('rd.cancelado', 0)
+                ->where('rd.cancelado', 0) // requi material no puede ser cancelado porque ya hay orden de compra
                 ->get();
 
             foreach ($infoSalidaDetalle as $dd){
@@ -1916,7 +1958,7 @@ class ProyectoController extends Controller
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 1) // entradas. la orden fue cancelada
-                ->where('rd.cancelado', 0)
+                ->where('rd.cancelado', 0) // requi material no puede ser cancelado porque ya hay orden de compra
                 ->get();
 
             foreach ($infoEntradaDetalle as $dd){
@@ -1927,7 +1969,7 @@ class ProyectoController extends Controller
 
             $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                ->select('rd.cantidad', 'rd.dinero')
                 ->where('psr.id_cuentaproy', $pp->id)
                 ->where('rd.cancelado', 0)
                 ->get();

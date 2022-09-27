@@ -476,7 +476,7 @@
                             showCancelButton: false,
                             allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
+                            confirmButtonText: 'Recargar',
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 location.reload();
@@ -485,13 +485,13 @@
                     }
                     if(response.data.success === 2){
                         Swal.fire({
-                            title: 'Material Ya Cotizado',
-                            text: "Un Material ya había sido Cotizado.",
+                            title: 'Material Con Cotización',
+                            text: "Un Material ya tiene una Cotización en Espera o ya fue Aprobada. Recargar para visualizar.",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
+                            confirmButtonText: 'Recargar',
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 location.reload();
@@ -535,7 +535,7 @@
                             showCancelButton: false,
                             allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
+                            confirmButtonText: 'Recargar',
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 location.reload();

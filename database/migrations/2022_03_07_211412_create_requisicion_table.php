@@ -23,10 +23,6 @@ class CreateRequisicionTable extends Migration
             $table->date('fecha')->nullable();
             $table->text('necesidad')->nullable();
 
-            //0: defecto
-            //1: inicio su cotización de uno o todos los materiales
-            $table->integer('estado');
-
             $table->foreign('id_proyecto')->references('id')->on('proyectos');
         });
     }

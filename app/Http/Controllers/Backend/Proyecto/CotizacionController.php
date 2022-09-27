@@ -105,12 +105,26 @@ class CotizacionController extends Controller
     }
 
     public function autorizarCotizacion(Request $request){
-        Cotizacion::where('id', $request->id)->update([
-            'estado' => 1,
-            'fecha_estado' => Carbon::now('America/El_Salvador')
-        ]);
 
-        return ['success' => 1];
+
+        DB::beginTransaction();
+
+        try {
+
+            if(Cotizacion::where('id', $request->id)
+            ->where('estado', 0)->first()){
+                Cotizacion::where('id', $request->id)->update([
+                    'estado' => 1,
+                    'fecha_estado' => Carbon::now('America/El_Salvador')
+                ]);
+            }
+
+            DB::commit();
+            return ['success' => 1];
+        }catch(\Throwable $e){
+            DB::rollback();
+            return ['success' => 99];
+        }
     }
 
     public function denegarCotizacion(Request $request){
@@ -126,18 +140,18 @@ class CotizacionController extends Controller
                 'fecha_estado' => Carbon::now('America/El_Salvador')
             ]);
 
-            $infoCotizacion = Cotizacion::where('id', $request->id)->first();
+           // $infoCotizacion = Cotizacion::where('id', $request->id)->first();
 
             // VOLVER A CAMBIAR DE ESTADO LOS MATERIALES QUE FUERON COTIZADOS
 
-            $infoRequi = Requisicion::where('id', $infoCotizacion->requisicion_id)->first();
+            /*$infoRequi = Requisicion::where('id', $infoCotizacion->requisicion_id)->first();
 
             // si tenia 1, es que todos los materiales estaban cotizados. volver a 0
             if($infoRequi->estado == 1){
                 Requisicion::where('id', $infoRequi->id)->update([
                     'estado' => 0,
                 ]);
-            }
+            }*/
 
             // hoy verificar cuales otros materiales fueron cotizados y volver a 0
 
@@ -167,14 +181,6 @@ class CotizacionController extends Controller
     }
 
     public function indexAutorizadasTabla(){
-
-        // todas las ordenes de cotizacion, para no mostrarlas
-        /*$orden = Orden::all();
-        $pila = array();
-
-        foreach ($orden as $dd){
-            array_push($pila, $dd->cotizacion_id);
-        }*/
 
         // autorizadas
         $lista = Cotizacion::where('estado', 1)
@@ -225,6 +231,8 @@ class CotizacionController extends Controller
             $dd->necesidad = $infoRequisicion->necesidad;
             $dd->destino = $infoRequisicion->destino;
             $dd->codigoproyecto = $infoProyecto->codigo;
+
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
         }
 
         return view('backend.admin.proyectos.cotizaciones.denegadas.tablacotizaciondenegadaing', compact('lista'));
@@ -410,14 +418,30 @@ class CotizacionController extends Controller
 
             foreach ($lista as $datainfo){
 
+                // MATERIAL A COTIZACION FUE CANCELADO
                 if($datainfo->cancelado == 1){
                     return ['success' => 4];
                 }
 
-                if(CotizacionDetalle::where('id_requidetalle', $datainfo->id)
-                    ->first()){
-                    // YA ESTABA UN MATERIAL COTIZADO
-                    return ['success' => 2];
+                if(CotizacionDetalle::where('id_requidetalle', $datainfo->id)->first()){
+                    // ENCONTRO MATERIAL COTIZADO, hoy se verificara si este material ya estaba aprobado o tiene una
+                    // cotización esperando (aprobación o denegación)
+                    $todos = CotizacionDetalle::where('id_requidetalle', $datainfo->id)->get();
+
+                    $pilaCoti = array();
+
+                    foreach ($todos as $dd){
+                        array_push($pilaCoti, $dd->cotizacion_id);
+                    }
+
+                    $conteoCoti = Cotizacion::whereIn('id', $pilaCoti)
+                        ->whereIn('estado', [0,1]) // estado default y aprobados
+                        ->count();
+
+                    if($conteoCoti > 0){
+                        // SIGNIFICA QUE MATERIAL A COTIZAR YA TENIA UNA COTIZACION EN ESPERA O APROBADA
+                        return ['success' => 2];
+                    }
                 }
 
                 // VERIFICACIÓN DE SALDOS
@@ -535,7 +559,7 @@ class CotizacionController extends Controller
 
             // CAMBIAR DE ESTADO LA REQUISICIÓN COMPLETADO, SI YA NO HAY NADA QUE COTIZAR
 
-            $conteo = RequisicionDetalle::where('requisicion_id', $request->idcotizar)
+            /*$conteo = RequisicionDetalle::where('requisicion_id', $request->idcotizar)
                 ->where('estado', 0)
                 ->count();
 
@@ -545,7 +569,7 @@ class CotizacionController extends Controller
                 Requisicion::where('id', $request->idcotizar)->update([
                     'estado' => 1,
                 ]);
-            }
+            }*/
 
             DB::commit();
             return ['success' => 5];

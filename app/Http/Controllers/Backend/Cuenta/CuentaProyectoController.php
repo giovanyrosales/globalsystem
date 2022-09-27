@@ -202,7 +202,7 @@ class CuentaProyectoController extends Controller
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 0) // salidas. y la orden es valido
-                ->where('rd.cancelado')
+                ->where('rd.cancelado', 0)
                 //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
 
@@ -215,7 +215,7 @@ class CuentaProyectoController extends Controller
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $pp->id)
                 ->where('pd.tipo', 1) // entradas. // la orden fue cancelada
-                ->where('rd.cancelado')
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoEntradaDetalle as $dd){
@@ -228,7 +228,7 @@ class CuentaProyectoController extends Controller
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('psr.id_cuentaproy', $pp->id)
-                ->where('rd.cancelado')
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoSaldoRetenido as $dd){

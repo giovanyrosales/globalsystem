@@ -9,7 +9,6 @@
                             <tr>
                                 <th style="width: 4%">#</th>
                                 <th style="width: 10%">Fecha</th>
-                                <th style="width: 10%">Estado</th>
                                 <th style="width: 18%">Opciones</th>
                             </tr>
                             </thead>
@@ -20,11 +19,6 @@
                                     <tr>
                                     <td style="width: 4%">{{ $dato->numero }}</td>
                                     <td style="width: 10%">{{ $dato->fecha }}</td>
-                                    @if($dato->completado)
-                                        <td style="width: 10%"><span class="badge bg-success"> {{ $dato->estado }}</span></td>
-                                    @else
-                                       <td style="width: 10%">{{ $dato->estado }}</td>
-                                    @endif
 
                                     <td>
                                         @can('boton.cotizar.requisicion')
@@ -40,13 +34,17 @@
                                         @endcan
 
                                         @can('boton.borrar.requisicion')
-                                            <!-- solo se borara si no hay ningún material cotizado -->
+                                            <!-- solo se borrara si no hay ningún material cotizado -->
                                             @if($dato->haycotizacion)
                                                 <button type="button" class="btn btn-danger btn-xs" onclick="modalBorrarRequisicion({{ $dato->id }})">
                                                     <i class="fas fa-trash-alt" title="Borrar"></i>&nbsp; Borrar
                                                 </button>
                                             @endif
                                         @endcan
+
+                                            <button type="button" class="btn btn-info btn-xs" onclick="modalInfoRequisicionCotizacion({{ $dato->id }})">
+                                                <i class="fas fa-pen-alt" title="Información Cotización"></i>&nbsp; Info Coti.
+                                            </button>
 
                                     </td>
                                 </tr>

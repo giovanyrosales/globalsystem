@@ -446,7 +446,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="preguntaGuardarRequisicionEditar()">Guardar</button>
+                <button type="button" class="btn btn-primary" id="botonGuardarRequiDetalle" onclick="preguntaGuardarRequisicionEditar()">Guardar</button>
             </div>
         </div>
     </div>
@@ -1354,7 +1354,6 @@
             $("#matriz-requisicion tbody tr").remove();
         }
 
-
         //******* VISTA EDITAR REQUISICION *********
 
         function vistaEditarRequisicion(id, conteo){
@@ -1375,6 +1374,22 @@
                         $('#conteo-requisicion-editar').val(conteo);
                         $('#destino-requisicion-editar').val(response.data.info.destino);
                         $('#necesidad-requisicion-editar').val(response.data.info.necesidad);
+
+                        if(response.data.btneditar){
+                            // ocultar botón
+                            document.getElementById("botonGuardarRequiDetalle").style.display = "none";
+
+                            document.getElementById("fecha-requisicion-editar").disabled = true;
+                            document.getElementById("destino-requisicion-editar").disabled = true;
+                            document.getElementById("necesidad-requisicion-editar").disabled = true;
+                        }else{
+                            // mostrar botón
+                            document.getElementById("botonGuardarRequiDetalle").style.display = "block";
+
+                            document.getElementById("fecha-requisicion-editar").disabled = false;
+                            document.getElementById("destino-requisicion-editar").disabled = false;
+                            document.getElementById("necesidad-requisicion-editar").disabled = false;
+                        }
 
                         var infodetalle = response.data.detalle;
 
@@ -1416,11 +1431,19 @@
 
                                         // cotizacion denegada, puede CANCELAR
                                     }else if(infodetalle[i].cotizado === 2){
-                                        markup += "<td>"+
-                                            "<button type='button' class='btn btn-block btn-danger' onclick='cancelarFilaRequiEditar(this)'>Cancelar</button>"+
-                                            "</td>"+
 
-                                            "</tr>";
+                                        if(infodetalle[i].cancelado === 0){
+                                            markup += "<td>"+
+                                                "<button type='button' class='btn btn-block btn-danger' onclick='cancelarFilaRequiEditar(this)'>Cancelar</button>"+
+                                                "</td>"+
+
+                                                "</tr>";
+                                        }else {
+                                            markup += "<td>"+
+                                                "<span class='badge bg-danger'>Material Cancelado</span>"+
+                                                "</tr>";
+                                        }
+
                                     }
                                 }else{
                                     // no tiene cotizacion, asi que puede BORRAR
@@ -1451,9 +1474,67 @@
 
         // cancelar un material si fue denegada la cotizacion
         function cancelarFilaRequiEditar(e){
-            var row = $(e).closest('tr').attr('id');
 
-            console.log(row);
+            // ID REQUI_DETALLE
+            var id = $(e).closest('tr').attr('id');
+
+            Swal.fire({
+                title: 'Cancelar Material',
+                text: "Si el material no puede ser Cotizado. Se cancelara y se libera el saldo Retenido",
+                icon: 'info',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Salir',
+                confirmButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    cancelarMaterialCotizado(id);
+                }
+            })
+        }
+
+        function cancelarMaterialCotizado(id){
+            openLoading();
+
+            axios.post(url+'/proyecto/requisicion/material/cancelar', {
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1) {
+
+                        Swal.fire({
+                            title: 'Material Ya Cotizado',
+                            text: "El material Ya fue Aprobado o se esta esperando una Respuesta (Aprobado o Denegado). No se puede Cancelar",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Recargar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }else if(response.data.success === 2){
+                        toastr.success('Cancelado correctamente');
+                        $('#modalEditarRequisicion').modal('hide');
+                        recargarRequisicion();
+                    }
+                    else{
+                        toastr.error('error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al actualizar');
+                    closeLoading();
+                });
+
         }
 
         // ver modal para detalle requisicion editar

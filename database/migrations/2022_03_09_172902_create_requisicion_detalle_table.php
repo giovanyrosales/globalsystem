@@ -26,7 +26,7 @@ class CreateRequisicionDetalleTable extends Migration
 
             //0: defecto
             //1: material cotizado
-
+            // ayuda para volver a cotizarlo si fue denegado la cotización
             $table->boolean('estado');
 
             $table->foreign('requisicion_id')->references('id')->on('requisicion');
