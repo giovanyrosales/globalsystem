@@ -22,6 +22,10 @@ class CreatePMaterialesTable extends Migration
             $table->string('descripcion', 300);
             $table->decimal('costo', 10, 2);
 
+            // 0: default
+            // 1: no sera visible para jefes para crear su presupuesto
+            $table->boolean('visible');
+
             $table->foreign('id_objespecifico')->references('id')->on('obj_especifico');
             $table->foreign('id_unidadmedida')->references('id')->on('p_unidadmedida');
         });

@@ -64,12 +64,12 @@
 
                                     <div class="form-group">
                                         <label>Nombre</label>
-                                        <input type="text" maxlength="200" class="form-control" id="nombre-nuevo" placeholder="Nombre">
+                                        <input type="text" maxlength="200" autocomplete="off" class="form-control" id="nombre-nuevo" placeholder="Nombre">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Descripción</label>
-                                        <input type="text" maxlength="200" class="form-control" id="descripcion-nuevo" placeholder="Descripción">
+                                        <input type="text" maxlength="200" autocomplete="off" class="form-control" id="descripcion-nuevo" placeholder="Descripción">
                                     </div>
 
                                 </div>

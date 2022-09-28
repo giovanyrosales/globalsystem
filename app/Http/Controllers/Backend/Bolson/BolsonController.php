@@ -19,24 +19,23 @@ class BolsonController extends Controller
         $this->middleware('auth');
     }
 
-    public function indexCuenta(){
-        return view('Backend.Admin.Bolson.Cuenta.vistaCuentaBolson');
+    public function indexBolson(){
+        return view('backend.admin.proyectos.bolson.registro.vistabolson');
     }
 
-    public function tablaCuenta(){
+    public function tablaBolson(){
 
-        $cuenta = Bolson::orderBy('fecha')->get();
+        $lista = Bolson::orderBy('fecha')->get();
 
-        foreach ($cuenta as $dd){
+        foreach ($lista as $dd){
 
             $infoCuenta = Cuenta::where('id', $dd->id_cuenta)->first();
             $dd->cuenta = $infoCuenta->nombre;
-            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+
             $dd->montoini = number_format((float)$dd->montoini, 2, '.', ',');
-            $dd->saldo = number_format((float)$dd->saldo, 2, '.', ',');
         }
 
-        return view('Backend.Admin.Bolson.Cuenta.tablaCuentaBolson', compact('cuenta'));
+        return view('backend.admin.proyectos.bolson.registro.tablabolson', compact('lista'));
     }
 
     public function buscarNombreCuenta(Request $request){

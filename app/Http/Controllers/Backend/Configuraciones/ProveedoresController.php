@@ -5,14 +5,18 @@ namespace App\Http\Controllers\Backend\Configuraciones;
 use App\Http\Controllers\Controller;
 use App\Models\CatalogoMateriales;
 use App\Models\Clasificaciones;
+use App\Models\Cuenta;
 use App\Models\ObjEspecifico;
 use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
 use App\Models\P_Materiales;
+use App\Models\P_PresupUnidad;
 use App\Models\P_UnidadMedida;
 use App\Models\Proveedores;
 use App\Models\Rubro;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ProveedoresController extends Controller
@@ -451,6 +455,7 @@ class ProveedoresController extends Controller
         $dato->id_objespecifico = $request->objespecifico;
         $dato->descripcion = $request->nombre;
         $dato->costo = $request->precio;
+        $dato->visible = 0;
 
         if($dato->save()){
             return ['success' => 2];
@@ -545,6 +550,109 @@ class ProveedoresController extends Controller
         return ['success' => 2];
     }
 
+
+    public function indexRevisionPresupuestoUnidad(){
+
+        $departamentos = P_Departamento::orderBy('nombre')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre')->get();
+
+        return view('backend.admin.presupuestounidad.revisar.vistarevisar', compact('departamentos', 'anios'));
+    }
+
+    public function indexReportePresupuestoUnidad(){
+        $departamentos = P_Departamento::orderBy('nombre')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre')->get();
+
+        return view('backend.admin.presupuestounidad.reportes.vistareportespresupuestounidad', compact('departamentos', 'anios'));
+    }
+
+    public function indexCrearPresupuestoUnidad(){
+
+        // verificar si hay presupuesto pendiente por crear
+
+        $idusuario = Auth::id();
+        $infouser = Usuario::where('id', $idusuario)->first();
+
+        // solo sera necesario verificar con tabla presub_unidad
+
+        // obtener lista de anios del departamento
+        $listaAnios = P_PresupUnidad::where('id_departamento', $infouser->id_departamento)->get();
+
+        $pila = array();
+
+        foreach ($listaAnios as $p){
+            array_push($pila, $p->id_anio);
+        }
+
+        $listado = P_AnioPresupuesto::whereNotIn('id', $pila)->get();
+
+        // redireccionar a vista si ya no hay presupuesto por crear
+        if($listado->isEmpty()){
+            return view('backend.admin.encargado.crear.indexvacio');
+        }
+
+        $unidad = P_UnidadMedida::orderBy('nombre')->get();
+
+        $rubro = Rubro::orderBy('codigo', 'ASC')->get();
+
+        $resultsBloque = array();
+        $index = 0;
+        $resultsBloque2 = array();
+        $index2 = 0;
+        $resultsBloque3 = array();
+        $index3 = 0;
+
+        // agregar cuentas
+        foreach($rubro as $secciones){
+            array_push($resultsBloque,$secciones);
+
+            $subSecciones = Cuenta::where('id_rubro', $secciones->id)
+                ->orderBy('codigo', 'ASC')
+                ->get();
+
+            // agregar objetos
+            foreach ($subSecciones as $lista){
+
+                array_push($resultsBloque2, $lista);
+
+                $subSecciones2 = ObjEspecifico::where('id_cuenta', $lista->id)
+                    ->orderBy('codigo', 'ASC')
+                    ->get();
+
+                // agregar materiales
+                foreach ($subSecciones2 as $ll){
+
+                    array_push($resultsBloque3, $ll);
+
+                    if($ll->numero == 61109){
+                        $ll->nombre = $ll->nombre . " ( ACTIVOS FIJOS MENORES A $600.00 )";
+                    }
+
+                    $subSecciones3 = P_Materiales::where('id_objespecifico', $ll->id)
+                        ->orderBy('descripcion', 'ASC')
+                        ->where('visible', 1)
+                        ->get();
+
+                    foreach ($subSecciones3 as $subLista){
+
+                        $infoUnidad = P_UnidadMedida::where('id', $subLista->id_unimedida)->first();
+                        $subLista->unimedida = $infoUnidad->nombre;
+                    }
+
+                    $resultsBloque3[$index3]->material = $subSecciones3;
+                    $index3++;
+                }
+
+                $resultsBloque2[$index2]->objeto = $subSecciones2;
+                $index2++;
+            }
+
+            $resultsBloque[$index]->cuenta = $subSecciones;
+            $index++;
+        }
+
+        return view('backend.admin.presupuestounidad.crear.vistacrearpresupuestounidad', compact('listado', 'unidad', 'rubro'));
+    }
 
 
 }

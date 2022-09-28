@@ -27,7 +27,6 @@ class CreateCotizacionDetalleTable extends Migration
 
             $table->foreign('cotizacion_id')->references('id')->on('cotizacion');
             $table->foreign('id_requidetalle')->references('id')->on('requisicion_detalle');
-            $table->foreign('material_id')->references('id')->on('materiales');
         });
     }
 

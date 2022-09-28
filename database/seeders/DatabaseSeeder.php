@@ -28,5 +28,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ObjetoSeeder::class);
         $this->call(FuenteRSeeder::class);
         $this->call(TipoPartidaSeeder::class);
+        $this->call(PunidadMedidaSeeder::class);
     }
 }

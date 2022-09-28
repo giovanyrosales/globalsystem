@@ -276,6 +276,25 @@ Route::get('/admin/vista/catalogo/material/tabla', [MaterialesController::class,
 
 
 
+// --- BOLSON ---
+Route::get('/admin/bolson/index', [BolsonController::class,'indexBolson'])->name('admin.bolson.index');
+Route::get('/admin/bolson/tabla', [BolsonController::class,'tablaBolson']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // --- CLASIFICACIONES ---
 Route::get('/admin/clasificaciones/index', [ClasificacionesController::class,'index'])->name('admin.clasificaciones.index');
@@ -435,7 +454,14 @@ Route::post('/admin/p/materiales/nuevo', [ProveedoresController::class, 'nuevoMa
 Route::post('/admin/p/materiales/informacion', [ProveedoresController::class, 'informacionMaterialesPresupuesto']);
 Route::post('/admin/p/materiales/editar', [ProveedoresController::class, 'editarMaterialesPresupuesto']);
 
+// REVISIÓN DE PRESUPUESTOS POR UNIDAD Y AÑO
+Route::get('/admin/p/revision/presupuesto/index', [ProveedoresController::class,'indexRevisionPresupuestoUnidad'])->name('p.revision.presupuesto.unidad');
 
+// GENERAR REPORTES Y CONSOLIDADO DE PRESUPUESTO UNIDADES
+Route::get('/admin/p/reportes/unidad/presupuesto/index', [ProveedoresController::class,'indexReportePresupuestoUnidad'])->name('p.generar.reportes.presupuesto.unidad');
+
+// CREAR PRESUPUESTO POR UNA UNIDAD
+Route::get('/admin/p/crear/presupuesto/unidad/index', [ProveedoresController::class,'indexCrearPresupuestoUnidad'])->name('p.admin.crear.presupuesto.index');
 
 
 

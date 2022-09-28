@@ -35,12 +35,14 @@
                                         <!-- ORDEN NO ANULADA -->
                                         @if($dato->estado == 0)
 
-                                            <!-- acta aun no generada -->
+                                            <!-- acta a un no generada Y SOLO JEFE UACI PUEDE ANULAR ORDEN DE COMPRA-->
                                             @if($dato->actaid == 0)
+                                                @can('boton.anular.orden.compra')
                                                 <button type="button" class="btn btn-danger btn-xs" onclick="abrirModalAnular({{ $dato->id }})">
                                                     <i class="fas fa-trash-alt" title="Anular"></i>&nbsp; Anular
                                                 </button>
                                                 <br> <br>
+                                                @endcan
                                             @endif
 
                                             <button type="button" class="btn btn-success btn-xs" onclick="Imprimir({{ $dato->id }})">

@@ -90,7 +90,7 @@
                                         <label>Unidad de Medida:</label>
                                         <br>
                                         <select width="60%" class="form-control" id="select-unidad-nuevo">
-                                            <option selected>Seleccione una opción...</option>
+                                            <option value="" selected>Seleccione una opción...</option>
                                             @foreach($lUnidad as $sel)
                                                 <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
                                             @endforeach

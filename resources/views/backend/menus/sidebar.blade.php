@@ -453,16 +453,57 @@
                             <li class="nav-item">
                                 <a href="{{ route('p.admin.materiales.presupuesto.index') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Catálogo de Materiales</p>
+                                    <p>Materiales</p>
                                 </a>
                             </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.bolson.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Bolsón</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('p.revision.presupuesto.unidad') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Revisión</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('p.generar.reportes.presupuesto.unidad') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Generar</p>
+                                </a>
+                            </li>
+
 
                         </ul>
                     </li>
 
 
 
+                    <li class="nav-item">
 
+                        <a href="#" class="nav-link">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Mi Presupuesto
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('p.admin.crear.presupuesto.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Crear</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
 
 
 
