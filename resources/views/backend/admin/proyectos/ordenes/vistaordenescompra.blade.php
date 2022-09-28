@@ -107,6 +107,33 @@
         </div>
     </div>
 
+    <!-- CUANTOS MATERIALES QUIERE VER POR HOJA -->
+    <div class="modal fade" id="modalHoja">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Materiales por Página</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="id-pagina"/>
+                </div>
+
+                <div class="form-group col-md-12">
+                    <label>Cantidad de Materiales por Página</label>
+                    <input type="number" id="cantidad-pagina" class="form-control" value="15" placeholder="0">
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-success" type="button" onclick="generarImpresion()">Imprimir Orden</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @extends('backend.menus.footerjs')
@@ -188,7 +215,7 @@
                         })
                     }
                     else if(response.data.success === 2){
-                        toastr.success('Orden Anulada!')
+                        toastr.success('Orden Anulada!');
                         recargar();
                     }
                     else{
@@ -251,7 +278,41 @@
         }
 
         function Imprimir(id){
-            window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + id);
+            // PREGUNTAR CUANDO MATERIALES QUIERE POR HOJA
+            $('#id-pagina').val(id);
+            $('#modalHoja').modal('show');
+        }
+
+        function generarImpresion(){
+
+            var id = document.getElementById('id-pagina').value;
+            var cantidad = document.getElementById('cantidad-pagina').value;
+
+            if(cantidad === ''){
+                toastr.error('Cantidad por Página es Requerido');
+                return;
+            }
+
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
+            if(!cantidad.match(reglaNumeroEntero)) {
+                toastr.error('Cantidad debe ser número Entero');
+                return;
+            }
+
+            if(cantidad <= 0){
+                toastr.error('Cantidad no debe tener negativos o Cero');
+                return;
+            }
+
+            if(cantidad.length > 3){
+                toastr.error('Cantidad máximo 3 dígitos de límite');
+                return;
+            }
+
+            $('#modalHoja').modal('hide');
+
+            window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + id + "/" + cantidad);
         }
 
     </script>

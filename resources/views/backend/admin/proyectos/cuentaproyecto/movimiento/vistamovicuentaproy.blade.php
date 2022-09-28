@@ -180,7 +180,8 @@
     <script>
 
         function recargar(){
-            var ruta = "{{ url('/admin/movicuentaproy/tablamovicuentaproy') }}";
+            let id = {{ $id }}; // id PROYECTO
+            var ruta = "{{ URL::to('/admin/movicuentaproy/tablamovicuentaproy') }}/" + id;
             $('#tablaDatatable').load(ruta);
         }
 

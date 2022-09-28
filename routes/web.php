@@ -221,7 +221,8 @@ Route::get('/admin/cotizacion/proyecto/denegadas/tabla-index', [CotizacionContro
 
 // --- ORDENES ---
 Route::post('/admin/ordenes/proyecto/generar/nuevo',  [OrdenController::class,'generarOrden']);
-Route::get('/admin/ordenes/proyecto/pdf/{id}', [OrdenController::class,'vistaPdfOrden']);
+// cantidad es # de material por hoja
+Route::get('/admin/ordenes/proyecto/pdf/{id}/{cantidad}', [OrdenController::class,'vistaPdfOrden']);
 
 // --- ORDENES DE COMPRAS ---
 Route::get('/admin/ordenes/compras/index', [OrdenController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
@@ -367,13 +368,13 @@ Route::post('/admin/objespecifico/editar', [CodigoEspecifController::class, 'edi
 // ************************************************** REQUERIMIENTOS, COTIZACIONES Y ORDENES DE LAS UNIDADES O DEPARTAMENTOS ***********************
 
 // --- REQUERIMIENTOS de una unidad mostrados en usuario de uaciunidad---
-Route::get('/admin/listar/requerimientosunidad/index', [RequerimientoController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientosunidad.index');
+/*Route::get('/admin/listar/requerimientosunidad/index', [RequerimientoController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientosunidad.index');
 Route::get('/admin/listar/requerimientosunidad/tabla', [RequerimientoController::class,'indexTablaListarRequerimientosUnidad']);
 Route::get('/admin/requerimientosunidad/listado/{id}', [RequerimientoController::class,'listadoRequerimientoPorUnidad']);
 Route::get('/admin/requerimientosunidad/listado/tabla/{id}', [RequerimientoController::class,'tablaRequerimientosUnidadIndividual']);
 Route::post('/admin/requerimientosunidad/informacion', [RequerimientoController::class, 'informacionRequerimientoUnidad']);
 Route::post('/admin/requerimientosunidad/cotizacion/guardar', [RequerimientoController::class, 'guardarNuevaCotizacionUnidad']);
-
+*/
 // --- VISTA COTIZACIONES PENDIENTES DE LOS DEPARTAMENTOS ---
 /*Route::get('/admin/cotizacion/pendiente/index', [CotizacionUnidadController::class,'indexPendiente'])->name('cotizaciones.pendientes.index');
 Route::get('/admin/cotizacion/pendiente/tabla-index', [CotizacionUnidadController::class,'indexPendienteTabla']);

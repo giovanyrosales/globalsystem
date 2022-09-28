@@ -180,8 +180,13 @@
                         $('#modalGenerarOrden').modal('hide');
                         toastr.success('Orden Generada');
                         recargar();
+
+                        // POR DEFECTO SE IRA CON 10 MATERIALES
+
+                        let id = response.data.id;
+
                         // vista pdf
-                        window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + response.data.id);
+                        window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + id + "/" + 10);
                     }
                     else if(response.data.success === 2) {
                         // la orden de compra con la cotización, no estaba aprobada.

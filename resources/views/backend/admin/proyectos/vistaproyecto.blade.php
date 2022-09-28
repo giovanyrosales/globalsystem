@@ -1447,6 +1447,7 @@
                                         }
 
                                     }
+
                                 }else{
                                     // no tiene cotizacion, asi que puede BORRAR
                                     markup += "<td>"+
@@ -1508,9 +1509,22 @@
 
                     if(response.data.success === 1) {
 
+                        // si es 1, la coti fue aprobada, sino se esta esperando que sea
+                        // aprobada o denegada
+                        let tipo = response.data.tipo;
+                        var mensaje = '';
+                        var titulo = '';
+                        if(tipo > 0){
+                            titulo = "Cotización Aprobada";
+                            mensaje = "El material fue aprobado. No se puede cancelar";
+                        }else{
+                            titulo = "Material en Espera";
+                            mensaje = "El material esta esperando que su cotización sea Aprobado o Denegada. No se puede Cancelar por el momento.";
+                        }
+
                         Swal.fire({
-                            title: 'Material Ya Cotizado',
-                            text: "El material Ya fue Aprobado o se esta esperando una Respuesta (Aprobado o Denegado). No se puede Cancelar",
+                            title: titulo,
+                            text: mensaje,
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -1519,7 +1533,8 @@
                             confirmButtonText: 'Recargar'
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                $('#modalEditarRequisicion').modal('hide');
+                                recargarRequisicion();
                             }
                         })
 
@@ -1612,7 +1627,8 @@
                             confirmButtonText: 'Recargar'
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                $('#modalEditarRequisicion').modal('hide');
+                                recargarRequisicion();
                             }
                         })
 

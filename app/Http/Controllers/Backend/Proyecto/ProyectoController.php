@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Proyecto;
 
 use App\Http\Controllers\Controller;
+use App\Models\Acta;
 use App\Models\AreaGestion;
 use App\Models\Bitacora;
 use App\Models\BitacoraDetalle;
@@ -18,6 +19,7 @@ use App\Models\LineaTrabajo;
 use App\Models\MoviCuentaProy;
 use App\Models\Naturaleza;
 use App\Models\ObjEspecifico;
+use App\Models\Orden;
 use App\Models\Partida;
 use App\Models\PartidaDetalle;
 use App\Models\Proveedores;
@@ -747,6 +749,7 @@ class ProyectoController extends Controller
                     $rDetalle->cantidad = $request->cantidad[$i];
                     $rDetalle->estado = 0;
                     $rDetalle->dinero = $infoCatalogo->pu; // lo que vale el material en ese momento
+                    $rDetalle->cancelado = 0;
                     $rDetalle->save();
 
                     // guardar el SALDO RETENIDO
@@ -816,6 +819,29 @@ class ProyectoController extends Controller
                 if($infoCoti > 0){
                     // COTI APROBADA, NO PUEDE BORRAR
                     $infoEstado = 1;
+
+                    // verificar si la orden de compra con esa cotización fue denegada, para cancelar
+
+                    // todas las cotizaciones donde puede estar este MATERIAL DE REQUI DETALLE
+                    $arrayCoti = Cotizacion::whereIn('id', $pila)->get();
+                    $pilaCoti = array();
+                    foreach ($arrayCoti as $dd){
+                        array_push($pilaCoti, $dd->id);
+                    }
+
+                    // ver si existe al menos 1 orden
+                    if(Orden::whereIn('cotizacion_id', $pilaCoti)->first()){
+                        $conteoOrden = Orden::whereIn('cotizacion_id', $pilaCoti)
+                            ->where('estado', 0) // APROBADA LA ORDEN
+                            ->count();
+
+                        if($conteoOrden > 0){
+                            // material tiene una orden aprobada
+                        }else{
+                            // material tiene una orden denegada
+                            $infoEstado = 2;
+                        }
+                    }
                 }else{
                     // COTI DENEGADA, PUEDE CANCELAR MATERIAL
                     $infoEstado = 2;
@@ -928,8 +954,39 @@ class ProyectoController extends Controller
             ->count();
 
         if($conteo > 0){
-            // MATERIAL FUE APROBADO O ESPERANDO APROBACIÓN, NO SE PUEDE CANCELAR YA
-            return ['success' => 1];
+
+            // si hay cotización, hoy verificar si orden de compra fue anulada
+            $arrayCoti = Cotizacion::whereIn('id', $pila)->get();
+            $pilaCoti = array();
+            foreach ($arrayCoti as $dd){
+                array_push($pilaCoti, $dd->id);
+            }
+
+            // ver si existe al menos 1 orden
+            if(Orden::whereIn('cotizacion_id', $pilaCoti)->first()){
+                $conteoOrden = Orden::whereIn('cotizacion_id', $pilaCoti)
+                    ->where('estado', 0) // APROBADA LA ORDEN
+                    ->count();
+
+                if($conteoOrden > 0){
+                    // material tiene una orden aprobada
+                }else{
+                    // material tiene una orden denegada
+
+                    // SE PUEDE CANCELAR PORQUE TIENE UNA ORDEN DE COMPRA CANCELADA
+
+                    RequisicionDetalle::where('id', $request->id)->update([
+                        'cancelado' => 1,
+                    ]);
+
+                    return ['success' => 2];
+                }
+            }
+
+            // MATERIAL FUE APROBADO O ---- ESPERANDO APROBACIÓN ----, NO SE PUEDE CANCELAR YA
+            // solo para mostrar mensaje que la coti fue aprobada y no se puede borrar.
+            $infoTipo = Cotizacion::whereIn('id', $pila)->where('estado', 1)->count();
+            return ['success' => 1, 'tipo' => $infoTipo];
         }
 
         // SE PUEDE CANCELAR, PORQUE NINGUNA COTI ESTA APROBADA
@@ -954,7 +1011,7 @@ class ProyectoController extends Controller
         if(Requisicion::where('id', $request->id)->first()){
 
             // buscar si no hay ningún material ya cotizado
-            if(Cotizacion::where('id', $request->id)->first()){
+            if(Cotizacion::where('requisicion_id', $request->id)->first()){
                 // SE ENCONTRO UN MATERIAL COTIZADO, RETORNAR.
                 return ['success' => 1];
             }

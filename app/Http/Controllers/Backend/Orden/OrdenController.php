@@ -10,6 +10,8 @@ use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
 use App\Models\CuentaProy;
 use App\Models\CuentaProyDetalle;
+use App\Models\CuentaProyRetenido;
+use App\Models\ObjEspecifico;
 use App\Models\Orden;
 use App\Models\Presupuesto;
 use App\Models\Proveedores;
@@ -93,22 +95,29 @@ class OrdenController extends Controller
 
                 $cuenta = new CuentaProyDetalle();
                 $cuenta->id_cuentaproy = $infoCuenta->id;
-                $cuenta->id_requi_detalle = $dd->id;
-                $cuenta->tipo = 1; // ENTRADA
+                $cuenta->id_requi_detalle = $infoRequiDeta->id;
+                $cuenta->tipo = 0; // SALIDA DE DINERO
+                $cuenta->save();
+
+                // BORRAR MATERIAL RETENIDO, pero si es anulada, volvera a retenido
+
+                CuentaProyRetenido::where('id_cuentaproy', $infoCuenta->id)
+                    ->where('id_requi_detalle', $infoRequiDeta->id)
+                    ->delete();
             }
 
             DB::commit();
             return ['success' => 1, 'id' => $or->id];
 
         }catch(\Throwable $e){
-            //Log::info('error: ' . $e);
+            Log::info('error: ' . $e);
             DB::rollback();
             return ['success' => 99];
         }
     }
 
     // pdf orden de compra
-    public function vistaPdfOrden($id){ // id de la orden
+    public function vistaPdfOrden($id, $cantidad){ // id de la orden
 
         $orden = Orden::where('id', $id)->first();
         $cotizacion = Cotizacion::where('id', $orden->cotizacion_id)->first();
@@ -127,9 +136,14 @@ class OrdenController extends Controller
         foreach ($det_cotizacion as $dd){
             $vuelta += 1;
 
-            if(strlen($dd->nombre) >= 25){
-                $subcadena = substr($dd->nombre, 0, 25);
-                $dd->nombre = ($subcadena . ".");
+            $infoRequiDetalle = RequisicionDetalle::where('id', $dd->id_requidetalle)->first();
+            $infoMaterial = CatalogoMateriales::where('id', $infoRequiDetalle->material_id)->first();
+            $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
+
+            if(strlen($infoMaterial->nombre) >= 25){
+                $subcadena = substr($infoMaterial->nombre, 0, 25);
+            }else{
+                $subcadena = $infoMaterial->nombre;
             }
 
             $multi = $dd->cantidad * $dd->precio_u;
@@ -140,14 +154,14 @@ class OrdenController extends Controller
 
             $dataArray[] = [
                 'cantidad' => $dd->cantidad,
-                'nombre' => $dd->nombre,
-                'cod_presup' => $dd->cod_presup,
+                'nombre' => $subcadena,
+                'cod_presup' => $infoObjeto->codigo,
                 'precio_u' => $precio_u,
                 'multi' => $multi
             ];
 
             // CANTIDAD POR HOJA
-            if($vuelta == 15){
+            if($vuelta == $cantidad){
                 $array_merged[] = array_merge($dataArray);
                 $dataArray = array();
                 $vuelta = 0;
@@ -168,7 +182,7 @@ class OrdenController extends Controller
         $mes = $fecha[1];
         $anio = $fecha[2];
 
-        $pdf = PDF::loadView('Backend.Admin.Reportes.pdfOrdenCompra', compact('orden',
+        $pdf = PDF::loadView('backend.admin.proyectos.reportes.pdfordencompra', compact('orden',
             'cotizacion','proyecto','dia','mes',
             'anio','proveedor','array_merged',
             'administrador', 'total'));
@@ -210,54 +224,79 @@ class OrdenController extends Controller
 
     public function anularCompra(Request $request){
 
-        // SOLO ANULAR SINO TIENE ACTA GENERADA
-        if(Acta::where('orden_id', $request->id)->first()){
-            return ['success' => 1];
-        }
+        DB::beginTransaction();
+        try {
 
-        if($info = Orden::where('id', $request->id)->first()){
-
-            // pendiente de anulación
-            if($info->estado == 0){
-                Orden::where('id', $request->id)->update([
-                    'estado' => 1,
-                    'fecha_anulada' => Carbon::now('America/El_Salvador'),
-                    ]);
-
-                // CAMBIAR DE ESTADO PARA QUE SE PUEDA COTIZAR DE NUEVO LOS MATERIALES
-                // SUMAR ENTRADA DE DINERO. PORQUE FUE ANULADA
-
-                $infoCoti = Cotizacion::where('id', $info->cotizacion_id)->first();
-                $infoRequi = Requisicion::where('id', $infoCoti->requisicion_id)->first();
-                $infoCotiDeta = CotizacionDetalle::where('cotizacion_id', $infoCoti->id)->get();
-
-                // setear por cada material cotizado
-
-                foreach ($infoCotiDeta as $dd){
-
-                    // para que pueda ser cotizado nuevamente
-                    RequisicionDetalle::where('id', $dd->id_requidetalle)->update([
-                        'estado' => 0,
-                    ]);
-
-                    $infoRequiDetalle = RequisicionDetalle::where('id', $dd->id_requidetalle)->first();
-                    $infoMaterial = CatalogoMateriales::where('id', $infoRequiDetalle->material_id)->first();
-
-                    $cuentaProy = CuentaProy::where('proyecto_id', $infoRequi->id_proyecto)
-                        ->where('objespeci_id', $infoMaterial->id_objespecifico)
-                        ->first();
-
-                    // para que vuelva el dinero a lo RESTANTE
-                    $cuenta = new CuentaProyDetalle();
-                    $cuenta->id_cuentaproy = $cuentaProy->id;
-                    $cuenta->id_requi_detalle = $dd->id;
-                    $cuenta->tipo = 1; // ENTRADA DE DINERO
-                    $cuenta->save();
-                }
+            // SOLO ANULAR SINO TIENE ACTA GENERADA
+            if(Acta::where('orden_id', $request->id)->first()){
+                return ['success' => 1];
             }
 
-            return ['success' => 2];
-        }else{
+            if($info = Orden::where('id', $request->id)->first()){
+
+                // pendiente de anulación
+                if($info->estado == 0){
+                    Orden::where('id', $request->id)->update([
+                        'estado' => 1,
+                        'fecha_anulada' => Carbon::now('America/El_Salvador'),
+                    ]);
+
+                    // CAMBIAR DE ESTADO PARA QUE SE PUEDA COTIZAR DE NUEVO LOS MATERIALES
+                    // SUMAR ENTRADA DE DINERO. PORQUE FUE ANULADA
+                    // VOLVER AGREGAR EL MATERIAL RETENIDO
+                    // **** UNICAMENTE SI LA ORDEN FUE APROBADA PRIMERO Y DESPUES ANULADA ***
+
+                    $infoCoti = Cotizacion::where('id', $info->cotizacion_id)->first();
+                    $infoRequi = Requisicion::where('id', $infoCoti->requisicion_id)->first();
+                    $infoCotiDeta = CotizacionDetalle::where('cotizacion_id', $infoCoti->id)->get();
+
+                    // setear por cada material cotizado
+
+                    foreach ($infoCotiDeta as $dd){
+
+                        // para que pueda ser cotizado nuevamente
+                        RequisicionDetalle::where('id', $dd->id_requidetalle)->update([
+                            'estado' => 0,
+                        ]);
+
+                        $infoRequiDetalle = RequisicionDetalle::where('id', $dd->id_requidetalle)->first();
+                        $infoMaterial = CatalogoMateriales::where('id', $infoRequiDetalle->material_id)->first();
+
+                        $cuentaProy = CuentaProy::where('proyecto_id', $infoRequi->id_proyecto)
+                            ->where('objespeci_id', $infoMaterial->id_objespecifico)
+                            ->first();
+
+                        // para que vuelva el dinero a lo RESTANTE
+                        $cuenta = new CuentaProyDetalle();
+                        $cuenta->id_cuentaproy = $cuentaProy->id;
+                        $cuenta->id_requi_detalle = $infoRequiDetalle->id;
+                        $cuenta->tipo = 1; // ENTRADA DE DINERO
+                        $cuenta->save();
+
+                        // volver Retenidos solo sí fueron borrados. es decir primero se género la orden y
+                        // despues se cancelo
+
+                        if(!CuentaProyRetenido::where('id_requi_detalle', $infoRequiDetalle->id)
+                            ->where('id_cuentaproy', $cuentaProy->id)->first()){
+
+                            $retenido = new CuentaProyRetenido();
+                            $retenido->id_requi_detalle = $infoRequiDetalle->id;
+                            $retenido->id_cuentaproy = $cuentaProy->id;
+                            $retenido->save();
+                        }
+
+                    }
+                }
+
+                DB::commit();
+                return ['success' => 2];
+            }else{
+                return ['success' => 99];
+            }
+
+        }catch(\Throwable $e){
+            Log::info('error: ' . $e);
+            DB::rollback();
             return ['success' => 99];
         }
     }
@@ -304,7 +343,7 @@ class OrdenController extends Controller
         $fecha = strftime("%d-%B-%Y",strtotime($acta->fecha_acta));
         $hora = $acta->hora;
 
-        $pdf = PDF::loadView('Backend.Admin.Reportes.pdfActaOrdenCompra', compact('acta','proyecto','fecha','proveedor','administrador','hora','orden'));
+        $pdf = PDF::loadView('backend.admin.proyectos.reportes.pdfactaordencompra', compact('acta','proyecto','fecha','proveedor','administrador','hora','orden'));
         $pdf->setPaper('letter', 'portrait')->setWarnings(false);
         return $pdf->stream('acta_orden_compra.pdf');
     }
