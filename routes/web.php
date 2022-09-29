@@ -27,9 +27,13 @@ use App\Http\Controllers\Backend\Bolson\BolsonController;
 use App\Http\Controllers\Backend\Cuenta\CuentaProyectoController;
 use App\Http\Controllers\Backend\Recursos\RecursosController;
 use App\Http\Controllers\Backend\Pdf\ControlPdfController;
-use App\Http\Controllers\Backend\Uaciunidades\Requerimientos\RequerimientoController;
-use App\Http\Controllers\Backend\Uaciunidades\Cotizaciones\CotizacionUnidadController;
-use App\Http\Controllers\Backend\Uaciunidades\Ordenes\OrdenUnidadController;
+
+use App\Http\Controllers\Backend\PresupuestoUnidad\Anio\AnioPresupuestoUnidadController;
+use App\Http\Controllers\Backend\PresupuestoUnidad\Departamento\DepartamentoPresupuestoUnidadController;
+use App\Http\Controllers\Backend\PresupuestoUnidad\UnidadMedida\UnidadMedidaPresupuestoUnidadController;
+use App\Http\Controllers\Backend\PresupuestoUnidad\Materiales\MaterialesPresupuestoUnidadController;
+use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ConfiguracionPresupuestoUnidadController;
+
 
 // --- LOGIN ---
 Route::get('/', [LoginController::class,'index'])->name('login');
@@ -424,34 +428,37 @@ Route::post('/admin/ordenes/anular/compra',  [OrdenUnidadController::class,'anul
 Route::post('/admin/ordenes/generar/acta',  [OrdenUnidadController::class,'generarActa']);
 Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenUnidadController::class,'reporteActaGenerada']);*/
 
+
+
+
 // ************************************** PRESUPUESTO DE UNIDADES **********************************************************************************
 
 // --- AÑO DE PRESUPUESTO ---
-Route::get('/admin/p/anio/presupuesto/index', [ProveedoresController::class,'indexAnioPresupuesto'])->name('p.admin.anio.presupuesto.index');
-Route::get('/admin/p/anio/presupuesto/tabla', [ProveedoresController::class,'tablaAnioPresupuesto']);
-Route::post('/admin/p/anio/presupuesto/nuevo', [ProveedoresController::class, 'nuevoAnioPresupuesto']);
-Route::post('/admin/p/anio/presupuesto/informacion', [ProveedoresController::class, 'informacionAnioPresupuesto']);
-Route::post('/admin/p/anio/presupuesto/editar', [ProveedoresController::class, 'editarAnioPresupuesto']);
+Route::get('/admin/p/anio/presupuesto/index', [AnioPresupuestoUnidadController::class,'indexAnioPresupuesto'])->name('p.admin.anio.presupuesto.index');
+Route::get('/admin/p/anio/presupuesto/tabla', [AnioPresupuestoUnidadController::class,'tablaAnioPresupuesto']);
+Route::post('/admin/p/anio/presupuesto/nuevo', [AnioPresupuestoUnidadController::class, 'nuevoAnioPresupuesto']);
+Route::post('/admin/p/anio/presupuesto/informacion', [AnioPresupuestoUnidadController::class, 'informacionAnioPresupuesto']);
+Route::post('/admin/p/anio/presupuesto/editar', [AnioPresupuestoUnidadController::class, 'editarAnioPresupuesto']);
 
-// --- NOMBRE DE LOS DEPARTAMENTOS / UNIDAES ---
-Route::get('/admin/p/departamentos/index', [ProveedoresController::class,'indexDepartamentos'])->name('p.admin.departamentos.presupuesto.index');
-Route::get('/admin/p/departamentos/tabla', [ProveedoresController::class,'tablaDepartamentos']);
-Route::post('/admin/p/departamentos/nuevo', [ProveedoresController::class, 'nuevoDepartamentos']);
-Route::post('/admin/p/departamentos/informacion', [ProveedoresController::class, 'informacionDepartamentos']);
-Route::post('/admin/p/departamentos/editar', [ProveedoresController::class, 'editarDepartamentos']);
+// --- NOMBRE DE LOS DEPARTAMENTOS ---
+Route::get('/admin/p/departamentos/index', [DepartamentoPresupuestoUnidadController::class,'indexDepartamentos'])->name('p.admin.departamentos.presupuesto.index');
+Route::get('/admin/p/departamentos/tabla', [DepartamentoPresupuestoUnidadController::class,'tablaDepartamentos']);
+Route::post('/admin/p/departamentos/nuevo', [DepartamentoPresupuestoUnidadController::class, 'nuevoDepartamentos']);
+Route::post('/admin/p/departamentos/informacion', [DepartamentoPresupuestoUnidadController::class, 'informacionDepartamentos']);
+Route::post('/admin/p/departamentos/editar', [DepartamentoPresupuestoUnidadController::class, 'editarDepartamentos']);
 
-// --- UNIDAD DE MEDIDA ---
-Route::get('/admin/p/unidadmedida/index', [ProveedoresController::class,'indexUnidadMedida'])->name('p.admin.unidadmedida.presupuesto.index');
-Route::get('/admin/p/unidadmedida/tabla', [ProveedoresController::class,'tablaUnidadMedida']);
-Route::post('/admin/p/unidadmedida/nuevo', [ProveedoresController::class, 'nuevoUnidadMedida']);
-Route::post('/admin/p/unidadmedida/informacion', [ProveedoresController::class, 'informacionUnidadMedida']);
-Route::post('/admin/p/unidadmedida/editar', [ProveedoresController::class, 'editarUnidadMedida']);
+// --- UNIDAD DE MEDIDA PARA UNIDADES ---
+Route::get('/admin/p/unidadmedida/index', [UnidadMedidaPresupuestoUnidadController::class,'indexUnidadMedida'])->name('p.admin.unidadmedida.presupuesto.index');
+Route::get('/admin/p/unidadmedida/tabla', [UnidadMedidaPresupuestoUnidadController::class,'tablaUnidadMedida']);
+Route::post('/admin/p/unidadmedida/nuevo', [UnidadMedidaPresupuestoUnidadController::class, 'nuevoUnidadMedida']);
+Route::post('/admin/p/unidadmedida/informacion', [UnidadMedidaPresupuestoUnidadController::class, 'informacionUnidadMedida']);
+Route::post('/admin/p/unidadmedida/editar', [UnidadMedidaPresupuestoUnidadController::class, 'editarUnidadMedida']);
 
 // --- CATALOGO DE MATERIALES PARA DEPARTAMENTOS ---
-Route::get('/admin/p/materiales/index', [ProveedoresController::class,'indexMaterialesPresupuesto'])->name('p.admin.materiales.presupuesto.index');
-Route::get('/admin/p/materiales/tabla/index', [ProveedoresController::class,'tablaMaterialesPresupuesto']);
-Route::post('/admin/p/materiales/nuevo', [ProveedoresController::class, 'nuevoMaterialesPresupuesto']);
-Route::post('/admin/p/materiales/informacion', [ProveedoresController::class, 'informacionMaterialesPresupuesto']);
+Route::get('/admin/p/materiales/index', [MaterialesPresupuestoUnidadController::class,'indexMaterialesPresupuesto'])->name('p.admin.materiales.presupuesto.index');
+Route::get('/admin/p/materiales/tabla/index', [MaterialesPresupuestoUnidadController::class,'tablaMaterialesPresupuesto']);
+Route::post('/admin/p/materiales/nuevo', [MaterialesPresupuestoUnidadController::class, 'nuevoMaterialesPresupuesto']);
+Route::post('/admin/p/materiales/informacion', [MaterialesPresupuestoUnidadController::class, 'informacionMaterialesPresupuesto']);
 Route::post('/admin/p/materiales/editar', [ProveedoresController::class, 'editarMaterialesPresupuesto']);
 
 // REVISIÓN DE PRESUPUESTOS POR UNIDAD Y AÑO

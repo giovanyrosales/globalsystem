@@ -14,6 +14,8 @@
     }
 </style>
 
+<!-- VISTA PARA CREAR NUEVOS DEPARTAMENTOS -->
+
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
@@ -60,7 +62,7 @@
 
                                     <div class="form-group">
                                         <label>Nombre</label>
-                                        <input type="text" maxlength="300" class="form-control" id="nombre" placeholder="Nombre">
+                                        <input type="text" maxlength="300" autocomplete="off" class="form-control" id="nombre" placeholder="Nombre">
                                     </div>
 
                                 </div>
@@ -95,7 +97,7 @@
                                     <div class="form-group">
                                         <label>Nombre</label>
                                         <input type="hidden" id="id-editar">
-                                        <input type="text" maxlength="300" class="form-control" id="nombre-editar" placeholder="Nombre">
+                                        <input type="text" maxlength="300" autocomplete="off" class="form-control" id="nombre-editar" placeholder="Nombre">
                                     </div>
 
                                 </div>

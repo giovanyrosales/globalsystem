@@ -571,23 +571,6 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        // UN DATO CAMBIO Y NO TENDRÍA QUE HABER CAMBIADO
-
-                        Swal.fire({
-                            title: 'Material Bloqueado',
-                            text: "La información no puede ser Actualizada porque ya esta utilizado en una Partida",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2){
                         Swal.fire({
                             title: 'Material Repetido',
                             text: "El objeto específico, la clasificación, el nombre, y la unidad de medida están repetidos",
@@ -602,7 +585,7 @@
                             }
                         })
                     }
-                    else if(response.data.success === 3){
+                    else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
                         recargar();

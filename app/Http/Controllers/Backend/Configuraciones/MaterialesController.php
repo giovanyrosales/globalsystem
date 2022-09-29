@@ -141,25 +141,9 @@ class MaterialesController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
-        // VERIFICAR QUE LOS DATOS NO HAYAN CAMBIADO SI YA ESTABA AGREGADO EN UNA PARTIDA DETALLE
-        if(PartidaDetalle::where('material_id', $request->id)->first()){
+        DB::beginTransaction();
 
-            $infoCatalogo = CatalogoMateriales::where('id', $request->id)->first();
-
-            // MISMOS RETORNOS QUE UN DATO HA CAMBIADO
-
-            if($infoCatalogo->nombre != $request->nombre){
-                return ['success' => 1];
-            }
-
-            if($infoCatalogo->id_objespecifico != $request->codigo){
-                return ['success' => 1];
-            }
-
-            if($infoCatalogo->id_unidadmedida != $request->unidad){
-                return ['success' => 1];
-            }
-        }
+        try {
 
         // VERIFICAR MATERIAL REPETIDO
         if(CatalogoMateriales::where('id', '!=', $request->id)
@@ -168,19 +152,34 @@ class MaterialesController extends Controller
             ->where('id_unidadmedida', $request->unidad)
             ->where('id_clasificacion', $request->clasificacion)
             ->first()){
-            return ['success' => 2];
+            return ['success' => 1];
         }
 
-        // MATERIAL ACTUALIZADO
-        CatalogoMateriales::where('id', $request->id)->update([
-            'id_clasificacion' => $request->clasificacion,
-            'id_unidadmedida' => $request->unidad,
-            'id_objespecifico' => $request->codigo,
-            'nombre' => $request->nombre,
-            'pu' => $request->precio
-        ]);
+        // PODRA MODIFICAR SI EL MATERIAL NO ESTA AGREGADO A PARTIDA DETALLE
+        if(!PartidaDetalle::where('material_id', $request->id)->first()){
 
-        return ['success' => 3];
+            CatalogoMateriales::where('id', $request->id)->update([
+                'id_clasificacion' => $request->clasificacion,
+                'id_unidadmedida' => $request->unidad,
+                'id_objespecifico' => $request->codigo,
+                'nombre' => $request->nombre,
+                'pu' => $request->precio
+            ]);
+        }else{
+            // UNICAMENTE ESTO PODRA EDITAR
+            CatalogoMateriales::where('id', $request->id)->update([
+                'id_clasificacion' => $request->clasificacion,
+                'pu' => $request->precio
+            ]);
+        }
+
+            DB::commit();
+            return ['success' => 2];
+        }catch(\Throwable $e){
+
+            DB::rollback();
+            return ['success' => 99];
+        }
     }
 
 

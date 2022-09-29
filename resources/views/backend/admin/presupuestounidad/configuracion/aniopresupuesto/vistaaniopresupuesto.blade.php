@@ -13,6 +13,8 @@
     }
 </style>
 
+<!-- VISTA PARA CREAR UN AÑO PARA UN NUEVO PRESUPUESTO DE UNIDAD -->
+
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
@@ -59,7 +61,7 @@
 
                                     <div class="form-group">
                                         <label>Año</label>
-                                        <input type="text" maxlength="20" autocomplete="off" class="form-control" id="nombre" placeholder="">
+                                        <input type="number" maxlength="4" autocomplete="off" class="form-control" id="nombre">
                                     </div>
 
                                 </div>
@@ -94,7 +96,7 @@
                                     <div class="form-group">
                                         <label>Año</label>
                                         <input type="hidden" id="id-editar">
-                                        <input type="text" maxlength="20" class="form-control" id="nombre-editar" placeholder="">
+                                        <input type="number" autocomplete="off" maxlength="4" class="form-control" id="nombre-editar">
                                     </div>
 
                                 </div>
@@ -153,8 +155,25 @@
                 return;
             }
 
-            if(nombre.length > 20){
-                toastr.error('Año máximo 20 caracteres');
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
+            if(!nombre.match(reglaNumeroEntero)) {
+                toastr.error('Año debe ser número Entero');
+                return;
+            }
+
+            if(nombre <= 0){
+                toastr.error('Año no debe tener negativos o Cero');
+                return;
+            }
+
+            if(nombre.length > 4){
+                toastr.error('Año debe tener máximo 4 dígitos');
+                return;
+            }
+
+            if(nombre.length < 4){
+                toastr.error('Año debe tener mínimo 4 dígitos');
                 return;
             }
 
@@ -167,6 +186,21 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
+                        Swal.fire({
+                            title: 'Año Repetido',
+                            text: "Se encontró el año ya registrado",
+                            icon: 'question',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
@@ -210,12 +244,29 @@
             var nombre = document.getElementById('nombre-editar').value;
 
             if(nombre === ''){
-                toastr.error('Nombre es requerido');
+                toastr.error('Año es requerido');
                 return;
             }
 
-            if(nombre.length > 20){
-                toastr.error('Nombre máximo 20 caracteres');
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
+            if(!nombre.match(reglaNumeroEntero)) {
+                toastr.error('Año debe ser número Entero');
+                return;
+            }
+
+            if(nombre <= 0){
+                toastr.error('Año no debe tener negativos o Cero');
+                return;
+            }
+
+            if(nombre.length > 4){
+                toastr.error('Año debe tener máximo 4 dígitos');
+                return;
+            }
+
+            if(nombre.length < 4){
+                toastr.error('Año debe tener mínimo 4 dígitos');
                 return;
             }
 
@@ -230,6 +281,21 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+                        Swal.fire({
+                            title: 'Año Repetido',
+                            text: "Se encontró el año ya registrado",
+                            icon: 'question',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 1){
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
                         recargar();

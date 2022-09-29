@@ -14,12 +14,14 @@
     }
 </style>
 
+<!-- VISTA PARA CREAR UNIDAD DE MEDIDA PARA PRESUPUESTO DE UNIDADES -->
+
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
                     <i class="fas fa-plus-square"></i>
                     Nueva Unidad Medida
                 </button>

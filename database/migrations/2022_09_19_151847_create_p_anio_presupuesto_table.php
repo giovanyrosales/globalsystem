@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\Schema;
 class CreatePAnioPresupuestoTable extends Migration
 {
     /**
-     * PARA PRESUPUESTO DE UNIDAD
+     * AÑO PARA CADA PRESUPUESTO DE UNIDAD
      *
      * @return void
      */
     public function up(){
         Schema::create('p_anio_presupuesto', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 20);
+            $table->integer('nombre');
         });
     }
 
