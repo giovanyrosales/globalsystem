@@ -219,7 +219,73 @@ class ProveedoresController extends Controller
     }
 
     public function indexCargadora(){
-        return view('backend.admin.presupuestounidad.crear.vistacargadoracrearpresupuesto');
+
+        $rubro = Rubro::orderBy('codigo', 'ASC')->get();
+
+        $resultsBloque = array();
+        $index = 0;
+        $resultsBloque2 = array();
+        $index2 = 0;
+        $resultsBloque3 = array();
+        $index3 = 0;
+
+        // agregar cuentas
+        foreach($rubro as $secciones){
+            array_push($resultsBloque,$secciones);
+
+            $subSecciones = Cuenta::where('id_rubro', $secciones->id)
+                ->orderBy('codigo', 'ASC')
+                ->get();
+
+            // agregar objetos
+            foreach ($subSecciones as $lista){
+
+                array_push($resultsBloque2, $lista);
+
+                $subSecciones2 = ObjEspecifico::where('id_cuenta', $lista->id)
+                    ->orderBy('codigo', 'ASC')
+                    ->get();
+
+                // agregar materiales
+
+                foreach ($subSecciones2 as $ll){
+
+                    array_push($resultsBloque3, $ll);
+
+
+
+                    if($ll->numero == 61109){
+                        $ll->nombre = $ll->nombre . " ( ACTIVOS FIJOS MENORES A $600.00 )";
+                    }
+
+                    $subSecciones3 = P_Materiales::where('id_objespecifico', $ll->id)
+                        ->orderBy('descripcion', 'ASC')
+                        ->where('visible', 1) // solo materiales visibles, ya que admin puede ocultar
+                        ->get();
+
+                    $fila = 0;
+
+                    foreach ($subSecciones3 as $subLista){
+
+                        $infoUnidad = P_UnidadMedida::where('id', $subLista->id_unidadmedida)->first();
+                        $subLista->unimedida = $infoUnidad->nombre;
+                        $fila += 1;
+                        $subLista->fila = $fila;
+                    }
+
+                    $resultsBloque3[$index3]->material = $subSecciones3;
+                    $index3++;
+                }
+
+                $resultsBloque2[$index2]->objeto = $subSecciones2;
+                $index2++;
+            }
+
+            $resultsBloque[$index]->cuenta = $subSecciones;
+            $index++;
+        }
+
+        return view('backend.admin.presupuestounidad.crear.contenedorcatalogorubro', compact('rubro'));
     }
 
     public function indexCrearPresupuestoUnidad(){
@@ -249,65 +315,33 @@ class ProveedoresController extends Controller
 
         $unidad = P_UnidadMedida::orderBy('nombre')->get();
 
-        $rubro = Rubro::orderBy('codigo', 'ASC')->get();
+        return view('backend.admin.presupuestounidad.crear.vistacrearpresupuestounidad', compact( 'listado', 'unidad'));
+    }
 
-        $resultsBloque = array();
-        $index = 0;
-        $resultsBloque2 = array();
-        $index2 = 0;
-        $resultsBloque3 = array();
-        $index3 = 0;
 
-        // agregar cuentas
-        foreach($rubro as $secciones){
-            array_push($resultsBloque,$secciones);
+    public function buscarMaterialPresupuestoUnidad(Request $request){
 
-            $subSecciones = Cuenta::where('id_rubro', $secciones->id)
-                ->orderBy('codigo', 'ASC')
-                ->get();
+        $data = P_Materiales::where('descripcion', 'LIKE', "%{$request->texto}%")
+            ->take(25)
+            ->get();
 
-            // agregar objetos
-            foreach ($subSecciones as $lista){
-
-                array_push($resultsBloque2, $lista);
-
-                $subSecciones2 = ObjEspecifico::where('id_cuenta', $lista->id)
-                    ->orderBy('codigo', 'ASC')
-                    ->get();
-
-                // agregar materiales
-                foreach ($subSecciones2 as $ll){
-
-                    array_push($resultsBloque3, $ll);
-
-                    if($ll->numero == 61109){
-                        $ll->nombre = $ll->nombre . " ( ACTIVOS FIJOS MENORES A $600.00 )";
-                    }
-
-                    $subSecciones3 = P_Materiales::where('id_objespecifico', $ll->id)
-                        ->orderBy('descripcion', 'ASC')
-                        ->where('visible', 1) // solo materiales visibles, ya que admin puede ocultar
-                        ->get();
-
-                    foreach ($subSecciones3 as $subLista){
-
-                        $infoUnidad = P_UnidadMedida::where('id', $subLista->id_unidadmedida)->first();
-                        $subLista->unimedida = $infoUnidad->nombre;
-                    }
-
-                    $resultsBloque3[$index3]->material = $subSecciones3;
-                    $index3++;
-                }
-
-                $resultsBloque2[$index2]->objeto = $subSecciones2;
-                $index2++;
-            }
-
-            $resultsBloque[$index]->cuenta = $subSecciones;
-            $index++;
+        $haymaterial = true;
+        if(sizeof($data) == 0){
+            $haymaterial = false;
         }
 
-        return view('backend.admin.presupuestounidad.crear.vistacrearpresupuestounidad', compact('listado', 'unidad', 'rubro'));
+        foreach ($data as $dd){
+
+            $infoObj = ObjEspecifico::where('id', $dd->id_objespecifico)->first();
+            $infoCuenta = Cuenta::where('id', $infoObj->id_cuenta)->first();
+            $infoRubro = Rubro::where('id', $infoCuenta->id_rubro)->first();
+
+            $dd->objeto = $infoObj->codigo . " - " . $infoObj->nombre;
+            $dd->cuenta = $infoCuenta->codigo . " - " . $infoCuenta->nombre;
+            $dd->rubro = $infoRubro->codigo . " - " . $infoRubro->nombre;
+        }
+
+        return ['success' => 1, 'info' => $data, 'conteo' => $haymaterial];
     }
 
 

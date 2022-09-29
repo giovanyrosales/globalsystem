@@ -5,7 +5,9 @@
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
-    <link href="{{ asset('css/main.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
+
 @stop
 
 
@@ -20,13 +22,12 @@
                 <div class="col-sm-6">
                     <h1>Crear Presupuesto</h1>
                 </div>
-
             </div>
         </div>
     </section>
 
     <!-- Main content -->
-    <section class="content">
+    <section class="content" >
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
@@ -46,185 +47,142 @@
                                 </div>
                             </div>
 
-                            <div class="col-12">
-                                <!-- Custom Tabs -->
-                                <div class="card">
-                                    <div class="card-header d-flex p-0">
-                                        <h3 class="card-title p-3"></h3>
-
-                                        <button type="button" onclick="modalBuscarMaterial()" class="btn btn-default btn-sm" style="margin-bottom: 5px">
-                                            <i class="fas fa-search"></i>
-                                            Buscar Material
-                                        </button>
-
-                                        <ul class="nav nav-pills ml-auto p-2">
-                                            <li class="nav-item"><a class="nav-link active" href="#tab_1" onclick="mostrarBloque()" data-toggle="tab">Base Presupuesto</a></li>
-                                            <li class="nav-item"><a class="nav-link" href="#tab_2" onclick="ocultarBloque()" data-toggle="tab">Nuevos Materiales</a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="tab-content">
-                                            <div class="tab-pane active" id="tab_1">
-
-                                                <!-- inicio -->
-                                                <div>
-
-                                                    <form>
-                                                        <div class="card-body">
-
-                                                            <!-- foreach para rubro -->
-
-                                                            @foreach($rubro as $item)
-
-                                                                <div class="accordion-group" data-behavior="accordion">
-
-                                                                    <label class="accordion-header" style="background: #c5c6c8; color: black !important;">{{ $item->codigo }} - {{ $item->nombre }}</label>
-
-                                                                    <!-- foreach para cuenta -->
-                                                                    <div class="accordion-body">
-
-                                                                        @foreach($item->cuenta as $cc)
-
-                                                                            <div class="accordion-group" data-behavior="accordion" data-multiple="true">
-                                                                                <p class="accordion-header" style="background: #b0c2f2; color: black !important;">{{ $cc->codigo }} - {{ $cc->nombre }}</p>
-
-                                                                                <div class="accordion-body">
-                                                                                    <div class="accordion-group" data-behavior="accordion" data-multiple="true">
-
-                                                                                        <!-- foreach para objetos -->
-                                                                                        @foreach($cc->objeto as $obj)
-
-                                                                                            <p class="accordion-header" style="background: #b0f2c2; color: black !important;">{{ $obj->codigo }} | {{ $obj->nombre }}</p>
-                                                                                            <div class="accordion-body">
-
-                                                                                                <table data-toggle="table">
-                                                                                                    <thead>
-                                                                                                    <tr>
-                                                                                                        <th style="width: 30%; text-align: center">Descripción</th>
-                                                                                                        <th style="width: 20%; text-align: center">U/M</th>
-                                                                                                        <th style="width: 15%; text-align: center">Costo</th>
-                                                                                                        <th style="width: 10%; text-align: center">Unidades</th>
-                                                                                                        <th style="width: 10%; text-align: center">Periodo</th>
-                                                                                                        <th style="width: 10%; text-align: center">Total</th>
-
-                                                                                                    </tr>
-                                                                                                    </thead>
-                                                                                                    <tbody>
-
-                                                                                                    <!-- foreach para material -->
-
-                                                                                                    @foreach($obj->material as $mm)
-
-                                                                                                        <tr>
-                                                                                                            <td>
-                                                                                                                <input type="hidden" name="idMaterial[]" value='{{ $mm->id }}'>
-                                                                                                                <input value="{{ $mm->descripcion }}" disabled class="form-control"  type="text">
-                                                                                                            </td>
-                                                                                                            <td><input value="{{ $mm->unimedida }}" disabled class="form-control"  type="text"></td>
-                                                                                                            <td><input value="{{ $mm->costo }}" disabled class="form-control" style="max-width: 150px" ></td>
-                                                                                                            <td><input name="unidades[]" class="form-control" min="1" type="number" onchange="multiplicar(this)" maxlength="6"  style="max-width: 180px" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"></td>
-                                                                                                            <td><input name="periodo[]" class="form-control" min="1" type="number" onchange="multiplicar(this)" maxlength="6"  style="max-width: 180px" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"></td>
-                                                                                                            <td><input name="total[]" disabled class="form-control" type="text" style="max-width: 180px"></td>
-                                                                                                        </tr>
-
-                                                                                                        <!-- fin foreach material -->
-                                                                                                    @endforeach
-
-                                                                                                    </tbody>
-
-                                                                                                </table>
-
-                                                                                            </div>
-
-                                                                                    @endforeach
-                                                                                    <!-- finaliza foreach para objetos-->
-
-                                                                                    </div>
-                                                                                </div>
-
-
-                                                                            </div>
-
-                                                                    @endforeach
-                                                                    <!-- fin foreach para cuenta -->
-                                                                    </div>
-                                                                </div>
-
-                                                                @if($loop->last)
-                                                                    <script>
-                                                                        setTimeout(function () {
-                                                                           closeLoading();
-                                                                        }, 1000);
-                                                                    </script>
-                                                                @endif
-
-                                                        @endforeach
-                                                        <!-- fin foreach para rubro -->
-
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-
-
-
-
-                                            <!-- LISTA DE NUEVOS MATERIALES - TABS 2 -->
-                                            <div class="tab-pane" id="tab_2">
-
-                                                <form>
-                                                    <div class="card-body">
-
-                                                        <table class="table" id="matrizMateriales" style="border: 80px" data-toggle="table">
-                                                            <thead>
-                                                            <tr>
-                                                                <th style="width: 30%; text-align: center">Descripción</th>
-                                                                <th style="width: 20%; text-align: left">Unidad de Medida</th>
-                                                                <th style="width: 15%; text-align: center">Costo</th>
-                                                                <th style="width: 15%; text-align: center">Cantidad</th>
-                                                                <th style="width: 10%; text-align: center">Periodo</th>
-
-                                                                <th style="width: 10%; text-align: center">Opciones</th>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody id="myTbodyMateriales">
-
-
-                                                            </tbody>
-
-                                                        </table>
-
-                                                        <br>
-                                                        <button type="button" class="btn btn-block btn-success" id="btnAdd">Agregar Fila</button>
-                                                        <br>
-
-                                                    </div>
-
-                                                </form>
-
-                                            </div>
+                            <section class="content">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div id="tablaDatatable">
 
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </section>
 
-                            <div class="card-footer">
-                                <div id="bloque-codigo">
-                                    <label>Código según Color </label>
-                                    <button type="button" class="btn btn-info" style="background: #c5c6c8; color: black !important; font-weight: bold">RUBRO</button>
-                                    <button type="button" class="btn btn-info" style="background: #b0c2f2; color: black !important; font-weight: bold">CUENTA</button>
-                                    <button type="button" class="btn btn-info" style="background: #b0f2c2; color: black !important; font-weight: bold">OBJETO ESPECÍFICO</button>
-                                </div>
-
-                                <button type="button" onclick="verificar()" class="btn btn-success float-right">Guardar</button>
-                            </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="modalBuscador">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Buscar Material</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-nuevo">
+                        <div class="card-body">
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+
+                                        <div class="form-group">
+                                            <div class="input-group mb-3" style="width: 40%;">
+                                                <input type="text" class="form-control" autocomplete="off" maxlength="100" id="nombre-material" placeholder="Nombre del Material a Buscar...">
+                                                <span class="input-group-append">
+                                                <button type="button" class="btn btn-info btn-flat" onclick="buscarMaterial()">BUSCAR</button>
+                                              </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="row" style="margin-top: 20px">
+                                            <table class="table" id="matriz-material"  data-toggle="table">
+                                                <thead>
+                                                <tr>
+                                                    <th style="width: 20%">RUBRO</th>
+                                                    <th style="width: 20%">CUENTA</th>
+                                                    <th style="width: 20%">OBJETO ESPE.</th>
+                                                    <th style="width: 40%">MATERIAL</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalNuevoMaterial">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Solicitud de Material</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-nuevo">
+                        <div class="card-body">
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+
+                                        <div class="form-group">
+                                            <label>Nombre del Material</label>
+                                            <input type="text" class="form-control" autocomplete="off" maxlength="300" id="material-nuevo" placeholder="Nombre">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Costo:</label>
+                                            <input type="text" class="form-control" autocomplete="off" id="costo-nuevo" placeholder="0.00">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Cantidad:</label>
+                                            <input type="text" class="form-control" autocomplete="off" id="cantidad-nuevo" placeholder="0">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Periodo:</label>
+                                            <input type="text" class="form-control" autocomplete="off" id="periodo-nuevo" placeholder="0">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Unidad de Medida</label>
+                                            <select class="form-control" id="select-medida-nuevo">
+                                                @foreach($unidad as $sel)
+                                                    <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="verificarNuevoMaterial()">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </div>
 
 
@@ -238,29 +196,30 @@
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
-    <script src="{{ asset('js/jquery.simpleaccordion.js') }}"></script>
+    <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
 
     <script type="text/javascript">
         $(document).ready(function(){
             openLoading();
+
+            setTimeout(function () {
+                var ruta = "{{ URL::to('/admin/p/cargadora') }}";
+                $('#tablaDatatable').load(ruta);
+            }, 1000);
+
+            $('#select-medida-nuevo').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
+
             document.getElementById("divcontenedor").style.display = "block";
         });
     </script>
 
-    <script>
-        $(document).ready(function() {
-            $('[data-behavior=accordion]').simpleAccordion({cbOpen:accOpen, cbClose:accClose});
-        });
-
-        function accClose(e, $this) {
-            $this.find('span').fadeIn(200);
-        }
-
-        function accOpen(e, $this) {
-            $this.find('span').fadeOut(200)
-        }
-
-    </script>
 
     <script>
 
@@ -338,50 +297,7 @@
         }
 
 
-        // filas de la tabla
-        $(document).ready(function () {
-            $("#btnAdd").on("click", function () {
 
-                //agrega las filas dinamicamente
-
-                var markup = "<tr>"+
-
-                    "<td>"+
-                    "<input name='descripcion[]' maxlength='800' class='form-control' type='text'>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<select class='form-control seleccion' style='max-width: 180px' name='unidadmedida[]'"+
-                    "<option value='0'>Seleccionar Unidad</option>"+
-                    "@foreach($unidad as $data)"+
-                    "<option value='{{ $data->id }}'>{{ $data->nombre }}</option>"+
-                    "@endforeach>"+
-                    "</select>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<input name='costoextra[]' class='form-control' min='1' style='max-width: 150px' type='number' value=''/>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<input name='cantidadextra[]' class='form-control' min='1' style='max-width: 180px' type='number' value=''/>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<input name='periodoextra[]' class='form-control' min='1' onkeypress='if ( isNaN( String.fromCharCode(event.keyCode) )) return false;' style='max-width: 180px' type='number' value=''/>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFila(this)'>Borrar</button>"+
-                    "</td>"+
-
-                    "</tr>";
-
-                // $("tbody").append(markup);
-                $("#matrizMateriales tbody").append(markup);
-
-            });
-        });
 
         function borrarFila(elemento){
             var tabla = elemento.parentNode.parentNode;
@@ -688,6 +604,214 @@
         function ocultarBloque(){
             document.getElementById("bloque-codigo").style.display = "none";
         }
+
+        // buscar material
+        function modalBuscarMaterial(){
+            $('#modalBuscador').modal('show');
+        }
+
+        function buscarMaterial(){
+
+            var nombre = document.getElementById("nombre-material").value;
+
+            if(nombre === ''){
+                toastr.error('Nombre Material es Requerido');
+                return;
+            }
+
+            if(nombre.length < 3){
+                toastr.error('Mínimo 3 Caracteres para Buscar');
+                return;
+            }
+
+            openLoading();
+            $("#matriz-material tbody tr").remove();
+
+            axios.post(url+'/p/buscar/material/presupuesto', {
+                'texto' : nombre
+            })
+                .then((response) => {
+
+                    closeLoading();
+
+               if(response.data.success === 1){
+
+                   if(response.data.conteo){
+
+                       let infodetalle = response.data.info;
+
+                       for (var i = 0; i < infodetalle.length; i++) {
+
+                           var markup = "<tr>" +
+
+                               "<td>" +
+                               "<input class='form-control' value='" + infodetalle[i].rubro + "' disabled type='text'>" +
+                               "</td>" +
+
+                               "<td>" +
+                               "<input class='form-control' value='" + infodetalle[i].cuenta + "' disabled type='text'>" +
+                               "</td>" +
+
+                               "<td>" +
+                               "<input class='form-control' value='" + infodetalle[i].objeto + "' disabled type='text'>" +
+                               "</td>" +
+
+                               "<td>" +
+                               "<input class='form-control' style='background-color: #b0f2c2' value='" + infodetalle[i].descripcion + "' disabled type='text'>" +
+                               "</td>" +
+
+                               "</tr>";
+
+                           $("#matriz-material tbody").append(markup);
+                       }
+                   }else{
+                    toastr.info('Material No Encontrado');
+                   }
+               }else{
+                   toastr.error('Error al buscar');
+               }
+
+            })
+            .catch((error) => {
+               toastr.error('Error al buscar');
+            });
+        }
+
+
+        function modalNuevaSolicitud(){
+            $('#modalNuevoMaterial').modal('show');
+        }
+
+        function verificarNuevoMaterial(){
+
+            var material = document.getElementById('material-nuevo').value;
+            var costo = document.getElementById('costo-nuevo').value;
+            var cantidad = document.getElementById('cantidad-nuevo').value;
+            var periodo = document.getElementById('periodo-nuevo').value;
+            var medida = document.getElementById('select-medida-nuevo').value;
+
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
+            // ****
+
+            if(material === ''){
+                toastr.error('Material es requerido');
+                return;
+            }
+
+            if(material.length > 300){
+                toastr.error('Material máximo 300 caracteres');
+                return;
+            }
+
+            // ****
+
+            if(costo === ''){
+                toastr.error('Costo es requerido');
+                return;
+            }
+
+            if(!costo.match(reglaNumeroDecimal)) {
+                toastr.error('Costo debe ser número Decimal y No Negativos');
+                return;
+            }
+
+            if(costo < 0){
+                toastr.error('Costo no permite números negativos');
+                return;
+            }
+
+            if(costo.length > 10){
+                toastr.error('Costo máximo 10 dígitos de límite');
+                return;
+            }
+
+            // ****
+
+            if(cantidad === ''){
+                toastr.error('Cantidad es requerido');
+                return;
+            }
+
+            if(!cantidad.match(reglaNumeroEntero)) {
+                toastr.error('Cantidad debe ser número Entero y No Negativos');
+                return;
+            }
+
+            if(cantidad <= 0){
+                toastr.error('Cantidad no permite números negativos y Ceros');
+                return;
+            }
+
+            if(cantidad.length > 10){
+                toastr.error('Cantidad máximo 10 dígitos de límite');
+                return;
+            }
+
+            // ****
+
+            if(periodo === ''){
+                toastr.error('Periodo es requerido');
+                return;
+            }
+
+            if(!periodo.match(reglaNumeroEntero)) {
+                toastr.error('Periodo debe ser número Entero y No Negativos');
+                return;
+            }
+
+            if(periodo < 0){
+                toastr.error('Periodo no permite números negativos');
+                return;
+            }
+
+            if(periodo.length > 3){
+                toastr.error('Periodo máximo 3 dígitos de límite');
+                return;
+            }
+
+            // ****
+
+            if(medida === ''){
+                toastr.error('Unidad Medida es requerido');
+                return;
+            }
+
+            //var textounidad = medida.options[medida.selectedIndex].text;
+
+            var markup = "<tr>"+
+
+                "<td>"+
+                "<input name='descripcionfila[]' maxlength='300' value='"+ material +"' disabled class='form-control' type='text'>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='unidadmedidafila[]' value='"+costo+"' class='form-control' disabled data-info='"+medida+"' type='text'/>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='costoextrafila[]' value='"+costo+"' disabled class='form-control'  type='text'/>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='cantidadextrafila[]' value='"+cantidad+"' disabled class='form-control' />"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='periodoextrafila[]' value='"+periodo+"' disabled class='form-control'/>"+
+                "</td>"+
+
+                "<td>"+
+                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFila(this)'>Borrar</button>"+
+                "</td>"+
+
+                "</tr>";
+
+            $("#myTbodyMateriales tbody").append(markup);
+        }
+
+
 
     </script>
 

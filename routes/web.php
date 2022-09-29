@@ -470,6 +470,9 @@ Route::get('/admin/p/reportes/unidad/presupuesto/index', [ProveedoresController:
 // CREAR PRESUPUESTO POR UNA UNIDAD
 Route::get('/admin/p/crear/presupuesto/unidad/index', [ProveedoresController::class,'indexCrearPresupuestoUnidad'])->name('p.admin.crear.presupuesto.index');
 
+Route::get('/admin/p/cargadora', [ProveedoresController::class,'indexCargadora']);
+
+Route::post('/admin/p/buscar/material/presupuesto', [ProveedoresController::class, 'buscarMaterialPresupuestoUnidad']);
 
 
 

@@ -10,7 +10,7 @@
             speedClose: 150,
             easingOpen: null,
             easingClose: null,
-            headClass: 'accordion-header',
+            headClass: ['accordion-header'],
             bodyClass: 'accordion-body',
             openClass: 'open',
             defaultOpenClass: 'default-open',
