@@ -32,7 +32,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
+                    <h3 class="card-title">Listado de Usuarios asignados a Departamento</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">

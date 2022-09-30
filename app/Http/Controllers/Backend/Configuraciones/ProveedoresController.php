@@ -12,6 +12,7 @@ use App\Models\P_Departamento;
 use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
 use App\Models\P_UnidadMedida;
+use App\Models\P_UsuarioDepartamento;
 use App\Models\Proveedores;
 use App\Models\Rubro;
 use App\Models\Usuario;
@@ -292,12 +293,18 @@ class ProveedoresController extends Controller
         // verificar si hay presupuesto pendiente por crear
 
         $idusuario = Auth::id();
-        $infouser = Usuario::where('id', $idusuario)->first();
+
+        // si este id de usuario no esta registrado con departamento. mostrar alerta
+        if(!P_UsuarioDepartamento::where('id_usuario', $idusuario)->first()){
+            return view('backend.admin.presupuestounidad.crear.vistadepartamentonoasignado');
+        }
+
+        $infoDepa = P_UsuarioDepartamento::where('id_usuario', $idusuario)->first();
 
         // solo sera necesario verificar con tabla presub_unidad
 
         // obtener lista de anios del departamento
-        $listaAnios = P_PresupUnidad::where('id_departamento', $infouser->id_departamento)->get();
+        $listaAnios = P_PresupUnidad::where('id_departamento', $infoDepa->id_departamento)->get();
 
         $pila = array();
 
