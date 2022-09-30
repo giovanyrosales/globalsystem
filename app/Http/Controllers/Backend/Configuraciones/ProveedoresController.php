@@ -17,6 +17,8 @@ use App\Models\Rubro;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class ProveedoresController extends Controller
@@ -263,14 +265,11 @@ class ProveedoresController extends Controller
                         ->where('visible', 1) // solo materiales visibles, ya que admin puede ocultar
                         ->get();
 
-                    $fila = 0;
 
                     foreach ($subSecciones3 as $subLista){
 
                         $infoUnidad = P_UnidadMedida::where('id', $subLista->id_unidadmedida)->first();
                         $subLista->unimedida = $infoUnidad->nombre;
-                        $fila += 1;
-                        $subLista->fila = $fila;
                     }
 
                     $resultsBloque3[$index3]->material = $subSecciones3;
@@ -344,5 +343,74 @@ class ProveedoresController extends Controller
         return ['success' => 1, 'info' => $data, 'conteo' => $haymaterial];
     }
 
+    public function nuevoPresupuestoUnidades(Request $request){
+
+        $rules = array(
+            'anio' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        // obtener información del usuario, saber quien eta agregando el presupuesto
+        $idusuario = Auth::id();
+        $userData = Usuario::where('id', $idusuario)->first();
+
+        // verificar que aun no exista el presupuesto
+        if(P_PresupUnidad::where('id_anio', $request->anio)
+            ->where('id_departamento', $userData->id_departamento)
+            ->first()){
+            return ['success' => 1];
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            $pr = new PresupUnidad();
+            $pr->id_anio = $request->anio;
+            $pr->id_departamento = $userData->id_departamento;
+            $pr->id_estado = 1; // editable
+            $pr->save();
+
+            if($request->idmaterial != null) {
+                for ($i = 0; $i < count($request->idmaterial); $i++) {
+
+                    $prDetalle = new PresupUnidadDetalle();
+                    $prDetalle->id_presup_unidad = $pr->id;
+                    $prDetalle->id_material = $request->idmaterial[$i];
+                    $prDetalle->cantidad = $request->unidades[$i];
+                    $prDetalle->periodo = $request->periodo[$i];
+                    $prDetalle->save();
+                }
+            }
+
+            // ingreso de materiales extra
+            if($request->descripcion != null) {
+                for ($j = 0; $j < count($request->descripcion); $j++) {
+
+                    $mtrDetalle = new MaterialExtraDetalle();
+                    $mtrDetalle->id_presup_unidad = $pr->id;
+                    $mtrDetalle->id_unidad = $request->unidadmedida[$j];
+                    $mtrDetalle->descripcion = $request->descripcion[$j];
+                    $mtrDetalle->costo = $request->costoextra[$j];
+                    $mtrDetalle->cantidad = $request->cantidadextra[$j];
+                    $mtrDetalle->periodo = $request->periodoextra[$j];
+                    $mtrDetalle->save();
+                }
+            }
+
+            DB::commit();
+            return ['success' => 2];
+        }catch(\Throwable $e){
+            DB::rollback();
+            Log::info('ee' . $e);
+            return ['success' => 3];
+        }
+
+    }
 
 }

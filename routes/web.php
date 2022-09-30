@@ -65,6 +65,18 @@ Route::post('/admin/permisos/nuevo-rol', [PermisoController::class, 'nuevoRol'])
 Route::post('/admin/permisos/extra-nuevo', [PermisoController::class, 'nuevoPermisoExtra']);
 Route::post('/admin/permisos/extra-borrar', [PermisoController::class, 'borrarPermisoGlobal']);
 
+// --- USUARIO DEPARTAMENTO ---
+
+Route::get('/admin/usuario/departamento/index', [PermisoController::class,'indexUsuarioDepartamento'])->name('admin.usuario.departamento.index');
+Route::get('/admin/usuario/departamento/tabla', [PermisoController::class,'tablaUsuarioDepartamento']);
+Route::post('/admin/p/usuario/departamento/nuevo', [PermisoController::class, 'nuevoUsuarioDepartamento']);
+Route::post('/admin/p/usuario/departamento/informacion', [PermisoController::class, 'informacionUsuarioDepartamento']);
+Route::post('/admin/p/usuario/departamento/editar', [PermisoController::class, 'editarUsuarioDepartamento']);
+
+
+
+
+
 // --- PERFIL ---
 Route::get('/admin/editar-perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('admin.perfil');
 Route::post('/admin/editar-perfil/actualizar', [PerfilController::class, 'editarUsuario']);
@@ -473,6 +485,9 @@ Route::get('/admin/p/crear/presupuesto/unidad/index', [ProveedoresController::cl
 Route::get('/admin/p/cargadora', [ProveedoresController::class,'indexCargadora']);
 
 Route::post('/admin/p/buscar/material/presupuesto', [ProveedoresController::class, 'buscarMaterialPresupuestoUnidad']);
+
+Route::post('/admin/p/crear/presupuesto/unidad', [ProveedoresController::class, 'nuevoPresupuestoUnidades']);
+
 
 
 

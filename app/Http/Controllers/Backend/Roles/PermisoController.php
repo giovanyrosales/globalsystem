@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Backend\Roles;
 
 use App\Http\Controllers\Controller;
+use App\Models\P_Departamento;
+use App\Models\P_UsuarioDepartamento;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -129,8 +132,103 @@ class PermisoController extends Controller
     public function borrarPermisoGlobal(Request $request){
 
         // buscamos el permiso el cual queremos eliminar
-        $permission = Permission::findById($request->idpermiso)->delete();
+        Permission::findById($request->idpermiso)->delete();
 
         return ['success' => 1];
     }
+
+
+    //******************************************************************************************
+
+    public function indexUsuarioDepartamento(){
+
+        $usuarios = Usuario::orderBy('nombre')->get();
+        $departamentos = P_Departamento::orderBy('nombre')->get();
+
+        return view('backend.admin.rolesypermisos.usuariodepartamento.vistausuariodepartamento', compact('usuarios', 'departamentos'));
+    }
+
+    public function tablaUsuarioDepartamento(){
+
+        $listado = DB::table('p_usuario_departamento AS pud')
+            ->join('usuario AS u', 'pud.id_usuario', '=', 'u.id')
+            ->join('p_departamento AS pd', 'pud.id_departamento', '=', 'pd.id')
+            ->select('pud.id', 'u.nombre', 'u.usuario', 'pd.nombre AS nombredepa')
+            ->orderBy('u.nombre')
+            ->get();
+
+        return view('backend.admin.rolesypermisos.usuariodepartamento.tablausuariodepartamento', compact('listado'));
+    }
+
+    public function nuevoUsuarioDepartamento(Request $request){
+
+        $regla = array(
+            'usuario' => 'required',
+            'departamento' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        // verificar si existe el usuario
+        if(P_UsuarioDepartamento::where('id_usuario', $request->usuario)->first()){
+            return ['success' => 1];
+        }
+
+        $dato = new P_UsuarioDepartamento();
+        $dato->id_usuario = $request->usuario;
+        $dato->id_departamento = $request->departamento;
+        $dato->save();
+
+        return ['success' => 2];
+    }
+
+    public function informacionUsuarioDepartamento(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($info = P_UsuarioDepartamento::where('id', $request->id)->first()){
+
+            $depar = P_Departamento::orderBy('nombre')->get();
+
+            $infoUsuario = Usuario::where('id', $info->id_usuario)->first();
+            $nombre = $infoUsuario->nombre;
+
+            return ['success' => 1, 'info' => $info, 'nombre' => $nombre, 'depa' => $depar];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    public function editarUsuarioDepartamento(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+            'departamento' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(P_UsuarioDepartamento::where('id', $request->id)->first()){
+
+            P_UsuarioDepartamento::where('id', $request->id)->update([
+                'id_departamento' => $request->departamento,
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
 }

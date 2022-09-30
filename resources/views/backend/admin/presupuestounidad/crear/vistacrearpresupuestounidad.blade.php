@@ -130,7 +130,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="formulario-nuevo">
+                    <form id="formulario-nuevo-material">
                         <div class="card-body">
 
                             <div class="card-body">
@@ -138,6 +138,12 @@
                                     <div class="col-md-12">
 
                                         <div class="form-group">
+                                            <h5 style="font-weight: bold; text-align: center "><i class="fas fa-info"></i> Se deberá Notificar a Jefatura de Presupuesto que se Necesita el Material que esta Solicitando</h5>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="form-group" style="margin-top: 15px">
                                             <label>Nombre del Material</label>
                                             <input type="text" class="form-control" autocomplete="off" maxlength="300" id="material-nuevo" placeholder="Nombre">
                                         </div>
@@ -220,7 +226,6 @@
         });
     </script>
 
-
     <script>
 
         function multiplicar(e){
@@ -242,17 +247,17 @@
                 // validar
 
                 if(!unidades.value.match(reglaNumeroDecimal)) {
-                    modalMensaje('Error', 'unidades debe ser número decimal');
+                    modalMensaje('Error', 'Unidades debe ser número decimal');
                     return;
                 }
 
                 if(unidades.value <= 0){
-                    modalMensaje('Error', 'unidades no debe ser negativo o cero');
+                    modalMensaje('Error', 'Unidades no debe ser negativo o cero');
                     return;
                 }
 
                 if(unidades.value > 1000000){
-                    modalMensaje('Error', 'unidades máximo 1 millón');
+                    modalMensaje('Error', 'Unidades máximo 1 millón');
                     return;
                 }
 
@@ -264,17 +269,17 @@
                 // validar
 
                 if(!periodo.value.match(reglaNumeroEntero)) {
-                    modalMensaje('Error', 'periodo debe ser número entero');
+                    modalMensaje('Error', 'Periodo debe ser número entero');
                     return;
                 }
 
                 if(periodo.value <= 0){
-                    modalMensaje('Error', 'periodo no debe ser negativo o cero');
+                    modalMensaje('Error', 'Periodo no debe ser negativo o cero');
                     return;
                 }
 
                 if(periodo.value > 1000000){
-                    modalMensaje('Error', 'periodo máximo 1 millón');
+                    modalMensaje('Error', 'Periodo máximo 1 millón');
                     return;
                 }
 
@@ -295,9 +300,6 @@
                 total.value = '';
             }
         }
-
-
-
 
         function borrarFila(elemento){
             var tabla = elemento.parentNode.parentNode;
@@ -342,7 +344,6 @@
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
             // verificar que todos las unidades y periodos ingresados sean validos
-
             for(var a = 0; a < unidades.length; a++){
 
                 var datoUnidades = unidades[a];
@@ -352,17 +353,17 @@
                     // revisar si es decimal
 
                     if(!datoUnidades.match(reglaNumeroDecimal)) {
-                        modalMensaje('Presupuesto Base','unidades ingresada no es valido');
+                        modalMensaje('Presupuesto Base','Unidades ingresada no es valido');
                         return;
                     }
 
                     if(datoUnidades <= 0){
-                        modalMensaje('Presupuesto Base', 'unidades no debe ser negativos o cero');
+                        modalMensaje('Presupuesto Base', 'Unidades no debe ser negativos o cero');
                         return;
                     }
 
                     if(datoUnidades > 1000000){
-                        modalMensaje('Presupuesto Base', 'unidades máximo 1 millón');
+                        modalMensaje('Presupuesto Base', 'Unidades máximo 1 millón');
                         return;
                     }
                 }
@@ -377,17 +378,17 @@
                     // revisar si es decimal
 
                     if(!datoPeriodo.match(reglaNumeroEntero)) {
-                        modalMensaje('Presupuesto Base', 'periodo ingresada no es valido');
+                        modalMensaje('Presupuesto Base', 'Periodo ingresada no es valido');
                         return;
                     }
 
                     if(datoPeriodo <= 0){
-                        modalMensaje('Presupuesto Base', 'periodo no debe ser negativos o cero');
+                        modalMensaje('Presupuesto Base', 'Periodo no debe ser negativos o cero');
                         return;
                     }
 
                     if(datoPeriodo > 1000000){
-                        modalMensaje('Presupuesto Base', 'periodo máximo 1 millón');
+                        modalMensaje('Presupuesto Base', 'Periodo máximo 1 millón');
                         return;
                     }
                 }
@@ -395,27 +396,36 @@
 
             let formData = new FormData();
 
-            // verificar ingreso de materiales extras
+            // VERIFICAR LOS MATERIALES QUE SE VAN A SOLICITAR
 
             var nRegistro = $('#matrizMateriales >tbody >tr').length;
             if (nRegistro > 0){
 
-                var descripcion = $("input[name='descripcion[]']").map(function(){return $(this).val();}).get();
-                var costoextra = $("input[name='costoextra[]']").map(function(){return $(this).val();}).get();
-                var cantidadextra = $("input[name='cantidadextra[]']").map(function(){return $(this).val();}).get();
-                var periodoextra = $("input[name='periodoextra[]']").map(function(){return $(this).val();}).get();
+                var descripcion = $("input[name='descripcionfila[]']").map(function(){return $(this).val();}).get();
+                var costoextra = $("input[name='costoextrafila[]']").map(function(){return $(this).val();}).get();
+                var cantidadextra = $("input[name='cantidadextrafila[]']").map(function(){return $(this).val();}).get();
+                var periodoextra = $("input[name='periodoextrafila[]']").map(function(){return $(this).val();}).get();
+                var unidadmedidafila = $("input[name='unidadmedidafila[]']").map(function(){return $(this).attr("data-infomedida");}).get();
 
                 for(var c = 0; c < descripcion.length; c++){
+
+                    let detalle = unidadmedidafila[c];
+
+                    // identifica si el 0 es tipo number o texto
+                    if(detalle == 0){
+                        modalMensaje('Nuevos Materiales', 'En la Fila #' + (c+1) + " No se encuentra la Unidad de Medida. Por favor agregar de nuevo el Material");
+                        return;
+                    }
 
                     var datoDescripcion = descripcion[c];
 
                     if(datoDescripcion === ''){
-                        modalMensaje('Nuevos Materiales', 'un material le falta su descripción');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (c+1) + ', al Material falta su descripción. Borrar fila y agregar de nuevo');
                         return;
                     }
 
-                    if(datoDescripcion.length > 800){
-                        modalMensaje('Nuevos Materiales', 'máximo 800 caracteres para descripción');
+                    if(datoDescripcion.length > 300){
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (c+1) + ', al Material su descripción supera los 300 caracteres. Borrar fila y agregar de nuevo');
                         return;
                     }
                 }
@@ -425,22 +435,22 @@
                     var datoCostoExtra = costoextra[d];
 
                     if(datoCostoExtra === ''){
-                        modalMensaje('Nuevos Materiales', 'costo es requerido');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (d+1) + ', el Costo es requerido. Borrar fila y agregar de nuevo');
                         return;
                     }
 
                     if(!datoCostoExtra.match(reglaNumeroDecimal)) {
-                        modalMensaje('Nuevos Materiales', 'costo debe ser decimal');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (d+1) + ', el Costo debe ser Número Decimal. Borrar fila y agregar de nuevo');
                         return;
                     }
 
                     if(datoCostoExtra <= 0){
-                        modalMensaje('Nuevos Materiales', 'costo no debe ser negativo o cero');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (d+1) + ', el Costo no debe ser Negativo o Cero. Borrar fila y agregar de nuevo');
                         return;
                     }
 
                     if(datoCostoExtra > 1000000){
-                        modalMensaje('Nuevos Materiales', 'costo máximo es 1 millón');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (d+1) + ', el Costo no debe superar 1 millón. Borrar fila y agregar de nuevo');
                         return;
                     }
                 }
@@ -450,22 +460,22 @@
                     var datoCantidadExtra = cantidadextra[t];
 
                     if(datoCantidadExtra === ''){
-                        modalMensaje('Nuevos Materiales', 'cantidad es requerido');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (t+1) + ', la Cantidad es Requerida. Borrar fila y agregar de nuevo');
                         return;
                     }
 
                     if(!datoCantidadExtra.match(reglaNumeroEntero)) {
-                        modalMensaje('Nuevos Materiales', 'cantidad debe ser decimal');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (t+1) + ', la Cantidad debe ser Número Decimal. Borrar fila y agregar de nuevo');
                         return;
                     }
 
                     if(datoCantidadExtra <= 0){
-                        modalMensaje('Nuevos Materiales', 'cantidad no debe ser negativo o cero');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (t+1) + ', la Cantidad no debe ser Número negativo o Cero. Borrar fila y agregar de nuevo');
                         return;
                     }
 
                     if(datoCantidadExtra > 1000000){
-                        modalMensaje('Nuevos Materiales', 'cantidad máximo es 1 millón');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (t+1) + ', la Cantidad no debe superar 1 millón. Borrar fila y agregar de nuevo');
                         return;
                     }
                 }
@@ -475,45 +485,38 @@
                     var datoPeriodoExtra = periodoextra[e];
 
                     if(datoPeriodoExtra === ''){
-                        modalMensaje('Nuevos Materiales', 'periodo es requerido');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (e+1) + ', el Periodo es Requerido. Borrar fila y agregar de nuevo');
                         return;
                     }
 
                     if(!datoPeriodoExtra.match(reglaNumeroEntero)) {
-                        modalMensaje('Nuevos Materiales', 'periodo debe ser número entero');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (e+1) + ', el Periodo debe ser Número Entero. Borrar fila y agregar de nuevo');
                         return;
                     }
 
                     if(datoPeriodoExtra <= 0){
-                        modalMensaje('Nuevos Materiales', 'periodo no debe ser negativo o cero');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (e+1) + ', el Periodo no debe ser Número Negativo o Cero. Borrar fila y agregar de nuevo');
                         return;
                     }
 
                     if(datoPeriodoExtra > 1000000){
-                        modalMensaje('Nuevos Materiales', 'periodo máximo es 1 millón');
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (e+1) + ', El Periodo debe tener máximo 1 millón. Borrar fila y agregar de nuevo');
                         return;
                     }
                 }
 
+                // AGREGAR SOLICITUD DE NUEVOS MATERIALES
                 for(var p = 0; p < descripcion.length; p++){
-                    formData.append('descripcion[]', descripcion[p]);
-                    formData.append('costoextra[]', costoextra[p]);
-                    formData.append('cantidadextra[]', cantidadextra[p]);
-                    formData.append('periodoextra[]', periodoextra[p]);
+                    formData.append('descripcionfila[]', descripcion[p]);
+                    formData.append('costoextrafila[]', costoextra[p]);
+                    formData.append('cantidadextrafila[]', cantidadextra[p]);
+                    formData.append('periodoextrafila[]', periodoextra[p]);
+                    formData.append('unidadmedida[]', unidadmedidafila[p]);
                 }
-
-                var row = $('table').find('tr');
-                $(row).each(function (index, element) {
-                    var unidad = $(this).find('.seleccion').val();
-
-                    if(unidad !== undefined && unidad != null){
-                        formData.append('unidadmedida[]', unidad);
-                    }
-                });
             }
-            // fin validacion
 
-            // llenar array para enviar
+
+            // TODOS LOS MATERIALES DE PRESUPUESTO
             for(var z = 0; z < unidades.length; z++){
 
                 if(unidades[z].length > 0 && periodo[z].length > 0){
@@ -524,7 +527,7 @@
             }
             formData.append('anio', anio);
 
-            axios.post(url+'/nuevo/presupuesto/crear', formData, {
+            axios.post(url+'/p/crear/presupuesto/unidad', formData, {
             })
                 .then((response) => {
 
@@ -679,6 +682,8 @@
 
 
         function modalNuevaSolicitud(){
+            document.getElementById("formulario-nuevo-material").reset();
+            $('#select-medida-nuevo').prop('selectedIndex', 0).change();
             $('#modalNuevoMaterial').modal('show');
         }
 
@@ -778,7 +783,7 @@
                 return;
             }
 
-            //var textounidad = medida.options[medida.selectedIndex].text;
+            var texto = $("#select-medida-nuevo option:selected").text();
 
             var markup = "<tr>"+
 
@@ -787,7 +792,7 @@
                 "</td>"+
 
                 "<td>"+
-                "<input name='unidadmedidafila[]' value='"+costo+"' class='form-control' disabled data-info='"+medida+"' type='text'/>"+
+                "<input name='unidadmedidafila[]' value='"+texto+"' class='form-control' disabled data-infomedida='"+medida+"' type='text'/>"+
                 "</td>"+
 
                 "<td>"+
@@ -808,7 +813,9 @@
 
                 "</tr>";
 
-            $("#myTbodyMateriales tbody").append(markup);
+            $("#matrizMateriales tbody").append(markup);
+
+            $('#modalNuevoMaterial').modal('hide');
         }
 
 

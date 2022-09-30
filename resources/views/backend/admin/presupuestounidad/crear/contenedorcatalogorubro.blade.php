@@ -54,7 +54,6 @@
                                                                     <table data-toggle="table">
                                                                         <thead>
                                                                         <tr>
-                                                                            <th style="width: 6%; text-align: center">#</th>
                                                                             <th style="width: 30%; text-align: center">Descripción</th>
                                                                             <th style="width: 20%; text-align: center">U/M</th>
                                                                             <th style="width: 15%; text-align: center">Costo</th>
@@ -71,8 +70,6 @@
                                                                         @foreach($obj->material as $mm)
 
                                                                             <tr>
-                                                                                <td><input value="{{ $mm->fila }}" disabled class="form-control" type="text"></td>
-
                                                                                 <td>
                                                                                     <input type="hidden" name="idMaterial[]" value='{{ $mm->id }}'>
                                                                                     <input value="{{ $mm->descripcion }}" disabled class="form-control"  type="text">
@@ -145,8 +142,7 @@
                                     <th style="width: 10%; text-align: center">Opciones</th>
                                 </tr>
                                 </thead>
-                                <tbody id="myTbodyMateriales">
-
+                                <tbody>
 
                                 </tbody>
 
