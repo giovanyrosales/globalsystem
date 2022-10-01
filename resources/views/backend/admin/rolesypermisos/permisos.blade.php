@@ -197,13 +197,18 @@
 
     <script>
 
+        function recargar(){
+            var ruta = "{{ url('/admin/permisos/tabla') }}";
+            $('#tablaDatatable').load(ruta);
+        }
+
         function modalAgregar(){
             document.getElementById("formulario-nuevo").reset();
             $('#modalAgregar').modal('show');
         }
 
+        // nuevo usuario de sistema
         function nuevoUsuario(){
-
             var nombre = document.getElementById('nombre-nuevo').value;
             var usuario = document.getElementById('usuario-nuevo').value;
             var password = document.getElementById('password-nuevo').value;
@@ -279,6 +284,7 @@
                 });
         }
 
+        // información de usuario
         function verInformacion(id){
             openLoading();
             document.getElementById("formulario-editar").reset();
@@ -323,6 +329,7 @@
                 });
         }
 
+        // actualizar el usuario
         function actualizar(){
             var id = document.getElementById('id-editar').value;
             var nombre = document.getElementById('nombre-editar').value;
@@ -397,10 +404,7 @@
                 });
         }
 
-        function recargar(){
-            var ruta = "{{ url('/admin/permisos/tabla') }}";
-            $('#tablaDatatable').load(ruta);
-        }
+
 
     </script>
 

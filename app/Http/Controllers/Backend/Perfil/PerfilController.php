@@ -13,12 +13,14 @@ class PerfilController extends Controller
         $this->middleware('auth');
     }
 
+    // retorna vista para editar contraseña al usuario
     public function indexEditarPerfil(){
         $usuario = auth()->user();
 
-        return view('Backend.Admin.Perfil.vistaPerfil', compact('usuario'));
+        return view('backend.admin.perfil.vistaperfil', compact('usuario'));
     }
 
+    // editar contraseña del usuario
     public function editarUsuario(Request $request){
 
         $regla = array(

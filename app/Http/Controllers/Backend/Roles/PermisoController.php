@@ -18,20 +18,24 @@ class PermisoController extends Controller
         $this->middleware('auth');
     }
 
+    //retorna vista de "Permisos" en sisdebar
     public function index(){
         $roles = Role::all()->pluck('name', 'id');
 
-        return view('Backend.Admin.RolesYPermisos.permisos', compact('roles'));
+        return view('backend.admin.rolesypermisos.permisos', compact('roles'));
     }
 
+    // muestra tabla de usuarios del sistema
     public function tablaUsuarios(){
         $usuarios = Usuario::orderBy('id', 'ASC')->get();
 
-        return view('Backend.Admin.RolesYPermisos.Tabla.tablaPermisos', compact('usuarios'));
+        return view('backend.admin.rolesypermisos.tabla.tablapermisos', compact('usuarios'));
     }
 
+    // crear nuevo usuario
     public function nuevoUsuario(Request $request){
 
+        // verificar que usuario no este registrado
         if(Usuario::where('usuario', $request->usuario)->first()){
             return ['success' => 1];
         }
@@ -51,6 +55,7 @@ class PermisoController extends Controller
         }
     }
 
+    // obtener información de un usuario
     public function infoUsuario(Request $request){
         if($info = Usuario::where('id', $request->id)->first()){
 
@@ -68,10 +73,12 @@ class PermisoController extends Controller
         }
     }
 
+    // editar un usuario
     public function editarUsuario(Request $request){
 
         if(Usuario::where('id', $request->id)->first()){
 
+            // verificar que usuario no este repetido
             if(Usuario::where('usuario', $request->usuario)
                 ->where('id', '!=', $request->id)->first()){
                 return ['success' => 1];
@@ -97,6 +104,7 @@ class PermisoController extends Controller
         }
     }
 
+    // crear un nuevo Rol
     public function nuevoRol(Request $request){
 
         $regla = array(
@@ -117,6 +125,7 @@ class PermisoController extends Controller
         return ['success' => 2];
     }
 
+    // crear nuevos permisos
     public function nuevoPermisoExtra(Request $request){
 
         // verificar si existe el permiso
@@ -129,6 +138,7 @@ class PermisoController extends Controller
         return ['success' => 2];
     }
 
+    // borrar permiso global, a todos los roles que lo contenga
     public function borrarPermisoGlobal(Request $request){
 
         // buscamos el permiso el cual queremos eliminar
@@ -138,8 +148,9 @@ class PermisoController extends Controller
     }
 
 
-    //******************************************************************************************
+    //******************  ASIGNACIÓN DE USUARIO A DEPARTAMENTO  *************************************************
 
+    // retorna vista para asignar usuario a un departamento
     public function indexUsuarioDepartamento(){
 
         $usuarios = Usuario::orderBy('nombre')->get();
@@ -148,6 +159,7 @@ class PermisoController extends Controller
         return view('backend.admin.rolesypermisos.usuariodepartamento.vistausuariodepartamento', compact('usuarios', 'departamentos'));
     }
 
+    // retorna tabla de usuarios asignados a un departamento
     public function tablaUsuarioDepartamento(){
 
         $listado = DB::table('p_usuario_departamento AS pud')
@@ -160,6 +172,7 @@ class PermisoController extends Controller
         return view('backend.admin.rolesypermisos.usuariodepartamento.tablausuariodepartamento', compact('listado'));
     }
 
+    // crear nueva asignación de usuario a departamento
     public function nuevoUsuarioDepartamento(Request $request){
 
         $regla = array(
@@ -184,6 +197,7 @@ class PermisoController extends Controller
         return ['success' => 2];
     }
 
+    // información de usuario asignado a departamento
     public function informacionUsuarioDepartamento(Request $request){
 
         $regla = array(
@@ -207,6 +221,7 @@ class PermisoController extends Controller
         }
     }
 
+    // editar asignación de usuario a departamento
     public function editarUsuarioDepartamento(Request $request){
 
         $regla = array(

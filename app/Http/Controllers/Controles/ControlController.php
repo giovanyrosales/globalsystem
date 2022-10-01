@@ -11,6 +11,7 @@ class ControlController extends Controller
         $this->middleware('auth');
     }
 
+    // verifica que usuario inicio sesión y redirecciona a su vista según ROL
     public function indexRedireccionamiento(){
 
         $user = Auth::user();
@@ -60,6 +61,7 @@ class ControlController extends Controller
         return view('backend.index', compact( 'ruta', 'user'));
     }
 
+    // redirecciona a vista sin permisos
     public function indexSinPermiso(){
         return view('errors.403');
     }

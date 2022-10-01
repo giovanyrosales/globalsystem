@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Backend\Proyecto;
+namespace App\Http\Controllers\Backend\Proyectos\Cotizacion;
 
 use App\Http\Controllers\Controller;
 use App\Models\Administradores;
@@ -229,11 +229,12 @@ class CotizacionController extends Controller
         return view('backend.admin.proyectos.cotizaciones.denegadas.tablacotizaciondenegadaing', compact('lista'));
     }
 
-    // vista listar requerimientos para que sea visible para UACI
+    // retorna vista con el proyecto, que tiene requerimientos pendientes de cotización
     public function indexListarRequerimientos(){
         return view('backend.admin.proyectos.requerimientos.vistarequerimientosing');
     }
 
+    // retorna tabla con el proyecto, que tiene requerimientos pendientes de cotización
     public function indexTablaListarRequerimientos(){
 
         $data = DB::table('requisicion AS r')
@@ -261,7 +262,7 @@ class CotizacionController extends Controller
         return view('backend.admin.proyectos.requerimientos.tablarequerimientosing', compact('lista'));
     }
 
-    // mostrar la vista de requerimientos pendiente para x proyecto
+    // retorna vista de requisiciones pendientes de proyecto para ser cotizadas
     public function listadoRequerimientoPorProyecto($id){
 
         $proveedores = Proveedores::orderBy('nombre')->get();
@@ -269,13 +270,16 @@ class CotizacionController extends Controller
         return view('backend.admin.proyectos.requerimientos.vistaindividualrequerimientoing', compact('id', 'proveedores'));
     }
 
+    // retorna tabla de requisiciones pendientes de proyecto para ser cotizadas
     public function tablaRequerimientosIndividual($id){
+        // se recibe ID de proyecto
 
         $data = DB::table('requisicion AS r')
             ->join('requisicion_detalle AS d', 'd.requisicion_id', '=', 'r.id')
             ->select('r.id')
             ->where('d.estado', 0)
             ->where('d.cancelado', 0)
+            ->where('r.id_proyecto', $id)
             ->groupBy('r.id')
             ->get();
 
@@ -294,6 +298,7 @@ class CotizacionController extends Controller
         return view('backend.admin.proyectos.requerimientos.tablaindividualrequerimientoing', compact('lista'));
     }
 
+    // retorna información de requerimiento para ser cotizada
     public function informacionRequerimiento(Request $request){
 
         $regla = array(
@@ -325,7 +330,7 @@ class CotizacionController extends Controller
         }
     }
 
-    // obtener listado de materiales de requisición, para mostrar detalle a UACI
+    // se envía los ID requi_detalle de proyectos para verificar y retornar información de lo que se cotizara
     public function verificarRequerimiento(Request $request){
 
         // La lista de ID que llega son de requisicion_detalle
@@ -376,7 +381,7 @@ class CotizacionController extends Controller
             'totalMulti' => $totalMulti];
     }
 
-
+    // guarda una nueva cotización
     public function guardarNuevaCotizacion(Request $request){
 
         DB::beginTransaction();
@@ -547,7 +552,7 @@ class CotizacionController extends Controller
             DB::commit();
             return ['success' => 5];
         }catch(\Throwable $e){
-            Log::info('ee' . $e);
+           // Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 99];
         }

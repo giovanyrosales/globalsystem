@@ -6,7 +6,7 @@ use App\Http\Controllers\Controles\ControlController;
 use App\Http\Controllers\Backend\Roles\RolesController;
 use App\Http\Controllers\Backend\Roles\PermisoController;
 use App\Http\Controllers\Backend\Perfil\PerfilController;
-use App\Http\Controllers\Backend\Proyecto\ProyectoController;
+use App\Http\Controllers\Backend\Proyectos\Proyecto\ProyectoController;
 use App\Http\Controllers\Backend\Configuraciones\CodigoEspecifController;
 use App\Http\Controllers\Backend\Configuraciones\UnidadMedidaController;
 use App\Http\Controllers\Backend\Configuraciones\ClasificacionesController;
@@ -20,13 +20,14 @@ use App\Http\Controllers\Backend\Configuraciones\AdescosController;
 use App\Http\Controllers\Backend\Configuraciones\EquiposController;
 use App\Http\Controllers\Backend\Configuraciones\AsociacionesController;
 use App\Http\Controllers\Backend\Configuraciones\AdministradoresController;
-use App\Http\Controllers\Backend\Proyecto\CotizacionController;
+use App\Http\Controllers\Backend\Proyectos\Cotizacion\CotizacionController;
 use App\Http\Controllers\Backend\Orden\OrdenController;
-use App\Http\Controllers\Backend\Inicio\InicioController;
 use App\Http\Controllers\Backend\Bolson\BolsonController;
 use App\Http\Controllers\Backend\Cuenta\CuentaProyectoController;
 use App\Http\Controllers\Backend\Recursos\RecursosController;
 use App\Http\Controllers\Backend\Pdf\ControlPdfController;
+
+use App\Http\Controllers\Backend\Configuracion\Estadisticas\EstadisticasController;
 
 use App\Http\Controllers\Backend\PresupuestoUnidad\Anio\AnioPresupuestoUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Departamento\DepartamentoPresupuestoUnidadController;
@@ -36,15 +37,18 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ConfiguracionPres
 
 
 // --- LOGIN ---
+
 Route::get('/', [LoginController::class,'index'])->name('login');
 
 Route::post('admin/login', [LoginController::class, 'login']);
 Route::post('admin/logout', [LoginController::class, 'logout'])->name('admin.logout');
 
 // --- CONTROL WEB ---
+
 Route::get('/panel', [ControlController::class,'indexRedireccionamiento'])->name('admin.panel');
 
 // --- ROLES ---
+
 Route::get('/admin/roles/index', [RolesController::class,'index'])->name('admin.roles.index');
 Route::get('/admin/roles/tabla', [RolesController::class,'tablaRoles']);
 Route::get('/admin/roles/lista/permisos/{id}', [RolesController::class,'vistaPermisos']);
@@ -55,7 +59,8 @@ Route::get('/admin/roles/permisos/lista', [RolesController::class,'listaTodosPer
 Route::get('/admin/roles/permisos-todos/tabla', [RolesController::class,'tablaTodosPermisos']);
 Route::post('/admin/roles/borrar-global', [RolesController::class, 'borrarRolGlobal']);
 
-// --- PERMISOS ---
+// --- PERMISOS A USUARIOS ---
+
 Route::get('/admin/permisos/index', [PermisoController::class,'index'])->name('admin.permisos.index');
 Route::get('/admin/permisos/tabla', [PermisoController::class,'tablaUsuarios']);
 Route::post('/admin/permisos/nuevo-usuario', [PermisoController::class, 'nuevoUsuario']);
@@ -65,7 +70,7 @@ Route::post('/admin/permisos/nuevo-rol', [PermisoController::class, 'nuevoRol'])
 Route::post('/admin/permisos/extra-nuevo', [PermisoController::class, 'nuevoPermisoExtra']);
 Route::post('/admin/permisos/extra-borrar', [PermisoController::class, 'borrarPermisoGlobal']);
 
-// --- USUARIO DEPARTAMENTO ---
+// --- ASIGNAR USUARIO A DEPARTAMENTO ---
 
 Route::get('/admin/usuario/departamento/index', [PermisoController::class,'indexUsuarioDepartamento'])->name('admin.usuario.departamento.index');
 Route::get('/admin/usuario/departamento/tabla', [PermisoController::class,'tablaUsuarioDepartamento']);
@@ -73,86 +78,117 @@ Route::post('/admin/p/usuario/departamento/nuevo', [PermisoController::class, 'n
 Route::post('/admin/p/usuario/departamento/informacion', [PermisoController::class, 'informacionUsuarioDepartamento']);
 Route::post('/admin/p/usuario/departamento/editar', [PermisoController::class, 'editarUsuarioDepartamento']);
 
-
-
-
-
-// --- PERFIL ---
+// --- PERFIL DE USUARIO ---
 Route::get('/admin/editar-perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('admin.perfil');
 Route::post('/admin/editar-perfil/actualizar', [PerfilController::class, 'editarUsuario']);
 
 // --- SIN PERMISOS VISTA 403 ---
 Route::get('sin-permisos', [ControlController::class,'indexSinPermiso'])->name('no.permisos.index');
 
-// ********** ESTADÍSTICAS **********
+// ********** ESTADÍSTICAS DEL SISTEMA **********
 
 // --- ESTADÍSTICAS ---
-Route::get('/admin/inicio/index', [InicioController::class,'index'])->name('admin.estadisticas.index');
+Route::get('/admin/inicio/index', [EstadisticasController::class,'indexEstadisticas'])->name('admin.estadisticas.index');
 
 
-// ********** PROYECTOS **********
+
+
+// **************************** PROYECTOS ********************************************
 
 // --- NUEVO PROYECTO ---
-Route::get('/admin/proyecto/nuevo/index', [ProyectoController::class,'index'])->name('admin.nuevo.proyecto.index');
+
+// retorna vista para registrar nuevo proyecto
+Route::get('/admin/proyecto/nuevo/index', [ProyectoController::class,'indexNuevoProyecto'])->name('admin.nuevo.proyecto.index');
+// guarda un nuevo proyecto
 Route::post('/admin/proyecto/nuevo', [ProyectoController::class, 'nuevoProyecto']);
 
 
 // --- LISTA DE PROYECTOS ---
+
+// retorna vista de todos los proyectos
 Route::get('/admin/proyecto/lista/index', [ProyectoController::class,'indexProyectoLista'])->name('admin.lista.proyectos.index');
+// retorna tabla de todos los proyectos
 Route::get('/admin/proyecto/lista/tabla/index', [ProyectoController::class,'tablaProyectoLista']);
+// información de un proyecto
 Route::post('/admin/proyecto/lista/informacion', [ProyectoController::class, 'informacionProyecto']);
+// edita la información de un proyecto
 Route::post('/admin/proyecto/lista/editar', [ProyectoController::class, 'editarProyecto']);
+// retorna vista para MODAL, aquí se visualiza el presupuesto. aquí se visualiza botón para aprobar el presupuesto
 Route::get('/admin/ver/presupuesto/uaci/{id}', [ProyectoController::class,'informacionPresupuestoParaAprobacion']);
+// petición para aprobar el presupuesto y guardar las cuentas proyecto
 Route::post('/admin/proyecto/aprobar/presupuesto', [ProyectoController::class, 'aprobarPresupuesto']);
-
-// ver saldo para presupuesto de proyecto
+// mostrará vista para MODAL, donde esta el saldo inicial, el restante y el retenido.
 Route::get('/admin/ver/presupuesto/saldo/{id}', [ProyectoController::class,'infoTablaSaldoProyecto']);
-
-// cambiar estado de presupuesto ingenieria para que lo apruebe uaci
+// petición para cambiar estado de presupuesto, asi para que el encargado de Presupuesto lo apruebe
 Route::post('/admin/proyecto/estado/presupuesto', [ProyectoController::class, 'cambiarEstadoPresupuesto']);
 
 
-
-
 // --- VISTA DE PROYECTO ---
-Route::get('/admin/proyecto/vista/index/{id}', [ProyectoController::class,'indexProyectoVista']);
-Route::get('/admin/proyecto/vista/bitacora/{id}', [ProyectoController::class,'tablaProyectoListaBitacora']);
-Route::post('/admin/proyecto/vista/bitacora/registrar', [ProyectoController::class, 'registrarBitacora']);
-Route::post('/admin/proyecto/vista/bitacora/borrar', [ProyectoController::class, 'borrarBitacora']);
-Route::post('/admin/proyecto/vista/bitacora/informacion', [ProyectoController::class, 'informacionBitacora']);
-Route::post('/admin/proyecto/vista/bitacora/editar', [ProyectoController::class, 'editarBitacora']);
-Route::get('/admin/proyecto/vista/bitacora-detalle/{id}', [ProyectoController::class,'vistaBitacoraDetalle']);
-Route::get('/admin/proyecto/vista/tabla/bitacora-detalle/{id}', [ProyectoController::class,'tablaBitacoraDetalle']);
-Route::get('/admin/proyecto/vista/bitacora-detalle-doc/{file}' , [ProyectoController::class, 'descargarBitacoraDoc']);
-Route::post('/admin/proyecto/vista/bitacora-detalle/borrar' , [ProyectoController::class, 'borrarBitacoraDetalle']);
-Route::post('/admin/proyecto/vista/bitacora-detalle/nuevo' , [ProyectoController::class, 'nuevoBitacoraDetalle']);
 
+// retorna vista de todos los proyectos
 Route::get('/admin/proyecto/lista/index', [ProyectoController::class,'indexProyectoLista'])->name('admin.lista.proyectos.index');
+// retorna tabla con todos los proyectos creados
 Route::get('/admin/proyecto/lista/tabla/index', [ProyectoController::class,'tablaProyectoLista']);
 
+// retorna vista con información del proyecto individual por ID
+Route::get('/admin/proyecto/vista/index/{id}', [ProyectoController::class,'indexProyectoVista']);
+
+// * Bitacoras
+
+// retorna vista de tabla de las bitácoras de un proyecto por ID
+Route::get('/admin/proyecto/vista/bitacora/{id}', [ProyectoController::class,'tablaProyectoListaBitacora']);
+// registra una nueva bitácora para proyecto ID
+Route::post('/admin/proyecto/vista/bitacora/registrar', [ProyectoController::class, 'registrarBitacora']);
+// borrar una bitácora de proyecto ID
+Route::post('/admin/proyecto/vista/bitacora/borrar', [ProyectoController::class, 'borrarBitacora']);
+// información de una bitácora proyecto por ID
+Route::post('/admin/proyecto/vista/bitacora/informacion', [ProyectoController::class, 'informacionBitacora']);
+// editar bitácora de un proyecto ID
+Route::post('/admin/proyecto/vista/bitacora/editar', [ProyectoController::class, 'editarBitacora']);
+// pasa a otra vista donde esta el detalle de la bitácora de un proyecto por ID bitácora
+Route::get('/admin/proyecto/vista/bitacora-detalle/{id}', [ProyectoController::class,'vistaBitacoraDetalle']);
+// retorna tabla detalle de bitácora de un proyecto por ID bitácora
+Route::get('/admin/proyecto/vista/tabla/bitacora-detalle/{id}', [ProyectoController::class,'tablaBitacoraDetalle']);
+// descargar un documento de la bitácora por ID
+Route::get('/admin/proyecto/vista/bitacora-detalle-doc/{file}' , [ProyectoController::class, 'descargarBitacoraDoc']);
+// borrar documento bitácora por ID
+Route::post('/admin/proyecto/vista/bitacora-detalle/borrar' , [ProyectoController::class, 'borrarBitacoraDetalle']);
+// registrar nuevo detalle a una bitácora por ID
+Route::post('/admin/proyecto/vista/bitacora-detalle/nuevo' , [ProyectoController::class, 'nuevoBitacoraDetalle']);
 
 
-// --- VISTA REQUISICION ---
+// * REQUISICIÓN PARA PROYECTOS
+
+// retorna tabla con todas las requisiciones de un Proyecto ID
 Route::get('/admin/proyecto/vista/requisicion/{id}', [ProyectoController::class,'tablaProyectoListaRequisicion']);
+// crea una nueva requisición
 Route::post('/admin/proyecto/vista/requisicion/nuevo', [ProyectoController::class, 'nuevoRequisicion']);
+// información de una requisición de proyecto
 Route::post('/admin/proyecto/vista/requisicion/informacion', [ProyectoController::class, 'informacionRequisicion']);
+// editar una requisición de proyecto
 Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::class, 'editarRequisicion']);
+// borrar toda una requisición
 Route::post('/admin/proyecto/requisicion/borrar/todo', [ProyectoController::class, 'borrarRequisicion']);
-
-// cancelar un material de requisicion.
+// petición para cancelar un material de requisición
 Route::post('/admin/proyecto/requisicion/material/cancelar', [ProyectoController::class, 'cancelarMaterialRequisicion']);
 
 
+// * LISTADO DE REQUERIMIENTOS PENDIENTES PARA SER COTIZADOS POR UACI
 
-// --- REQUERIMIENTOS PRESUPUESTO INGENIERIA para unidad de uaci ---
+// retorna vista con el proyecto, que tiene requerimientos pendientes de cotización
 Route::get('/admin/listar/requerimientos/index', [CotizacionController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientos.index');
+// retorna tabla con el proyecto, que tiene requerimientos pendientes de cotización
 Route::get('/admin/listar/requerimientos/tabla', [CotizacionController::class,'indexTablaListarRequerimientos']);
+// retorna vista de requisiciones pendientes de proyecto para ser cotizadas
 Route::get('/admin/requerimientos/listado/{id}', [CotizacionController::class,'listadoRequerimientoPorProyecto']);
+// retorna tabla de requisiciones pendientes de proyecto para ser cotizadas
 Route::get('/admin/requerimientos/listado/tabla/{id}', [CotizacionController::class,'tablaRequerimientosIndividual']);
+// retorna información de requerimiento para ser cotizada
 Route::post('/admin/requerimientos/informacion', [CotizacionController::class, 'informacionRequerimiento']);
+// se envía los ID requi_detalle de proyectos para verificar y retornar información de lo que se cotizara
 Route::post('/admin/requerimientos/verificar', [CotizacionController::class, 'verificarRequerimiento']);
+// guarda una nueva cotización
 Route::post('/admin/requerimientos/cotizacion/guardar', [CotizacionController::class, 'guardarNuevaCotizacion']);
-
 
 
 

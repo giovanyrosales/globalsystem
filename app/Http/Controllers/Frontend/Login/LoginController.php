@@ -15,10 +15,12 @@ class LoginController extends Controller
         $this->middleware('guest', ['except' => ['logout']]);
     }
 
+    // retorna vista de login
     public function index(){
-        return view('Frontend.Login.vistaLogin');
+        return view('frontend.login.vistalogin');
     }
 
+    // verificar usuario y contraseña para iniciar sesión
     public function login(Request $request){
 
         $rules = array(
@@ -32,7 +34,7 @@ class LoginController extends Controller
             return ['success' => 0];
         }
 
-        // si ya habia iniciado sesion, redireccionar
+        // si ya habia iniciado sesión, redireccionar
         if (Auth::check()) {
             return ['success'=> 1, 'ruta'=> route('admin.panel')];
         }
@@ -54,7 +56,8 @@ class LoginController extends Controller
         }
     }
 
-    public function logout(Request $request){
+    // cerrar sesión
+    public function logout(){
         Auth::logout();
         return redirect('/');
     }

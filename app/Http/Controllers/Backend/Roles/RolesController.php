@@ -13,20 +13,21 @@ class RolesController extends Controller
         $this->middleware('auth');
     }
 
+    // retorna vista roles
     public function index(){
-        return view('Backend.Admin.RolesYPermisos.roles');
+        return view('backend.admin.rolesypermisos.roles');
     }
 
+    // retorna datos de tabla para roles
     public function tablaRoles(){
         $roles = Role::all()->pluck('name', 'id');
-        return view('Backend.Admin.RolesYPermisos.Tabla.tablaRoles', compact('roles'));
+        return view('backend.admin.rolesypermisos.tabla.tablaroles', compact('roles'));
     }
 
+    // obtener todos los permisos que existen
     public function vistaPermisos($id){
-        // obtener todos los permisos que existen
         $permisos = Permission::all()->sortBy('name')->pluck('name', 'id');
-
-        return view('Backend.Admin.RolesYPermisos.RolesPermisos', compact('id', 'permisos'));
+        return view('backend.admin.rolesypermisos.rolespermisos', compact('id', 'permisos'));
     }
 
     public function tablaRolesPermisos($id){
@@ -38,7 +39,7 @@ class RolesController extends Controller
         // lista de todos los permisos que existen
         //$permisos = Permission::pluck('name', 'id');
 
-        return view('Backend.Admin.RolesYPermisos.Tabla.tablaRolesPermisos', compact('permisos'));
+        return view('backend.admin.rolesypermisos.tabla.tablarolespermisos', compact('permisos'));
     }
 
     public function borrarPermiso(Request $request){
@@ -70,13 +71,13 @@ class RolesController extends Controller
     }
 
     public function listaTodosPermisos(){
-        return view('Backend.Admin.RolesYPermisos.listaPermisos');
+        return view('backend.admin.rolesypermisos.listapermisos');
     }
 
     public function tablaTodosPermisos(){
 
         $permisos = Permission::all();
-        return view('Backend.Admin.RolesYPermisos.Tabla.tablaListaPermisos', compact('permisos'));
+        return view('backend.admin.rolesypermisos.tabla.tablalistapermisos', compact('permisos'));
     }
 
     public function borrarRolGlobal(Request $request){
