@@ -18,6 +18,7 @@ class MaterialesPresupuestoUnidadController extends Controller
 
     // ************** CREAR CATÁLOGO DE MATERIALES PARA PRESUPUESTO DE UNIDAD **************
 
+    // retorna vista catálogo de materiales para presupuesto de unidades
     public function indexMaterialesPresupuesto(){
         $lUnidad = P_UnidadMedida::orderBy('nombre', 'ASC')->get();
         $lObjEspeci = ObjEspecifico::orderBy('nombre', 'ASC')->get();
@@ -25,6 +26,7 @@ class MaterialesPresupuestoUnidadController extends Controller
         return view('backend.admin.presupuestounidad.configuracion.materiales.vistamaterialespresupuesto', compact('lUnidad', 'lObjEspeci'));
     }
 
+    // retorna tabla catálogo de materiales para presupuesto de unidades
     public function tablaMaterialesPresupuesto(){
         $lista = P_Materiales::orderBy('descripcion', 'ASC')->get();
 
@@ -50,6 +52,7 @@ class MaterialesPresupuestoUnidadController extends Controller
         return view('backend.admin.presupuestounidad.configuracion.materiales.tablamaterialespresupuesto', compact('lista'));
     }
 
+    // registrar un nuevo material
     public function nuevoMaterialesPresupuesto(Request $request){
 
         $regla = array(
@@ -82,6 +85,7 @@ class MaterialesPresupuestoUnidadController extends Controller
         }
     }
 
+    // obtener información de material
     public function informacionMaterialesPresupuesto(Request $request){
         $regla = array(
             'id' => 'required',
@@ -116,6 +120,7 @@ class MaterialesPresupuestoUnidadController extends Controller
         }
     }
 
+    // editar un material
     public function editarMaterialesPresupuesto(Request $request){
 
         $regla = array(

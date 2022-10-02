@@ -32,7 +32,7 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.permisos.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Permisos</p>
+                                <p>Usuario Permisos</p>
                             </a>
                         </li>
 
@@ -423,74 +423,122 @@
                 @endcan
 
 
+                <li class="nav-item">
 
+                    <a href="#" class="nav-link nav-">
+                        <i class="far fa-edit"></i>
+                        <p>
+                            modificando
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.bolson.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Bolsón</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+
+
+
+
+                @can('sidebar.seccion.configuraciones.presupuesto.unidades')
 
                     <li class="nav-item">
 
                         <a href="#" class="nav-link nav-">
                             <i class="far fa-edit"></i>
                             <p>
-                                Modificando
+                                Configuración Pres. Unidades
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
 
                         <ul class="nav nav-treeview">
+
+                            @can('p.anio.presupuesto.unidades')
                             <li class="nav-item">
                                 <a href="{{ route('p.admin.anio.presupuesto.index') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Año Presupuesto</p>
                                 </a>
                             </li>
+                            @endcan
 
+                            @can('p.departamento.presupuesto.unidades')
                             <li class="nav-item">
                                 <a href="{{ route('p.admin.departamentos.presupuesto.index') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Departamentos</p>
                                 </a>
                             </li>
+                            @endcan
 
+                            @can('p.unidadmedida.presupuesto.unidades')
                             <li class="nav-item">
                                 <a href="{{ route('p.admin.unidadmedida.presupuesto.index') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Unidad Medida</p>
                                 </a>
                             </li>
+                            @endcan
 
+                            @can('p.materiales.presupuesto.unidades')
                             <li class="nav-item">
                                 <a href="{{ route('p.admin.materiales.presupuesto.index') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Materiales</p>
                                 </a>
                             </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.bolson.index') }}" target="frameprincipal" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Bolsón</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('p.revision.presupuesto.unidad') }}" target="frameprincipal" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Revisión</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="{{ route('p.generar.reportes.presupuesto.unidad') }}" target="frameprincipal" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Generar</p>
-                                </a>
-                            </li>
-
+                            @endcan
 
                         </ul>
                     </li>
+                @endcan
 
+                    @can('sidebar.revision.presupuesto.unidades')
+                    <li class="nav-item">
 
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Revisión Pres. Unidades
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
 
+                        <ul class="nav nav-treeview">
+
+                            @can('p.revision.presupuesto.unidades')
+                                <li class="nav-item">
+                                    <a href="{{ route('p.revision.presupuesto.unidad') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Revisión</p>
+                                    </a>
+                                </li>
+                            @endcan
+
+                            @can('p.generar.reportes.presupuesto.unidades')
+                                <li class="nav-item">
+                                    <a href="{{ route('p.generar.reportes.presupuesto.unidad') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Reportes</p>
+                                    </a>
+                                </li>
+                            @endcan
+
+                        </ul>
+                    </li>
+                    @endcan
+
+                @can('sidebar.p.presupuesto.crear')
                     <li class="nav-item">
 
                         <a href="#" class="nav-link">
@@ -502,16 +550,28 @@
                         </a>
 
                         <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('p.admin.crear.presupuesto.index') }}" target="frameprincipal" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Crear</p>
-                                </a>
-                            </li>
+
+                                @can('p.crear.presupuesto.unidad')
+                                <li class="nav-item">
+                                    <a href="{{ route('p.admin.crear.presupuesto.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Crear</p>
+                                    </a>
+                                </li>
+                                @endcan
+
+                                @can('p.editar.presupuesto.unidad')
+                                    <li class="nav-item">
+                                        <a href="{{ route('p.admin.editar.presupuesto.index') }}" target="frameprincipal" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Editar</p>
+                                        </a>
+                                    </li>
+                                @endcan
 
                         </ul>
                     </li>
-
+                @endcan
 
 
             </ul>

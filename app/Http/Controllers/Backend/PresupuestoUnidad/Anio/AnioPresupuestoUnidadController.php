@@ -15,15 +15,18 @@ class AnioPresupuestoUnidadController extends Controller
 
     // ************** CREAR AÑOS PARA PRESUPUESTO DE UNIDAD **************
 
+    // retorna vista de años para presupuesto
     public function indexAnioPresupuesto(){
         return view('backend.admin.presupuestounidad.configuracion.aniopresupuesto.vistaaniopresupuesto');
     }
 
+    // retorna tabla de años para presupuesto
     public function tablaAnioPresupuesto(){
         $lista = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
         return view('backend.admin.presupuestounidad.configuracion.aniopresupuesto.tablaaniopresupuesto', compact('lista'));
     }
 
+    // registra nuevo año
     public function nuevoAnioPresupuesto(Request $request){
         $regla = array(
             'nombre' => 'required'
@@ -46,9 +49,9 @@ class AnioPresupuestoUnidadController extends Controller
         }else{
             return ['success' => 99];
         }
-
     }
 
+    // obtener información de año
     public function informacionAnioPresupuesto(Request $request){
         $regla = array(
             'id' => 'required',
@@ -64,9 +67,9 @@ class AnioPresupuestoUnidadController extends Controller
         }else{
             return ['success' => 2];
         }
-
     }
 
+    // editar un año de presupuesto
     public function editarAnioPresupuesto(Request $request){
         $regla = array(
             'id' => 'required',

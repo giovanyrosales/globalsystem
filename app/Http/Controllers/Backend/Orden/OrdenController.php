@@ -46,6 +46,7 @@ class OrdenController extends Controller
         $this->middleware('auth');
     }
 
+    // crear una nueva orden
     public function generarOrden(Request $request){
 
         $regla = array(
@@ -116,7 +117,7 @@ class OrdenController extends Controller
         }
     }
 
-    // pdf orden de compra
+    // generar PDF de orden de compra y variable {cantidad} es # de material por hoja
     public function vistaPdfOrden($id, $cantidad){ // id de la orden
 
         $orden = Orden::where('id', $id)->first();
@@ -192,11 +193,13 @@ class OrdenController extends Controller
         return $pdf->stream('Orden_Compra.pdf');
     }
 
+    // retorna vista con las ordenes de compras
     public function indexOrdenesCompras(){
 
         return view('backend.admin.proyectos.ordenes.vistaordenescompra');
     }
 
+    // retorna tabla con las ordenes de compras
     public function tablaOrdenesCompras(){
 
         $lista = orden::orderBy('fecha_orden')->get();
@@ -222,6 +225,7 @@ class OrdenController extends Controller
         return view('backend.admin.proyectos.ordenes.tablaordenescompra', compact('lista'));
     }
 
+    // anular una orden de compra
     public function anularCompra(Request $request){
 
         DB::beginTransaction();
@@ -301,6 +305,7 @@ class OrdenController extends Controller
         }
     }
 
+    // generar acta de una orden de compra
     function generarActa(Request $request){
 
         $regla = array(
@@ -330,6 +335,7 @@ class OrdenController extends Controller
         }
     }
 
+    // generar PDF de la acta de compra
     public function reporteActaGenerada($id){
 
         $acta = Acta::where('id',  $id)->first();

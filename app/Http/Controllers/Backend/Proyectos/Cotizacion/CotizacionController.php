@@ -31,10 +31,12 @@ class CotizacionController extends Controller
         $this->middleware('auth');
     }
 
+    // retorna vista con las cotizaciones pendientes
     public function indexPendiente(){
         return view('backend.admin.proyectos.cotizaciones.pendiente.vistacotizacionpendienteing');
     }
 
+    // retorna tabla con las cotizaciones pendientes
     public function indexPendienteTabla(){
 
         $lista = Cotizacion::where('estado', 0)->orderBy('id', 'ASC')->get();
@@ -56,6 +58,7 @@ class CotizacionController extends Controller
         return view('backend.admin.proyectos.cotizaciones.pendiente.tablacotizacionpendienteing', compact('lista'));
     }
 
+    // retorna vista de los detalle de la cotización, un uso es cuando uaci espera que sea aprobada la coti
     public function indexCotizacion($id){ // id de cotizacion
 
         // destino, necesidad, proveedor, fecha cotizacion
@@ -107,11 +110,10 @@ class CotizacionController extends Controller
             'proveedor', 'infoCotiDetalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal', 'cotizacion'));
     }
 
+    // autorizar la cotización
     public function autorizarCotizacion(Request $request){
 
-
         DB::beginTransaction();
-
         try {
 
             if(Cotizacion::where('id', $request->id)
@@ -130,6 +132,7 @@ class CotizacionController extends Controller
         }
     }
 
+    // denegar la cotización
     public function denegarCotizacion(Request $request){
 
         DB::beginTransaction();
@@ -165,12 +168,14 @@ class CotizacionController extends Controller
 
     }
 
+    // retorna vista de cotizaciones autorizadas
     public function indexAutorizadas(){
         $contrato = Administradores::orderBy('nombre')->get();
 
         return view('backend.admin.proyectos.cotizaciones.procesada.vistacotizacionprocesadaing', compact('contrato'));
     }
 
+    // retorna tabla de cotizaciones autorizadas
     public function indexAutorizadasTabla(){
 
         // autorizadas
@@ -202,11 +207,13 @@ class CotizacionController extends Controller
         return view('backend.admin.proyectos.cotizaciones.procesada.tablacotizacionprocesadaing', compact('lista'));
     }
 
+    // retorna vista de cotizaciones denegadas
     public function indexDenegadas(){
 
         return view('backend.admin.proyectos.cotizaciones.denegadas.vistacotizaciondenegadaing');
     }
 
+    // retorna tabla de cotizaciones denegadas
     public function indexDenegadasTabla(){
 
         // denegadas
@@ -563,6 +570,7 @@ class CotizacionController extends Controller
         return $float_redondeado;
     }
 
+    // vista de cotización detalle para procesadas o denegadas
     public function vistaDetalleCotizacion($id){
         // id de cotizacion
 

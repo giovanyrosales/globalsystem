@@ -5,7 +5,6 @@
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
-    <link href="{{ asset('css/main.css') }}" type="text/css" rel="stylesheet" />
 @stop
 
 
@@ -80,7 +79,7 @@
             var anio = document.getElementById('select-anio').value;
             var departamento = document.getElementById('select-departamento').value;
 
-            window.location.href="{{ url('/admin/departamento/presup/aniounidad') }}/"+departamento+"/"+anio;
+            window.location.href="{{ url('/admin/p/departamento/presupuesto/unidad/') }}/"+departamento+"/"+anio;
         }
 
     </script>

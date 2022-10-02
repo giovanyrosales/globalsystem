@@ -41,7 +41,8 @@ class RolesSeeder extends Seeder
         // Uaci Unidad
         $roleUaciUnidad = Role::create(['name' => 'uaciunidad']);
 
-        // Unidad
+        // PARA PRESUPUESTO DE UNIDADES
+        // este crea y edita el presupuesto de una unidad
         $roleUnidad = Role::create(['name' => 'unidad']);
 
         // Recursos Humanos
@@ -133,6 +134,9 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'sidebar.equipos', 'description' => 'sidebar seccion equipos'])->syncRoles($roleUaciUnidad);
             Permission::create(['name' => 'sidebar.asociaciones', 'description' => 'sidebar seccion asociaciones'])->syncRoles($roleUaciUnidad);
 
+
+
+
         // REQUERIMIENTOS PROYECTO
         Permission::create(['name' => 'sidebar.seccion.requerimientos', 'description' => 'sidebar seccion requerimientos'])->syncRoles($roleUaci);
         Permission::create(['name' => 'sidebar.requerimientos.listar', 'description' => 'sidebar seccion requerimientos - listar requerimientos'])->syncRoles($roleUaci);
@@ -145,6 +149,41 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'boton.aprobar.presupuesto', 'description' => 'boton para aprobar presupuesto, mostrado en modal'])->syncRoles($rolePresupuesto);
         Permission::create(['name' => 'boton.dinero.presupuesto', 'description' => 'boton para mostrar MODAL cuanto dinero le queda a un proyecto del presupuesto'])->syncRoles($roleAdministrador, $roleUaci, $rolePresupuesto);
         Permission::create(['name' => 'boton.movimiento.cuenta.proyecto', 'description' => 'botón para redirigir a movimiento cuenta proyecto'])->syncRoles($roleAdministrador, $roleUaci, $rolePresupuesto);
+
+
+
+
+
+        // ************** PERMISOS PARA PRESUPUESTO DE UNIDADES ***************
+
+        // CONFIGURACIÓN PARA PRESUPUESTO DE UNIDADES
+        Permission::create(['name' => 'sidebar.seccion.configuraciones.presupuesto.unidades', 'description' => 'sidebar sección configuración para presupuesto de unidades'])->syncRoles($rolePresupuesto);
+
+        Permission::create(['name' => 'p.anio.presupuesto.unidades', 'description' => 'crear años para presupuesto de unidades'])->syncRoles($rolePresupuesto);
+        Permission::create(['name' => 'p.departamento.presupuesto.unidades', 'description' => 'crear departamentos para presupuesto de unidades'])->syncRoles($rolePresupuesto);
+        Permission::create(['name' => 'p.unidadmedida.presupuesto.unidades', 'description' => 'crear unidad de medida para presupuesto de unidades'])->syncRoles($rolePresupuesto);
+        Permission::create(['name' => 'p.materiales.presupuesto.unidades', 'description' => 'crear materiales para presupuesto de unidades'])->syncRoles($rolePresupuesto);
+
+        // REPORTES PARA PRESUPUESTO DE UNIDADES
+
+        Permission::create(['name' => 'sidebar.revision.presupuesto.unidades', 'description' => 'sidebar sección revisión para presupuesto de unidades'])->syncRoles($rolePresupuesto);
+
+        Permission::create(['name' => 'p.revision.presupuesto.unidades', 'description' => 'revision de presupuesto de cada unidad'])->syncRoles($rolePresupuesto);
+        Permission::create(['name' => 'p.generar.reportes.presupuesto.unidades', 'description' => 'vista para generar reportes general'])->syncRoles($rolePresupuesto);
+
+        // CREAR PRESUPUESTO DE UNA UNIDAD
+        Permission::create(['name' => 'sidebar.p.presupuesto.crear', 'description' => 'sidebar para crear presupuesto de unidades'])->syncRoles($roleUnidad);
+        Permission::create(['name' => 'p.crear.presupuesto.unidad', 'description' => 'para crear presupuesto de unidades'])->syncRoles($roleUnidad);
+        Permission::create(['name' => 'p.editar.presupuesto.unidad', 'description' => 'para editar presupuesto de unidades'])->syncRoles($roleUnidad);
+
+
+
+
+
+
+
+
+
 
 
     }

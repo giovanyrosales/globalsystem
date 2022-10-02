@@ -7,7 +7,7 @@
         <div class="card-header d-flex p-0">
             <h3 class="card-title p-3"></h3>
 
-            <button type="button" onclick="modalBuscarMaterial()" class="btn btn-default btn-sm" style="margin-bottom: 5px; margin-top: 5px">
+            <button type="button" onclick="modalBuscarMaterial()" class="btn btn-default btn-sm" style="margin-bottom: 5px; margin-top: 5px; background: #E5E7E9">
                 <i class="fas fa-search"></i>
                 Buscar Material
             </button>
@@ -121,9 +121,6 @@
                     </div>
                 </div>
 
-
-
-
                 <!-- LISTA DE NUEVOS MATERIALES - TABS 2 -->
                 <div class="tab-pane" id="tab_2">
 
@@ -149,7 +146,7 @@
                             </table>
 
                             <br>
-                            <button type="button" class="btn btn-block btn-success" onclick="modalNuevaSolicitud()">Agregar Solicutud de Material</button>
+                            <button type="button" class="btn btn-block btn-success" onclick="modalNuevaSolicitud()">Agregar Solicitud de Material</button>
                             <br>
 
                         </div>
@@ -164,7 +161,7 @@
 
     <div class="card-footer">
         <div class="btn-group-vertical" id="bloque-codigo" style="width: 175px !important;">
-            <label style="margin-left: 5px">Código según Color </label>
+            <label style="margin-left: 5px">Tipo según Color </label>
             <button type="button" class="btn btn-info" style="background: #c5c6c8; color: black !important; font-weight: bold">RUBRO</button>
             <button type="button" class="btn btn-info" style="background: #b0c2f2; color: black !important; font-weight: bold">CUENTA</button>
             <button type="button" class="btn btn-info" style="background: #b0f2c2; color: black !important; font-weight: bold">OBJETO ESPECÍFICO</button>

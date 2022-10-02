@@ -14,7 +14,8 @@ class AreaGestionController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
+    // retorna vista con las áreas de gestión
+    public function indexAreaGestion(){
 
         $linea = LineaTrabajo::orderBy('codigo', 'ASC')->get();
 
@@ -24,10 +25,11 @@ class AreaGestionController extends Controller
             }
         }
 
-        return view('Backend.Admin.Configuraciones.AreaGestion.vistaAreaGestion', compact('linea'));
+        return view('backend.admin.proyectos.configuraciones.areagestion.vistaareagestion', compact('linea'));
     }
 
-    public function tabla(){
+    // retorna tabla con las áreas de gestión
+    public function tablaAreaGestion(){
         $lista = AreaGestion::orderBy('codigo', 'ASC')->get();
 
         foreach ($lista as $ll){
@@ -38,9 +40,10 @@ class AreaGestionController extends Controller
             $ll->linea = $linea;
         }
 
-        return view('Backend.Admin.Configuraciones.AreaGestion.tablaAreaGestion', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.areagestion.tablaareagestion', compact('lista'));
     }
 
+    // registrar nueva área de gestión
     public function nuevaAreaGestion(Request $request){
 
         $regla = array(
@@ -64,8 +67,8 @@ class AreaGestionController extends Controller
         }
     }
 
-    // informacion
-    public function informacionArea(Request $request){
+    // obtener información de un área de gestión
+    public function informacionAreaGestion(Request $request){
         $regla = array(
             'id' => 'required',
         );
@@ -90,8 +93,8 @@ class AreaGestionController extends Controller
         }
     }
 
-    // editar
-    public function editarArea(Request $request){
+    // editar área de gestión
+    public function editarAreaGestion(Request $request){
 
         $regla = array(
             'id' => 'required',

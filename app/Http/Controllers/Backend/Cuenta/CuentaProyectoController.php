@@ -23,119 +23,19 @@ class CuentaProyectoController extends Controller
         $this->middleware('auth');
     }
 
-    public function indexCuenta($id){
-        $infoProyecto = Proyecto::where('id', $id)->first();
-        $nombre = $infoProyecto->codigo . " - " . $infoProyecto->nombre;
-
-        return view('Backend.Admin.CuentaProyecto.vistaCuentaProyecto', compact('id', 'nombre'));
-    }
-
-    public function tablaCuenta($id){
-
-        $cuenta = CuentaProy::where('proyecto_id', $id)->orderBy('id', 'DESC')->get();
-
-        foreach ($cuenta as $dd){
-
-            $infoCuenta = Cuenta::where('id', $dd->cuenta_id)->first();
-            $dd->cuenta = $infoCuenta->nombre . " - " . $infoCuenta->codigo;
-
-            $dd->montoini = number_format((float)$dd->montoini, 2, '.', ',');
-            $dd->saldo = number_format((float)$dd->saldo, 2, '.', ',');
-        }
-
-        return view('Backend.Admin.CuentaProyecto.tablaCuentaProyecto', compact('cuenta'));
-    }
-
-    public function nuevaCuentaProy(Request $request){
-
-        $rules = array(
-            'proyecto' => 'required',
-            'cuenta' => 'required',
-        );
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ( $validator->fails()){
-            return ['success' => 0];
-        }
-
-        $or = new CuentaProy();
-        $or->proyecto_id = $request->proyecto;
-        $or->cuenta_id = $request->cuenta;
-        $or->montoini = $request->monto;
-        $or->saldo = $request->saldo;
-        $or->estado = 1;
-
-        if($or->save()){
-            return ['success' => 1];
-        }else{
-            return ['success' => 2];
-        }
-    }
-
-
-    public function informacionCuentaProy(Request $request){
-
-        $regla = array(
-            'id' => 'required',
-        );
-
-        $validar = Validator::make($request->all(), $regla);
-
-        if ($validar->fails()){ return ['success' => 0];}
-
-        if($lista = CuentaProy::where('id', $request->id)->first()){
-
-            $infoProyecto = Proyecto::orderBy('nombre')->get();
-            $infocuenta = Cuenta::orderBy('nombre')->get();
-
-            return ['success' => 1, 'info' => $lista, 'proyecto' => $infoProyecto,
-                'idproyecto' => $lista->proyecto_id, 'cuenta' => $infocuenta,
-                'idcuenta' => $lista->cuenta_id];
-        }else{
-            return ['success' => 2];
-        }
-    }
-
-    public function editarCuentaProy(Request $request){
-
-        $rules = array(
-            'id' => 'required'
-        );
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if($validator->fails()){
-            return ['success' => 0];
-        }
-
-        if(CuentaProy::where('id', $request->id)->first()){
-
-            CuentaProy::where('id', $request->id)->update([
-                'proyecto_id' => $request->proyecto,
-                'cuenta_id' => $request->cuenta,
-                'montoini' => $request->montoini,
-                'saldo' => $request->saldo,
-            ]);
-
-            return ['success' => 1];
-        }else{
-            return ['success' => 2];
-        }
-    }
-
-
+    // retorna vista con los movimientos de cuenta para un proyecto ID
     public function indexMoviCuentaProy($id){
         // ID: PROYECTO
         return view('backend.admin.proyectos.cuentaproyecto.movimiento.vistamovicuentaproy', compact('id'));
     }
 
-    // VER HISTORICOS
+    // retorna vista con los historicos movimientos por proyecto ID
     public function indexMoviCuentaProyHistorico($id){
         // ID: PROYECTO
         return view('backend.admin.proyectos.cuentaproyecto.historico.vistamovicuentahistorico', compact('id'));
     }
 
+    // retorna tabla con los historicos movimientos por proyecto ID
     public function tablaMoviCuentaProyHistorico($id){
 
         // ID PROYECTO
@@ -167,8 +67,7 @@ class CuentaProyectoController extends Controller
         return view('backend.admin.proyectos.cuentaproyecto.historico.tablamovicuentahistorico', compact('infoMovimiento'));
     }
 
-
-
+    // retorna tabla con los movimientos de cuenta para un proyecto ID
     public function indexTablaMoviCuentaProy($id){
 
         // ID PROYECTO
@@ -247,6 +146,7 @@ class CuentaProyectoController extends Controller
         return view('backend.admin.proyectos.cuentaproyecto.movimiento.tablamovicuentaproy', compact('presupuesto'));
     }
 
+    // registra una nuevo movimiento de cuenta
     public function nuevaMoviCuentaProy(Request $request){
 
         DB::beginTransaction();
@@ -417,6 +317,7 @@ class CuentaProyectoController extends Controller
         return $float_redondeado;
     }
 
+    // descargar un documento Reforma de movimiento de cuenta
     public function descargarReforma($id){
 
         $url = MoviCuentaProy::where('id', $id)->pluck('reforma')->first();
@@ -426,6 +327,7 @@ class CuentaProyectoController extends Controller
         return response()->download($pathToFile, $nombre);
     }
 
+    // guardar un documento Reforma para movimiento de cuenta
     public function guardarDocumentoReforma(Request $request){
 
         $rules = array(
@@ -481,7 +383,7 @@ class CuentaProyectoController extends Controller
         }
     }
 
-
+    // información de un movimiento de cuenta
     public function informacionMoviCuentaProy(Request $request){
 
         $regla = array(
@@ -572,6 +474,7 @@ class CuentaProyectoController extends Controller
         }
     }
 
+    // al mover el select de movimiento cuenta a modificar, quiero ver el saldo restante
     public function infoSaldoRestanteCuenta(Request $request){
 
         $regla = array(
@@ -650,73 +553,7 @@ class CuentaProyectoController extends Controller
 
     }
 
-    public function editarMoviCuentaProy(Request $request){
-        $rules = array(
-            'id' => 'required'
-        );
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if($validator->fails()){
-            return ['success' => 0];
-        }
-
-        if($info = MoviCuentaProy::where('id', $request->id)->first()){
-
-
-            if($request->hasFile('documento')){
-                $cadena = Str::random(15);
-                $tiempo = microtime();
-                $union = $cadena.$tiempo;
-                $nombre = str_replace(' ', '_', $union);
-
-                $extension = '.'.$request->documento->getClientOriginalExtension();
-                $nomDocumento = $nombre.strtolower($extension);
-                $avatar = $request->file('documento');
-                $estado = Storage::disk('archivos')->put($nomDocumento, \File::get($avatar));
-
-                if($estado){
-
-                    $documentoOld = $info->reforma;
-
-                    MoviCuentaProy::where('id', $request->id)->update([
-                        'proyecto_id' => $request->proyecto,
-                        'cuentaproy_id' => $request->cuenta,
-                        'aumenta' => $request->aumenta,
-                        'disminuye' => $request->disminuye,
-                        'fecha' => $request->fecha,
-                        'reforma' => $nomDocumento]);
-
-                    // borrar archivo anterior
-                    if(Storage::disk('archivos')->exists($documentoOld)){
-                        Storage::disk('archivos')->delete($documentoOld);
-                    }
-
-                    return ['success' => 1];
-                }else{
-                    return ['success' => 2];
-                }
-
-            }else{
-
-                MoviCuentaProy::where('id', $request->id)->update([
-                    'proyecto_id' => $request->proyecto,
-                    'cuentaproy_id' => $request->cuenta,
-                    'aumenta' => $request->aumenta,
-                    'disminuye' => $request->disminuye,
-                    'fecha' => $request->fecha]);
-
-                return ['success' => 1];
-            }
-
-        }else{
-            return ['success' => 2];
-        }
-    }
-
-
-    //--------------- PLANILLA ---------------------------
-
+    // retorna vista para agregar planilla a proyecto
     public function indexPlanilla($id){
 
         $info = Proyecto::where('id', $id)->first();
@@ -729,6 +566,7 @@ class CuentaProyectoController extends Controller
         return view('backend.admin.proyectos.planilla.vistaplanilla', compact('id','datos'));
     }
 
+    // retorna tabla para agregar planilla a proyecto
     public function tablaPlanilla($id){
 
         $lista = Planilla::where('proyecto_id', $id)->orderBy('fecha_de')->get();
@@ -751,6 +589,7 @@ class CuentaProyectoController extends Controller
         return view('backend.admin.proyectos.planilla.tablaplanilla', compact('lista'));
     }
 
+    // agrega una nueva planilla a proyecto
     public function nuevaPlanilla(Request $request){
 
         DB::beginTransaction();
@@ -780,6 +619,7 @@ class CuentaProyectoController extends Controller
         }
     }
 
+    // obtener información de planilla
     public function informacionPlanilla(Request $request){
         $regla = array(
             'id' => 'required',
@@ -797,6 +637,7 @@ class CuentaProyectoController extends Controller
         }
     }
 
+    // edita la información de una planilla
     public function editarPlanilla(Request $request){
 
         if(Planilla::where('id', $request->id)->first()){

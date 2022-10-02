@@ -13,16 +13,18 @@ class UnidadMedidaController extends Controller
         $this->middleware('auth');
     }
 
-    // vista para agregar unidades de medida
-    public function index(){
-        return view('backend.admin.configuraciones.unidadmedida.vistaunidadmedida');
+    // retorna vista de las unidades de medida para Proyecto
+    public function indexUnidadMedidaProyecto(){
+        return view('backend.admin.proyectos.configuraciones.unidadmedida.vistaunidadmedida');
     }
 
-    public function tabla(){
+    // retorna tabla de las unidades de medida para Proyecto
+    public function tablaUnidadMedidaProyecto(){
         $lista = UnidadMedida::orderBy('medida', 'ASC')->get();
-        return view('backend.admin.configuraciones.unidadmedida.tablaunidadmedida', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.unidadmedida.tablaunidadmedida', compact('lista'));
     }
 
+    // registrar una nueva unidad de medida
     public function nuevaUnidadMedida(Request $request){
 
         $regla = array(
@@ -47,7 +49,7 @@ class UnidadMedidaController extends Controller
         }
     }
 
-    // informacion
+    // obtener información de unidad de medida
     public function informacionUnidadMedida(Request $request){
         $regla = array(
             'id' => 'required',
@@ -65,7 +67,7 @@ class UnidadMedidaController extends Controller
         }
     }
 
-    // editar
+    // editar una unidad de medida
     public function editarUnidadMedida(Request $request){
 
         $regla = array(

@@ -1647,11 +1647,6 @@
                 });
         }
 
-        // vista a ver cotizacion
-        function vistaCotizacion(id){
-            // id tabla requisicion
-            window.location.href="{{ url('/admin/proyecto/vista/cotizacion') }}/" + id;
-        }
 
     </script>
 

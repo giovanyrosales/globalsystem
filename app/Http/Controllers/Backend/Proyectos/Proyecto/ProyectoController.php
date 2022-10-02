@@ -1067,7 +1067,7 @@ class ProyectoController extends Controller
             $dd->descripcion = $descripcion->nombre;
         }
 
-        return view('Backend.Admin.Proyectos.Cotizacion.vistaCotizacion', compact('requisicion', 'proveedores',
+        return view('backend.admin.proyectos.cotizacion.vistacotizacion', compact('requisicion', 'proveedores',
             'requisicionDetalle', 'id'));
     }
 
@@ -1088,7 +1088,7 @@ class ProyectoController extends Controller
         return ['success' => 1, 'lista' => $lista];
     }
 
-    // MUESTRA MATERIALES SOLO DEL PRESUPUESTO DEL PROYECTO
+    // busca materiales solo del presupuesto proyecto
     public function buscadorMaterialRequisicion(Request $request){
 
         if($request->get('query')){
@@ -1159,7 +1159,7 @@ class ProyectoController extends Controller
         }
     }
 
-    // utilizado para un usuario tipo ingenieria
+    // buscador de material para crear una partida
     public function buscadorMaterialPresupuesto(Request $request){
 
         if($request->get('query')){
@@ -1206,7 +1206,7 @@ class ProyectoController extends Controller
         }
     }
 
-    // utilizado para un usuario tipo ingenieria al editar
+    // buscador de material para editar una partida
     public function buscadorMaterialPresupuestoEditar(Request $request){
 
         if($request->get('query')){
@@ -1250,53 +1250,8 @@ class ProyectoController extends Controller
         }
     }
 
-    /*  public function nuevaCotizacion(Request $request){
 
-          $rules = array(
-              'fecha' => 'required',
-          );
-
-          $validator = Validator::make($request->all(), $rules);
-
-          if ( $validator->fails()){
-              return ['success' => 0];
-          }
-
-          DB::beginTransaction();
-
-          try {
-
-              $r = new Cotizacion();
-              $r->proveedor_id = $request->proveedor;
-              $r->requisicion_id = $request->id;
-              $r->fecha = $request->fecha;
-              $r->estado = 0; // aprobada o no aprobada por jefa uaci
-              $r->save();
-
-              for ($i = 0; $i < count($request->precio); $i++) {
-
-                  // obtener cantidad
-                  $info = RequisicionDetalle::where('id', $request->idarray[$i])->first();
-
-                  $rDetalle = new CotizacionDetalle();
-                  $rDetalle->cotizacion_id = $r->id;
-                  $rDetalle->material_id = $info->material_id;
-                  $rDetalle->cantidad = $info->cantidad;
-                  $rDetalle->precio_u = $request->precio[$i];
-                  $rDetalle->cod_presup = $request->codigo[$i];
-                  $rDetalle->estado = 0;
-                  $rDetalle->save();
-              }
-
-              DB::commit();
-              return ['success' => 1];
-          }catch(\Throwable $e){
-              DB::rollback();
-              return ['success' => 2];
-          }
-      }*/
-
-    // *** INGENIERIA ***
+    // retorna tabla con las partidas de un proyecto por ID
     public function tablaProyectoListaPresupuesto($id){
 
         $partida = Partida::where('proyecto_id', $id)
@@ -1317,6 +1272,7 @@ class ProyectoController extends Controller
         return view('backend.admin.proyectos.infoproyectoindividual.tablalistapresupuesto', compact('partida', 'presuaprobado'));
     }
 
+    // registra una nueva partida a un proyecto por ID
     public function agregarPresupuestoPartida(Request $request){
 
         $rules = array(
@@ -1385,6 +1341,7 @@ class ProyectoController extends Controller
         }
     }
 
+    // obtiene información de la partida de un proyecto
     function informacionPresupuesto(Request $request){
         $rules = array(
             'id' => 'required', // id fila presupuesto (partida)
@@ -1421,6 +1378,7 @@ class ProyectoController extends Controller
         return ['success' => 2];
     }
 
+    // editar la información de una partida
     public function editarPresupuesto(Request $request){
 
         DB::beginTransaction();
@@ -1498,6 +1456,7 @@ class ProyectoController extends Controller
         }
     }
 
+    // borra una partida con todos los detalle
     public function borrarPresupuesto(Request $request){
 
         $regla = array(
@@ -1533,7 +1492,7 @@ class ProyectoController extends Controller
         }
     }
 
-    // para crear pdf se debe verificar que exista esta partida
+    // verifica si partida mano de obra existe
     public function verificarPartidaManoObra(Request $request){
 
         // TIPO PARTIDA 3: Mano de obra (Por Administración)
@@ -2076,7 +2035,7 @@ class ProyectoController extends Controller
         return ['success' => 3];
     }
 
-
+    // busca materiales para crear una requisición, solo muestra materiales asignado a presupuesto de proyecto
     public function verCatalogoMaterialRequisicion($id){
 
         $lista = Partida::where('proyecto_id', $id)->get();

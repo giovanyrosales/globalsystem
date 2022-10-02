@@ -29,5 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->call(FuenteRSeeder::class);
         $this->call(TipoPartidaSeeder::class);
         $this->call(PunidadMedidaSeeder::class);
+        $this->call(DepartamentoUnidadSeeder::class);
+        $this->call(EstadoUnidadSeeder::class);
     }
 }

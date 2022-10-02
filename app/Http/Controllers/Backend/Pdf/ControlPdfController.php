@@ -18,6 +18,7 @@ class ControlPdfController extends Controller
         $this->middleware('auth');
     }
 
+    // generar un PDF con el presupuesto de Proyecto
     public function generarPrespuestoPdf($id){
 
         // obtener todas los presupuesto por id_tipopartida

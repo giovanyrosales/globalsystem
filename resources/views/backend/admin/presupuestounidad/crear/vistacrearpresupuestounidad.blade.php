@@ -10,6 +10,13 @@
 
 @stop
 
+<style>
+
+    .modal-xl {
+        max-width: 90% !important;
+    }
+
+</style>
 
 <div class="content-wrapper" style="display: none" id="divcontenedor">
 
@@ -208,10 +215,8 @@
         $(document).ready(function(){
             openLoading();
 
-            setTimeout(function () {
-                var ruta = "{{ URL::to('/admin/p/cargadora') }}";
-                $('#tablaDatatable').load(ruta);
-            }, 1000);
+            var ruta = "{{ URL::to('/admin/p/contenedor/nuevo/presupuesto') }}";
+            $('#tablaDatatable').load(ruta);
 
             $('#select-medida-nuevo').select2({
                 theme: "bootstrap-5",
@@ -464,7 +469,7 @@
                         return;
                     }
 
-                    if(!datoCantidadExtra.match(reglaNumeroEntero)) {
+                    if(!datoCantidadExtra.match(reglaNumeroDecimal)) {
                         modalMensaje('Nuevos Materiales', 'Fila: #' + (t+1) + ', la Cantidad debe ser Número Decimal. Borrar fila y agregar de nuevo');
                         return;
                     }
@@ -533,11 +538,37 @@
 
                     if(response.data.success === 1){
                         // presupuesto ya habia sido creado
-                        yacreado();
+                        Swal.fire({
+                            title: 'Presupuesto ya habia sido creado',
+                            text: "Puede modificarlo en la sección Editar",
+                            icon: 'error',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            closeOnClickOutside: false,
+                            allowOutsideClick: false,
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
                     }
                     else if(response.data.success === 2){
                         // presupuesto creado
-                        creado();
+                        Swal.fire({
+                            title: 'Presupuesto creado',
+                            text: "Puede modificarlo en la sección Editar",
+                            icon: 'success',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            closeOnClickOutside: false,
+                            allowOutsideClick: false,
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
                     }
                     else{
                         // error al crear
@@ -566,39 +597,6 @@
             });
         }
 
-        function yacreado(){
-            Swal.fire({
-                title: 'Presupuesto ya habia sido creado',
-                text: "Puede modificarlo en la sección Editar",
-                icon: 'error',
-                showCancelButton: false,
-                confirmButtonColor: '#28a745',
-                closeOnClickOutside: false,
-                allowOutsideClick: false,
-                confirmButtonText: 'Aceptar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    location.reload();
-                }
-            });
-        }
-
-        function creado(){
-            Swal.fire({
-                title: 'Presupuesto creado',
-                text: "Puede modificarlo en la sección Editar",
-                icon: 'success',
-                showCancelButton: false,
-                confirmButtonColor: '#28a745',
-                closeOnClickOutside: false,
-                allowOutsideClick: false,
-                confirmButtonText: 'Aceptar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    location.reload();
-                }
-            });
-        }
 
         function mostrarBloque(){
             document.getElementById("bloque-codigo").style.display = "block";

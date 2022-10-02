@@ -16,13 +16,15 @@ class CodigoEspecifController extends Controller
         $this->middleware('auth');
     }
 
+    // retorna vista de cuenta
     public function indexCuenta(){
 
         $rubro = Rubro::orderBy('codigo', 'ASC')->get();
 
-        return view('Backend.Admin.Configuraciones.Cuenta.vistaCuenta', compact('rubro'));
+        return view('backend.admin.configuraciones.cuenta.vistacuenta', compact('rubro'));
     }
 
+    // retorna tabla de cuenta
     public function tablaCuenta(){
         $lista = Cuenta::orderBy('codigo', 'ASC')->get();
 
@@ -32,9 +34,10 @@ class CodigoEspecifController extends Controller
             $l->rubro = $infoRubro->codigo . " - " . $infoRubro->nombre;
         }
 
-        return view('Backend.Admin.Configuraciones.Cuenta.tablaCuenta', compact('lista'));
+        return view('backend.admin.configuraciones.cuenta.tablacuenta', compact('lista'));
     }
 
+    // registrar una nueva cuenta
     public function nuevaCuenta(Request $request){
 
         $regla = array(
@@ -59,7 +62,7 @@ class CodigoEspecifController extends Controller
         }
     }
 
-    // informacion
+    // obtener información de una cuenta
     public function informacionCuenta(Request $request){
         $regla = array(
             'id' => 'required',
@@ -79,7 +82,7 @@ class CodigoEspecifController extends Controller
         }
     }
 
-    // editar
+    // editar una cuenta
     public function editarCuenta(Request $request){
 
         $regla = array(
@@ -111,13 +114,15 @@ class CodigoEspecifController extends Controller
 
     // ******** OBJETO ESPECIFICO **************
 
+    // retorna vista de objeto específico
     public function indexObjEspecifico(){
 
         $cuenta = Cuenta::orderBy('codigo', 'ASC')->get();
 
-        return view('Backend.Admin.Configuraciones.ObjEspecifico.vistaObjEspecifico', compact('cuenta'));
+        return view('backend.admin.configuraciones.objespecifico.vistaobjespecifico', compact('cuenta'));
     }
 
+    // retorna tabla de objeto específico
     public function tablaObjEspecifico(){
 
         $lista = ObjEspecifico::orderBy('nombre')->get();
@@ -127,9 +132,10 @@ class CodigoEspecifController extends Controller
             $l->cuenta = $infoCuenta->codigo . " - " . $infoCuenta->nombre;
         }
 
-        return view('Backend.Admin.Configuraciones.ObjEspecifico.tablaObjEspecifico', compact('lista'));
+        return view('backend.admin.configuraciones.objespecifico.tablaobjespecifico', compact('lista'));
     }
 
+    // registrar un objeto específico
     public function nuevaObjEspecifico(Request $request){
 
         $regla = array(
@@ -154,6 +160,7 @@ class CodigoEspecifController extends Controller
         }
     }
 
+    // obtener información de un objeto específico
     public function informacionObjEspecifico(Request $request){
         $regla = array(
             'id' => 'required',
@@ -174,6 +181,7 @@ class CodigoEspecifController extends Controller
         }
     }
 
+    // editar un objeto específico
     public function editarObjEspecifico(Request $request){
         $regla = array(
             'id' => 'required',

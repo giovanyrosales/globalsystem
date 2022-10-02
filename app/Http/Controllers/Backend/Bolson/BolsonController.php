@@ -19,10 +19,12 @@ class BolsonController extends Controller
         $this->middleware('auth');
     }
 
+    // retorna vista con lista de bolsones
     public function indexBolson(){
         return view('backend.admin.proyectos.bolson.registro.vistabolson');
     }
 
+    // retorna tabla con lista de bolsones
     public function tablaBolson(){
 
         $lista = Bolson::orderBy('fecha')->get();

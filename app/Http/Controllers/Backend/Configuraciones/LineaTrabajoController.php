@@ -13,16 +13,19 @@ class LineaTrabajoController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
-        return view('Backend.Admin.Configuraciones.LineaTrabajo.vistaLineaDeTrabajo');
+    // retorna vista con las líneas de trabajo
+    public function indexLineaTrabajo(){
+        return view('backend.admin.proyectos.configuraciones.lineatrabajo.vistalineadetrabajo');
     }
 
-    public function tabla(){
+    // retorna tabla con las líneas de trabajo
+    public function tablaLineaTrabajo(){
         $lista = LineaTrabajo::orderBy('codigo', 'ASC')->get();
-        return view('Backend.Admin.Configuraciones.LineaTrabajo.tablaLineaDeTrabajo', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.lineatrabajo.tablalineadetrabajo', compact('lista'));
     }
 
-    public function nuevaLinea(Request $request){
+    // registrar nueva línea de trabajo
+    public function nuevaLineaTrabajo(Request $request){
 
         $regla = array(
             'codigo' => 'required'
@@ -44,8 +47,8 @@ class LineaTrabajoController extends Controller
         }
     }
 
-    // informacion
-    public function informacionLinea(Request $request){
+    // obtener información de línea de trabajo
+    public function informacionLineaTrabajo(Request $request){
         $regla = array(
             'id' => 'required',
         );
@@ -62,8 +65,8 @@ class LineaTrabajoController extends Controller
         }
     }
 
-    // editar
-    public function editarLinea(Request $request){
+    // editar línea de trabajo
+    public function editarLineaTrabajo(Request $request){
 
         $regla = array(
             'id' => 'required',

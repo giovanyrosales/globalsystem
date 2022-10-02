@@ -11,8 +11,8 @@ class RecursosController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
-
-        return view('Backend.Admin.Recursos.vistaRecursosHumanos');
+    // retorna vista de recursos humanos
+    public function indexRecursosHumanos(){
+        return view('backend.admin.recursos.recursoshumanos.vistarecursoshumanos');
     }
 }

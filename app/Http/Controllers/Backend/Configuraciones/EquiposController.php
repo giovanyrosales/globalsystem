@@ -14,17 +14,20 @@ class EquiposController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
+    // retorna vista de equipos
+    public function indexEquipos(){
 
-        return view('Backend.Admin.Configuraciones.equipos.vistaEquipos');
+        return view('backend.admin.configuraciones.equipos.vistaequipos');
     }
 
-    public function tabla(){
+    // retorna tabla de equipos
+    public function tablaEquipos(){
         $lista = Equipos::orderBy('codigo', 'ASC')->get();
 
-        return view('Backend.Admin.Configuraciones.equipos.tablaEquipos', compact('lista'));
+        return view('backend.admin.configuraciones.equipos.tablaequipos', compact('lista'));
     }
 
+    // registra un nuevo equipo
     public function nuevoEquipo(Request $request){
 
         $regla = array(
@@ -47,7 +50,7 @@ class EquiposController extends Controller
         }
     }
 
-    // informacion
+    // obtener información de un equipo
     public function informacionEquipo(Request $request){
         $regla = array(
             'id' => 'required',
@@ -65,7 +68,7 @@ class EquiposController extends Controller
         }
     }
 
-    // editar
+    // editar un equipo
     public function editarEquipo(Request $request){
 
         $regla = array(

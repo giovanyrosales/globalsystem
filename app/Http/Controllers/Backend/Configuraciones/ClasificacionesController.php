@@ -13,15 +13,18 @@ class ClasificacionesController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
-        return view('Backend.Admin.Configuraciones.Clasificaciones.vistaClasificaciones');
+    // retorna vista con las clasificaciones de material
+    public function indexClasificaciones(){
+        return view('backend.admin.proyectos.configuraciones.clasificaciones.vistaclasificaciones');
     }
 
-    public function tabla(){
+    // retorna tabla con las clasificaciones de material
+    public function tablaClasificaciones(){
         $lista = Clasificaciones::orderBy('nombre', 'ASC')->get();
-        return view('Backend.Admin.Configuraciones.Clasificaciones.tablaClasificaciones', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.clasificaciones.tablaclasificaciones', compact('lista'));
     }
 
+    // registra nueva clasificación
     public function nuevaClasificacion(Request $request){
 
         $regla = array(
@@ -42,7 +45,7 @@ class ClasificacionesController extends Controller
         }
     }
 
-    // informacion
+    // obtener información de una clasificación
     public function informacionClasificacion(Request $request){
         $regla = array(
             'id' => 'required',
@@ -60,7 +63,7 @@ class ClasificacionesController extends Controller
         }
     }
 
-    // editar
+    // editar clasificación
     public function editarClasificacion(Request $request){
 
         $regla = array(

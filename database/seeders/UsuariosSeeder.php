@@ -70,12 +70,7 @@ class UsuariosSeeder extends Seeder
             'activo' => 1,
         ])->assignRole('uaciunidad');
 
-        Usuario::create([
-            'nombre' => 'Unidad',
-            'usuario' => 'unidad',
-            'password' => bcrypt('1234'),
-            'activo' => 1,
-        ])->assignRole('unidad');
+
 
     }
 }

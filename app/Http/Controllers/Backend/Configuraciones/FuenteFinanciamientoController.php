@@ -13,16 +13,19 @@ class FuenteFinanciamientoController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
-        return view('Backend.Admin.Configuraciones.FuenteFinanciamiento.vistaFuenteFinanciamiento');
+    // retorna vista con las fuentes de financiamiento
+    public function indexFuenteFinanciamiento(){
+        return view('backend.admin.proyectos.configuraciones.fuentefinanciamiento.vistafuentefinanciamiento');
     }
 
-    public function tabla(){
+    // retorna tabla con las fuentes de financiamiento
+    public function tablaFuenteFinanciamiento(){
         $lista = FuenteFinanciamiento::orderBy('codigo', 'ASC')->get();
-        return view('Backend.Admin.Configuraciones.FuenteFinanciamiento.tablaFuenteFinanciamiento', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.fuentefinanciamiento.tablafuentefinanciamiento', compact('lista'));
     }
 
-    public function nuevaFuente(Request $request){
+    // registrar nueva fuente de financiamiento
+    public function nuevaFuenteFinanciamiento(Request $request){
 
         $regla = array(
             'codigo' => 'required'
@@ -44,8 +47,8 @@ class FuenteFinanciamientoController extends Controller
         }
     }
 
-    // informacion
-    public function informacionFuente(Request $request){
+    // obtener información de una fuente de financiamiento
+    public function informacionFuenteFinanciamiento(Request $request){
         $regla = array(
             'id' => 'required',
         );
@@ -62,8 +65,8 @@ class FuenteFinanciamientoController extends Controller
         }
     }
 
-    // editar
-    public function editarFuente(Request $request){
+    // editar fuente de financiamiento
+    public function editarFuenteFinanciamiento(Request $request){
 
         $regla = array(
             'id' => 'required',

@@ -16,15 +16,18 @@ class DepartamentoPresupuestoUnidadController extends Controller
 
     // ************** CREAR DEPARTAMENTOS PARA PRESUPUESTO DE UNIDAD **************
 
+    // retorna vista con los departamentos
     public function indexDepartamentos(){
         return view('backend.admin.presupuestounidad.configuracion.departamentos.vistadepartamentopresupuesto');
     }
 
+    // retorna tabla con los departamentos
     public function tablaDepartamentos(){
         $lista = P_Departamento::orderBy('nombre', 'ASC')->get();
         return view('backend.admin.presupuestounidad.configuracion.departamentos.tabladepartamentopresupuesto', compact('lista'));
     }
 
+    // registrar un nuevo departamento
     public function nuevoDepartamentos(Request $request){
         $regla = array(
             'nombre' => 'required'
@@ -42,9 +45,9 @@ class DepartamentoPresupuestoUnidadController extends Controller
         }else{
             return ['success' => 2];
         }
-
     }
 
+    // obtener información de un departamento
     public function informacionDepartamentos(Request $request){
         $regla = array(
             'id' => 'required',
@@ -60,9 +63,9 @@ class DepartamentoPresupuestoUnidadController extends Controller
         }else{
             return ['success' => 2];
         }
-
     }
 
+    // editar un departamento
     public function editarDepartamentos(Request $request){
         $regla = array(
             'id' => 'required',

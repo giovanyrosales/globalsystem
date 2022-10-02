@@ -91,11 +91,7 @@ Route::get('sin-permisos', [ControlController::class,'indexSinPermiso'])->name('
 Route::get('/admin/inicio/index', [EstadisticasController::class,'indexEstadisticas'])->name('admin.estadisticas.index');
 
 
-
-
-// **************************** PROYECTOS ********************************************
-
-// --- NUEVO PROYECTO ---
+// * NUEVO PROYECTO
 
 // retorna vista para registrar nuevo proyecto
 Route::get('/admin/proyecto/nuevo/index', [ProyectoController::class,'indexNuevoProyecto'])->name('admin.nuevo.proyecto.index');
@@ -103,7 +99,7 @@ Route::get('/admin/proyecto/nuevo/index', [ProyectoController::class,'indexNuevo
 Route::post('/admin/proyecto/nuevo', [ProyectoController::class, 'nuevoProyecto']);
 
 
-// --- LISTA DE PROYECTOS ---
+// * LISTA DE PROYECTOS
 
 // retorna vista de todos los proyectos
 Route::get('/admin/proyecto/lista/index', [ProyectoController::class,'indexProyectoLista'])->name('admin.lista.proyectos.index');
@@ -171,7 +167,8 @@ Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::cla
 Route::post('/admin/proyecto/requisicion/borrar/todo', [ProyectoController::class, 'borrarRequisicion']);
 // petición para cancelar un material de requisición
 Route::post('/admin/proyecto/requisicion/material/cancelar', [ProyectoController::class, 'cancelarMaterialRequisicion']);
-
+// busca materiales solo del presupuesto proyecto
+Route::post('/admin/buscar/material/soloproyecto',  [ProyectoController::class,'buscadorMaterialRequisicion']);
 
 // * LISTADO DE REQUERIMIENTOS PENDIENTES PARA SER COTIZADOS POR UACI
 
@@ -191,249 +188,352 @@ Route::post('/admin/requerimientos/verificar', [CotizacionController::class, 've
 Route::post('/admin/requerimientos/cotizacion/guardar', [CotizacionController::class, 'guardarNuevaCotizacion']);
 
 
+// * PRESUPUESTO DE PROYECTO
 
-//****************************** INGENIERIA *********************************/
-
-
-
-// --- Presupuesto de Proyecto ---
+// retorna tabla con las partidas de un proyecto por ID
 Route::get('/admin/proyecto/vista/presupuesto/{id}', [ProyectoController::class,'tablaProyectoListaPresupuesto']);
+// registra una nueva partida a un proyecto por ID
 Route::post('/admin/proyecto/agregar/presupuesto',  [ProyectoController::class,'agregarPresupuestoPartida']);
+// obtiene información de la partida de un proyecto
 Route::post('/admin/proyecto/vista/presupuesto/informacion', [ProyectoController::class, 'informacionPresupuesto']);
+// editar la información de una partida
 Route::post('/admin/proyecto/vista/presupuesto/editar', [ProyectoController::class, 'editarPresupuesto']);
+// borra una partida con todos los detalle
 Route::post('/admin/proyecto/vista/presupuesto/borrar', [ProyectoController::class, 'borrarPresupuesto']);
+// generar un PDF con el presupuesto de Proyecto
 Route::get('/admin/generar/pdf/presupuesto/{id}', [ControlPdfController::class,'generarPrespuestoPdf']);
-
 // verifica si partida mano de obra existe
 Route::post('/admin/proyecto/partida/manoobra/existe', [ProyectoController::class, 'verificarPartidaManoObra']);
 
-// --- CUENTA PROYECTO ----
-Route::get('/admin/cuentaproy/cuenta/{id}', [CuentaProyectoController::class,'indexCuenta']);
-Route::get('/admin/cuentaproy/cuenta/indextabla/{id}', [CuentaProyectoController::class,'tablaCuenta']);
+// * PLANILLA PARA PROYECTO
 
-// --- PLANILLA ---
+// retorna vista para agregar planilla a proyecto
 Route::get('/admin/planilla/lista/{id}', [CuentaProyectoController::class,'indexPlanilla']);
+// retorna tabla para agregar planilla a proyecto
 Route::get('/admin/planilla/tabla/lista/{id}', [CuentaProyectoController::class,'tablaPlanilla']);
+// agrega una nueva planilla a proyecto
 Route::post('/admin/planilla/nuevo',  [CuentaProyectoController::class,'nuevaPlanilla']);
+// obtener información de planilla
 Route::post('/admin/planilla/informacion',  [CuentaProyectoController::class,'informacionPlanilla']);
+// edita la información de una planilla
 Route::post('/admin/planilla/editar',  [CuentaProyectoController::class,'editarPlanilla']);
 
-// --- MOVIMIENTO CUENTA PROYECTO ----
+// * MOVIMIENTO CUENTA PROYECTO
+
+// retorna vista con los movimientos de cuenta para un proyecto ID
 Route::get('/admin/movicuentaproy/indexmovicuentaproy/{id}', [CuentaProyectoController::class,'indexMoviCuentaProy']);
+// retorna tabla con los movimientos de cuenta para un proyecto ID
 Route::get('/admin/movicuentaproy/tablamovicuentaproy/{id}', [CuentaProyectoController::class,'indexTablaMoviCuentaProy']);
-
+// retorna vista con los historicos movimientos por proyecto ID
 Route::get('/admin/movicuentaproy/historico/{id}', [CuentaProyectoController::class,'indexMoviCuentaProyHistorico']);
+// retorna tabla con los historicos movimientos por proyecto ID
 Route::get('/admin/movicuentaproy/tablahistorico/{id}', [CuentaProyectoController::class,'tablaMoviCuentaProyHistorico']);
-
+// registra una nuevo movimiento de cuenta
 Route::post('/admin/movicuentaproy/nuevo',  [CuentaProyectoController::class,'nuevaMoviCuentaProy']);
+// descargar un documento Reforma de movimiento de cuenta
 Route::get('/admin/movicuentaproy/documento/{id}',  [CuentaProyectoController::class,'descargarReforma']);
+// guardar un documento Reforma para movimiento de cuenta
 Route::post('/admin/movicuentaproy/documento/guardar',  [CuentaProyectoController::class,'guardarDocumentoReforma']);
+// información de un movimiento de cuenta
 Route::post('/admin/movicuentaproy/informacion',  [CuentaProyectoController::class,'informacionMoviCuentaProy']);
-
-// al mover el select de Cuenta a modificar, quiero ver el saldo restante
+// al mover el select de movimiento cuenta a modificar, quiero ver el saldo restante
 Route::post('/admin/movicuentaproy/info/saldo',  [CuentaProyectoController::class,'infoSaldoRestanteCuenta']);
-Route::post('/admin/movicuentaproy/editar',  [CuentaProyectoController::class,'editarMoviCuentaProy']);
 
-// --- VISTA GENERAR COTIZACION ---
-Route::get('/admin/proyecto/vista/cotizacion/{id}', [ProyectoController::class,'indexCotizacion']);
-Route::post('/admin/proyecto/lista/cotizaciones',  [ProyectoController::class,'obtenerListaCotizaciones']);
 
-// busca materiales solo del presupuesto proyecto
-Route::post('/admin/buscar/material/soloproyecto',  [ProyectoController::class,'buscadorMaterialRequisicion']);
-
-// utilizado para un usuario tipo ingenieria
+// buscador de material para crear una partida
 Route::post('/admin/proyecto/buscar/material-presupuesto',  [ProyectoController::class,'buscadorMaterialPresupuesto']);
+// buscador de material para editar una partida
 Route::post('/admin/proyecto/buscar/material-presupuesto-editar',  [ProyectoController::class,'buscadorMaterialPresupuestoEditar']);
-
-//Route::post('/admin/proyecto/cotizacion/nuevo',  [ProyectoController::class,'nuevaCotizacion']);
-
-// muestra catalogo de materiales al usuario admmin que hace requisiciones para ver que pedir
+// busca materiales para crear una requisición, solo muestra materiales asignado a presupuesto de proyecto
 Route::get('/admin/ver/materiales/admin/requisicion/{id}', [ProyectoController::class,'verCatalogoMaterialRequisicion']);
 
 
-// --- VISTA COTIZACIONES PENDIENTES PARA PROYECTOS---
+// * COTIZACIONES PENDIENTES PARA PROYECTOS
+
+// retorna vista con las cotizaciones pendientes
 Route::get('/admin/cotizacion/proyecto/pendiente/index', [CotizacionController::class,'indexPendiente'])->name('cotizaciones.pendientes.proyecto.index');
+// retorna tabla con las cotizaciones pendientes
 Route::get('/admin/cotizacion/proyecto/pendiente/tabla', [CotizacionController::class,'indexPendienteTabla']);
-
+// retorna vista de los detalle de la cotización, un uso es cuando uaci espera que sea aprobada la coti
 Route::get('/admin/cotizacion/proyecto/individual/index/{id}', [CotizacionController::class,'indexCotizacion']);
+// autorizar la cotización
 Route::post('/admin/cotizacion/proyecto/autorizar',  [CotizacionController::class,'autorizarCotizacion']);
+// denegar la cotización
 Route::post('/admin/cotizacion/proyecto/denegar',  [CotizacionController::class,'denegarCotizacion']);
-
-// vista de cotizacion detalle para procesadas o denegadas
+// vista de cotización detalle para procesadas o denegadas
 Route::get('/admin/cotizacion/proyecto/detalle/{id}', [CotizacionController::class,'vistaDetalleCotizacion']);
 
 
-// --- VISTA COTIZACIONES AUTORIZADAS ---
+// * VISTA COTIZACIONES AUTORIZADAS
+
+// retorna vista de cotizaciones autorizadas
 Route::get('/admin/cotizacion/autorizadas/index', [CotizacionController::class,'indexAutorizadas'])->name('cotizaciones.autorizadas.index');
+// retorna tabla de cotizaciones autorizadas
 Route::get('/admin/cotizacion/proyecto/autorizadas/tabla-index', [CotizacionController::class,'indexAutorizadasTabla']);
 
-// --- VISTA COTIZACIONES DENEGADAS ---
+// * VISTA COTIZACIONES DENEGADAS
+
+// retorna vista de cotizaciones denegadas
 Route::get('/admin/cotizacion/proyecto/denegadas/index', [CotizacionController::class,'indexDenegadas'])->name('cotizaciones.denegadas.index');
+// retorna tabla de cotizaciones denegadas
 Route::get('/admin/cotizacion/proyecto/denegadas/tabla-index', [CotizacionController::class,'indexDenegadasTabla']);
 
-// --- ORDENES ---
+// * ORDENES
+
+// crear una nueva orden
 Route::post('/admin/ordenes/proyecto/generar/nuevo',  [OrdenController::class,'generarOrden']);
-// cantidad es # de material por hoja
+// generar PDF de orden de compra y variable {cantidad} es # de material por hoja
 Route::get('/admin/ordenes/proyecto/pdf/{id}/{cantidad}', [OrdenController::class,'vistaPdfOrden']);
 
-// --- ORDENES DE COMPRAS ---
+// * ORDENES DE COMPRAS
+
+// retorna vista con las ordenes de compras
 Route::get('/admin/ordenes/compras/index', [OrdenController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
+// retorna tabla con las ordenes de compras
 Route::get('/admin/ordenes/compras/tabla-index', [OrdenController::class,'tablaOrdenesCompras']);
+// anular una orden de compra
 Route::post('/admin/ordenes/proyecto/anular/compra',  [OrdenController::class,'anularCompra']);
+// generar acta de una orden de compra
 Route::post('/admin/ordenes/proyecto/generar/acta',  [OrdenController::class,'generarActa']);
+// generar PDF de la acta de compra
 Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenController::class,'reporteActaGenerada']);
 
 
-// ********** CONFIGURACION **********
+// * CONFIGURACIÓN DEL SISTEMA
 
-// --- UNIDAD MEDIDA ---
-Route::get('/admin/unidadmedida/index', [UnidadMedidaController::class,'index'])->name('admin.unidadmedida.index');
-Route::get('/admin/unidadmedida/tabla/index', [UnidadMedidaController::class,'tabla']);
+// retorna vista de las unidades de medida para Proyecto
+Route::get('/admin/unidadmedida/index', [UnidadMedidaController::class,'indexUnidadMedidaProyecto'])->name('admin.unidadmedida.index');
+// retorna tabla de las unidades de medida para Proyecto
+Route::get('/admin/unidadmedida/tabla/index', [UnidadMedidaController::class,'tablaUnidadMedidaProyecto']);
+// registrar una nueva unidad de medida
 Route::post('/admin/unidadmedida/nuevo', [UnidadMedidaController::class, 'nuevaUnidadMedida']);
+// obtener información de unidad de medida
 Route::post('/admin/unidadmedida/informacion', [UnidadMedidaController::class, 'informacionUnidadMedida']);
+// editar una unidad de medida
 Route::post('/admin/unidadmedida/editar', [UnidadMedidaController::class, 'editarUnidadMedida']);
 
-// --- PROVEEDORES ---
-Route::get('/admin/proveedores/index', [ProveedoresController::class,'index'])->name('admin.proveedores.index');
-Route::get('/admin/proveedores/tabla/index', [ProveedoresController::class,'tabla']);
+// * PROVEEDORES
+
+// retorna vista con los proveedores para cotizaciones
+Route::get('/admin/proveedores/index', [ProveedoresController::class,'indexVistaProveedor'])->name('admin.proveedores.index');
+// retorna tabla con los proveedores para cotizaciones
+Route::get('/admin/proveedores/tabla/index', [ProveedoresController::class,'tablaVistaProveedor']);
+// registra nuevo proveedor
 Route::post('/admin/proveedores/nuevo', [ProveedoresController::class, 'nuevoProveedor']);
+// obtener información de un proveedor
 Route::post('/admin/proveedores/informacion', [ProveedoresController::class, 'informacionProveedor']);
+// edita la información de proveedor
 Route::post('/admin/proveedores/editar', [ProveedoresController::class, 'editarProveedor']);
 
-// --- ADMINISTRADORES DE PROYECTO ---
-Route::get('/admin/administradores/index', [AdministradoresController::class,'index'])->name('admin.administradores.index');
-Route::get('/admin/administradores/tabla/index', [AdministradoresController::class,'tabla']);
+// * ADMINISTRADORES DE PROYECTO
+
+// retorna vista con los nombres de administradores
+Route::get('/admin/administradores/index', [AdministradoresController::class,'indexVistaAdministradores'])->name('admin.administradores.index');
+// retorna tabla con los nombres de administradores
+Route::get('/admin/administradores/tabla/index', [AdministradoresController::class,'tablaVistaAdministradores']);
+// registra nuevo administrador de proyectos
 Route::post('/admin/administradores/nuevo', [AdministradoresController::class, 'nuevoAdministrador']);
+// obtener información de administrador de proyecto
 Route::post('/admin/administradores/informacion', [AdministradoresController::class, 'informacionAdministrador']);
+// editar datos de administrador de proyecto
 Route::post('/admin/administradores/editar', [AdministradoresController::class, 'editarAdministrador']);
 
-// --- CATALOGO DE MATERIALES ---
-Route::get('/admin/catalogo/materiales/index', [MaterialesController::class,'index'])->name('admin.catalogo.materiales.index');
-Route::get('/admin/catalogo/materiales/tabla/index', [MaterialesController::class,'tabla']);
+// * CATALOGO DE MATERIALES
+
+// retorna vista con catálogo de materiales para proyecto
+Route::get('/admin/catalogo/materiales/index', [MaterialesController::class,'indexCatalogoMaterial'])->name('admin.catalogo.materiales.index');
+// retorna tabla con catálogo de materiales para proyecto
+Route::get('/admin/catalogo/materiales/tabla/index', [MaterialesController::class,'tablaCatalogoMaterial']);
+// registra nuevo material para proyectos
 Route::post('/admin/catalogo/materiales/nuevo', [MaterialesController::class, 'nuevoMaterial']);
-Route::post('/admin/catalogo/materiales/informacion', [MaterialesController::class, 'informacion']);
+// obtener información de un material de proyecto
+Route::post('/admin/catalogo/materiales/informacion', [MaterialesController::class, 'informacionCatalogoMaterial']);
+// editar catálogo de material de proyecto
 Route::post('/admin/catalogo/materiales/editar', [MaterialesController::class, 'editarMaterial']);
 
-// --- SOLICITUD DE MATERIAL POR PARTE DE INGENIERIA
+// * SOLICITUD DE MATERIAL POR PARTE DE INGENIERÍA
+
+// retorna vista con materiales solicitados para agregar catálogo de materiales
 Route::get('/admin/solicitud/material/ing/index', [MaterialesController::class,'indexSolicitudMaterialIng'])->name('admin.solicitud.material.ing.index');
+// retorna tabla con materiales solicitados para agregar catálogo de materiales
 Route::get('/admin/solicitud/material/ing/tabla', [MaterialesController::class,'tablaSolicitudMaterialIng']);
+// nuevo registro de material solicitado
 Route::post('/admin/solicitud/material/ing/nuevo', [MaterialesController::class, 'nuevoSolicitudMaterialIng']);
+// información para editar material solicitado
 Route::post('/admin/solicitud/material/ing/informacion', [MaterialesController::class, 'informacionSolicitudMaterialIng']);
+// borrar material solicitado
 Route::post('/admin/solicitud/material/ing/borrar', [MaterialesController::class, 'borrarSolicitudMaterialIng']);
+// agregar material solicitado por ingenieria
 Route::post('/admin/solicitud/material/ing/agregar', [MaterialesController::class, 'agregarSolicitudMaterialIng']);
 
-// CATALOGO DE MATERIALES PARA QUE INGENIERIA VEA LA LISTA DE LO QUE HAY
+// * CATÁLOGO DE MATERIALES PARA QUE INGENIERÍA VEA LA LISTA DE LO QUE HAY
+
+// retorna vista con todos los materiales de catálogo para que unicamente pueda verse
 Route::get('/admin/vista/catalogo/material/index', [MaterialesController::class,'indexVistaCatalogoMaterial'])->name('admin.vista.catalogo.material.index');
+// retorna tabla con todos los materiales de catálogo para que unicamente pueda verse
 Route::get('/admin/vista/catalogo/material/tabla', [MaterialesController::class,'tablaVistaCatalogoMaterial']);
 
 
+// * BOLSÓN
 
-// --- BOLSON ---
+// retorna vista con lista de bolsones
 Route::get('/admin/bolson/index', [BolsonController::class,'indexBolson'])->name('admin.bolson.index');
+// retorna tabla con lista de bolsones
 Route::get('/admin/bolson/tabla', [BolsonController::class,'tablaBolson']);
 
 
+// * CLASIFICACIONES
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// --- CLASIFICACIONES ---
-Route::get('/admin/clasificaciones/index', [ClasificacionesController::class,'index'])->name('admin.clasificaciones.index');
-Route::get('/admin/clasificaciones/tabla/index', [ClasificacionesController::class,'tabla']);
+// retorna vista con las clasificaciones de material
+Route::get('/admin/clasificaciones/index', [ClasificacionesController::class,'indexClasificaciones'])->name('admin.clasificaciones.index');
+// retorna tabla con las clasificaciones de material
+Route::get('/admin/clasificaciones/tabla/index', [ClasificacionesController::class,'tablaClasificaciones']);
+// registra nueva clasificación
 Route::post('/admin/clasificaciones/nuevo', [ClasificacionesController::class, 'nuevaClasificacion']);
+// obtener información de una clasificación
 Route::post('/admin/clasificaciones/informacion', [ClasificacionesController::class, 'informacionClasificacion']);
+// editar clasificación
 Route::post('/admin/clasificaciones/editar', [ClasificacionesController::class, 'editarClasificacion']);
 
 
+// * LÍNEA DE TRABAJO
 
-// --- LÍNEA DE TRABAJO ---
-Route::get('/admin/linea/trabajo/index', [LineaTrabajoController::class,'index'])->name('admin.linea.de.trabajo.index');
-Route::get('/admin/linea/trabajo/tabla/index', [LineaTrabajoController::class,'tabla']);
-Route::post('/admin/linea/trabajo/nuevo', [LineaTrabajoController::class, 'nuevaLinea']);
-Route::post('/admin/linea/trabajo/informacion', [LineaTrabajoController::class, 'informacionLinea']);
-Route::post('/admin/linea/trabajo/editar', [LineaTrabajoController::class, 'editarLinea']);
+// retorna vista con las líneas de trabajo
+Route::get('/admin/linea/trabajo/index', [LineaTrabajoController::class,'indexLineaTrabajo'])->name('admin.linea.de.trabajo.index');
+// retorna tabla con las líneas de trabajo
+Route::get('/admin/linea/trabajo/tabla/index', [LineaTrabajoController::class,'tablaLineaTrabajo']);
+// registrar nueva línea de trabajo
+Route::post('/admin/linea/trabajo/nuevo', [LineaTrabajoController::class, 'nuevaLineaTrabajo']);
+// obtener información de línea de trabajo
+Route::post('/admin/linea/trabajo/informacion', [LineaTrabajoController::class, 'informacionLineaTrabajo']);
+// editar línea de trabajo
+Route::post('/admin/linea/trabajo/editar', [LineaTrabajoController::class, 'editarLineaTrabajo']);
 
-// --- FUENTE DE FINANCIAMIENTO ---
-Route::get('/admin/fuentef/index', [FuenteFinanciamientoController::class,'index'])->name('admin.fuente.financiamiento.index');
-Route::get('/admin/fuentef/tabla/index', [FuenteFinanciamientoController::class,'tabla']);
-Route::post('/admin/fuentef/nuevo', [FuenteFinanciamientoController::class, 'nuevaFuente']);
-Route::post('/admin/fuentef/informacion', [FuenteFinanciamientoController::class, 'informacionFuente']);
-Route::post('/admin/fuentef/editar', [FuenteFinanciamientoController::class, 'editarFuente']);
+// * FUENTE DE FINANCIAMIENTO
 
-// --- FUENTE DE RECURSOS ---
-Route::get('/admin/fuenter/index', [FuenteRecursosController::class,'index'])->name('admin.fuente.recurso.index');
-Route::get('/admin/fuenter/tabla/index', [FuenteRecursosController::class,'tabla']);
-Route::post('/admin/fuenter/nuevo', [FuenteRecursosController::class, 'nuevaFuente']);
-Route::post('/admin/fuenter/informacion', [FuenteRecursosController::class, 'informacionFuente']);
-Route::post('/admin/fuenter/editar', [FuenteRecursosController::class, 'editarFuente']);
+// retorna vista con las fuentes de financiamiento
+Route::get('/admin/fuentef/index', [FuenteFinanciamientoController::class,'indexFuenteFinanciamiento'])->name('admin.fuente.financiamiento.index');
+// retorna tabla con las fuentes de financiamiento
+Route::get('/admin/fuentef/tabla/index', [FuenteFinanciamientoController::class,'tablaFuenteFinanciamiento']);
+// registrar nueva fuente de financiamiento
+Route::post('/admin/fuentef/nuevo', [FuenteFinanciamientoController::class, 'nuevaFuenteFinanciamiento']);
+// obtener información de una fuente de financiamiento
+Route::post('/admin/fuentef/informacion', [FuenteFinanciamientoController::class, 'informacionFuenteFinanciamiento']);
+// editar fuente de financiamiento
+Route::post('/admin/fuentef/editar', [FuenteFinanciamientoController::class, 'editarFuenteFinanciamiento']);
 
-// --- ÁREA DE GESTIÓN ---
-Route::get('/admin/areagestion/index', [AreaGestionController::class,'index'])->name('admin.area.gestion.index');
-Route::get('/admin/areagestion/tabla/index', [AreaGestionController::class,'tabla']);
+// * FUENTE DE RECURSOS
+
+// retorna vista con las fuentes de recursos
+Route::get('/admin/fuenter/index', [FuenteRecursosController::class,'indexFuenteRecursos'])->name('admin.fuente.recurso.index');
+// retorna tabla con las fuentes de recursos
+Route::get('/admin/fuenter/tabla/index', [FuenteRecursosController::class,'tablaFuenteRecursos']);
+// registrar nueva fuente de recursos
+Route::post('/admin/fuenter/nuevo', [FuenteRecursosController::class, 'nuevaFuenteRecursos']);
+// obtener información de una fuente de recursos
+Route::post('/admin/fuenter/informacion', [FuenteRecursosController::class, 'informacionFuenteRecursos']);
+// editar una fuente de recursos
+Route::post('/admin/fuenter/editar', [FuenteRecursosController::class, 'editarFuenteRecursos']);
+
+// * ÁREA DE GESTIÓN
+
+// retorna vista con las áreas de gestión
+Route::get('/admin/areagestion/index', [AreaGestionController::class,'indexAreaGestion'])->name('admin.area.gestion.index');
+// retorna tabla con las áreas de gestión
+Route::get('/admin/areagestion/tabla/index', [AreaGestionController::class,'tablaAreaGestion']);
+// registrar nueva área de gestión
 Route::post('/admin/areagestion/nuevo', [AreaGestionController::class, 'nuevaAreaGestion']);
-Route::post('/admin/areagestion/informacion', [AreaGestionController::class, 'informacionArea']);
-Route::post('/admin/areagestion/editar', [AreaGestionController::class, 'editarArea']);
+// obtener información de un área de gestión
+Route::post('/admin/areagestion/informacion', [AreaGestionController::class, 'informacionAreaGestion']);
+// editar área de gestión
+Route::post('/admin/areagestion/editar', [AreaGestionController::class, 'editarAreaGestion']);
 
 
+// * EQUIPOS
 
-// --- ADESCOS ---
-Route::get('/admin/adescos/index', [AdescosController::class,'index'])->name('admin.adescos.index');
-Route::get('/admin/adescos/tabla/index', [AdescosController::class,'tabla']);
-Route::post('/admin/adescos/nuevo', [AdescosController::class, 'nuevoAdesco']);
-Route::post('/admin/adescos/informacion', [AdescosController::class, 'informacionAdesco']);
-Route::post('/admin/adescos/editar', [AdescosController::class, 'editarAdesco']);
-
-// --- EQUIPOS ---
-Route::get('/admin/equipos/index', [EquiposController::class,'index'])->name('admin.equipos.index');
-Route::get('/admin/equipos/tabla/index', [EquiposController::class,'tabla']);
+// retorna vista de equipos
+Route::get('/admin/equipos/index', [EquiposController::class,'indexEquipos'])->name('admin.equipos.index');
+// retorna tabla de equipos
+Route::get('/admin/equipos/tabla/index', [EquiposController::class,'tablaEquipos']);
+// registra un nuevo equipo
 Route::post('/admin/equipos/nuevo', [EquiposController::class, 'nuevoEquipo']);
+// obtener información de un equipo
 Route::post('/admin/equipos/informacion', [EquiposController::class, 'informacionEquipo']);
+// editar un equipo
 Route::post('/admin/equipos/editar', [EquiposController::class, 'editarEquipo']);
 
-// --- ASOCIACIONES ---
-Route::get('/admin/asociaciones/index', [AsociacionesController::class,'index'])->name('admin.asociaciones.index');
-Route::get('/admin/asociaciones/tabla/index', [AsociacionesController::class,'tabla']);
+// * RUBRO
+
+// retorna vista de rubros
+Route::get('/admin/rubro/index', [ProveedoresController::class,'indexRubro'])->name('admin.rubro.index');
+// retorna tabla de rubros
+Route::get('/admin/rubro/tabla', [ProveedoresController::class,'tablaRubro']);
+// registra un nuevo rubro
+Route::post('/admin/rubro/nuevo', [ProveedoresController::class, 'nuevaRubro']);
+// obtener información de un rubro
+Route::post('/admin/rubro/informacion', [ProveedoresController::class, 'informacionRubro']);
+// editar un rubro
+Route::post('/admin/rubro/editar', [ProveedoresController::class, 'editarRubro']);
+
+// * CUENTA
+
+// retorna vista de cuenta
+Route::get('/admin/cuenta/index', [CodigoEspecifController::class,'indexCuenta'])->name('admin.cuenta.index');
+// retorna tabla de cuenta
+Route::get('/admin/cuenta/tabla', [CodigoEspecifController::class,'tablaCuenta']);
+// registrar una nueva cuenta
+Route::post('/admin/cuenta/nuevo', [CodigoEspecifController::class, 'nuevaCuenta']);
+// obtener información de una cuenta
+Route::post('/admin/cuenta/informacion', [CodigoEspecifController::class, 'informacionCuenta']);
+// editar una cuenta
+Route::post('/admin/cuenta/editar', [CodigoEspecifController::class, 'editarCuenta']);
+
+// * OBJETO ESPECIFICO
+
+// retorna vista de objeto específico
+Route::get('/admin/objespecifico/index', [CodigoEspecifController::class,'indexObjEspecifico'])->name('admin.obj.especifico.index');
+// retorna tabla de objeto específico
+Route::get('/admin/objespecifico/tabla', [CodigoEspecifController::class,'tablaObjEspecifico']);
+// registrar un objeto específico
+Route::post('/admin/objespecifico/nuevo', [CodigoEspecifController::class, 'nuevaObjEspecifico']);
+// obtener información de un objeto específico
+Route::post('/admin/objespecifico/informacion', [CodigoEspecifController::class, 'informacionObjEspecifico']);
+// editar un objeto específico
+Route::post('/admin/objespecifico/editar', [CodigoEspecifController::class, 'editarObjEspecifico']);
+
+// * ADESCOS
+
+// retorna vista de adescos
+Route::get('/admin/adescos/index', [AdescosController::class,'indexAdescos'])->name('admin.adescos.index');
+// retorna tabla de adescos
+Route::get('/admin/adescos/tabla/index', [AdescosController::class,'tablaAdescos']);
+// registrar una nueva adesco
+Route::post('/admin/adescos/nuevo', [AdescosController::class, 'nuevoAdesco']);
+// obtener información de una adesco
+Route::post('/admin/adescos/informacion', [AdescosController::class, 'informacionAdesco']);
+// editar una adesco
+Route::post('/admin/adescos/editar', [AdescosController::class, 'editarAdesco']);
+
+// * ASOCIACIONES
+
+// retorna vista de asociación
+Route::get('/admin/asociaciones/index', [AsociacionesController::class,'indexAsociacion'])->name('admin.asociaciones.index');
+// retorna tabla de asociación
+Route::get('/admin/asociaciones/tabla/index', [AsociacionesController::class,'tablaAsociacion']);
+// registrar una nueva asociación
 Route::post('/admin/asociaciones/nuevo', [AsociacionesController::class, 'nuevoAsociacion']);
+// obtener información de una asociación
 Route::post('/admin/asociaciones/informacion', [AsociacionesController::class, 'informacionAsociacion']);
+// editar una asociación
 Route::post('/admin/asociaciones/editar', [AsociacionesController::class, 'editarAsociacion']);
 
 
+// * RECURSOS HUMANOS
+
+// retorna vista de recursos humanos
+Route::get('/admin/recursos/index', [RecursosController::class,'indexRecursosHumanos'])->name('admin.recursos.index');
 
 
-// --- RECURSOS HUMANOS ---
-Route::get('/admin/recursos/index', [RecursosController::class,'index'])->name('admin.recursos.index');
-
-// --- RUBRO ---
-Route::get('/admin/rubro/index', [ProveedoresController::class,'indexRubro'])->name('admin.rubro.index');
-Route::get('/admin/rubro/tabla', [ProveedoresController::class,'tablaRubro']);
-Route::post('/admin/rubro/nuevo', [ProveedoresController::class, 'nuevaRubro']);
-Route::post('/admin/rubro/informacion', [ProveedoresController::class, 'informacionRubro']);
-Route::post('/admin/rubro/editar', [ProveedoresController::class, 'editarRubro']);
-
-// --- CUENTA ---
-Route::get('/admin/cuenta/index', [CodigoEspecifController::class,'indexCuenta'])->name('admin.cuenta.index');
-Route::get('/admin/cuenta/tabla', [CodigoEspecifController::class,'tablaCuenta']);
-Route::post('/admin/cuenta/nuevo', [CodigoEspecifController::class, 'nuevaCuenta']);
-Route::post('/admin/cuenta/informacion', [CodigoEspecifController::class, 'informacionCuenta']);
-Route::post('/admin/cuenta/editar', [CodigoEspecifController::class, 'editarCuenta']);
-
-// --- OBJETO ESPECIFICO ---
-Route::get('/admin/objespecifico/index', [CodigoEspecifController::class,'indexObjEspecifico'])->name('admin.obj.especifico.index');
-Route::get('/admin/objespecifico/tabla', [CodigoEspecifController::class,'tablaObjEspecifico']);
-Route::post('/admin/objespecifico/nuevo', [CodigoEspecifController::class, 'nuevaObjEspecifico']);
-Route::post('/admin/objespecifico/informacion', [CodigoEspecifController::class, 'informacionObjEspecifico']);
-Route::post('/admin/objespecifico/editar', [CodigoEspecifController::class, 'editarObjEspecifico']);
 
 
 // ************************************************** REQUERIMIENTOS, COTIZACIONES Y ORDENES DE LAS UNIDADES O DEPARTAMENTOS ***********************
@@ -482,47 +582,85 @@ Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenUnidadController::class,'re
 // ************************************** PRESUPUESTO DE UNIDADES **********************************************************************************
 
 // --- AÑO DE PRESUPUESTO ---
+
+// retorna vista de años para presupuesto
 Route::get('/admin/p/anio/presupuesto/index', [AnioPresupuestoUnidadController::class,'indexAnioPresupuesto'])->name('p.admin.anio.presupuesto.index');
+// retorna tabla de años para presupuesto
 Route::get('/admin/p/anio/presupuesto/tabla', [AnioPresupuestoUnidadController::class,'tablaAnioPresupuesto']);
+// registra nuevo año
 Route::post('/admin/p/anio/presupuesto/nuevo', [AnioPresupuestoUnidadController::class, 'nuevoAnioPresupuesto']);
+// obtener información de año
 Route::post('/admin/p/anio/presupuesto/informacion', [AnioPresupuestoUnidadController::class, 'informacionAnioPresupuesto']);
+// editar un año de presupuesto
 Route::post('/admin/p/anio/presupuesto/editar', [AnioPresupuestoUnidadController::class, 'editarAnioPresupuesto']);
 
-// --- NOMBRE DE LOS DEPARTAMENTOS ---
+// * NOMBRE DE LOS DEPARTAMENTOS
+
+// retorna vista con los departamentos
 Route::get('/admin/p/departamentos/index', [DepartamentoPresupuestoUnidadController::class,'indexDepartamentos'])->name('p.admin.departamentos.presupuesto.index');
+// retorna tabla con los departamentos
 Route::get('/admin/p/departamentos/tabla', [DepartamentoPresupuestoUnidadController::class,'tablaDepartamentos']);
+// registrar un nuevo departamento
 Route::post('/admin/p/departamentos/nuevo', [DepartamentoPresupuestoUnidadController::class, 'nuevoDepartamentos']);
+// obtener información de un departamento
 Route::post('/admin/p/departamentos/informacion', [DepartamentoPresupuestoUnidadController::class, 'informacionDepartamentos']);
+// editar un departamento
 Route::post('/admin/p/departamentos/editar', [DepartamentoPresupuestoUnidadController::class, 'editarDepartamentos']);
 
-// --- UNIDAD DE MEDIDA PARA UNIDADES ---
+// * UNIDAD DE MEDIDA PARA UNIDADES
+
+// retorna vista con unidades de medida para presupuesto unidades
 Route::get('/admin/p/unidadmedida/index', [UnidadMedidaPresupuestoUnidadController::class,'indexUnidadMedida'])->name('p.admin.unidadmedida.presupuesto.index');
+// retorna tabla con unidades de medida para presupuesto unidades
 Route::get('/admin/p/unidadmedida/tabla', [UnidadMedidaPresupuestoUnidadController::class,'tablaUnidadMedida']);
+// registra una nueva unidad de medida
 Route::post('/admin/p/unidadmedida/nuevo', [UnidadMedidaPresupuestoUnidadController::class, 'nuevoUnidadMedida']);
+// obtener información de unidad de medida
 Route::post('/admin/p/unidadmedida/informacion', [UnidadMedidaPresupuestoUnidadController::class, 'informacionUnidadMedida']);
+// edita una unidad de medida
 Route::post('/admin/p/unidadmedida/editar', [UnidadMedidaPresupuestoUnidadController::class, 'editarUnidadMedida']);
 
-// --- CATALOGO DE MATERIALES PARA DEPARTAMENTOS ---
+// * CATÁLOGO DE MATERIALES PARA DEPARTAMENTOS
+
+// retorna vista catálogo de materiales para presupuesto de unidades
 Route::get('/admin/p/materiales/index', [MaterialesPresupuestoUnidadController::class,'indexMaterialesPresupuesto'])->name('p.admin.materiales.presupuesto.index');
+// retorna tabla catálogo de materiales para presupuesto de unidades
 Route::get('/admin/p/materiales/tabla/index', [MaterialesPresupuestoUnidadController::class,'tablaMaterialesPresupuesto']);
+// registrar un nuevo material
 Route::post('/admin/p/materiales/nuevo', [MaterialesPresupuestoUnidadController::class, 'nuevoMaterialesPresupuesto']);
+// obtener información de material
 Route::post('/admin/p/materiales/informacion', [MaterialesPresupuestoUnidadController::class, 'informacionMaterialesPresupuesto']);
-Route::post('/admin/p/materiales/editar', [ProveedoresController::class, 'editarMaterialesPresupuesto']);
+// editar un material
+Route::post('/admin/p/materiales/editar', [MaterialesPresupuestoUnidadController::class, 'editarMaterialesPresupuesto']);
 
-// REVISIÓN DE PRESUPUESTOS POR UNIDAD Y AÑO
+
+// retorna vista para revisión de presupuesto por unidad y año
 Route::get('/admin/p/revision/presupuesto/index', [ProveedoresController::class,'indexRevisionPresupuestoUnidad'])->name('p.revision.presupuesto.unidad');
-
-// GENERAR REPORTES Y CONSOLIDADO DE PRESUPUESTO UNIDADES
+// retorna vista para generar reportes y consolidado de presupuesto de unidades
 Route::get('/admin/p/reportes/unidad/presupuesto/index', [ProveedoresController::class,'indexReportePresupuestoUnidad'])->name('p.generar.reportes.presupuesto.unidad');
 
-// CREAR PRESUPUESTO POR UNA UNIDAD
+// retorna vista para crear nuevo presupuesto de la unidad
 Route::get('/admin/p/crear/presupuesto/unidad/index', [ProveedoresController::class,'indexCrearPresupuestoUnidad'])->name('p.admin.crear.presupuesto.index');
+// esta vista retorna con el presupuesto nuevo. y al cargarse desactiva el modal loading de carga
+Route::get('/admin/p/contenedor/nuevo/presupuesto', [ProveedoresController::class,'contenedorNuevoPresupuesto']);
 
-Route::get('/admin/p/cargadora', [ProveedoresController::class,'indexCargadora']);
-
+// busca material del catálogo de materiales para unidades
 Route::post('/admin/p/buscar/material/presupuesto', [ProveedoresController::class, 'buscarMaterialPresupuestoUnidad']);
-
+// crea el nuevo presupuesto del año correspondiente
 Route::post('/admin/p/crear/presupuesto/unidad', [ProveedoresController::class, 'nuevoPresupuestoUnidades']);
+
+
+// retorna vista editar un presupuesto
+Route::get('/admin/p/editar/presupuesto/unidad/index', [ProveedoresController::class,'indexEditarPresupuestoUnidad'])->name('p.admin.editar.presupuesto.index');
+
+Route::get('/admin/p/editar/presupuesto/anio/{id}', [ProveedoresController::class,'indexPresupuestoUnidadEdicion']);
+Route::get('/admin/p/editar/presupuesto/anio/contenedor/{id}', [ProveedoresController::class,'contenedorEditarPresupuestoUnidad']);
+
+Route::post('/admin/p/editar/presupuesto/editar', [ProveedoresController::class,'editarPresupuestoUnidad']);
+
+// retorna vista revisar presupuesto y ver si se aprueba, se envía ID departamento y ID unidad
+Route::get('/admin/p/departamento/presupuesto/unidad/{depa}/{anio}', [ProveedoresController::class,'indexPresupuestoParaAprobar']);
+Route::get('/admin/p/departamento/presupuesto/contenedor/{depa}/{anio}', [ProveedoresController::class,'contenedorPresupuestoIndividual']);
 
 
 

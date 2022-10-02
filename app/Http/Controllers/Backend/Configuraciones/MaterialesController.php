@@ -22,17 +22,18 @@ class MaterialesController extends Controller
         $this->middleware('auth');
     }
 
-    // vista para registrar un nuevo material
-    public function index(){
+    // retorna vista con catálogo de materiales para proyecto
+    public function indexCatalogoMaterial(){
         $lClasificacion = Clasificaciones::orderBy('nombre', 'ASC')->get();
         $lUnidad = UnidadMedida::orderBy('medida', 'ASC')->get();
         $lObjEspeci = ObjEspecifico::orderBy('nombre', 'ASC')->get();
 
-        return view('backend.admin.configuraciones.materiales.vistacatalogomateriales', compact('lClasificacion',
+        return view('backend.admin.proyectos.configuraciones.materiales.vistacatalogomateriales', compact('lClasificacion',
         'lUnidad', 'lObjEspeci'));
     }
 
-    public function tabla(){
+    // retorna tabla con catálogo de materiales para proyecto
+    public function tablaCatalogoMaterial(){
         $lista = CatalogoMateriales::orderBy('nombre', 'ASC')->get();
 
         foreach ($lista as $item) {
@@ -58,9 +59,10 @@ class MaterialesController extends Controller
             $item->objespecifico = $objespecifico;
         }
 
-        return view('backend.admin.configuraciones.materiales.tablacatalogomateriales', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.materiales.tablacatalogomateriales', compact('lista'));
     }
 
+    // registra nuevo material para proyectos
     public function nuevoMaterial(Request $request){
 
         $regla = array(
@@ -94,7 +96,8 @@ class MaterialesController extends Controller
         }
     }
 
-    public function informacion(Request $request){
+    // obtener información de un material de proyecto
+    public function informacionCatalogoMaterial(Request $request){
         $regla = array(
             'id' => 'required',
         );
@@ -129,6 +132,7 @@ class MaterialesController extends Controller
         }
     }
 
+    // editar catálogo de material de proyecto
     public function editarMaterial(Request $request){
 
         $regla = array(
@@ -183,23 +187,24 @@ class MaterialesController extends Controller
     }
 
 
-    //***************** SOLICITUD DE MATERIAL INGENIERIA ***********
-    // vista para registrar un nuevo material
+    // retorna vista con materiales solicitados para agregar catálogo de materiales
     public function indexSolicitudMaterialIng(){
         $lClasificacion = Clasificaciones::orderBy('nombre', 'ASC')->get();
         $lUnidad = UnidadMedida::orderBy('medida', 'ASC')->get();
         $lObjEspeci = ObjEspecifico::orderBy('nombre', 'ASC')->get();
 
-        return view('backend.admin.configuraciones.solicitudes.ingenieria.vistasolimaterialing', compact('lClasificacion',
+        return view('backend.admin.proyectos.configuraciones.solicitudes.ingenieria.vistasolimaterialing', compact('lClasificacion',
         'lUnidad', 'lObjEspeci'));
     }
 
+    // retorna tabla con materiales solicitados para agregar catálogo de materiales
     public function tablaSolicitudMaterialIng(){
         $lista = SoliMaterialIng::orderBy('nombre')->get();
 
-        return view('backend.admin.configuraciones.solicitudes.ingenieria.tablasolimaterialing', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.solicitudes.ingenieria.tablasolimaterialing', compact('lista'));
     }
 
+    // nuevo registro de material solicitado
     public function nuevoSolicitudMaterialIng(Request $request){
 
         $regla = array(
@@ -219,9 +224,11 @@ class MaterialesController extends Controller
             return ['success' => 1];
         }else{
             return ['success' => 2];
+
         }
     }
 
+    // borrar material solicitado
     public function borrarSolicitudMaterialIng(Request $request){
         $regla = array(
             'id' => 'required',
@@ -238,6 +245,7 @@ class MaterialesController extends Controller
         return ['success' => 1];
     }
 
+    // información para editar material solicitado
     public function informacionSolicitudMaterialIng(Request $request){
         $regla = array(
             'id' => 'required',
@@ -256,7 +264,7 @@ class MaterialesController extends Controller
     }
 
 
-    // agregar material solicitado por ingenieria y borrar el material
+    // agregar material solicitado por ingenieria
     public function agregarSolicitudMaterialIng(Request $request){
 
         $regla = array(
@@ -295,11 +303,12 @@ class MaterialesController extends Controller
         }
     }
 
-
+    // retorna vista con todos los materiales de catálogo para que unicamente pueda verse
     public function indexVistaCatalogoMaterial(){
-        return view('backend.admin.configuraciones.vistacatalogomateriales.vistacatalogomateriales');
+        return view('backend.admin.proyectos.configuraciones.vistacatalogomateriales.vistacatalogomateriales');
     }
 
+    // retorna tabla con todos los materiales de catálogo para que unicamente pueda verse
     public function tablaVistaCatalogoMaterial(){
         $lista = CatalogoMateriales::orderBy('nombre', 'ASC')->get();
 
@@ -326,7 +335,7 @@ class MaterialesController extends Controller
             $item->objespecifico = $objespecifico;
         }
 
-        return view('backend.admin.configuraciones.vistacatalogomateriales.tablacatalogomateriales', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.vistacatalogomateriales.tablacatalogomateriales', compact('lista'));
     }
 
 

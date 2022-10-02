@@ -14,17 +14,20 @@ class AdministradoresController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
+    // retorna vista con los nombres de administradores
+    public function indexVistaAdministradores(){
 
-        return view('Backend.Admin.Configuraciones.Administradores.vistaAdministradores');
+        return view('backend.admin.proyectos.configuraciones.administradores.vistaadministradores');
     }
 
-    public function tabla(){
+    // retorna tabla con los nombres de administradores
+    public function tablaVistaAdministradores(){
         $lista = Administradores::orderBy('nombre', 'ASC')->get();
 
-        return view('Backend.Admin.Configuraciones.Administradores.tablaAdministradores', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.administradores.tablaadministradores', compact('lista'));
     }
 
+    // registra nuevo administrador de proyectos
     public function nuevoAdministrador(Request $request){
 
         $regla = array(
@@ -46,7 +49,7 @@ class AdministradoresController extends Controller
         }
     }
 
-    // informacion
+    // obtener información de administrador de proyecto
     public function informacionAdministrador(Request $request){
         $regla = array(
             'id' => 'required',
@@ -64,7 +67,7 @@ class AdministradoresController extends Controller
         }
     }
 
-    // editar
+    // editar datos de administrador de proyecto
     public function editarAdministrador(Request $request){
 
         $regla = array(

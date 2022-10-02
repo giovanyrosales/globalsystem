@@ -15,15 +15,18 @@ class UnidadMedidaPresupuestoUnidadController extends Controller
 
     // ************** CREAR UNIDAD DE MEDIDA PARA PRESUPUESTO DE UNIDAD **************
 
+    // retorna vista con unidades de medida para presupuesto unidades
     public function indexUnidadMedida(){
         return view('backend.admin.presupuestounidad.configuracion.unidadmedida.vistaunidadmedida');
     }
 
+    // retorna tabla con unidades de medida para presupuesto unidades
     public function tablaUnidadMedida(){
         $lista = P_UnidadMedida::orderBy('nombre', 'ASC')->get();
         return view('backend.admin.presupuestounidad.configuracion.unidadmedida.tablaunidadmedida', compact('lista'));
     }
 
+    // registra una nueva unidad de medida
     public function nuevoUnidadMedida(Request $request){
         $regla = array(
             'nombre' => 'required'
@@ -43,6 +46,7 @@ class UnidadMedidaPresupuestoUnidadController extends Controller
         }
     }
 
+    // obtener información de unidad de medida
     public function informacionUnidadMedida(Request $request){
         $regla = array(
             'id' => 'required',
@@ -60,6 +64,7 @@ class UnidadMedidaPresupuestoUnidadController extends Controller
         }
     }
 
+    // edita una unidad de medida
     public function editarUnidadMedida(Request $request){
         $regla = array(
             'id' => 'required',

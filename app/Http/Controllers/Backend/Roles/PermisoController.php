@@ -42,7 +42,6 @@ class PermisoController extends Controller
 
         $u = new Usuario();
         $u->nombre = $request->nombre;
-        $u->apellido = $request->apellido;
         $u->usuario = $request->usuario;
         $u->password = bcrypt($request->password);
         $u->activo = 1;

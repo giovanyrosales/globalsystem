@@ -14,7 +14,8 @@ class FuenteRecursosController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
+    // retorna vista con las fuentes de recursos
+    public function indexFuenteRecursos(){
 
         $fuentef = FuenteFinanciamiento::orderBy('codigo', 'ASC')->get();
 
@@ -24,10 +25,11 @@ class FuenteRecursosController extends Controller
             }
         }
 
-        return view('Backend.Admin.Configuraciones.FuenteRecursos.vistaFuenteRecursos', compact('fuentef'));
+        return view('backend.admin.proyectos.configuraciones.fuenterecursos.vistafuenterecursos', compact('fuentef'));
     }
 
-    public function tabla(){
+    // retorna tabla con las fuentes de recursos
+    public function tablaFuenteRecursos(){
         $lista = FuenteRecursos::orderBy('codigo', 'ASC')->get();
 
         foreach ($lista as $ll){
@@ -38,10 +40,10 @@ class FuenteRecursosController extends Controller
             $ll->recurso = $recurso;
         }
 
-        return view('Backend.Admin.Configuraciones.FuenteRecursos.tablaFuenteRecursos', compact('lista'));
+        return view('backend.admin.proyectos.configuraciones.fuenterecursos.tablafuenterecursos', compact('lista'));
     }
 
-    public function nuevaFuente(Request $request){
+    public function nuevaFuenteRecursos(Request $request){
 
         $regla = array(
             'codigo' => 'required'
@@ -64,7 +66,7 @@ class FuenteRecursosController extends Controller
     }
 
     // informacion
-    public function informacionFuente(Request $request){
+    public function informacionFuenteRecursos(Request $request){
         $regla = array(
             'id' => 'required',
         );
@@ -90,7 +92,7 @@ class FuenteRecursosController extends Controller
     }
 
     // editar
-    public function editarFuente(Request $request){
+    public function editarFuenteRecursos(Request $request){
 
         $regla = array(
             'id' => 'required',

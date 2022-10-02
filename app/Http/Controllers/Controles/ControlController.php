@@ -27,7 +27,7 @@ class ControlController extends Controller
         }
 
         //PRESUPUESTO
-        else  if($user->hasRole('sidebar.estadisticas')){
+        else  if($user->hasRole('presupuesto')){
             $ruta = 'admin.estadisticas.index';
         }
 
@@ -51,7 +51,7 @@ class ControlController extends Controller
         }
          // UNIDAD
          else  if($user->hasRole('unidad')){
-            $ruta = 'admin.estadisticas.index';
+            $ruta = 'p.admin.crear.presupuesto.index';
         }
         else{
             // no tiene ningun permiso de vista, redirigir a pantalla sin permisos

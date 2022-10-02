@@ -5,7 +5,6 @@
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
-    <link href="{{ asset('css/main.css') }}" type="text/css" rel="stylesheet" />
 @stop
 
 
@@ -17,7 +16,7 @@
                 <br>
                 <div class="callout callout-info">
                     <h5><i class="fas fa-info"></i> Nota:</h5>
-                    <label>Su Usuario no esta asignado a ninguna Unidad. Contactar al Administrador.</label>
+                    <label style="font-size: 18px">Su Usuario no esta asignado a ninguna Unidad. Contactar al Administrador.</label>
                 </div>
             </div>
         </div>

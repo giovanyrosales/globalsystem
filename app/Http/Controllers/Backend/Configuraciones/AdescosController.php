@@ -13,17 +13,20 @@ class AdescosController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
+    // retorna vista de adescos
+    public function indexAdescos(){
 
         return view('Backend.Admin.Configuraciones.adescos.vistaAdescos');
     }
 
-    public function tabla(){
+    // retorna tabla de adescos
+    public function tablaAdescos(){
         $lista = Adescos::orderBy('nombre', 'ASC')->get();
 
         return view('Backend.Admin.Configuraciones.adescos.tablaAdescos', compact('lista'));
     }
 
+    // registrar una nueva adesco
     public function nuevoAdesco(Request $request){
 
         $regla = array(
@@ -47,7 +50,7 @@ class AdescosController extends Controller
         }
     }
 
-    // informacion
+    // obtener información de una adesco
     public function informacionAdesco(Request $request){
         $regla = array(
             'id' => 'required',
@@ -65,7 +68,7 @@ class AdescosController extends Controller
         }
     }
 
-    // editar
+    // editar una adesco
     public function editarAdesco(Request $request){
 
         $regla = array(

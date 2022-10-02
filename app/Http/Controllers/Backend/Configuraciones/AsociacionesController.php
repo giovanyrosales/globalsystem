@@ -14,17 +14,19 @@ class AsociacionesController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
-
-        return view('Backend.Admin.Configuraciones.asociaciones.vistaAsociaciones');
+    // retorna vista de asociación
+    public function indexAsociacion(){
+        return view('backend.admin.configuraciones.asociaciones.vistaasociaciones');
     }
 
-    public function tabla(){
+    // retorna tabla de asociación
+    public function tablaAsociacion(){
         $lista = Asociaciones::orderBy('nombre', 'ASC')->get();
 
-        return view('Backend.Admin.Configuraciones.asociaciones.tablaAsociaciones', compact('lista'));
+        return view('backend.admin.configuraciones.asociaciones.tablaasociaciones', compact('lista'));
     }
 
+    // registrar una nueva asociación
     public function nuevoAsociacion(Request $request){
 
         $regla = array(
@@ -47,7 +49,7 @@ class AsociacionesController extends Controller
         }
     }
 
-    // informacion
+    // obtener información de una asociación
     public function informacionAsociacion(Request $request){
         $regla = array(
             'id' => 'required',
@@ -65,7 +67,7 @@ class AsociacionesController extends Controller
         }
     }
 
-    // editar
+    // editar una asociación
     public function editarAsociacion(Request $request){
 
         $regla = array(
