@@ -30,6 +30,10 @@
                                             <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aumentar
                                         </button>
 
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionAgregar({{ $dato->id }})">
+                                            <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aprobar Aumento
+                                        </button>
+
                                     </td>
                                 </tr>
                             @endforeach
