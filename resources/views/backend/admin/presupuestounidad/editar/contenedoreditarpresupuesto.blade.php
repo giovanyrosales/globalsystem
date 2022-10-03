@@ -10,13 +10,15 @@
                     <form class="form-vertical">
                         <div class="card-body">
                             <div class="form-group">
-                                <label style="margin-left: 15px;">Presupuesto Año: {{ $preanio }}</label>
+                                <label style="margin-left: 18px;">Presupuesto Año: {{ $preanio }}</label>
                             </div>
 
                             <div class="form-group">
 
                                 @if($estado == 1)
                                     <label style="margin-left: 15px;">Estado: Pendiente de Aprobación</label>
+                                @elseif($estado == 2)
+                                    <label style="margin-left: 15px;">Estado: En Revisión</label>
                                 @else
                                     <label style="margin-left: 15px;">Estado: <span class="badge bg-success">Presupuesto Aprobado</span> </label>
                                 @endif
@@ -613,7 +615,7 @@
                 if(response.data.success === 1){
                     Swal.fire({
                         title: 'Información',
-                        text: "El presupuesto ya esta aprobado. No se puede editar",
+                        text: "El presupuesto esta en Revisión. No se puede editar",
                         icon: 'info',
                         showCancelButton: false,
                         confirmButtonColor: '#28a745',
@@ -626,7 +628,25 @@
                         }
                     });
                 }
+
                 else if(response.data.success === 2){
+                    Swal.fire({
+                        title: 'Información',
+                        text: "El presupuesto esta Aprobado. No se puede editar",
+                        icon: 'info',
+                        showCancelButton: false,
+                        confirmButtonColor: '#28a745',
+                        closeOnClickOutside: false,
+                        allowOutsideClick: false,
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                }
+
+                else if(response.data.success === 3){
                     Swal.fire({
                         title: 'Presupuesto Actualizado',
                         text: "",

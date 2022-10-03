@@ -34,6 +34,7 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\Departamento\DepartamentoPres
 use App\Http\Controllers\Backend\PresupuestoUnidad\UnidadMedida\UnidadMedidaPresupuestoUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Materiales\MaterialesPresupuestoUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ConfiguracionPresupuestoUnidadController;
+use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ReportesPresupuestoUnidadController;
 
 
 // --- LOGIN ---
@@ -337,6 +338,12 @@ Route::post('/admin/administradores/nuevo', [AdministradoresController::class, '
 Route::post('/admin/administradores/informacion', [AdministradoresController::class, 'informacionAdministrador']);
 // editar datos de administrador de proyecto
 Route::post('/admin/administradores/editar', [AdministradoresController::class, 'editarAdministrador']);
+// obtener información de un imprevisto de proyecto
+Route::post('/admin/proyecto/buscar/imprevisto', [AdministradoresController::class, 'informacionImprevistoProyecto']);
+// editar imprevisto de proyecto
+Route::post('/admin/proyecto/editar/imprevisto', [AdministradoresController::class, 'editarImprevistoProyecto']);
+
+
 
 // * CATALOGO DE MATERIALES
 
@@ -633,36 +640,54 @@ Route::post('/admin/p/materiales/informacion', [MaterialesPresupuestoUnidadContr
 // editar un material
 Route::post('/admin/p/materiales/editar', [MaterialesPresupuestoUnidadController::class, 'editarMaterialesPresupuesto']);
 
+// * CREACIÓN Y EDICIÓN DE PRESUPUESTO DE UNIDAD
 
 // retorna vista para revisión de presupuesto por unidad y año
-Route::get('/admin/p/revision/presupuesto/index', [ProveedoresController::class,'indexRevisionPresupuestoUnidad'])->name('p.revision.presupuesto.unidad');
+Route::get('/admin/p/revision/presupuesto/index', [ConfiguracionPresupuestoUnidadController::class,'indexRevisionPresupuestoUnidad'])->name('p.revision.presupuesto.unidad');
 // retorna vista para generar reportes y consolidado de presupuesto de unidades
-Route::get('/admin/p/reportes/unidad/presupuesto/index', [ProveedoresController::class,'indexReportePresupuestoUnidad'])->name('p.generar.reportes.presupuesto.unidad');
-
+Route::get('/admin/p/reportes/unidad/presupuesto/index', [ConfiguracionPresupuestoUnidadController::class,'indexReportePresupuestoUnidad'])->name('p.generar.reportes.presupuesto.unidad');
 // retorna vista para crear nuevo presupuesto de la unidad
-Route::get('/admin/p/crear/presupuesto/unidad/index', [ProveedoresController::class,'indexCrearPresupuestoUnidad'])->name('p.admin.crear.presupuesto.index');
+Route::get('/admin/p/crear/presupuesto/unidad/index', [ConfiguracionPresupuestoUnidadController::class,'indexCrearPresupuestoUnidad'])->name('p.admin.crear.presupuesto.index');
 // esta vista retorna con el presupuesto nuevo. y al cargarse desactiva el modal loading de carga
-Route::get('/admin/p/contenedor/nuevo/presupuesto', [ProveedoresController::class,'contenedorNuevoPresupuesto']);
-
+Route::get('/admin/p/contenedor/nuevo/presupuesto', [ConfiguracionPresupuestoUnidadController::class,'contenedorNuevoPresupuesto']);
 // busca material del catálogo de materiales para unidades
-Route::post('/admin/p/buscar/material/presupuesto', [ProveedoresController::class, 'buscarMaterialPresupuestoUnidad']);
+Route::post('/admin/p/buscar/material/presupuesto', [ConfiguracionPresupuestoUnidadController::class, 'buscarMaterialPresupuestoUnidad']);
 // crea el nuevo presupuesto del año correspondiente
-Route::post('/admin/p/crear/presupuesto/unidad', [ProveedoresController::class, 'nuevoPresupuestoUnidades']);
-
-
+Route::post('/admin/p/crear/presupuesto/unidad', [ConfiguracionPresupuestoUnidadController::class, 'nuevoPresupuestoUnidades']);
 // retorna vista editar un presupuesto
-Route::get('/admin/p/editar/presupuesto/unidad/index', [ProveedoresController::class,'indexEditarPresupuestoUnidad'])->name('p.admin.editar.presupuesto.index');
-
-Route::get('/admin/p/editar/presupuesto/anio/{id}', [ProveedoresController::class,'indexPresupuestoUnidadEdicion']);
-Route::get('/admin/p/editar/presupuesto/anio/contenedor/{id}', [ProveedoresController::class,'contenedorEditarPresupuestoUnidad']);
-
-Route::post('/admin/p/editar/presupuesto/editar', [ProveedoresController::class,'editarPresupuestoUnidad']);
+Route::get('/admin/p/editar/presupuesto/unidad/index', [ConfiguracionPresupuestoUnidadController::class,'indexEditarPresupuestoUnidad'])->name('p.admin.editar.presupuesto.index');
+// retorna vista para seleccionar año para editar un presupuesto
+Route::get('/admin/p/editar/presupuesto/anio/{id}', [ConfiguracionPresupuestoUnidadController::class,'indexPresupuestoUnidadEdicion']);
+// retorna contenedor para editar un presupuesto
+Route::get('/admin/p/editar/presupuesto/anio/contenedor/{id}', [ConfiguracionPresupuestoUnidadController::class,'contenedorEditarPresupuestoUnidad']);
+// petición para editar un presupuesto si no esta en revisión o aprobado
+Route::post('/admin/p/editar/presupuesto/editar', [ConfiguracionPresupuestoUnidadController::class,'editarPresupuestoUnidad']);
 
 // retorna vista revisar presupuesto y ver si se aprueba, se envía ID departamento y ID unidad
-Route::get('/admin/p/departamento/presupuesto/unidad/{depa}/{anio}', [ProveedoresController::class,'indexPresupuestoParaAprobar']);
-Route::get('/admin/p/departamento/presupuesto/contenedor/{depa}/{anio}', [ProveedoresController::class,'contenedorPresupuestoIndividual']);
+Route::get('/admin/p/departamento/presupuesto/unidad/{depa}/{anio}', [ConfiguracionPresupuestoUnidadController::class,'indexPresupuestoParaAprobar']);
+// retorna contenedor de presupuesto para revisión
+Route::get('/admin/p/departamento/presupuesto/contenedor/{depa}/{anio}', [ConfiguracionPresupuestoUnidadController::class,'contenedorPresupuestoIndividual']);
+// petición para transferir material solicitado por una unidad y agregar a base de materiales
+Route::post('/admin/p/presupuesto/nuevo/material/transferir', [ConfiguracionPresupuestoUnidadController::class,'transferirNuevoMaterial']);
+// actualizar estado de un presupuesto
+Route::post('/admin/p/presupuesto/unidad/cambiar/estado', [ConfiguracionPresupuestoUnidadController::class,'editarEstadoPresupuesto']);
+// verifica si todos los presupuestos esten aprobados para generar consolidado PDF
+Route::post('/admin/p/generador/verificar/consolidado/presupuesto', [ConfiguracionPresupuestoUnidadController::class,'verificarConsolidadoPresupuesto']);
 
 
+
+// retornar PDF con los totales, se envía el ID año
+Route::get('/admin/p/generador/pdf/totales/{anio}', [ReportesPresupuestoUnidadController::class,'generarTotalesPdfPresupuesto']);
+// retorna Excel con los totales, se envía el ID año
+Route::get('/admin/p/generador/excel/totales/{anio}', [ReportesPresupuestoUnidadController::class,'generarTotalesExcelPresupuesto']);
+// retorna PDF con el consolidado, todos los presupuestos ya están aprobados
+Route::get('/admin/p/generador/consolidado/pdf/presupuesto/{anio}', [ReportesPresupuestoUnidadController::class,'generarConsolidadoPdfPresupuesto']);
+// retorna Excel con el consolidado, todos los presupuestos ya están aprobados
+Route::get('/admin/p/generador/excel/consolidado/{anio}', [ReportesPresupuestoUnidadController::class,'generarConsolidadoExcelPresupuesto']);
+// retorna PDF con los totales por unidad que se seleccionó
+Route::get('/admin/p/generador/pdf/porunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalPdfPorUnidades']);
+// retorna Excel con los totales por unidad que se seleccionó
+Route::get('/admin/p/generador/excel/porunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalExcelPorUnidades']);
 
 
 

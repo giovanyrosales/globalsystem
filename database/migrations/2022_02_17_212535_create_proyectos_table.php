@@ -39,7 +39,13 @@ class CreateProyectosTable extends Migration
             $table->string('acuerdocierre', 100)->nullable(); // file
             $table->decimal('monto', 12, 2)->nullable();
 
+            // el imprevisto para aumentar dinero a proyecto
+            $table->integer('imprevisto');
+
             // para aprobar las partidas presupuesto
+            // 0: default
+            // 1: listo para revisión
+            // 2: aprobado
             $table->boolean('presu_aprobado');
             $table->dateTime('fecha_aprobado')->nullable();
 

@@ -347,7 +347,7 @@
     </tr>
 
     <tr>
-        <td width="20%" style="font-weight: bold">IMPREVISTOS (5% de sub total)</td>
+        <td width="20%" style="font-weight: bold">IMPREVISTOS ({{$numimprevisto}}% de sub total)</td>
         <td width="12%" style="font-weight: bold">{{ $imprevisto }}</td>
     </tr>
 

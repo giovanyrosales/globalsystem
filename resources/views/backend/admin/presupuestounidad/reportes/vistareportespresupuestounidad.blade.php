@@ -4,7 +4,8 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-    <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
 @stop
 
 
@@ -31,7 +32,7 @@
                                             <div class="info-box shadow">
                                                 <span class="info-box-icon bg-transparent"><i class="far fa-calendar-alt"></i></span>
                                                 <div class="info-box-content">
-                                                    <label>Fecha</label>
+                                                    <label>Año de Presupuesto</label>
                                                     <select class="form-control" id="select-anio" style="width: 35%">
                                                         @foreach($anios as $item)
                                                             <option value="{{$item->id}}">{{$item->nombre}}</option>
@@ -56,17 +57,17 @@
                                         </button>
                                     </div>
 
-                                    <hr>
+                                    <hr style="height: 0.5px; background-color: grey">
 
                                     <h5><i class="fas fa-file"></i> Generar Consolidado</h5> <br>
 
                                     <div class="row">
-                                        <button type="button" onclick="verificar()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
+                                        <button type="button" onclick="verificarConsolidado()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
                                             <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
                                             Generar PDF
                                         </button>
 
-                                        <button type="button" onclick="generarExcelConsolidado()" class="btn" style="margin-left: 25px; border-color: black; border-radius: 0.1px;">
+                                        <button type="button" onclick="verificarConsolidadoExcel()" class="btn" style="margin-left: 25px; border-color: black; border-radius: 0.1px;">
                                             <img src="{{ asset('images/logoexcel.png') }}" width="48px" height="55px">
                                             Generar Excel
                                         </button>
@@ -74,17 +75,17 @@
 
                                     <br><br>
 
-                                    <hr>
+                                    <hr style="height: 0.5px; background-color: grey">
 
                                     <h5><i class="fas fa-info"></i> Generar Presupuesto por Unidad</h5>
-
+                                    <p><i class="fas fa-info"></i> Solo buscara Presupuestos Aprobados</p>
                                     <div class="form-group row">
                                         <div class="col-sm-9">
                                             <div class="info-box shadow">
                                                 <span class="info-box-icon bg-transparent"><i class="far fa-calendar-alt"></i></span>
                                                 <div class="info-box-content">
                                                     <label>Fecha</label>
-                                                    <select class="form-control" id="select-anio-unidad" style="width: 35%">
+                                                    <select class="form-control" id="select-anio-unidad"  style="width: 35%">
                                                         @foreach($anios as $item)
                                                             <option value="{{$item->id}}">{{$item->nombre}}</option>
                                                         @endforeach
@@ -190,23 +191,32 @@
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
-    <script src="{{ asset('js/jquery.simpleaccordion.js') }}"></script>
+    <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
 
     <script>
         $(document).ready(function() {
             document.getElementById("divcc").style.display = "block";
+
+            $('#select-unidad').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Busqueda no encontrada";
+                    }
+                },
+            });
         });
 
     </script>
 
     <script>
 
-        function verificar(){
+        function verificarConsolidado(){
 
             var anio = document.getElementById('select-anio').value;
 
             if(anio === ''){
-                toastr.error('año es requerido');
+                toastr.error('Año es requerido');
                 return;
             }
 
@@ -215,15 +225,15 @@
 
             openLoading();
 
-            axios.post(url+'/generador/verificar/presupuesto', formData, {
+            axios.post(url+'/p/generador/verificar/consolidado/presupuesto', formData, {
             })
                 .then((response) => {
 
                     closeLoading();
                     if(response.data.success === 1){
                         // generar tabla
-                        generarPdfConsolidado();
-                    }
+                        var anio = document.getElementById('select-anio').value;
+                        window.open("{{ URL::to('admin/p/generador/consolidado/pdf/presupuesto') }}/" + anio);                    }
 
                     else if(response.data.success === 2){
                         // departamentos si aprobar aun
@@ -245,41 +255,59 @@
                 });
         }
 
-
-        function generarPdfConsolidado(){
+        function verificarConsolidadoExcel(){
 
             var anio = document.getElementById('select-anio').value;
-            window.open("{{ URL::to('admin/generador/pdf/presupuesto') }}/" + anio);
-        }
 
-        function msjActualizado(){
-            Swal.fire({
-                title: 'Actualizado',
-                text: 'Nuevo Material transferido correctamente',
-                icon: 'info',
-                showCancelButton: false,
-                confirmButtonColor: '#28a745',
-                confirmButtonText: 'Aceptar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    location.reload();
-                }
-            });
+            if(anio === ''){
+                toastr.error('Año es requerido');
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('anio', anio);
+
+            openLoading();
+
+            axios.post(url+'/p/generador/verificar/consolidado/presupuesto', formData, {
+            })
+                .then((response) => {
+
+                    closeLoading();
+                    if(response.data.success === 1){
+                        // generar tabla
+                        var fecha = document.getElementById('select-anio').value;
+                        window.open("{{ URL::to('admin/p/generador/excel/consolidado') }}/" + fecha);
+                    }
+
+                    else if(response.data.success === 2){
+                        // departamentos si aprobar aun
+                        $('#modalPendiente').modal('show');
+
+                        document.getElementById("select-departamento").options.length = 0;
+
+                        $.each(response.data.lista, function( key, val ){
+                            $('#select-departamento').append('<option value="0">'+val.nombre+'</option>');
+                        });
+                    }
+                    else{
+                        toastr.error('Error al generar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al generar');
+                    closeLoading();
+                });
         }
 
         function generarPdfTotales(){
             var idanio = document.getElementById('select-anio').value;
-            window.open("{{ URL::to('admin/generador/pdf/totales') }}/" + idanio);
-        }
-
-        function generarExcelConsolidado(){
-            var fecha = document.getElementById('select-anio').value;
-            window.open("{{ URL::to('admin/generador/excel/consolidado') }}/" + fecha);
+            window.open("{{ URL::to('admin/p/generador/pdf/totales') }}/" + idanio);
         }
 
         function generarExcelTotales(){
             var fecha = document.getElementById('select-anio').value;
-            window.open("{{ URL::to('admin/generador/excel/totales') }}/" + fecha);
+            window.open("{{ URL::to('admin/p/generador/excel/totales') }}/" + fecha);
         }
 
         function generarPdfPorUnidad(){
@@ -302,7 +330,7 @@
             let listado = selected.toString();
             let reemplazo = listado.replace(/,/g, "-");
 
-            window.open("{{ URL::to('admin/generador/pdf/porunidad') }}/" + idanio + "/" + reemplazo);
+            window.open("{{ URL::to('admin/p/generador/pdf/porunidad') }}/" + idanio + "/" + reemplazo);
         }
 
         function generarExcelPorUnidad(){
@@ -324,7 +352,7 @@
             let listado = selected.toString();
             let reemplazo = listado.replace(/,/g, "-");
 
-            window.open("{{ URL::to('admin/generador/excel/porunidad') }}/" + idanio + "/" + reemplazo);
+            window.open("{{ URL::to('admin/p/generador/excel/porunidad') }}/" + idanio + "/" + reemplazo);
         }
 
 

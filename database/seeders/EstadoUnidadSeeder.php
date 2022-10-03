@@ -19,6 +19,10 @@ class EstadoUnidadSeeder extends Seeder
         ]);
 
         P_Estado::create([
+            'nombre' => 'EN REVISIÓN',
+        ]);
+
+        P_Estado::create([
             'nombre' => 'APROBADO',
         ]);
     }

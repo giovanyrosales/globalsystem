@@ -25,14 +25,14 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.roles.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Roles</p>
+                                <p>Rol y Permisos</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a href="{{ route('admin.permisos.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Usuario Permisos</p>
+                                <p>Usuario</p>
                             </a>
                         </li>
 
@@ -260,7 +260,7 @@
                     <a href="#" class="nav-link nav-">
                         <i class="far fa-edit"></i>
                         <p>
-                            Configuraciones
+                            Configuración Proyectos
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
@@ -316,7 +316,7 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.catalogo.materiales.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Catálogo Materiales</p>
+                                <p>Materiales Proyecto</p>
                             </a>
                         </li>
                         @endcan
@@ -446,9 +446,6 @@
                 </li>
 
 
-
-
-
                 @can('sidebar.seccion.configuraciones.presupuesto.unidades')
 
                     <li class="nav-item">
@@ -494,7 +491,7 @@
                             <li class="nav-item">
                                 <a href="{{ route('p.admin.materiales.presupuesto.index') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Materiales</p>
+                                    <p>Materiales Unidad</p>
                                 </a>
                             </li>
                             @endcan

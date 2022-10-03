@@ -9,7 +9,7 @@
                 <div class="card">
                     <form class="form-vertical">
                         <div style="margin-left: 20px">
-                            <label style="color: darkgreen; font-size: 20px; font-family: arial">Total ${{$totalvalor}}</label>
+                            <label style="color: darkgreen; font-size: 20px; font-family: arial">Total:  ${{$totalvalor}}</label>
                         </div>
 
                         <div class="col-12">
@@ -219,6 +219,90 @@
 
     function recargar(){
         location.reload();
+    }
+
+    function verificarTransferir(e){
+        Swal.fire({
+            title: 'Transferir?',
+            text: "Se agregara a Presupuesto Base y Presupuesto de la Unidad",
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#d33',
+            cancelButtonText: 'Cancelar',
+            confirmButtonText: 'Si'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                transferir(e);
+            }
+        })
+    }
+
+    function transferir(e){
+
+        var table = e.parentNode.parentNode;
+        var objeto = table.cells[0].childNodes[0].value;
+        var idpresupuesto = {{ $idpresupuesto }};
+        var idfila = table.cells[1].children[0].value;
+
+        // guardar en base de materiales de la unidad
+        // guardar en base de materiales
+
+        let formData = new FormData();
+        formData.append('objeto', objeto);
+        formData.append('idpresupuesto', idpresupuesto);
+        formData.append('idfila', idfila);
+
+        axios.post(url+'/p/presupuesto/nuevo/material/transferir', formData, {
+        })
+            .then((response) => {
+
+                if(response.data.success === 1){
+
+                    Swal.fire({
+                        title: 'No Agregado',
+                        text: "Para agregar el Presupuesto no debe estar Aprobado",
+                        icon: 'info',
+                        showCancelButton: false,
+                        confirmButtonColor: '#28a745',
+                        closeOnClickOutside: false,
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                        }
+                    });
+                }
+
+                else if(response.data.success === 2) {
+                    table.parentNode.removeChild(table);
+
+                    let nombre = response.data.unidad;
+
+                    Swal.fire({
+                        title: 'Actualizado',
+                        text: "El Material ha sido agregado al Base Presupuesto y el Presupuesto de la Unidad: " + nombre,
+                        icon: 'info',
+                        showCancelButton: false,
+                        confirmButtonColor: '#28a745',
+                        closeOnClickOutside: false,
+                        allowOutsideClick: false,
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+
+                }
+                else{
+                    toastr.error('error al actualizar');
+                }
+            })
+            .catch((error) => {
+                toastr.error('error al actualizar');
+                closeLoading();
+            });
     }
 
 </script>

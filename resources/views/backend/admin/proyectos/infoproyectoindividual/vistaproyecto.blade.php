@@ -69,6 +69,17 @@
                                         <td>{{ $proyecto->ubicacion }}</td>
                                     </tr>
                                 </table>
+
+                                <!-- Solo se podra modificar el imprevisto, si no esta en revisión o aprobado el presupuesto -->
+                                @if($proyecto->presu_aprobado == 0)
+                                    @can('boton.editar.imprevisto.administrador')
+                                    <button type="button" style="margin-top: 15px" onclick="modalImprevisto()" class="btn btn-success btn-sm">
+                                        <i class="fas fa-money-bill"></i>
+                                        Imprevisto
+                                    </button>
+                                    @endcan
+                                @endif
+
                             </div>
                         </div>
                     </div>
@@ -368,6 +379,41 @@
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="editarBitacora()">Actualizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!------------------ MODAL IMPREVISTO DE PRESUPUESTO ---------------->
+<div class="modal fade" id="modalImprevisto">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Imprevisto de Presupuesto</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-imprevisto">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <div class="form-group">
+                                    <label>Imprevisto %</label>
+                                    <input type="number" class="form-control" id="imprevisto-editar" placeholder="0%">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="editarImprevisto()">Actualizar</button>
             </div>
         </div>
     </div>
@@ -2798,6 +2844,124 @@
                     closeLoading();
                 });
         }
+
+        // abrir modal para cambiar imprevisto para presupuesto proyecto
+        function modalImprevisto(){
+
+            openLoading();
+
+            let id = {{ $id }};
+
+            let formData = new FormData();
+            formData.append('id', id);
+
+            axios.post(url+'/proyecto/buscar/imprevisto', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1) {
+                        $('#imprevisto-editar').val(response.data.numero);
+                        $('#modalImprevisto').modal('show');
+                    }
+                    else{
+                        toastr.error('Error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al borrar');
+                    closeLoading();
+                });
+        }
+
+
+        function editarImprevisto(){
+
+            let imprevisto = document.getElementById('imprevisto-editar').value;
+
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
+            if(imprevisto === ''){
+                toastr.error('Imprevisto es requerido');
+                return;
+            }
+
+            if(!imprevisto.match(reglaNumeroEntero)) {
+                toastr.error('Imprevisto debe ser número Entero y no Negativo');
+                return;
+            }
+
+            if(imprevisto < 0){
+                toastr.error('Imprevisto no debe ser negativo');
+                return;
+            }
+
+            if(imprevisto > 50){
+                toastr.error('Imprevisto no puede ser mayor a 50%');
+                return;
+            }
+
+
+            openLoading();
+
+            let id = {{ $id }};
+
+            let formData = new FormData();
+            formData.append('id', id);
+            formData.append('imprevisto', imprevisto);
+
+            axios.post(url+'/proyecto/editar/imprevisto', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1) {
+
+                        Swal.fire({
+                            title: 'No Modificado',
+                            text: "El Presupuesto esta en Revisión",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+
+                    else if(response.data.success === 2) {
+
+                        Swal.fire({
+                            title: 'No Modificado',
+                            text: "El Presupuesto ya esta Aprobado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 3){
+                        toastr.success('Actualizado correctamente');
+                        $('#modalImprevisto').modal('hide');
+                    }
+                    else{
+                        toastr.error('Error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al borrar');
+                    closeLoading();
+                });
+        }
+
 
     </script>
 

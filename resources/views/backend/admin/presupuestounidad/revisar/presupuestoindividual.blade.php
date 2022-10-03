@@ -4,7 +4,6 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-    <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
 
@@ -25,15 +24,27 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <label>Presupuesto Año: {{ $infoAnio->nombre }}</label>
+                        <label style="font-size: 18px">Presupuesto Año: {{ $infoAnio->nombre }}</label>
                     </div>
-                    <div class="form-group">
-                        @if($estado == 1)
-                            <label style="margin-left: 15px;">Estado: Pendiente de Aprobación</label>
-                        @else
-                            <label style="margin-left: 15px;">Estado: <span class="badge bg-success">Presupuesto Aprobado</span> </label>
-                        @endif
+
+
+                    <div class="form-group col-md-3">
+                        <label style="color:#191818">Estado</label>
+                        <br>
+                        <div>
+                            <select class="form-control" id="select-estado" onchange="actualizarEstado()">
+                                @foreach($arrayestado as $item)
+
+                                    @if($estado == $item->id)
+                                        <option value="{{$item->id}}" selected="selected">{{$item->nombre}}</option>
+                                    @else
+                                        <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -96,5 +107,39 @@
         });
     </script>
 
+    <script>
+
+        function actualizarEstado(){
+
+            var estado = document.getElementById('select-estado').value;
+
+            var idpresupuesto = {{ $idpre }};
+
+            let formData = new FormData();
+            formData.append('idpresupuesto', idpresupuesto);
+            formData.append('idestado',estado);
+
+            axios.post(url+'/p/presupuesto/unidad/cambiar/estado', formData, {
+            })
+                .then((response) => {
+                    if(response.data.success === 1){
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Estado Actualizado',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                    }else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+    </script>
 
 @endsection

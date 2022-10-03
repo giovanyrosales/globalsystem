@@ -247,8 +247,8 @@ class ControlPdfController extends Controller
         $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalDescuento
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
-        // imprevisto del 5%
-        $imprevisto = ($subtotalPartida * 5) / 100;
+        // imprevisto obtenido del proyecto
+        $imprevisto = ($subtotalPartida * $infoPro->imprevisto) / 100;
 
         // total de la partida final
         $totalPartidaFinal = $subtotalPartida + $imprevisto;
@@ -505,7 +505,7 @@ class ControlPdfController extends Controller
     </tr>
 
     <tr>
-        <td width='20%' style='font-weight: bold'>IMPREVISTOS (5% de sub total)</td>
+        <td width='20%' style='font-weight: bold'>IMPREVISTOS ($infoPro->imprevisto% de sub total)</td>
         <td width='12%' style='font-weight: bold'>$imprevisto</td>
     </tr>
 

@@ -98,6 +98,7 @@ class ProyectoController extends Controller
                 $p->fecha = Carbon::now('America/El_Salvador');
                 $p->presu_aprobado = 0;
                 $p->fecha_aprobado = null;
+                $p->imprevisto = 5; // por default, después se puede modificar
 
                 if($p->save()){
                     return ['success' => 2];
@@ -130,6 +131,7 @@ class ProyectoController extends Controller
             $p->monto = 0;
             $p->presu_aprobado = 0;
             $p->fecha_aprobado = null;
+            $p->imprevisto = 5; // por default, después se puede modificar
 
             if($p->save()){
                 return ['success' => 2];
@@ -1747,8 +1749,8 @@ class ProyectoController extends Controller
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
 
-        // imprevisto del 5%
-        $imprevisto = ($subtotalPartida * 5) / 100;
+        // imprevisto obtenido del proyecto
+        $imprevisto = ($subtotalPartida * $infoPro->imprevisto) / 100;
 
         // total de la partida final
         $totalPartidaFinal = $subtotalPartida + $imprevisto;
@@ -1766,11 +1768,12 @@ class ProyectoController extends Controller
         $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
 
         $preAprobado = $infoPro->presu_aprobado;
+        $numimprevisto = $infoPro->imprevisto;
 
         return view('backend.admin.proyectos.modal.pdfpresupuesto', compact('partida1',
             'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento',
             'sumaMateriales', 'herramienta2Porciento', 'totalManoObra', 'totalAporteManoObra', 'totalAlquilerMaquinaria',
-            'totalTransportePesado', 'subtotalPartida', 'imprevisto', 'totalPartidaFinal', 'preAprobado'));
+            'totalTransportePesado', 'subtotalPartida', 'imprevisto', 'totalPartidaFinal', 'preAprobado', 'numimprevisto'));
     }
 
     // petición para aprobar el presupuesto y guardar las cuentas proyecto

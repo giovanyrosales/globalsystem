@@ -17,7 +17,6 @@
         height: 30px !important;
     }
 
-
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -78,7 +77,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Nombre *:</label>
+                                <label>Nombre:</label>
                                 <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresIngreso();" onkeyup="contarcaracteresIngreso();" maxlength="300" id="nombre-nuevo" placeholder="Nombre del material">
                                 <div id="res-caracter-nuevo" style="float: right">0/300</div>
                             </div>
@@ -100,7 +99,7 @@
 
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Precio Unitario *:</label>
+                                        <label>Precio Unitario:</label>
                                         <input type="number" class="form-control" autocomplete="off" id="precio-nuevo" maxlength="10" placeholder="0.00">
                                     </div>
                                 </div>
@@ -147,7 +146,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Nombre *:</label>
+                                        <label>Nombre:</label>
                                         <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresEditar();" onkeyup="contarcaracteresEditar();" maxlength="300" id="nombre-editar" placeholder="Nombre del material">
                                         <div id="res-caracter-editar" style="float: right">0/300</div>
                                     </div>
@@ -166,7 +165,7 @@
 
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label>Precio Unitario *:</label>
+                                                <label>Precio Unitario:</label>
                                                 <input type="number" class="form-control" autocomplete="off" id="precio-editar" maxlength="10">
                                             </div>
                                         </div>
@@ -298,10 +297,15 @@
 
         function nuevo(){
 
-            var codigo = document.getElementById('select-codigo-nuevo').value; // nullable
+            var codigo = document.getElementById('select-codigo-nuevo').value;
             var nombre = document.getElementById('nombre-nuevo').value;
             var precio = document.getElementById('precio-nuevo').value;
-            var unidad = document.getElementById('select-unidad-nuevo').value; // nullable
+            var unidad = document.getElementById('select-unidad-nuevo').value;
+
+            if(codigo === ''){
+                toastr.error('Objeto Específico es requerido');
+                return;
+            }
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -332,6 +336,11 @@
 
             if (precio.length > 10) {
                 toastr.error('Precio máximo 10 dígitos de límite');
+                return;
+            }
+
+            if(unidad === ''){
+                toastr.error('Unidad de Medida es requerido');
                 return;
             }
 
@@ -401,16 +410,6 @@
                         document.getElementById("select-codigo-editar").options.length = 0;
                         document.getElementById("select-unidad-editar").options.length = 0;
 
-                        // codigo especifico
-                        if(response.data.arraydatos['idcodigo'] == null){
-                            $('#select-codigo-editar').append('<option value="0">Seleccionar una opción</option>');
-                        }
-
-                        // unidad medida
-                        if(response.data.arraydatos['idmedida'] == null){
-                            $('#select-unidad-editar').append('<option value="0">Seleccionar una opción</option>');
-                        }
-
                         // objeto especifico
                         $.each(response.data.codigo, function( key, val ){
                             if(response.data.arraydatos['idcodigo'] == val.id){
@@ -429,7 +428,7 @@
                             }
                         });
 
-                        // BLOQUEAR SI EN PRESUPUESTO YA ESTA ESTE MATERIAL EN USO
+                        // BLOQUEAR SI EN PRESUPUESTO DE UNIDAD YA ESTA ESTE MATERIAL EN USO
                         /*if(response.data.bloqueo){
                             document.getElementById("select-codigo-editar").disabled = true;
                             document.getElementById("nombre-editar").disabled = true;
@@ -469,12 +468,12 @@
                 return;
             }
 
-            if(codigo == '0'){
+            if(codigo === ''){
                 toastr.error('Seleccionar Objeto Específico');
                 return;
             }
 
-            if(unidad == '0'){
+            if(unidad === ''){
                 toastr.error('Seleccionar Unidad de medida');
                 return;
             }

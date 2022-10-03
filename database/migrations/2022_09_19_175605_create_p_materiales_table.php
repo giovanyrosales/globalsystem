@@ -16,8 +16,8 @@ class CreatePMaterialesTable extends Migration
         Schema::create('p_materiales', function (Blueprint $table) {
             $table->id();
 
-            $table->bigInteger('id_objespecifico')->nullable()->unsigned();
-            $table->bigInteger('id_unidadmedida')->nullable()->unsigned();
+            $table->bigInteger('id_objespecifico')->unsigned();
+            $table->bigInteger('id_unidadmedida')->unsigned();
 
             $table->string('descripcion', 300);
             $table->decimal('costo', 10, 2);
