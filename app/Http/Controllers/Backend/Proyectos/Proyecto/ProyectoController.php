@@ -99,6 +99,7 @@ class ProyectoController extends Controller
                 $p->presu_aprobado = 0;
                 $p->fecha_aprobado = null;
                 $p->imprevisto = 5; // por default, después se puede modificar
+                $p->permiso = 0;
 
                 if($p->save()){
                     return ['success' => 2];
@@ -132,6 +133,7 @@ class ProyectoController extends Controller
             $p->presu_aprobado = 0;
             $p->fecha_aprobado = null;
             $p->imprevisto = 5; // por default, después se puede modificar
+            $p->permiso = 0;
 
             if($p->save()){
                 return ['success' => 2];

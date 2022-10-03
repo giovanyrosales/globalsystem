@@ -74,7 +74,8 @@ class CuentaProyectoController extends Controller
 
         $presupuesto = DB::table('cuentaproy AS p')
             ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
-            ->select('obj.nombre', 'obj.id AS idcodigo', 'obj.codigo', 'p.id', 'p.saldo_inicial')
+            ->select('obj.nombre', 'obj.id AS idcodigo', 'p.proyecto_id',
+                'obj.codigo', 'p.id', 'p.saldo_inicial')
             ->where('p.proyecto_id', $id)
             ->get();
 
@@ -133,6 +134,10 @@ class CuentaProyectoController extends Controller
             foreach ($infoSaldoRetenido as $dd){
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
+
+            // usado para ver puedo hacer un movimiento de cuenta
+            $infoProyecto = Proyecto::where('id', $pp->proyecto_id)->first();
+            $pp->permiso = $infoProyecto->permiso;
 
             // SUMAR LOS MOVIMIENTOS DE CUENTA
             $totalRestante = $totalMoviCuenta;

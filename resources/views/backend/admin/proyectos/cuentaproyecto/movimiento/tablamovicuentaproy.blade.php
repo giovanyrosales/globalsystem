@@ -26,14 +26,11 @@
                                     <td>${{ $dato->total_retenido }}</td>
 
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionAgregar({{ $dato->id }})">
-                                            <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aumentar
-                                        </button>
-
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionAgregar({{ $dato->id }})">
-                                            <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aprobar Aumento
-                                        </button>
-
+                                        @if($dato->permiso == 1)
+                                            <button type="button" class="btn btn-primary btn-xs" onclick="informacionAgregar({{ $dato->id }})">
+                                                <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aumentar
+                                            </button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

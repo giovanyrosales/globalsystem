@@ -49,6 +49,11 @@ class CreateProyectosTable extends Migration
             $table->boolean('presu_aprobado');
             $table->dateTime('fecha_aprobado')->nullable();
 
+            // utilizado para que jefe presupuesto de permiso de 1 movimiento de cuenta
+            // 0: no permiso
+            // 1: permiso
+            $table->boolean('permiso');
+
             $table->foreign('id_linea')->references('id')->on('linea');
             $table->foreign('id_fuentef')->references('id')->on('fuentef');
             $table->foreign('id_fuenter')->references('id')->on('fuenter');
