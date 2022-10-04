@@ -550,7 +550,7 @@
                             <div class="col-md-7">
                                 <div class="form-group">
                                     <label>Partida *:</label>
-                                    <input class="form-control" id="nombre-partida-nuevo" maxlength="600">
+                                    <input class="form-control" autocomplete="off" id="nombre-partida-nuevo" maxlength="600">
                                 </div>
                             </div>
 
@@ -1740,7 +1740,7 @@
                     "</td>" +
 
                     "<td>" +
-                    "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>" +
+                    "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' autocomplete='off' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>" +
                     "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
                     "</td>" +
 
@@ -1769,7 +1769,7 @@
                     "</td>" +
 
                     "<td>" +
-                    "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>" +
+                    "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' autocomplete='off' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>" +
                     "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
                     "</td>" +
 
@@ -1889,6 +1889,7 @@
             $("#matriz-presupuesto tr:eq("+(index+1)+")").css('background', '#F1948A');
         }
 
+        // verificar para guardar una Partida con su partida detalle
         function verificarPresupuesto(){
 
             var cantidadPartida = document.getElementById('cantidad-partida-nuevo').value; // decimal
@@ -1922,7 +1923,6 @@
             }
 
             var cantidad = $("input[name='cantidadPresupuestoArray[]']").map(function(){return $(this).val();}).get();
-            var descripcion = $("input[name='descripcionPresupuestoArray[]']").map(function(){return $(this).val();}).get();
             var descripcionAtributo = $("input[name='descripcionPresupuestoArray[]']").map(function(){return $(this).attr("data-infopresupuesto");}).get();
             var duplicado = $("input[name='duplicarPresupuestoArray[]']").map(function(){return $(this).val();}).get();
 
@@ -1934,11 +1934,20 @@
                     let datoCantidad = cantidad[a];
 
                     // identifica si el 0 es tipo number o texto
+                    // ESTO IDENTIFICA EL MATERIAL ID
                     if(detalle == 0){
                         colorRojoTablaPresupuesto(a);
                         alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
                         return;
                     }
+
+                /*  1- materiales
+                    2- herramientas (2% de materiales)
+                    3- mano de obra (por administracion)
+                    4- aporte mano de obra
+                    5- alquiler de maquinaria
+                    6- trasporte de concreto fresco
+                */
 
                     if(tipopartida != '4') {
 
@@ -1956,34 +1965,20 @@
 
                         if (datoCantidad <= 0) {
                             colorRojoTablaPresupuesto(a);
-                            toastr.error('Fila #' + (a + 1) + ' Cantidad no debe ser negativo');
+                            toastr.error('Fila #' + (a + 1) + ' Cantidad no debe ser negativo o cero');
                             return;
                         }
 
-                        if (datoCantidad.length > 10) {
+                        if (datoCantidad > 1000000) {
                             colorRojoTablaPresupuesto(a);
-                            toastr.error('Fila #' + (a + 1) + ' Cantidad máximo 10 caracteres');
+                            toastr.error('Fila #' + (a + 1) + ' Cantidad no puede superar 1 millón');
                             return;
                         }
 
                     }
                 }
 
-                for(var b = 0; b < descripcion.length; b++){
-
-                    var datoDescripcion = descripcion[b];
-
-                    if(datoDescripcion === ''){
-                        colorRojoTablaPresupuesto(b);
-                        toastr.error('Fila #' + (b+1) + ' la descripción es requerida');
-                        return;
-                    }
-
-                    if(datoDescripcion.length > 400){
-                        colorRojoTablaPresupuesto(b);
-                        toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
-                    }
-                }
+                // LA DESCRIPCIÓN NO ES NECESARIA VALIDAR, YA QUE SE VALIDA QUE LLEVE EL ID LA FILA
 
                 var reglaNumeroEntero = /^[0-9]\d*$/;
 
@@ -2010,9 +2005,9 @@
                         return;
                     }
 
-                    if(datoDuplicado.length > 3){
+                    if(datoDuplicado > 999){
                         colorRojoTablaPresupuesto(d);
-                        toastr.error('Fila #' + (d+1) + ' Duplicado máximo 3 caracteres');
+                        toastr.error('Fila #' + (d+1) + ' Duplicado no debe superar Número 999');
                         return;
                     }
                 }
@@ -2022,6 +2017,7 @@
                 for(var p = 0; p < cantidad.length; p++){
 
                     // SOLO PARA APORTE PATRONAL SIEMPRE SERA 0
+                    // O APORTE MANO DE OBRA
                     if(tipopartida == '4'){
                         formData.append('cantidad[]', 0);
                     }else{
@@ -2043,9 +2039,9 @@
             })
                 .then((response) => {
                     closeLoading();
+                    $('#modalAgregarPresupuesto').modal('hide');
 
                     if(response.data.success === 1) {
-                        $('#modalAgregarPresupuesto').modal('hide');
 
                         Swal.fire({
                             title: 'En Revisión',
@@ -2063,8 +2059,7 @@
                         })
                     }
 
-                    if(response.data.success === 1) {
-                        $('#modalAgregarPresupuesto').modal('hide');
+                    else if(response.data.success === 2) {
 
                         Swal.fire({
                             title: 'No Guardado',
@@ -2082,8 +2077,8 @@
                         })
                     }
 
-                    if(response.data.success === 3){
-                        $('#modalAgregarPresupuesto').modal('hide');
+                    else if(response.data.success === 3){
+
                         toastr.success('Registrado correctamente');
 
                         window.contadorGlobal = response.data.contador;

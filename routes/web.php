@@ -239,7 +239,10 @@ Route::post('/admin/movicuentaproy/documento/guardar',  [CuentaProyectoControlle
 Route::post('/admin/movicuentaproy/informacion',  [CuentaProyectoController::class,'informacionMoviCuentaProy']);
 // al mover el select de movimiento cuenta a modificar, quiero ver el saldo restante
 Route::post('/admin/movicuentaproy/info/saldo',  [CuentaProyectoController::class,'infoSaldoRestanteCuenta']);
-
+// petición para que jefe presupuesto autorice un movimiento de cuenta
+Route::post('/admin/movicuentaproy/autorizar/movimiento',  [CuentaProyectoController::class,'autorizarMovimientoDeCuenta']);
+// petición para que jefe presupuesto deniegue un movimiento de cuenta
+Route::post('/admin/movicuentaproy/denegar/movimiento',  [CuentaProyectoController::class,'denegarMovimientoDeCuenta']);
 
 // buscador de material para crear una partida
 Route::post('/admin/proyecto/buscar/material-presupuesto',  [ProyectoController::class,'buscadorMaterialPresupuesto']);

@@ -52,7 +52,11 @@ class ControlController extends Controller
          // UNIDAD
          else  if($user->hasRole('unidad')){
             $ruta = 'p.admin.crear.presupuesto.index';
-        }
+         }
+         // SECRETARIA
+         else  if($user->hasRole('secretaria')){
+             $ruta = 'admin.estadisticas.index';
+         }
         else{
             // no tiene ningun permiso de vista, redirigir a pantalla sin permisos
             $ruta = 'no.permisos.index';

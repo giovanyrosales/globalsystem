@@ -1336,10 +1336,11 @@ class ProyectoController extends Controller
                 }
             }
 
-            DB::commit();
+            //DB::commit();
             return ['success' => 3, 'contador' => $conteoPartida];
 
         }catch(\Throwable $e){
+            Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 4];
         }

@@ -189,7 +189,7 @@
 
                             @can('sidebar.requerimientosunidad.listar')
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.listar.requerimientosunidad.index') }}" target="frameprincipal" class="nav-link">
+                                    <a href="#" target="frameprincipal" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Listar Requerimientos Unidad</p>
                                     </a>

@@ -27,6 +27,22 @@
                         <i class="fas fa-list-alt"></i>
                         Histórico
                     </button>
+
+                    <!-- botón para dar permiso para hacer un movimiento de cuenta. para jefe presupuesto -->
+                    @can('boton.autorizar.denegar.movimiento.cuenta')
+                        @if($permiso == 1)
+                            <button type="button" style="margin-top: 15px" onclick="modalPermisoDenegar()" class="btn btn-danger btn-sm">
+                                <i class="fas fa-stop"></i>
+                                Denegar Movimiento
+                            </button>
+                        @else
+                            <button type="button" style="margin-top: 15px" onclick="modalPermisoAprobar()" class="btn btn-success btn-sm">
+                                <i class="fas fa-check"></i>
+                                Autorizar Movimiento
+                            </button>
+                        @endif
+                    @endcan
+
                 </div>
 
             </div>
@@ -141,7 +157,6 @@
             </div>
         </div>
     </div>
-
 
 </div>
 
@@ -334,7 +349,7 @@
             })
                 .then((response) => {
                     closeLoading();
-                    console.log(response)
+
                     if(response.data.success === 1){
 
                         let saldo = response.data.saldo;
@@ -373,6 +388,120 @@
                 });
         }
 
+
+        function modalPermisoAprobar(){
+            Swal.fire({
+                title: 'Aprobar un Movimiento',
+                text: "Solo se autoriza realizar un movimiento de cuenta",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    autorizarMovimiento();
+                }
+            })
+        }
+
+        function autorizarMovimiento(){
+
+            openLoading();
+
+            // id proyecto
+            let id = {{$id}};
+
+            axios.post(url+'/movicuentaproy/autorizar/movimiento',{
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'Autorizado',
+                            text: "Solo se podrá hacer un movimiento de cuenta",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            closeOnClickOutside: false,
+                            allowOutsideClick: false,
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    }
+                    else {
+                        toastr.error('Error al registrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al registrar');
+                    closeLoading();
+                });
+        }
+
+        function modalPermisoDenegar(){
+            Swal.fire({
+                title: 'Denegar un Movimiento',
+                text: "Solo se autoriza realizar un movimiento de cuenta",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    denegarMovimiento();
+                }
+            })
+        }
+
+        function denegarMovimiento(){
+
+            openLoading();
+
+            // id proyecto
+            let id = {{$id}};
+
+            axios.post(url+'/movicuentaproy/denegar/movimiento', {
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'Movimiento Denegado',
+                            text: "Se ha cancelado un movimiento de cuenta",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            closeOnClickOutside: false,
+                            allowOutsideClick: false,
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    }
+                    else {
+                        toastr.error('Error al registrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al registrar');
+                    closeLoading();
+                });
+        }
     </script>
 
 @endsection

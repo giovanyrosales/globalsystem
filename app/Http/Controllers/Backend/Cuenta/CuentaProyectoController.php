@@ -26,7 +26,11 @@ class CuentaProyectoController extends Controller
     // retorna vista con los movimientos de cuenta para un proyecto ID
     public function indexMoviCuentaProy($id){
         // ID: PROYECTO
-        return view('backend.admin.proyectos.cuentaproyecto.movimiento.vistamovicuentaproy', compact('id'));
+
+        $infoProyecto = Proyecto::where('id', $id)->first();
+        $permiso = $infoProyecto->permiso;
+
+        return view('backend.admin.proyectos.cuentaproyecto.movimiento.vistamovicuentaproy', compact('id', 'permiso'));
     }
 
     // retorna vista con los historicos movimientos por proyecto ID
@@ -666,5 +670,40 @@ class CuentaProyectoController extends Controller
             return ['success' => 2];
         }
     }
+
+
+    // petición para que jefe presupuesto autorice un movimiento de cuenta
+    public function autorizarMovimientoDeCuenta(Request $request){
+
+        if(Proyecto::where('id', $request->id)->first()){
+
+            Proyecto::where('id', $request->id)->update([
+                'permiso' => 1
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+
+    }
+
+    // petición para que jefe presupuesto deniegue un movimiento de cuenta
+    public function denegarMovimientoDeCuenta(Request $request){
+
+        if(Proyecto::where('id', $request->id)->first()){
+
+            Proyecto::where('id', $request->id)->update([
+                'permiso' => 0
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+
+    }
+
+
 
 }
