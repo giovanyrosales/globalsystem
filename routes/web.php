@@ -114,7 +114,7 @@ Route::post('/admin/proyecto/lista/editar', [ProyectoController::class, 'editarP
 Route::get('/admin/ver/presupuesto/uaci/{id}', [ProyectoController::class,'informacionPresupuestoParaAprobacion']);
 // petición para aprobar el presupuesto y guardar las cuentas proyecto
 Route::post('/admin/proyecto/aprobar/presupuesto', [ProyectoController::class, 'aprobarPresupuesto']);
-// mostrará vista para MODAL, donde esta el saldo inicial, el restante y el retenido.
+// mostrará vista para MODAL, donde está el saldo inicial, el restante y el retenido.
 Route::get('/admin/ver/presupuesto/saldo/{id}', [ProyectoController::class,'infoTablaSaldoProyecto']);
 // petición para cambiar estado de presupuesto, asi para que el encargado de Presupuesto lo apruebe
 Route::post('/admin/proyecto/estado/presupuesto', [ProyectoController::class, 'cambiarEstadoPresupuesto']);
@@ -239,10 +239,19 @@ Route::post('/admin/movicuentaproy/documento/guardar',  [CuentaProyectoControlle
 Route::post('/admin/movicuentaproy/informacion',  [CuentaProyectoController::class,'informacionMoviCuentaProy']);
 // al mover el select de movimiento cuenta a modificar, quiero ver el saldo restante
 Route::post('/admin/movicuentaproy/info/saldo',  [CuentaProyectoController::class,'infoSaldoRestanteCuenta']);
-// petición para que jefe presupuesto autorice un movimiento de cuenta
+// petición para que jefe presupuesto de permiso de realizar un movimiento de cuenta
 Route::post('/admin/movicuentaproy/autorizar/movimiento',  [CuentaProyectoController::class,'autorizarMovimientoDeCuenta']);
-// petición para que jefe presupuesto deniegue un movimiento de cuenta
+// petición para que jefe presupuesto quita permiso para realizar un movimiento de cuenta
 Route::post('/admin/movicuentaproy/denegar/movimiento',  [CuentaProyectoController::class,'denegarMovimientoDeCuenta']);
+// ver informacion del movimiento de cuenta para que jefe presupuesto Apruebe o Denegar
+Route::post('/admin/movimientohistorico/verificar/informacion',  [CuentaProyectoController::class,'informacionHistoricoParaAutorizar']);
+// denegar y borrar un movimiento de cuenta
+Route::post('/admin/movimientohistorico/denegar/borrar',  [CuentaProyectoController::class,'denegarBorrarMovimientoCuenta']);
+// autorizar y verificar el movimiento de cuenta
+Route::post('/admin/movimientohistorico/autorizar/actualizar',  [CuentaProyectoController::class,'autorizarMovimientoCuenta']);
+
+
+
 
 // buscador de material para crear una partida
 Route::post('/admin/proyecto/buscar/material-presupuesto',  [ProyectoController::class,'buscadorMaterialPresupuesto']);

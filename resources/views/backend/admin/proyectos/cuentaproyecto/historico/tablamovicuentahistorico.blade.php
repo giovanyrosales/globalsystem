@@ -8,10 +8,10 @@
                             <thead>
                             <tr>
                                 <th>Fecha</th>
-                                <th>Código</th>
-                                <th>Cuenta</th>
-                                <th>Aumento</th>
-                                <th>Disminuye</th>
+                                <th>Cuenta Aumento</th>
+                                <th>Cuenta Disminuye</th>
+                                <th>Monto</th>
+                                <th>Estado</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -20,21 +20,44 @@
                             @foreach($infoMovimiento as $dato)
 
                                 <td>{{ $dato->fecha }}</td>
-                                <td>{{ $dato->codigo }}</td>
-                                <td>{{ $dato->cuenta }}</td>
-                                <td>${{ $dato->aumento }}</td>
-                                <td>${{ $dato->disminuye }}</td>
+                                <td>{{ $dato->cuentaaumenta }}</td>
+                                <td>{{ $dato->cuentabaja }}</td>
+                                <td>${{ $dato->dinero }}</td>
+
+                                @if($dato->autorizado == 0)
+                                    <td><span class="badge bg-warning">Pendiente</span></td>
+                                @else
+                                    <td><span class="badge bg-success">Autorizada</span></td>
+                                @endif
 
                                 <td>
-                                    @if($dato->reforma != null)
-                                        <a href="{{ url('/admin/movicuentaproy/documento/'.$dato->id) }}">
-                                            <button class="btn btn-success btn-xs"><i class="fa fa-download"></i> Descargar</button>
-                                        </a>
-                                    @else
-                                        <button type="button" class="btn btn-success btn-xs" onclick="infoSubirDoc({{ $dato->id }})">
-                                            <i class="fas fa-upload" title="Cargar Reforma"></i>&nbsp; Cargar Reforma
-                                        </button>
-                                    @endif
+                                        @can('boton.agregar.reforma.movimiento.cuenta')
+                                            @if($dato->reforma != null)
+                                                <a href="{{ url('/admin/movicuentaproy/documento/'.$dato->id) }}">
+                                                    <button class="btn btn-success btn-xs"><i class="fa fa-download"></i> Descargar</button>
+                                                </a>
+                                            @endif
+                                        @endcan
+
+                                        @can('boton.descargar.reforma.movimiento.cuenta')
+
+                                            @if($dato->reforma == null && $dato->autorizado == 1)
+                                                <button type="button" class="btn btn-success btn-xs" onclick="infoSubirDoc({{ $dato->id }})">
+                                                    <i class="fas fa-upload" title="Cargar Reforma"></i>&nbsp; Cargar Reforma
+                                                </button>
+                                            @endif
+                                        @endcan
+
+                                        @can('boton.revision.movimiento.cuenta')
+
+                                                @if($dato->autorizado == 0)
+                                                    <button type="button" class="btn btn-info btn-xs" onclick="infoRevisarMovimiento({{ $dato->id }})">
+                                                        <i class="fas fa-check" title="Cargar Reforma"></i>&nbsp; Revisar
+                                                    </button>
+                                                @endif
+
+                                        @endcan
+
                                 </td>
 
 

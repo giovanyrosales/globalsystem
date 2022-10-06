@@ -76,6 +76,12 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'boton.editar.imprevisto.administrador', 'description' => 'sidebar seccion proyecto - boton para editar el imprevisto por administrador'])->syncRoles($roleIng);
             Permission::create(['name' => 'boton.autorizar.denegar.movimiento.cuenta', 'description' => 'utilizado por jefe presupuesto para autorizar o denegar un movimiento de cuenta'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'boton.agregar.movimiento.cuenta', 'description' => 'utilizado por administrador para hacer un movimiento de cuenta'])->syncRoles($roleAdministrador);
+            Permission::create(['name' => 'boton.agregar.reforma.movimiento.cuenta', 'description' => 'utilizado para subir la reforma de un movimiento de cuenta'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'boton.descargar.reforma.movimiento.cuenta', 'description' => 'utilizado para descargar la reforma de movimiento de cuenta'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'boton.revision.movimiento.cuenta', 'description' => 'utilizado para autorizar o denegar un movimiento de cuenta'])->syncRoles($rolePresupuesto);
+
+
+
 
 
 

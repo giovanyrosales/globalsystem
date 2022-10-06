@@ -19,6 +19,11 @@ class CreateCuentaproyTable extends Migration
             $table->bigInteger('objespeci_id')->unsigned(); // objeto especifico
             $table->decimal('saldo_inicial', 10,2); // no cambia nunca, mismo
 
+            // si se deniega, se borra fila
+            // 0: pendiente
+            // 1: autorizado
+            $table->boolean('autorizado');
+
             $table->foreign('proyecto_id')->references('id')->on('proyectos');
             $table->foreign('objespeci_id')->references('id')->on('obj_especifico');
         });

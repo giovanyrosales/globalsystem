@@ -92,7 +92,7 @@
 
                                     <div class="col-md-8">
                                         <div class="form-group">
-                                            <label>Código y Objeto Específico</label>
+                                            <label>Objeto Específico</label>
                                             <input type="text" disabled class="form-control" id="codigo">
                                         </div>
                                     </div>
@@ -121,7 +121,7 @@
                                     <hr style="height:1px;border:none;color:#333;background-color:#333;">
 
                                     <div class="form-group">
-                                        <label>Cuenta a Modificar para Disminuir Saldo</label>
+                                        <label>Obj. Específico a Modificar para Disminuir Saldo</label>
                                         <select class="form-control" id="select-cuentaproy" onchange="buscarSaldoRestante()" style="width: 100%">
                                         </select>
                                     </div>
@@ -135,13 +135,6 @@
                                         <div class="form-group col-md-6">
                                             <label style="font-weight: bold">Saldo Actual:</label>
                                             <input type="text" disabled class="form-control" id="restante">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Reforma</label>
-                                            <input type="file" id="documento" class="form-control" accept="image/jpeg, image/jpg, image/png, .pdf"/>
                                         </div>
                                     </div>
 
@@ -282,12 +275,12 @@
                 confirmButtonText: 'Si'
             }).then((result) => {
                 if (result.isConfirmed) {
-                   nuevo();
+                    nuevoMovimientoCuenta();
                 }
             })
         }
 
-        function nuevo(){
+        function nuevoMovimientoCuenta(){
 
             // ID CUENTAPROY
             var id = document.getElementById('id-editar').value;
@@ -296,7 +289,6 @@
 
             var selectcuenta = document.getElementById('select-cuentaproy').value;
             var fecha = document.getElementById('fecha-nuevo').value;
-            var documento = document.getElementById('documento');
 
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
@@ -330,20 +322,12 @@
                 return;
             }
 
-            if(documento.files && documento.files[0]){ // si trae doc
-                if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png|.pdf')){
-                    toastr.error('formato permitidos: .png .jpg .jpeg .pdf');
-                    return;
-                }
-            }
-
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
             formData.append('saldomodi', saldomodificar);
             formData.append('selectcuenta', selectcuenta);
             formData.append('fecha', fecha);
-            formData.append('documento', documento.files[0]);
 
             axios.post(url+'/movicuentaproy/nuevo', formData, {
             })
@@ -351,6 +335,24 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'Movimiento Denegado',
+                            text: "Se denego el Permiso para crear un movimiento de Cuenta",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+
+                    }
+                    else if(response.data.success === 2){
 
                         let saldo = response.data.saldo;
                         let unido = response.data.unido;
@@ -373,10 +375,25 @@
                         })
                     }
 
-                    if(response.data.success === 2){
-                        toastr.success('Registrado correctamente');
+                    if(response.data.success === 3){
                         $('#modalAgregar').modal('hide');
                         recargar();
+
+                        Swal.fire({
+                            title: 'Movimiento Creado',
+                            text: "Se debera esperar que sea Aprobado el Movimiento de Cuenta",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
                     }
                     else {
                         toastr.error('Error al registrar');
@@ -406,6 +423,7 @@
             })
         }
 
+        // autoriza realizar 1 solo movimiento de cuenta
         function autorizarMovimiento(){
 
             openLoading();
@@ -463,6 +481,7 @@
             })
         }
 
+        // quita la autorización de realizar un movimiento de cuenta
         function denegarMovimiento(){
 
             openLoading();

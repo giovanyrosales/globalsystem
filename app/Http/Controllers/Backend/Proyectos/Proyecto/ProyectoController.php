@@ -1336,11 +1336,11 @@ class ProyectoController extends Controller
                 }
             }
 
-            //DB::commit();
+            DB::commit();
             return ['success' => 3, 'contador' => $conteoPartida];
 
         }catch(\Throwable $e){
-            Log::info('ee' . $e);
+            //Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 4];
         }
@@ -1953,9 +1953,11 @@ class ProyectoController extends Controller
             // SUMA Y RESTA DE MOVIMIENTO DE CÓDIGOS
             // suma de saldo
             $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $pp->id)
+                ->where('autorizado', 1) // autorizados por presupuestos
                 ->sum('aumento');
 
             $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $pp->id)
+                ->where('autorizado', 1) // autorizados por presupuesto
                 ->sum('disminuye');
 
             $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;

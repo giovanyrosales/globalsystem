@@ -50,20 +50,20 @@ class CuentaProyectoController extends Controller
             array_push($pila, $ll->id);
         }
 
-        $infoMovimiento = MoviCuentaProy::whereIn('id_cuentaproy', $pila)
+        $infoMovimiento = MoviCuentaProy::whereIn('id_cuentaproy_sube', $pila)
             ->orderBy('fecha', 'ASC')
             ->get();
 
         foreach ($infoMovimiento as $dd){
 
-            $infoCuentaProy = CuentaProy::where('id', $dd->id_cuentaproy)->first();
-            $infoObjeto = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
+            $infoCuentaProyAumenta = CuentaProy::where('id', $dd->id_cuentaproy_sube)->first();
+            $infoCuentaProyBaja = CuentaProy::where('id', $dd->id_cuentaproy_baja)->first();
 
-            $dd->codigo = $infoObjeto->codigo;
-            $dd->cuenta = $infoObjeto->nombre;
+            $infoObjetoAumenta = ObjEspecifico::where('id', $infoCuentaProyAumenta->objespeci_id)->first();
+            $infoObjetoBaja = ObjEspecifico::where('id', $infoCuentaProyBaja->objespeci_id)->first();
 
-            $dd->aumento = number_format((float)$dd->aumento, 2, '.', ',');
-            $dd->disminuye = number_format((float)$dd->disminuye, 2, '.', ',');
+            $dd->cuentaaumenta = $infoObjetoAumenta->codigo . " - " . $infoObjetoAumenta->nombre;
+            $dd->cuentabaja = $infoObjetoBaja->codigo . " - " . $infoObjetoBaja->nombre;
 
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
         }
@@ -91,11 +91,13 @@ class CuentaProyectoController extends Controller
 
             // SUMA Y RESTA DE MOVIMIENTO DE CÓDIGOS
             // suma de saldo
-            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $pp->id)
-                ->sum('aumento');
+            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy_sube', $pp->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
 
-            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $pp->id)
-                ->sum('disminuye');
+            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy_baja', $pp->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
 
             $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
 
@@ -165,6 +167,14 @@ class CuentaProyectoController extends Controller
             // VERIFICAR MIS SALDOS RESTANTE Y VERIFICAR QUE NO QUEDE MENOR A 0
 
             $infoSaldo2 = CuentaProy::where('id', $request->selectcuenta)->first(); // y este va a disminuir
+            $infoProyecto = Proyecto::where('id', $infoSaldo2->proyecto_id)->first();
+
+            // no hay permiso para realizar el movimiento de cuenta
+            if($infoProyecto->permiso == 0){
+                return ['success' => 1];
+            }
+
+
             $infoObjeto2 = ObjEspecifico::where('id', $infoSaldo2->objespeci_id)->first();
             $unidoBloque2 = $infoObjeto2->codigo . " - " . $infoObjeto2->nombre;
 
@@ -172,11 +182,13 @@ class CuentaProyectoController extends Controller
             $totalEntrada2 = 0;
             $totalRetenido2 = 0;
 
-            $moviSumaSaldo2 = MoviCuentaProy::where('id_cuentaproy', $infoSaldo2->id)
-                ->sum('aumento');
+            $moviSumaSaldo2 = MoviCuentaProy::where('id_cuentaproy_sube', $infoSaldo2->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
 
-            $moviRestaSaldo2 = MoviCuentaProy::where('id_cuentaproy', $infoSaldo2->id)
-                ->sum('disminuye');
+            $moviRestaSaldo2 = MoviCuentaProy::where('id_cuentaproy_baja', $infoSaldo2->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
 
             $totalMoviCuenta2 = $moviSumaSaldo2 - $moviRestaSaldo2;
 
@@ -229,7 +241,7 @@ class CuentaProyectoController extends Controller
 
             // VALIDACIONES.
             // EL BLOQUE 1 SIEMPRE SERA UNA SUMA. ASI QUE NO LLEVA VALIDACIÓN.
-            // SOLO VALIDAR BLOQUE 2, QUE SERA LA CUENTA A DISMINUR SIEMPRE
+            // SOLO VALIDAR BLOQUE 2, QUE SERA LA CUENTA A DISMINUIR SIEMPRE
 
             $totalRestanteSaldo2 = ($totalRestanteSaldo2 - $request->saldomodi);
 
@@ -244,75 +256,28 @@ class CuentaProyectoController extends Controller
                 // saldo insuficiente para hacer este movimiento, ya que queda NEGATIVO
 
                 $totalBloque2 = number_format((float)$totalBloque2, 2, '.', ',');
-                return ['success' => 1, 'saldo' => $totalBloque2, 'unido' => $unidoBloque2];
+                return ['success' => 2, 'saldo' => $totalBloque2, 'unido' => $unidoBloque2];
             }
 
-            // PASADO VALIDACIÓN, SE PUEDE GUARDAR
+            // Guardar
 
-            if($request->hasFile('documento')){
-                $cadena = Str::random(15);
-                $tiempo = microtime();
-                $union = $cadena.$tiempo;
-                $nombre = str_replace(' ', '_', $union);
+            $co = new MoviCuentaProy();
+            $co->id_cuentaproy_sube = $request->id;
+            $co->dinero = $request->saldomodi;
+            $co->id_cuentaproy_baja = $request->selectcuenta;
+            $co->fecha = $request->fecha;
+            $co->reforma = null;
+            $co->autorizado = 0;
+            $co->save();
 
-                $extension = '.'.$request->documento->getClientOriginalExtension();
-                $nomDocumento = $nombre.strtolower($extension);
-                $avatar = $request->file('documento');
-                $estado = Storage::disk('archivos')->put($nomDocumento, \File::get($avatar));
+            // setear para que no agregue mas movimientos
+            Proyecto::where('id', $infoProyecto->id)->update([
+                'permiso' => 0,
+            ]);
 
-                if($estado){
+            DB::commit();
+            return ['success' => 3];
 
-                    // Guardar SUMA
-
-                    $co = new MoviCuentaProy();
-                    $co->id_cuentaproy = $request->id;
-                    $co->aumento = $request->saldomodi;
-                    $co->disminuye = 0;
-                    $co->fecha = $request->fecha;
-                    $co->reforma = $nomDocumento;
-                    $co->save();
-
-                    // Guardar RESTA
-
-                    $co = new MoviCuentaProy();
-                    $co->id_cuentaproy = $request->selectcuenta;
-                    $co->aumento = 0;
-                    $co->disminuye = $request->saldomodi;
-                    $co->fecha = $request->fecha;
-                    $co->reforma = $nomDocumento;
-                    $co->save();
-
-                    DB::commit();
-                    return ['success' => 2];
-
-                }else{
-                    return ['success' => 99];
-                }
-
-            }else{
-                // Guardar SUMA
-
-                $co = new MoviCuentaProy();
-                $co->id_cuentaproy = $request->id;
-                $co->aumento = $request->saldomodi;
-                $co->disminuye = 0;
-                $co->fecha = $request->fecha;
-                $co->reforma = null;
-                $co->save();
-
-                // Guardar RESTA
-
-                $co = new MoviCuentaProy();
-                $co->id_cuentaproy = $request->selectcuenta;
-                $co->aumento = 0;
-                $co->disminuye = $request->saldomodi;
-                $co->fecha = $request->fecha;
-                $co->reforma = null;
-                $co->save();
-
-                DB::commit();
-                return ['success' => 2];
-            }
         }catch(\Throwable $e){
             //Log::info('ee' . $e);
             DB::rollback();
@@ -424,11 +389,13 @@ class CuentaProyectoController extends Controller
 
             // SUMA Y RESTA DE MOVIMIENTO DE CÓDIGOS
             // suma de saldo
-            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $lista->id)
-                ->sum('aumento');
+            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy_sube', $lista->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
 
-            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $lista->id)
-                ->sum('disminuye');
+            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy_baja', $lista->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
 
             $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
 
@@ -504,11 +471,13 @@ class CuentaProyectoController extends Controller
 
             // SUMA Y RESTA DE MOVIMIENTO DE CÓDIGOS
             // suma de saldo
-            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $lista->id)
-                ->sum('aumento');
+            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy_sube', $lista->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
 
-            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $lista->id)
-                ->sum('disminuye');
+            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy_baja', $lista->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
 
             $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
 
@@ -701,9 +670,220 @@ class CuentaProyectoController extends Controller
         }else{
             return ['success' => 2];
         }
+    }
 
+    // ver información del movimiento de cuenta para que jefe presupuesto Apruebe o Denegar
+    public function informacionHistoricoParaAutorizar(Request $request){
+
+        $regla = array(
+            'id' => 'required', // ID movicuentaproy
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($infoMovi = MoviCuentaProy::where('id', $request->id)->first()){
+
+            $infoCuentaProySube = CuentaProy::where('id', $infoMovi->id_cuentaproy_sube)->first();
+            $infoCuentaProyBaja = CuentaProy::where('id', $infoMovi->id_cuentaproy_baja)->first();
+
+            $infoObjetoSube = ObjEspecifico::where('id', $infoCuentaProySube->objespeci_id)->first();
+            $infoObjetoBaja = ObjEspecifico::where('id', $infoCuentaProyBaja->objespeci_id)->first();
+
+            $infoCuentaSube = Cuenta::where('id', $infoObjetoSube->id_cuenta)->first();
+            $infoCuentaBaja = Cuenta::where('id', $infoObjetoBaja->id_cuenta)->first();
+
+            $objetoaumenta = $infoObjetoSube->codigo . " - " . $infoObjetoSube->nombre;
+            $objetobaja = $infoObjetoBaja->codigo . " - " . $infoObjetoBaja->nombre;
+
+            $cuentaaumenta = $infoCuentaSube->codigo . " - " . $infoCuentaSube->nombre;
+            $cuentabaja = $infoCuentaBaja->codigo . " - " . $infoCuentaBaja->nombre;
+
+            $fecha = date("d-m-Y", strtotime($infoMovi->fecha));
+
+            return ['success' => 1, 'info' => $infoMovi, 'cuentaaumenta' => $cuentaaumenta,
+                'cuentabaja' => $cuentabaja, 'objetosube' => $objetoaumenta, 'objetobaja' => $objetobaja,
+                'fecha' => $fecha];
+        }else{
+            return ['success' => 2];
+        }
     }
 
 
+    public function denegarBorrarMovimientoCuenta(Request $request){
+        $regla = array(
+            'id' => 'required', // ID movicuentaproy
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($infoMovi = MoviCuentaProy::where('id', $request->id)->first()){
+
+            // no borrar porque ya esta autorizado
+            if($infoMovi->autorizado == 1){
+                return ['success' => 1];
+            }
+
+            // borrar fila
+            MoviCuentaProy::where('id', $request->id)->delete();
+
+            return ['success' => 2];
+        }else{
+            return ['success' => 3];
+        }
+    }
+
+
+    public function autorizarMovimientoCuenta(Request $request){
+
+        DB::beginTransaction();
+
+        try {
+
+            if($infoMovimiento = MoviCuentaProy::where('id', $request->id)->first()){
+
+                // movimiento ya estaba autorizado
+                if($infoMovimiento->autorizado == 1){
+                    return ['success' => 1];
+                }
+
+                $infoCuentaProy = CuentaProy::where('id', $infoMovimiento->id_cuentaproy_baja)->first(); // y este va a disminuir
+                $infoObjeto2 = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
+                $unidoBloque2 = $infoObjeto2->codigo . " - " . $infoObjeto2->nombre;
+
+                $totalSalida2 = 0;
+                $totalEntrada2 = 0;
+                $totalRetenido2 = 0;
+
+                $moviSumaSaldo2 = MoviCuentaProy::where('id', $request->id)
+                    ->where('id_cuentaproy_sube', $infoCuentaProy->id)
+                    ->where('autorizado', 1)
+                    ->sum('dinero');
+
+                $moviRestaSaldo2 = MoviCuentaProy::where('id', $request->id)
+                    ->where('id_cuentaproy_baja', $infoCuentaProy->id)
+                    ->where('autorizado', 1)
+                    ->sum('dinero');
+
+                $totalMoviCuenta2 = $moviSumaSaldo2 - $moviRestaSaldo2;
+
+                // POR AQUI SE VALIDARA SI NO FUE CANCELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
+                // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
+
+                $infoSalidaDetalle2 = DB::table('cuentaproy_detalle AS pd')
+                    ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                    ->where('pd.id_cuentaproy', $infoCuentaProy->id)
+                    ->where('pd.tipo', 0) // salidas. la orden es valida
+                    ->where('rd.cancelado', 0)
+                    //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                    ->get();
+
+                foreach ($infoSalidaDetalle2 as $dd){
+                    $totalSalida2 = $totalSalida2 + ($dd->cantidad * $dd->dinero);
+                }
+
+                $infoEntradaDetalle2 = DB::table('cuentaproy_detalle AS pd')
+                    ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                    ->where('pd.id_cuentaproy', $infoCuentaProy->id)
+                    ->where('pd.tipo', 1) // entradas. la orden fue cancelada
+                    ->where('rd.cancelado', 0)
+                    ->get();
+
+                foreach ($infoEntradaDetalle2 as $dd){
+                    $totalEntrada2 = $totalEntrada2 + ($dd->cantidad * $dd->dinero);
+                }
+
+                // SALDOS RETENIDOS
+
+                $infoSaldoRetenido2 = DB::table('cuentaproy_retenido AS psr')
+                    ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                    ->where('psr.id_cuentaproy', $infoCuentaProy->id)
+                    ->where('rd.cancelado', 0)
+                    ->get();
+
+                foreach ($infoSaldoRetenido2 as $dd){
+                    $totalRetenido2 = $totalRetenido2 + ($dd->cantidad * $dd->dinero);
+                }
+
+                // total de los cambios movimientos que se han hecho.
+                $totalRestanteSaldo2 = $totalMoviCuenta2; // 0
+                Log::info('1- ' . $totalRestanteSaldo2);
+                // saldo restante
+                $totalRestanteSaldo2 += $infoCuentaProy->saldo_inicial - ($totalSalida2 - $totalEntrada2);
+                Log::info('2- ' . $totalRestanteSaldo2); // 50
+                // VALIDACIONES.
+                // EL BLOQUE 1 SIEMPRE SERA UNA SUMA. ASI QUE NO LLEVA VALIDACIÓN.
+                // SOLO VALIDAR BLOQUE 2, QUE SERA LA CUENTA A DISMINUR SIEMPRE
+
+                $totalRestanteSaldo2 = ($totalRestanteSaldo2 - $infoMovimiento->dinero);
+                Log::info('3- ' . $totalRestanteSaldo2); // 4
+
+                // aquí tenemos saldo restante - el saldo retenido.
+                $totalBloque2 = $totalRestanteSaldo2 - $totalRetenido2;
+
+                // comprobaciones.
+                // VERIFICAR SOLO BLOQUE 2 PORQUE ES UNA RESTA.
+                // saldo restante se RESTA TAMBIEN EL SALDO RETENIDO Y EL SALDO A QUITARLE.
+                // NO DEBE QUEDAR MENOR A 0
+
+                if($totalBloque2 < 0){
+                    // saldo insuficiente para hacer este movimiento, ya que queda NEGATIVO
+
+                    $totalBloque2 = number_format((float)$totalBloque2, 2, '.', ',');
+                    return ['success' => 2, 'saldo' => $totalBloque2, 'unido' => $unidoBloque2];
+                }
+
+                // PASADO VALIDACIÓN, SE PUEDE GUARDAR
+
+                if($request->hasFile('documento')){
+                    $cadena = Str::random(15);
+                    $tiempo = microtime();
+                    $union = $cadena.$tiempo;
+                    $nombre = str_replace(' ', '_', $union);
+
+                    $extension = '.'.$request->documento->getClientOriginalExtension();
+                    $nomDocumento = $nombre.strtolower($extension);
+                    $avatar = $request->file('documento');
+                    $estado = Storage::disk('archivos')->put($nomDocumento, \File::get($avatar));
+
+                    if($estado){
+
+                        // pasar estado autorizado y guardar documento
+
+                        MoviCuentaProy::where('id', $request->id)->update([
+                            'reforma' => $nomDocumento,
+                            'autorizado' => 1
+                        ]);
+
+                        //DB::commit();
+                        return ['success' => 3];
+                    }else{
+                        return ['success' => 99];
+                    }
+                }else{
+
+                    MoviCuentaProy::where('id', $request->id)->update([
+                        'autorizado' => 1
+                    ]);
+
+                    //DB::commit();
+                    return ['success' => 3];
+                }
+            }else{
+                return ['success' => 99];
+            }
+
+        }catch(\Throwable $e){
+            Log::info('ee' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
 
 }
