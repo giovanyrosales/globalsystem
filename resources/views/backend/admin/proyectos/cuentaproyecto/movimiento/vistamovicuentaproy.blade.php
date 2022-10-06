@@ -283,7 +283,7 @@
         function nuevoMovimientoCuenta(){
 
             // ID CUENTAPROY
-            var id = document.getElementById('id-editar').value;
+            var idcuentaproy = document.getElementById('id-editar').value;
 
             var saldomodificar = document.getElementById('saldo-modificar').value;
 
@@ -324,9 +324,9 @@
 
             openLoading();
             var formData = new FormData();
-            formData.append('id', id);
-            formData.append('saldomodi', saldomodificar);
-            formData.append('selectcuenta', selectcuenta);
+            formData.append('idcuentaproy', idcuentaproy); // id cuentaproy a subir
+            formData.append('saldomodi', saldomodificar); // dinero
+            formData.append('selectcuenta', selectcuenta); // id cuentaproy a descontar
             formData.append('fecha', fecha);
 
             axios.post(url+'/movicuentaproy/nuevo', formData, {
