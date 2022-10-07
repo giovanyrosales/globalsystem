@@ -147,6 +147,13 @@
 
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label>Saldo Restante Actualmente</label>
+                                            <input type="text" disabled placeholder="0.00" class="form-control" id="saldo-restante-actual">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label>Saldo Disminuir</label>
                                             <input type="text" disabled placeholder="0.00" class="form-control" id="saldo-baja-control">
                                         </div>
@@ -276,6 +283,7 @@
                         $('#objeto-baja-control').val(response.data.objetobaja);
                         $('#cuenta-baja-control').val(response.data.cuentabaja);
                         $('#saldo-baja-control').val("-$" + response.data.info.dinero);
+                        $('#saldo-restante-actual').val("$"+response.data.restantecuentabaja);
 
                     }else{
                         toastr.error('Información no encontrada');
@@ -382,7 +390,7 @@
 
             var formData = new FormData();
 
-            formData.append('id', id);
+            formData.append('id', id); // ID movicuentaproy
             formData.append('documento', documento.files[0]);
 
             openLoading();
@@ -414,13 +422,20 @@
 
                     else if(response.data.success === 2) {
 
-                        let saldo = response.data.saldo;
-                        let unido = response.data.unido;
+                        let objeto = response.data.objeto;
+                        let restante = response.data.restante;
+                        let retenido = response.data.retenido;
+                        let arestar = response.data.dinero;
+                        let calculado = response.data.calculado;
+
                         Swal.fire({
                             title: 'Movimiento Inválido',
-                            html: "La Cuenta a Modificar con el Código " + unido +"<br>"
-                                + "Tiene Saldo Restante $" + saldo + "<br>"
-                                + "Se verificó que (Saldo a Restar - Saldo Restante - Saldo Retenido) No sea menor a $0.00"
+                            html: "La Cuenta a Modificar con el Código " + objeto +"<br>"
+                                + "Tiene Saldo Insuficiente "+"<br>"
+                                + "Saldo Restante $"+ restante +"<br>"
+                                + "Saldo Retenido $"+ retenido +"<br>"
+                                + "Saldo a Restar $"+ arestar +"<br>"
+                                + "La cuenta quedara cón $"+ calculado+"<br>"
                             ,
                             icon: 'info',
                             showCancelButton: false,
@@ -429,9 +444,9 @@
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
+
                             }
                         })
-
                     }
                     else if(response.data.success === 3){
                         toastr.success('Movimiento Autorizado');

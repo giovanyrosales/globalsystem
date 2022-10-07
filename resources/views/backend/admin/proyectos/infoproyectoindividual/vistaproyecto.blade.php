@@ -1275,9 +1275,9 @@
                     return;
                 }
 
-                if(datoCantidad.length > 10){
+                if(datoCantidad.length > 1000000){
                     colorRojoTablaRequisicion(a);
-                    toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
+                    toastr.error('Fila #' + (a+1) + ' Cantidad máximo 1 millón');
                     return;
                 }
             }
@@ -1292,10 +1292,7 @@
                     return;
                 }
 
-                if(datoDescripcion.length > 400){
-                    colorRojoTablaRequisicion(b);
-                    toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
-                }
+                // cantidad de caracteres no se valida, ya que no se envía
             }
 
             // como tienen la misma cantidad de filas, podemos recorrer
@@ -1317,32 +1314,28 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        $('#modalAgregarRequisicion').modal('hide');
-                        toastr.success('Registrado correctamente');
-                        recargarRequisicion();
-                        limpiarRequisicion(response.data.contador);
-                    }
-
-                    else if(response.data.success === 3){
 
                         let fila = response.data.fila;
-                        let disponibleFormat = response.data.disponibleFormat;
-                        let retenidoFormat = response.data.retenidoFormat;
                         let obj = response.data.obj; // codigo especifico
+                        let restanteFormat = response.data.restanteFormat;
+                        let retenidoFormat = response.data.retenidoFormat;
                         let retenido = response.data.retenido;
                         let solicita = response.data.solicita;
 
                         colorRojoTablaRequisicion(fila);
 
                         var texto = '';
+
+                        // en true, mostramos el saldo Retenido
                         if(retenido > 0){
-                            texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj +
-                                ", Tiene Saldo Disponible $" + disponibleFormat + "<br>" + ",Saldo RETENIDO $" + retenidoFormat + "<br>" +
+                            texto = "Fila #" + (fila+1) + ", el objeto específico: " + obj + "<br>" +
+                                ", Tiene Saldo Restante $" + restanteFormat + "<br>" +
+                                ",Saldo Retenido $" + retenidoFormat + "<br>" +
                                 " Y se esta solicitando $" + solicita;
                         }else{
-                            texto = "Fila #" + (fila+1) + ", el objeto específico de código: " + obj + "<br>" +
-                                "Tiene Saldo Disponible $" + disponibleFormat + "<br>" +
-                            " Y se esta solicitando $" + solicita + "<br>";
+                            texto = "Fila #" + (fila+1) + ", el objeto específico: " + obj + "<br>" +
+                                "Tiene Saldo Restante $" + restanteFormat + "<br>" +
+                                " Y se esta solicitando $" + solicita + "<br>";
                         }
 
                         Swal.fire({
@@ -1359,13 +1352,18 @@
                             }
                         })
                     }
-
+                    else if(response.data.success === 2){
+                        $('#modalAgregarRequisicion').modal('hide');
+                        toastr.success('Registrado correctamente');
+                        recargarRequisicion();
+                        limpiarRequisicion(response.data.contador);
+                    }
                     else{
-                        toastr.error('error al crear requisición');
+                        toastr.error('Error al crear requisición');
                     }
                 })
                 .catch((error) => {
-                    toastr.error('error al crear requisición');
+                    toastr.error('Error al crear requisición');
                     closeLoading();
                 });
         }

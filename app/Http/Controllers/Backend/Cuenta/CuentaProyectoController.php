@@ -85,31 +85,30 @@ class CuentaProyectoController extends Controller
 
         foreach ($presupuesto as $pp){
 
+            // CÁLCULOS
+
             $totalSalida = 0;
             $totalEntrada = 0;
             $totalRetenido = 0;
 
-            // SUMA Y RESTA DE MOVIMIENTO DE CÓDIGOS
-            // suma de saldo
-            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy_sube', $pp->id)
+            // movimiento de cuentas (sube y baja)
+            $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $pp->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
 
-            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy_baja', $pp->id)
+            $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $pp->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
 
-            $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
+            $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
-            // POR AQUI SE VALIDARA SI NO FUE CANSELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
-            // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
+            // obtener todas las salidas de material
             $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $pp->id)
-                ->where('pd.tipo', 0) // salidas. y la orden es valido
+                ->where('pd.tipo', 0) // salidas, la orden compra es válida
                 ->where('rd.cancelado', 0)
-                //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                 ->get();
 
             foreach ($infoSalidaDetalle as $dd){
@@ -120,7 +119,7 @@ class CuentaProyectoController extends Controller
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $pp->id)
-                ->where('pd.tipo', 1) // entradas. // la orden fue cancelada
+                ->where('pd.tipo', 1) // entradas, la orden compra fue cancelada
                 ->where('rd.cancelado', 0)
                 ->get();
 
@@ -128,8 +127,7 @@ class CuentaProyectoController extends Controller
                 $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
             }
 
-            // SALDOS RETENIDOS
-
+            // información de saldos retenidos
             $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
@@ -141,16 +139,21 @@ class CuentaProyectoController extends Controller
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
+            // total de los cambios de detalle que se han hecho.
+            $totalCuentaDetalle = $totalEntrada - $totalSalida;
+
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + $pp->saldo_inicial - $totalCuentaDetalle;
+
+            //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
+
             // usado para ver puedo hacer un movimiento de cuenta
             $infoProyecto = Proyecto::where('id', $pp->proyecto_id)->first();
             $pp->permiso = $infoProyecto->permiso;
 
-            // SUMAR LOS MOVIMIENTOS DE CUENTA
-            $totalRestante = $totalMoviCuenta;
-            $totalRestante += $pp->saldo_inicial - ($totalSalida - $totalEntrada);
 
             $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
-            $pp->saldo_restante = number_format((float)$totalRestante, 2, '.', ',');
+            $pp->saldo_restante = number_format((float)$totalRestanteSaldo, 2, '.', ',');
             $pp->total_retenido = number_format((float)$totalRetenido, 2, '.', ',');
         }
 
@@ -163,12 +166,6 @@ class CuentaProyectoController extends Controller
         DB::beginTransaction();
 
         try {
-
-            /*formData.append('idcuentaproy', idcuentaproy); // id cuentaproy a subir
-            formData.append('saldomodi', saldomodificar); // dinero
-            formData.append('selectcuenta', selectcuenta); // id cuentaproy a descontar
-            formData.append('fecha', fecha);*/
-
 
             // VERIFICAR MIS SALDOS RESTANTE Y VERIFICAR QUE NO QUEDE MENOR A 0
 
@@ -183,13 +180,13 @@ class CuentaProyectoController extends Controller
             $infoObjetoEspe = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
             $txtObjetoEspec = $infoObjetoEspe->codigo . " - " . $infoObjetoEspe->nombre;
 
+            // PROCESO DE CÁLCULOS
+
             $totalSalida = 0;
             $totalEntrada = 0;
             $totalRetenido = 0;
 
-            // OBTENER MOVIMIENTO DE CUENTA SUBE Y BAJAS QUE TIENE EL CUENTAPROY QUE
-            // SE AFECTARA SU SALDO (disminuir)
-
+            // movimiento de cuentas (sube y baja)
             $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $request->selectcuenta)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
@@ -198,16 +195,15 @@ class CuentaProyectoController extends Controller
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
 
+            // variable para guardar movimiento de cuenta calculada
             $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
-            // POR AQUÍ SE VALIDARA SI NO FUE CANCELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
-            // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
-
+            // obtener todas las salidas de material
             $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $infoCuentaProy->id)
-                ->where('pd.tipo', 0) // salidas. la orden es valida
+                ->where('pd.tipo', 0) // salidas, la orden es valida
                 ->where('rd.cancelado', 0)
                 ->get();
 
@@ -215,11 +211,12 @@ class CuentaProyectoController extends Controller
                 $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
             }
 
+            // obtener todas las entradas de material
             $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $infoCuentaProy->id)
-                ->where('pd.tipo', 1) // entradas. la orden fue cancelada
+                ->where('pd.tipo', 1) // entradas, la orden fue cancelada
                 ->where('rd.cancelado', 0)
                 ->get();
 
@@ -227,8 +224,7 @@ class CuentaProyectoController extends Controller
                 $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
             }
 
-            // SALDOS RETENIDOS
-
+            // obtener saldos retenidos
             $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
@@ -240,65 +236,55 @@ class CuentaProyectoController extends Controller
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
-            // total de los cambios movimientos que se han hecho.
-            $totalRestanteSaldo = $totalMoviCuenta; // 0
+            // total de los cambios de detalle que se han hecho.
+            $totalCuentaDetalle = $totalEntrada - $totalSalida;
 
-            // saldo restante
-            $totalRestanteSaldo = $totalRestanteSaldo + $infoCuentaProy->saldo_inicial - ($totalSalida - $totalEntrada);
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + $infoCuentaProy->saldo_inicial - $totalCuentaDetalle;
 
-            // VALIDACIONES.
-            // EL BLOQUE 1 SIEMPRE SERA UNA SUMA. ASI QUE NO LLEVA VALIDACIÓN.
-            // SOLO VALIDAR BLOQUE 2, QUE SERA LA CUENTA A DISMINUIR SIEMPRE
+            // al saldo restante le vamos a restar el dinero que se quitara al código
+            // al otro código que se sumara, no sé verífica ya que no afecta que suba su dinero
+            // hoy se obtendrá lo restante - retenido, ya
+            $totalCalculado = ($totalRestanteSaldo - $request->saldomodificar) - $totalRetenido;
 
-            $totalRestanteSaldo = ($totalRestanteSaldo - $request->saldomodi); // dinero
-
-            // aqui tenemos saldo restante - el saldo retenido.
-            $totalBloque = $totalRestanteSaldo - $totalRetenido;
-
-            // comprobaciones.
-            // VERIFICAR SOLO BLOQUE 2 PORQUE ES UNA RESTA.
-            // saldo restante se RESTA TAMBIEN EL SALDO RETENIDO Y EL SALDO A QUITARLE.
-            // NO DEBE QUEDAR MENOR A 0
-
-            Log::info($totalBloque);
-
-            if($totalBloque < 0){
+            // al final no debe quedar menor a 0, para poder guardar el movimiento de cuenta.
+            if($totalCalculado < 0){
                 // saldo insuficiente para hacer este movimiento, ya que queda NEGATIVO
 
-                $totalBloque = number_format((float)$totalBloque, 2, '.', ',');
-                return ['success' => 2, 'saldo' => $totalBloque, 'unido' => $txtObjetoEspec];
+                $totalCalculado = number_format((float)$totalCalculado, 2, '.', ',');
+                $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
+                $totalRetenido = number_format((float)$totalRetenido, 2, '.', ',');
+                $dinero = number_format((float)$request->saldomodificar, 2, '.', ',');
+
+                return ['success' => 2, 'objeto' => $txtObjetoEspec, 'restante' => $totalRestanteSaldo,
+                    'retenido' => $totalRetenido, 'dinero' => $dinero,  'calculado' => $totalCalculado];
             }
-
-            Log::info('paso');
-
-            return 99;
 
             // Guardar
 
             $co = new MoviCuentaProy();
             $co->id_cuentaproy_sube = $request->idcuentaproy;
-            $co->dinero = $request->saldomodi;
+            $co->dinero = $request->saldomodificar;
             $co->id_cuentaproy_baja = $request->selectcuenta;
             $co->fecha = $request->fecha;
             $co->reforma = null;
             $co->autorizado = 0;
             $co->save();
 
-            // setear para que no agregue mas movimientos
+            // setear para que no agregue más movimientos
             Proyecto::where('id', $infoProyecto->id)->update([
                 'permiso' => 0,
             ]);
 
-            //DB::commit();
+            DB::commit();
             return ['success' => 3];
 
         }catch(\Throwable $e){
-            //Log::info('ee' . $e);
+            Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 99];
         }
     }
-
 
     function redondear_dos_decimal($valor) {
         $float_redondeado=round($valor * 100) / 100;
@@ -395,32 +381,30 @@ class CuentaProyectoController extends Controller
                 ->where('cp.id', '!=', $lista->id)
                 ->get();
 
-            // OBTENER SALDO RESTANTE
+            // CÁLCULOS
 
             $totalSalida = 0;
             $totalEntrada = 0;
             $totalRetenido = 0;
 
-            // SUMA Y RESTA DE MOVIMIENTO DE CÓDIGOS
-            // suma de saldo
-            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy_sube', $lista->id)
+            // movimiento de cuentas (sube y baja)
+            $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $lista->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
 
-            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy_baja', $lista->id)
+            $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $lista->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
 
-            $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
+            $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
-            // POR AQUI SE VALIDARA SI NO FUE CANSELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
-            // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
+            // obtener todas las salidas de material
             $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $lista->id)
-                ->where('pd.tipo', 0) // salidas. la orden es valida
-                //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                ->where('pd.tipo', 0) // salidas, la orden compra es válida
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoSalidaDetalle as $dd){
@@ -429,36 +413,41 @@ class CuentaProyectoController extends Controller
 
             $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $lista->id)
-                ->where('pd.tipo', 1) // entradas
+                ->where('pd.tipo', 1) // entradas, la orden compra fue cancelada
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoEntradaDetalle as $dd){
                 $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
             }
 
-            // SALDOS RETENIDOS
-
+            // información de saldos retenidos
             $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('psr.id_cuentaproy', $lista->id)
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoSaldoRetenido as $dd){
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
-            // SUMAR LOS MOVIMIENTOS DE CUENTA
-            $totalRestante =  $totalMoviCuenta;
-            $totalRestante += $lista->saldo_inicial - ($totalSalida - $totalEntrada);
+            // total de los cambios de detalle que se han hecho.
+            $totalCuentaDetalle = $totalEntrada - $totalSalida;
 
-            $totalRestante = "$". number_format((float)$totalRestante, 2, '.', ',');
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + $lista->saldo_inicial - $totalCuentaDetalle;
+
+            //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
+
+            $totalRestanteSaldo = "$". number_format((float)$totalRestanteSaldo, 2, '.', ',');
 
             return ['success' => 1, 'info' => $lista,
                 'objeto' => $infoObjeto, 'cuenta' => $cuenta,
-                'restante' => $totalRestante, 'arraycuentaproy' => $arrayCuentaProy];
+                'restante' => $totalRestanteSaldo, 'arraycuentaproy' => $arrayCuentaProy];
         }else{
             return ['success' => 2];
         }
@@ -477,32 +466,31 @@ class CuentaProyectoController extends Controller
 
         if($lista = CuentaProy::where('id', $request->id)->first()){
 
-            // OBTENER SALDO RESTANTE
+
+            // CÁLCULOS
 
             $totalSalida = 0;
             $totalEntrada = 0;
             $totalRetenido = 0;
 
-            // SUMA Y RESTA DE MOVIMIENTO DE CÓDIGOS
-            // suma de saldo
-            $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy_sube', $lista->id)
+            // movimiento de cuentas (sube y baja)
+            $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $lista->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
 
-            $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy_baja', $lista->id)
+            $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $lista->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
 
-            $totalMoviCuenta = $moviSumaSaldo - $moviRestaSaldo;
+            $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
-            // POR AQUI SE VALIDARA SI NO FUE CANSELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
-            // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
+            // obtener todas las salidas de material
             $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $lista->id)
-                ->where('pd.tipo', 0) // salidas. la orden es valida
-                //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
+                ->where('pd.tipo', 0) // salidas, la orden compra es válida
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoSalidaDetalle as $dd){
@@ -511,38 +499,42 @@ class CuentaProyectoController extends Controller
 
             $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $lista->id)
-                ->where('pd.tipo', 1) // entradas
+                ->where('pd.tipo', 1) // entradas, la orden compra fue cancelada
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoEntradaDetalle as $dd){
                 $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
             }
 
-            // SALDOS RETENIDOS
-
+            // información de saldos retenidos
             $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('psr.id_cuentaproy', $lista->id)
+                ->where('rd.cancelado', 0)
                 ->get();
 
             foreach ($infoSaldoRetenido as $dd){
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
-            // SUMAR LOS MOVIMIENTOS DE CUENTA
-            $totalRestante =  $totalMoviCuenta;
-            $totalRestante += $lista->saldo_inicial - ($totalSalida - $totalEntrada);
+            // total de los cambios de detalle que se han hecho.
+            $totalCuentaDetalle = $totalEntrada - $totalSalida;
 
-            $totalRestante = "$". number_format((float)$totalRestante, 2, '.', ',');
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + $lista->saldo_inicial - $totalCuentaDetalle;
 
-            return ['success' => 1, 'restante' => $totalRestante];
+            //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
+
+            $totalRestanteSaldo = "$". number_format((float)$totalRestanteSaldo, 2, '.', ',');
+
+            return ['success' => 1, 'restante' => $totalRestanteSaldo];
         }else{
             return ['success' => 2];
         }
-
     }
 
     // retorna vista para agregar planilla a proyecto
@@ -716,9 +708,76 @@ class CuentaProyectoController extends Controller
 
             $fecha = date("d-m-Y", strtotime($infoMovi->fecha));
 
+
+            // OBTENER SALDO RESTANTE, PARA EL OBJETO ESPECÍFICO QUE SE QUITARA DINERO
+
+            // CÁLCULOS
+
+            $totalSalida = 0;
+            $totalEntrada = 0;
+            $totalRetenido = 0;
+
+            // movimiento de cuentas (sube y baja)
+            $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $infoCuentaProyBaja->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $infoCuentaProyBaja->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
+
+            // obtener todas las salidas de material
+            $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
+                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero')
+                ->where('pd.id_cuentaproy', $infoCuentaProyBaja->id)
+                ->where('pd.tipo', 0) // salidas, la orden compra es válida
+                ->where('rd.cancelado', 0)
+                ->get();
+
+            foreach ($infoSalidaDetalle as $dd){
+                $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
+            }
+
+            $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
+                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                ->where('pd.id_cuentaproy', $infoCuentaProyBaja->id)
+                ->where('pd.tipo', 1) // entradas, la orden compra fue cancelada
+                ->where('rd.cancelado', 0)
+                ->get();
+
+            foreach ($infoEntradaDetalle as $dd){
+                $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
+            }
+
+            // información de saldos retenidos
+            $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
+                ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                ->where('psr.id_cuentaproy', $infoCuentaProyBaja->id)
+                ->where('rd.cancelado', 0)
+                ->get();
+
+            foreach ($infoSaldoRetenido as $dd){
+                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
+            }
+
+            // total de los cambios de detalle que se han hecho.
+            $totalCuentaDetalle = $totalEntrada - $totalSalida;
+
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + $infoCuentaProyBaja->saldo_inicial - $totalCuentaDetalle;
+
+            //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
+
+            $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
+
             return ['success' => 1, 'info' => $infoMovi, 'cuentaaumenta' => $cuentaaumenta,
                 'cuentabaja' => $cuentabaja, 'objetosube' => $objetoaumenta, 'objetobaja' => $objetobaja,
-                'fecha' => $fecha];
+                'fecha' => $fecha , 'restantecuentabaja' => $totalRestanteSaldo];
         }else{
             return ['success' => 2];
         }
@@ -753,6 +812,8 @@ class CuentaProyectoController extends Controller
 
     public function autorizarMovimientoCuenta(Request $request){
 
+        // ID movicuentaproy
+
         DB::beginTransaction();
 
         try {
@@ -765,92 +826,90 @@ class CuentaProyectoController extends Controller
                 }
 
                 $infoCuentaProy = CuentaProy::where('id', $infoMovimiento->id_cuentaproy_baja)->first(); // y este va a disminuir
-                $infoObjeto2 = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
-                $unidoBloque2 = $infoObjeto2->codigo . " - " . $infoObjeto2->nombre;
+                //$infoProyecto = Proyecto::where('id', $infoCuentaProy->proyecto_id)->first();
 
-                $totalSalida2 = 0;
-                $totalEntrada2 = 0;
-                $totalRetenido2 = 0;
+                $infoObjetoEspe = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
+                $txtObjetoEspec = $infoObjetoEspe->codigo . " - " . $infoObjetoEspe->nombre;
 
-                $moviSumaSaldo2 = MoviCuentaProy::where('id', $request->id)
-                    ->where('id_cuentaproy_sube', $infoCuentaProy->id)
-                    ->where('autorizado', 1)
-                    ->sum('dinero');
+                // PROCESO DE CÁLCULOS
 
-                $moviRestaSaldo2 = MoviCuentaProy::where('id', $request->id)
-                    ->where('id_cuentaproy_baja', $infoCuentaProy->id)
-                    ->where('autorizado', 1)
-                    ->sum('dinero');
+                $totalSalida = 0;
+                $totalEntrada = 0;
+                $totalRetenido = 0;
 
-                $totalMoviCuenta2 = $moviSumaSaldo2 - $moviRestaSaldo2;
+                // se está haciendo cálculos únicamente con la cuenta que BAJARA, la que subirá no se hace ningún cálculo
 
-                // POR AQUI SE VALIDARA SI NO FUE CANCELADO LA ORDEN DE COMPRA, YA QUE AHI SE CREA EL PRESU_DETALLE.
-                // Y SI ES CANCELADO SE CAMBIA UN ESTADO Y DEJAR DE SER VALIDO PARA VERIFICAR
+                // movimiento de cuentas (sube y baja)
+                $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $infoMovimiento->id_cuentaproy_baja) // 0
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
 
-                $infoSalidaDetalle2 = DB::table('cuentaproy_detalle AS pd')
+                $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $infoMovimiento->id_cuentaproy_baja) // 0
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+                // variable para guardar movimiento de cuenta calculada
+                $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja; // 0
+
+                // obtener todas las salidas de material
+                $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('pd.id_cuentaproy', $infoCuentaProy->id)
-                    ->where('pd.tipo', 0) // salidas. la orden es valida
+                    ->where('pd.tipo', 0) // salidas, la orden es valida
                     ->where('rd.cancelado', 0)
-                    //->where('pd.estado', 0)// ES VALIDO, Y NO ESTA CANCELADO LA ORDEN DE COMPRA
                     ->get();
 
-                foreach ($infoSalidaDetalle2 as $dd){
-                    $totalSalida2 = $totalSalida2 + ($dd->cantidad * $dd->dinero);
+                foreach ($infoSalidaDetalle as $dd){
+                    $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero); // 0
                 }
 
-                $infoEntradaDetalle2 = DB::table('cuentaproy_detalle AS pd')
+                // obtener todas las entradas de material
+                $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('pd.id_cuentaproy', $infoCuentaProy->id)
-                    ->where('pd.tipo', 1) // entradas. la orden fue cancelada
+                    ->where('pd.tipo', 1) // entradas, la orden fue cancelada
                     ->where('rd.cancelado', 0)
                     ->get();
 
-                foreach ($infoEntradaDetalle2 as $dd){
-                    $totalEntrada2 = $totalEntrada2 + ($dd->cantidad * $dd->dinero);
+                foreach ($infoEntradaDetalle as $dd){
+                    $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);  // 0
                 }
 
-                // SALDOS RETENIDOS
-
-                $infoSaldoRetenido2 = DB::table('cuentaproy_retenido AS psr')
+                // obtener saldos retenidos
+                $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                     ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('psr.id_cuentaproy', $infoCuentaProy->id)
                     ->where('rd.cancelado', 0)
                     ->get();
 
-                foreach ($infoSaldoRetenido2 as $dd){
-                    $totalRetenido2 = $totalRetenido2 + ($dd->cantidad * $dd->dinero);
+                foreach ($infoSaldoRetenido as $dd){
+                    $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);  // 0
                 }
 
-                // total de los cambios movimientos que se han hecho.
-                $totalRestanteSaldo2 = $totalMoviCuenta2; // 0
-                Log::info('1- ' . $totalRestanteSaldo2);
-                // saldo restante
-                $totalRestanteSaldo2 += $infoCuentaProy->saldo_inicial - ($totalSalida2 - $totalEntrada2);
-                Log::info('2- ' . $totalRestanteSaldo2); // 50
-                // VALIDACIONES.
-                // EL BLOQUE 1 SIEMPRE SERA UNA SUMA. ASI QUE NO LLEVA VALIDACIÓN.
-                // SOLO VALIDAR BLOQUE 2, QUE SERA LA CUENTA A DISMINUR SIEMPRE
+                // total de los cambios de detalle que se han hecho.
+                $totalCuentaDetalle = $totalEntrada - $totalSalida; // 0
 
-                $totalRestanteSaldo2 = ($totalRestanteSaldo2 - $infoMovimiento->dinero);
-                Log::info('3- ' . $totalRestanteSaldo2); // 4
+                // aquí se obtiene el Saldo Restante del código
+                $totalRestanteSaldo = $totalMoviCuenta + $infoCuentaProy->saldo_inicial - $totalCuentaDetalle; // 50 positivo
 
-                // aquí tenemos saldo restante - el saldo retenido.
-                $totalBloque2 = $totalRestanteSaldo2 - $totalRetenido2;
+                // al saldo restante le vamos a restar el dinero que se quitara al código
+                // al otro código que se sumara, no sé verífica ya que no afecta que suba su dinero
+                // hoy se obtendrá lo restante - retenido, ya
+                $totalCalculado = ($totalRestanteSaldo - $infoMovimiento->dinero) - $totalRetenido;
 
-                // comprobaciones.
-                // VERIFICAR SOLO BLOQUE 2 PORQUE ES UNA RESTA.
-                // saldo restante se RESTA TAMBIEN EL SALDO RETENIDO Y EL SALDO A QUITARLE.
-                // NO DEBE QUEDAR MENOR A 0
-
-                if($totalBloque2 < 0){
+                if($this->redondear_dos_decimal($totalCalculado) < 0){
                     // saldo insuficiente para hacer este movimiento, ya que queda NEGATIVO
 
-                    $totalBloque2 = number_format((float)$totalBloque2, 2, '.', ',');
-                    return ['success' => 2, 'saldo' => $totalBloque2, 'unido' => $unidoBloque2];
+                    $totalCalculado = number_format((float)$totalCalculado, 2, '.', ',');
+                    $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
+                    $totalRetenido = number_format((float)$totalRetenido, 2, '.', ',');
+                    $dinero = number_format((float)$infoMovimiento->dinero, 2, '.', ',');
+
+                    return ['success' => 2, 'objeto' => $txtObjetoEspec, 'restante' => $totalRestanteSaldo,
+                        'retenido' => $totalRetenido, 'dinero' => $dinero,  'calculado' => $totalCalculado];
                 }
 
                 // PASADO VALIDACIÓN, SE PUEDE GUARDAR
@@ -875,7 +934,7 @@ class CuentaProyectoController extends Controller
                             'autorizado' => 1
                         ]);
 
-                        //DB::commit();
+                        DB::commit();
                         return ['success' => 3];
                     }else{
                         return ['success' => 99];
@@ -886,7 +945,7 @@ class CuentaProyectoController extends Controller
                         'autorizado' => 1
                     ]);
 
-                    //DB::commit();
+                    DB::commit();
                     return ['success' => 3];
                 }
             }else{

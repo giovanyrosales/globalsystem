@@ -113,7 +113,7 @@
 
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Aumento Saldo</label>
+                                            <label>Aumento de Saldo</label>
                                             <input type="text" class="form-control" placeholder="0.00" id="saldo-modificar">
                                         </div>
                                     </div>
@@ -175,11 +175,10 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
-
 
             document.getElementById("divcontenedor").style.display = "block";
         });
@@ -307,8 +306,8 @@
                 return;
             }
 
-            if(saldomodificar.length > 10){
-                toastr.error('Saldo a modificar debe tener máximo 10 caracteres');
+            if(saldomodificar.length > 1000000){
+                toastr.error('Saldo a modificar debe tener máximo 1 millón');
                 return;
             }
 
@@ -325,7 +324,7 @@
             openLoading();
             var formData = new FormData();
             formData.append('idcuentaproy', idcuentaproy); // id cuentaproy a subir
-            formData.append('saldomodi', saldomodificar); // dinero
+            formData.append('saldomodificar', saldomodificar); // dinero
             formData.append('selectcuenta', selectcuenta); // id cuentaproy a descontar
             formData.append('fecha', fecha);
 
@@ -354,14 +353,20 @@
                     }
                     else if(response.data.success === 2){
 
-                        let saldo = response.data.saldo;
-                        let unido = response.data.unido;
+                        let objeto = response.data.objeto;
+                        let restante = response.data.restante;
+                        let retenido = response.data.retenido;
+                        let arestar = response.data.dinero;
+                        let calculado = response.data.calculado;
 
                         Swal.fire({
                             title: 'Movimiento Inválido',
-                            html: "La Cuenta a Modificar con el Código " + unido +"<br>"
-                                + "Tiene Saldo Restante $" + saldo + "<br>"
-                                + "Se verificó que (Saldo a Restar - Saldo Restante - Saldo Retenido) No sea menor a $0.00"
+                            html: "La Cuenta a Modificar con el Código " + objeto +"<br>"
+                                + "Tiene Saldo Insuficiente "+"<br>"
+                                + "Saldo Restante $"+ restante +"<br>"
+                                + "Saldo Retenido $"+ retenido +"<br>"
+                                + "Saldo a Restar $"+ arestar +"<br>"
+                                + "La cuenta quedara cón $"+ calculado+"<br>"
                             ,
                             icon: 'info',
                             showCancelButton: false,
@@ -375,7 +380,7 @@
                         })
                     }
 
-                    if(response.data.success === 3){
+                    else if(response.data.success === 3){
                         $('#modalAgregar').modal('hide');
                         recargar();
 
