@@ -668,7 +668,6 @@ class ProyectoController extends Controller
                     ->where('objespeci_id', $infoCatalogo->id_objespecifico)
                     ->first();
 
-
                 // CÁLCULOS
 
                 $totalSalida = 0;
@@ -731,15 +730,11 @@ class ProyectoController extends Controller
 
                 $totalCalculado = $totalRestanteSaldo - $totalRetenido;
 
-
-                // verificar cantidad * dinero del material nuevo
+                // verificar cantidad * dinero del material nuevo.
+                // este dinero se esta solicitando para la fila.
                 $saldoMaterial = $request->cantidad[$i] * $infoCatalogo->pu;
 
-                // se va a verificar Dinero de catálogo + (calculado)
-                $sumaSaldos = $saldoMaterial + $totalCalculado;
-
-
-                if($this->redondear_dos_decimal($totalRestanteSaldo) < $this->redondear_dos_decimal($sumaSaldos)){
+                if($this->redondear_dos_decimal($totalRestanteSaldo) < $this->redondear_dos_decimal($saldoMaterial)){
 
                     // retornar que no alcanza el saldo
 

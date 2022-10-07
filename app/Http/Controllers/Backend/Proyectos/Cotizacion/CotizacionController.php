@@ -419,6 +419,8 @@ class CotizacionController extends Controller
                 ->orderBy('id', 'ASC')
                 ->get();
 
+
+
             foreach ($lista as $datainfo){
 
                 // MATERIAL A COTIZACION FUE CANCELADO
@@ -442,7 +444,7 @@ class CotizacionController extends Controller
                         ->count();
 
                     if($conteoCoti > 0){
-                        // SIGNIFICA QUE MATERIAL A COTIZAR YA TENIA UNA COTIZACION EN ESPERA O APROBADA
+                        // SIGNIFICA QUE MATERIAL A COTIZAR YA TENIA UNA COTIZACIÓN EN ESPERA O APROBADA
                         return ['success' => 2];
                     }
                 }
@@ -450,11 +452,6 @@ class CotizacionController extends Controller
                 // VERIFICACIÓN DE SALDOS
 
                 $infoCatalogo = CatalogoMateriales::where('id', $datainfo->material_id)->first();
-
-                // ACTUALIZAR PRECIO DEL MATERIAL PRIMERAMENTE
-                RequisicionDetalle::where('id', $datainfo->id)->update([
-                    'dinero' => $infoCatalogo->pu
-                ]);
 
                 $infoObjeto = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
                 $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
@@ -465,15 +462,30 @@ class CotizacionController extends Controller
                     ->where('objespeci_id', $infoCatalogo->id_objespecifico)
                     ->first();
 
+
+                // CÁLCULOS
+
                 $totalSalida = 0;
                 $totalEntrada = 0;
                 $totalRetenido = 0;
 
+                // movimiento de cuentas (sube y baja)
+                $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $infoPresupuesto->id)
+                    ->where('autorizado', 1) // autorizado por presupuesto
+                    ->sum('dinero');
+
+                $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $infoPresupuesto->id)
+                    ->where('autorizado', 1) // autorizado por presupuesto
+                    ->sum('dinero');
+
+                $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
+
+                // obtener todas las salidas de material
                 $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                    ->select('rd.cantidad', 'rd.dinero')
                     ->where('pd.id_cuentaproy', $infoPresupuesto->id)
-                    ->where('pd.tipo', 0) // salidas
+                    ->where('pd.tipo', 0) // salidas, la orden compra es válida
                     ->where('rd.cancelado', 0)
                     ->get();
 
@@ -485,7 +497,7 @@ class CotizacionController extends Controller
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('pd.id_cuentaproy', $infoPresupuesto->id)
-                    ->where('pd.tipo', 1) // entradas
+                    ->where('pd.tipo', 1) // entradas, la orden compra fue cancelada
                     ->where('rd.cancelado', 0)
                     ->get();
 
@@ -493,41 +505,44 @@ class CotizacionController extends Controller
                     $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
                 }
 
-                // obtener cuanto saldo retenido tengo para el objeto específico
-                // y el dinero lo obtiene de LA REQUISICIÓN DETALLE
+                // información de saldos retenidos
+                $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
+                    ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                    ->where('psr.id_cuentaproy', $infoPresupuesto->id)
+                    ->where('rd.cancelado', 0)
+                    ->get();
 
-                // OBTENER SALDO RESTANTE POR LOS MOVIMIENTO DE CUENTAS
+                foreach ($infoSaldoRetenido as $dd){
+                    $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
+                }
 
-                $moviSumaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
-                    ->sum('aumento');
+                // total de los cambios de detalle que se han hecho.
+                $totalCuentaDetalle = $totalEntrada - $totalSalida;
 
-                $moviRestaSaldo = MoviCuentaProy::where('id_cuentaproy', $infoPresupuesto->id)
-                    ->sum('disminuye');
+                // aquí se obtiene el Saldo Restante del código
+                $totalRestanteSaldo = $totalMoviCuenta + $infoPresupuesto->saldo_inicial - $totalCuentaDetalle;
 
-                $saldoRestante = $moviSumaSaldo - $moviRestaSaldo;
-
-                // esto es lo que hay de SALDO RESTANTE PARA EL OBJETO ESPECÍFICO
-                $saldoRestante += $infoPresupuesto->saldo_inicial - ($totalSalida - $totalEntrada);
+                //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
 
                 // verificar cantidad * dinero del material nuevo
                 $saldoMaterial = $datainfo->cantidad * $infoCatalogo->pu;
 
                 // ************* NO SE SUMA EL SALDO RETENIDO. SOLO SE VERIFICA QUE HAYA SALDO RESTANTE.
-                $sumaSaldos = $saldoMaterial;
 
                 // verificar si alcanza el saldo para guardar la cotización
-                if($this->redondear_dos_decimal($saldoRestante) < $this->redondear_dos_decimal($sumaSaldos)){
+                if($this->redondear_dos_decimal($totalRestanteSaldo) < $this->redondear_dos_decimal($saldoMaterial)){
                     // retornar que no alcanza el saldo
 
                     // SALDO RESTANTE Y SALDO RETENIDO FORMATEADOS
-                    $saldoRestanteFormat = number_format((float)$saldoRestante, 2, '.', ',');
+                    $saldoRestanteFormat = number_format((float)$totalRestanteSaldo, 2, '.', ',');
                     $saldoRetenidoFormat = number_format((float)$totalRetenido, 2, '.', ',');
 
                     $costoFormat = number_format((float)$infoCatalogo->pu, 2, '.', ',');
 
                     // disponible - retenido
                     // PASAR A NUMERO POSITIVO
-                    $totalActualFormat = abs($saldoRestante - $totalRetenido);
+                    $totalActualFormat = abs($totalRestanteSaldo - $totalRetenido);
                     $totalActualFormat = number_format((float)$totalActualFormat, 2, '.', ',');
 
                     return ['success' => 3, 'fila' => $i,
@@ -556,7 +571,7 @@ class CotizacionController extends Controller
                 }
             } // end foreach
 
-            DB::commit();
+            //DB::commit();
             return ['success' => 5];
         }catch(\Throwable $e){
            // Log::info('ee' . $e);
