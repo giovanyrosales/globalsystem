@@ -9,11 +9,10 @@ use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
 use App\Models\CuentaProy;
-use App\Models\CuentaProyDetalle;
+use App\Models\CuentaProyRestante;
 use App\Models\CuentaProyRetenido;
 use App\Models\ObjEspecifico;
 use App\Models\Orden;
-use App\Models\Presupuesto;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
@@ -94,10 +93,10 @@ class OrdenController extends Controller
                     ->where('objespeci_id', $infoMaterial->id_objespecifico)
                     ->first();
 
-                $cuenta = new CuentaProyDetalle();
+                $cuenta = new CuentaProyRestante();
                 $cuenta->id_cuentaproy = $infoCuenta->id;
                 $cuenta->id_requi_detalle = $infoRequiDeta->id;
-                $cuenta->tipo = 0; // SALIDA DE DINERO
+                $cuenta->id_orden = $or->id;
                 $cuenta->save();
 
                 // BORRAR MATERIAL RETENIDO, pero si es anulada, volvera a retenido
@@ -240,22 +239,20 @@ class OrdenController extends Controller
 
                 // pendiente de anulación
                 if($info->estado == 0){
+
                     Orden::where('id', $request->id)->update([
                         'estado' => 1,
                         'fecha_anulada' => Carbon::now('America/El_Salvador'),
                     ]);
 
-                    // CAMBIAR DE ESTADO PARA QUE SE PUEDA COTIZAR DE NUEVO LOS MATERIALES
-                    // SUMAR ENTRADA DE DINERO. PORQUE FUE ANULADA
-                    // VOLVER AGREGAR EL MATERIAL RETENIDO
-                    // **** UNICAMENTE SI LA ORDEN FUE APROBADA PRIMERO Y DESPUES ANULADA ***
-
                     $infoCoti = Cotizacion::where('id', $info->cotizacion_id)->first();
                     $infoRequi = Requisicion::where('id', $infoCoti->requisicion_id)->first();
                     $infoCotiDeta = CotizacionDetalle::where('cotizacion_id', $infoCoti->id)->get();
 
-                    // setear por cada material cotizado
+                    // para que vuelva el dinero de RESTANTE, SE DEBERA BORRAR LA FILA
+                    CuentaProyRestante::where('id_orden', $info->id)->delete();
 
+                    // setear por cada material cotizado
                     foreach ($infoCotiDeta as $dd){
 
                         // para que pueda ser cotizado nuevamente
@@ -270,16 +267,8 @@ class OrdenController extends Controller
                             ->where('objespeci_id', $infoMaterial->id_objespecifico)
                             ->first();
 
-                        // para que vuelva el dinero a lo RESTANTE
-                        $cuenta = new CuentaProyDetalle();
-                        $cuenta->id_cuentaproy = $cuentaProy->id;
-                        $cuenta->id_requi_detalle = $infoRequiDetalle->id;
-                        $cuenta->tipo = 1; // ENTRADA DE DINERO
-                        $cuenta->save();
-
-                        // volver Retenidos solo sí fueron borrados. es decir primero se género la orden y
-                        // despues se cancelo
-
+                        // VOLVER A COLOCAR DINERO RETENIDO, porque la orden fue anulada, ya que el material
+                        // estara listo para ser cotizado de nuevo.
                         if(!CuentaProyRetenido::where('id_requi_detalle', $infoRequiDetalle->id)
                             ->where('id_cuentaproy', $cuentaProy->id)->first()){
 
@@ -288,7 +277,6 @@ class OrdenController extends Controller
                             $retenido->id_cuentaproy = $cuentaProy->id;
                             $retenido->save();
                         }
-
                     }
                 }
 

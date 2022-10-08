@@ -11,7 +11,6 @@ use App\Models\CuentaProy;
 use App\Models\MoviCuentaProy;
 use App\Models\ObjEspecifico;
 use App\Models\Orden;
-use App\Models\Presupuesto;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
 use App\Models\Requisicion;
@@ -139,14 +138,14 @@ class CotizacionController extends Controller
 
         try {
 
-            // COTIZACION DENEGADA
+            // COTIZACIÓN DENEGADA
 
             Cotizacion::where('id', $request->id)->update([
                 'estado' => 2,
                 'fecha_estado' => Carbon::now('America/El_Salvador')
             ]);
 
-            // hoy verificar cuales otros materiales fueron cotizados y volver a 0.
+            // hoy verificar cuales materiales fueron cotizados y volver a 0.
             // para que puedan ser cotizados de nuevo.
 
             $listado = CotizacionDetalle::where('cotizacion_id', $request->id)->get();
@@ -420,7 +419,6 @@ class CotizacionController extends Controller
                 ->get();
 
 
-
             foreach ($lista as $datainfo){
 
                 // MATERIAL A COTIZACION FUE CANCELADO
@@ -456,6 +454,8 @@ class CotizacionController extends Controller
                 $infoObjeto = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
                 $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
 
+                $txtObjeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+
                 // como siempre busco material que estaban en el presupuesto, siempre encontrara
                 // el proyecto ID y el ID de objeto específico
                 $infoPresupuesto = CuentaProy::where('proyecto_id', $infoRequisicion->id_proyecto)
@@ -465,8 +465,7 @@ class CotizacionController extends Controller
 
                 // CÁLCULOS
 
-                $totalSalida = 0;
-                $totalEntrada = 0;
+                $totalRestante = 0;
                 $totalRetenido = 0;
 
                 // movimiento de cuentas (sube y baja)
@@ -480,29 +479,16 @@ class CotizacionController extends Controller
 
                 $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
-                // obtener todas las salidas de material
-                $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
+                // obtener lo guardado de ordenes de compra, para obtener su restante
+                $arrayRestante = DB::table('cuentaproy_detalle AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
                     ->where('pd.id_cuentaproy', $infoPresupuesto->id)
-                    ->where('pd.tipo', 0) // salidas, la orden compra es válida
                     ->where('rd.cancelado', 0)
                     ->get();
 
-                foreach ($infoSalidaDetalle as $dd){
-                    $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
-                }
-
-                $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
-                    ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                    ->where('pd.id_cuentaproy', $infoPresupuesto->id)
-                    ->where('pd.tipo', 1) // entradas, la orden compra fue cancelada
-                    ->where('rd.cancelado', 0)
-                    ->get();
-
-                foreach ($infoEntradaDetalle as $dd){
-                    $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
+                foreach ($arrayRestante as $dd){
+                    $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
                 }
 
                 // información de saldos retenidos
@@ -517,11 +503,8 @@ class CotizacionController extends Controller
                     $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
                 }
 
-                // total de los cambios de detalle que se han hecho.
-                $totalCuentaDetalle = $totalEntrada - $totalSalida;
-
                 // aquí se obtiene el Saldo Restante del código
-                $totalRestanteSaldo = $totalMoviCuenta + $infoPresupuesto->saldo_inicial - $totalCuentaDetalle;
+                $totalRestanteSaldo = $totalMoviCuenta + $infoPresupuesto->saldo_inicial - $totalRestante;
 
                 //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
 
@@ -538,7 +521,7 @@ class CotizacionController extends Controller
                     $saldoRestanteFormat = number_format((float)$totalRestanteSaldo, 2, '.', ',');
                     $saldoRetenidoFormat = number_format((float)$totalRetenido, 2, '.', ',');
 
-                    $costoFormat = number_format((float)$infoCatalogo->pu, 2, '.', ',');
+                    $saldoMaterial = number_format((float)$saldoMaterial, 2, '.', ',');
 
                     // disponible - retenido
                     // PASAR A NUMERO POSITIVO
@@ -546,12 +529,12 @@ class CotizacionController extends Controller
                     $totalActualFormat = number_format((float)$totalActualFormat, 2, '.', ',');
 
                     return ['success' => 3, 'fila' => $i,
-                        'obj' => $infoObjeto->codigo,
+                        'obj' => $txtObjeto,
                         'disponibleFormat' => $saldoRestanteFormat, // esto va formateado
                         'retenidoFormat' => $saldoRetenidoFormat, // esto va formateado
                         'material' => $infoCatalogo,
                         'unidad' => $infoUnidad->medida,
-                        'costo' => $costoFormat,
+                        'costo' => $saldoMaterial,
                         'totalactual' => $totalActualFormat
                     ];
                 }else {
@@ -571,7 +554,7 @@ class CotizacionController extends Controller
                 }
             } // end foreach
 
-            //DB::commit();
+            DB::commit();
             return ['success' => 5];
         }catch(\Throwable $e){
            // Log::info('ee' . $e);

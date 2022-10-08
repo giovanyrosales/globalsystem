@@ -483,7 +483,7 @@
                             }
                         })
                     }
-                    if(response.data.success === 2){
+                    else if(response.data.success === 2){
                         Swal.fire({
                             title: 'Material Con Cotización',
                             text: "Un Material ya tiene una Cotización en Espera o ya fue Aprobada. Recargar para visualizar.",
@@ -498,7 +498,11 @@
                             }
                         })
                     }
-                    if(response.data.success === 3){
+                    else if(response.data.success === 3){
+
+                        // en esta validaciones no se toma en cuenta el saldo retenido, porque eso
+                        // se verifica al hacer una requisición. aquí solo se tomara en cuenta
+                        // si hay saldo restante.
 
                         let nombre = response.data.material.nombre;
                         let unidad = response.data.unidad;
@@ -509,10 +513,10 @@
 
                         Swal.fire({
                             title: 'Saldo Insuficiente',
-                            html: "El material " + nombre + " - " + unidad + ", Solicita $" + costo + ". Pero el Código " + codigo
-                            + " Tiene Saldo actual. " + "<br>"
-                                + "Disponible $" + disponible + "<br>"
-                                + "Saldo Faltante $" + totalactual + "<br>"
+                            html: "El material " + nombre + " - " + unidad + ", Solicita $" + costo + ". Pero el Código " + codigo + "<br>"
+                            + "El Saldo actual actual. " + "<br>"
+                                + "Saldo Restante $" + disponible + "<br>"
+                                + "Saldo Faltante para Cotizar $" + totalactual + "<br>"
                             ,
                             icon: 'info',
                             showCancelButton: false,
@@ -526,7 +530,7 @@
                         })
                     }
 
-                    if(response.data.success === 4){
+                    else if(response.data.success === 4){
 
                         Swal.fire({
                             title: 'Material Cancelado',

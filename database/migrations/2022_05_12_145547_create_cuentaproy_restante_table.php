@@ -4,32 +4,27 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCuentaproyDetalleTable extends Migration
+class CreateCuentaproyRestanteTable extends Migration
 {
     /**
      * GUARDA UN REGISTRO AL GENERAR ORDEN DE COMPRA, ASI BAJARA EL
-     * SALDO RESTANTE
-     *
+     * SALDO RESTANTE. SI SE ANULA LA ORDEN DE COMPRA, SE DEBERA BORRAR EL REGISTRO
+     * BUSCANDOSE CON LA ID_ORDEN
      *
      *
      * @return void
      */
     public function up()
     {
-        Schema::create('cuentaproy_detalle', function (Blueprint $table) {
+        Schema::create('cuentaproy_restante', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_cuentaproy')->unsigned();
             $table->bigInteger('id_requi_detalle')->unsigned();
-
-            //0 salida
-            //1 entrada
-            $table->boolean('tipo');
-
-            //0: LA ORDEN DE COMPRA ES VALIDA.
-            //1: LA ORDEN DE COMPRA FUE CANCELADA
+            $table->bigInteger('id_orden')->unsigned();
 
             $table->foreign('id_cuentaproy')->references('id')->on('cuentaproy');
             $table->foreign('id_requi_detalle')->references('id')->on('requisicion_detalle');
+            $table->foreign('id_orden')->references('id')->on('orden');
         });
     }
 
