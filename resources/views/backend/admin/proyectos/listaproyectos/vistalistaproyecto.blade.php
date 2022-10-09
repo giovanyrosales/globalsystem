@@ -256,6 +256,7 @@
                                 <!-- ID del proyecto -->
                                 <input type="hidden" id="id-proyecto">
 
+                                <!-- información del proyecto -->
                                 @can('boton.ver.proyecto')
                                     <div class="form-group">
                                         <button type="button" style="width: 100%" class="btn btn-warning" onclick="vista()">
@@ -264,6 +265,7 @@
                                     </div>
                                 @endcan
 
+                                <!-- editar información del proyecto -->
                                 @can('boton.editar.proyecto')
                                     <div class="form-group">
                                         <button type="button" style="width: 100%" class="btn btn-info" onclick="informacion()">
@@ -272,39 +274,36 @@
                                     </div>
                                 @endcan
 
-
-                            <!-- este el presupuesto mostrado en un modal, aquí aparece botón para aprobar -->
+                                <!-- este el presupuesto mostrado en un modal, aquí aparece botón para aprobar -->
                                 @can('boton.ver.presupuesto.modal')
 
-                                    <div class="form-group" id="btnpresuaprobar" style="display: none">
+                                    <div class="form-group" id="divModalPresupuesto">
                                         <button type="button" style="width: 100%;" class="btn btn-success" onclick="informacionPresupuesto()">
                                             <i class="fas fa-list-alt" title="Presupuesto"></i>&nbsp; Presupuesto
                                         </button>
                                     </div>
                                 @endcan
 
+                            <!-- ver planilla de proyecto -->
                                 @can('boton.ver.planilla')
-                                        <div class="form-group">
-                                    <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionPlanilla()">
-                                        <i class="fas fa-eye" title="Planilla"></i>&nbsp; Planilla
-                                    </button>
-                                        </div>
+                                    <div class="form-group" id="divBtnPlanilla" >
+                                        <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionPlanilla()">
+                                            <i class="fas fa-eye" title="Planilla"></i>&nbsp; Planilla
+                                        </button>
+                                    </div>
                                 @endcan
 
-                                <!-- EL USUARIO CON EL PERMISO PUEDE VER EL BOTON SALDO -->
-                                <!-- Cada vez que se abre el modal, se verifica si el el presupuesto esta Aprobado, y se muestra el
-                                     boton. solo se mostrara si el usuario tiene permiso ya que CREA el codigo del boton, y se
-                                     se verifica que no sea NULL para que muestre el botón-->
-
+                                <!-- modal con los saldos -->
                                 @can('boton.dinero.presupuesto')
-                                        <div class="form-group" id="divContenedorSaldos" style="display: none">
+                                        <div class="form-group" id="divContenedorSaldos">
                                             <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionSaldo()">
                                                 <i class="fas fa-list-alt" title="Saldos"></i>&nbsp; Saldos
                                             </button>
                                         </div>
                                 @endcan
+
                                 @can('boton.movimiento.cuenta.proyecto')
-                                    <div class="form-group" id="divContenedorMovimiento" style="display: none">
+                                    <div class="form-group" id="divContenedorMovimiento" >
                                         <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionMovimiento()">
                                             <i class="fas fa-list-alt" title="Movimiento Cuenta"></i>&nbsp; Movimiento Cuenta
                                         </button>
@@ -650,11 +649,11 @@
                 return;
             }
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(monto.length > 0){
-                if(!monto.match(reglaNumeroDecimal)) {
-                    toastr.error('valor debe ser número Decimal y No Negativos');
+                if(!monto.match(reglaNumeroDosDecimal)) {
+                    toastr.error('valor debe ser número Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -663,8 +662,8 @@
                     return;
                 }
 
-                if(monto.length > 10){
-                    toastr.error('monto máximo 10 dígitos de límite');
+                if(monto > 99000000){
+                    toastr.error('monto máximo 99 millones de límite');
                     return;
                 }
             }else{
@@ -699,7 +698,19 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        errorCodigo();
+                        Swal.fire({
+                            title: 'Código Erróneo',
+                            text: "El código ya se encuentra registrado",
+                            icon: 'error',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
                     }
                     else if(response.data.success === 2){
                         $('#modalEditar').modal('hide');
@@ -716,48 +727,54 @@
                 });
         }
 
-        function errorCodigo(){
-            Swal.fire({
-                title: 'Código Erróneo',
-                text: "El código ya se encuentra registrado",
-                icon: 'error',
-                showCancelButton: false,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                }
-            })
-        }
-
         // modal para varias opciones de proyecto
-        function modalOpciones(id, estado){
+        function modalOpciones(dato){
+
             // VIENE ID PROYECTO
-            $('#id-proyecto').val(id);
-            // para poder mostrar el botón ver presupuesto modal cuando sea necesario
-            // 1: LISTO PARA APROBACIÓN
-            if(estado === 1){
-                // verificar que se tenga el Permiso el usuario. y si lo tiene si mostrara el boton
-                // aprobar presupuesto de ingenieria
-                if (document.getElementById('btnpresuaprobar') !== null) {
-                    document.getElementById("btnpresuaprobar").style.display = "block";
+            $('#id-proyecto').val(dato.id);
+
+            // ocultar botones
+
+            if (document.getElementById('divModalPresupuesto') !== null) {
+                document.getElementById("divModalPresupuesto").style.display = "none";
+            }
+
+            if (document.getElementById('divBtnPlanilla') !== null) {
+                document.getElementById("divBtnPlanilla").style.display = "none";
+            }
+
+            if (document.getElementById('divContenedorSaldos') !== null) {
+                document.getElementById("divContenedorSaldos").style.display = "none";
+            }
+
+            if (document.getElementById('divContenedorMovimiento') !== null) {
+                document.getElementById("divContenedorMovimiento").style.display = "none";
+            }
+
+            let estado = dato.presu_aprobado;
+
+            // 1: LISTO PARA REVISIÓN
+            // el boton aparecera si usuario tiene permiso y el estado presupuesto sea 1 o 2
+            if(estado === 1 || estado === 2){
+                if (document.getElementById('divModalPresupuesto') !== null) {
+                    document.getElementById("divModalPresupuesto").style.display = "block";
+                }
+
+                if(estado === 2){
+                    if (document.getElementById('divBtnPlanilla') !== null) {
+                        document.getElementById("divBtnPlanilla").style.display = "block";
+                    }
+
+                    if (document.getElementById('divContenedorSaldos') !== null) {
+                        document.getElementById("divContenedorSaldos").style.display = "block";
+                    }
+
+                    if (document.getElementById('divContenedorMovimiento') !== null) {
+                        document.getElementById("divContenedorMovimiento").style.display = "block";
+                    }
                 }
             }
 
-            // PRESUPUESTO ESTA APROBADO
-            if(estado === 2){
-                if (document.getElementById('divContenedorSaldos') !== null) {
-                    document.getElementById("divContenedorSaldos").style.display = "block";
-                }
-
-                if (document.getElementById('divContenedorMovimiento') !== null) {
-                    document.getElementById("divContenedorMovimiento").style.display = "block";
-                }
-            }
-
-            $('#id-estado-proyecto').val(id);
             $('#modalOpcion').modal('show');
         }
 

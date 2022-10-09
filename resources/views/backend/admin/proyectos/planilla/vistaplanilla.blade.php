@@ -359,11 +359,11 @@
             }
 
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(salariototal.length > 0){
-                if(!salariototal.match(reglaNumeroDecimal)) {
-                    toastr.error('Salario Total debe ser decimal y no negativo');
+                if(!salariototal.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Salario Total debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -381,8 +381,8 @@
             }
 
             if(horasextras.length > 0){
-                if(!horasextras.match(reglaNumeroDecimal)) {
-                    toastr.error('Horas Extras debe ser decimal y no negativo');
+                if(!horasextras.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Horas Extras debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -400,8 +400,8 @@
             }
 
             if(insaforp.length > 0){
-                if(!insaforp.match(reglaNumeroDecimal)) {
-                    toastr.error('Insaforp debe ser decimal y no negativo');
+                if(!insaforp.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Insaforp debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -421,8 +421,8 @@
             // *****
 
             if(issslaboral.length > 0){
-                if(!issslaboral.match(reglaNumeroDecimal)) {
-                    toastr.error('ISSS Laboral debe ser decimal y no negativo');
+                if(!issslaboral.match(reglaNumeroDosDecimal)) {
+                    toastr.error('ISSS Laboral debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -440,8 +440,8 @@
             }
 
             if(issspatronal.length > 0){
-                if(!issspatronal.match(reglaNumeroDecimal)) {
-                    toastr.error('ISSS Patronal debe ser decimal y no negativo');
+                if(!issspatronal.match(reglaNumeroDosDecimal)) {
+                    toastr.error('ISSS Patronal debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -461,8 +461,8 @@
             // -----
 
             if(confialaboral.length > 0){
-                if(!confialaboral.match(reglaNumeroDecimal)) {
-                    toastr.error('AFP Confía Laboral debe ser decimal y no negativo');
+                if(!confialaboral.match(reglaNumeroDosDecimal)) {
+                    toastr.error('AFP Confía Laboral debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -480,8 +480,8 @@
             }
 
             if(confiapatronal.length > 0){
-                if(!confiapatronal.match(reglaNumeroDecimal)) {
-                    toastr.error('AFP Confía Patronal debe ser decimal y no negativo');
+                if(!confiapatronal.match(reglaNumeroDosDecimal)) {
+                    toastr.error('AFP Confía Patronal debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -501,8 +501,8 @@
             // -----
 
             if(crecerlaboral.length > 0){
-                if(!confialaboral.match(reglaNumeroDecimal)) {
-                    toastr.error('AFP Crecer Laboral debe ser decimal y no negativo');
+                if(!confialaboral.match(reglaNumeroDosDecimal)) {
+                    toastr.error('AFP Crecer Laboral debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -520,8 +520,8 @@
             }
 
             if(crecerpatronal.length > 0){
-                if(!crecerpatronal.match(reglaNumeroDecimal)) {
-                    toastr.error('AFP Crecer Patronal debe ser decimal y no negativo');
+                if(!crecerpatronal.match(reglaNumeroDosDecimal)) {
+                    toastr.error('AFP Crecer Patronal debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -637,11 +637,11 @@
                 return;
             }
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(salariototal.length > 0){
-                if(!salariototal.match(reglaNumeroDecimal)) {
-                    toastr.error('Salario Total debe ser decimal y no negativo');
+                if(!salariototal.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Salario Total debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -659,8 +659,8 @@
             }
 
             if(horasextras.length > 0){
-                if(!horasextras.match(reglaNumeroDecimal)) {
-                    toastr.error('Horas Extras debe ser decimal y no negativo');
+                if(!horasextras.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Horas Extras debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -678,8 +678,8 @@
             }
 
             if(insaforp.length > 0){
-                if(!insaforp.match(reglaNumeroDecimal)) {
-                    toastr.error('Insaforp debe ser decimal y no negativo');
+                if(!insaforp.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Insaforp debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -699,8 +699,8 @@
             // *****
 
             if(issslaboral.length > 0){
-                if(!issslaboral.match(reglaNumeroDecimal)) {
-                    toastr.error('ISSS Laboral debe ser decimal y no negativo');
+                if(!issslaboral.match(reglaNumeroDosDecimal)) {
+                    toastr.error('ISSS Laboral debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -718,8 +718,8 @@
             }
 
             if(issspatronal.length > 0){
-                if(!issspatronal.match(reglaNumeroDecimal)) {
-                    toastr.error('ISSS Patronal debe ser decimal y no negativo');
+                if(!issspatronal.match(reglaNumeroDosDecimal)) {
+                    toastr.error('ISSS Patronal debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -739,8 +739,8 @@
             // -----
 
             if(confialaboral.length > 0){
-                if(!confialaboral.match(reglaNumeroDecimal)) {
-                    toastr.error('AFP Confía Laboral debe ser decimal y no negativo');
+                if(!confialaboral.match(reglaNumeroDosDecimal)) {
+                    toastr.error('AFP Confía Laboral debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -758,8 +758,8 @@
             }
 
             if(confiapatronal.length > 0){
-                if(!confiapatronal.match(reglaNumeroDecimal)) {
-                    toastr.error('AFP Confía Patronal debe ser decimal y no negativo');
+                if(!confiapatronal.match(reglaNumeroDosDecimal)) {
+                    toastr.error('AFP Confía Patronal debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -779,8 +779,8 @@
             // -----
 
             if(crecerlaboral.length > 0){
-                if(!confialaboral.match(reglaNumeroDecimal)) {
-                    toastr.error('AFP Crecer Laboral debe ser decimal y no negativo');
+                if(!confialaboral.match(reglaNumeroDosDecimal)) {
+                    toastr.error('AFP Crecer Laboral debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -798,8 +798,8 @@
             }
 
             if(crecerpatronal.length > 0){
-                if(!crecerpatronal.match(reglaNumeroDecimal)) {
-                    toastr.error('AFP Crecer Patronal debe ser decimal y no negativo');
+                if(!crecerpatronal.match(reglaNumeroDosDecimal)) {
+                    toastr.error('AFP Crecer Patronal debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 

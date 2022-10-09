@@ -118,6 +118,8 @@ Route::post('/admin/proyecto/aprobar/presupuesto', [ProyectoController::class, '
 Route::get('/admin/ver/presupuesto/saldo/{id}', [ProyectoController::class,'infoTablaSaldoProyecto']);
 // petición para cambiar estado de presupuesto, asi para que el encargado de Presupuesto lo apruebe
 Route::post('/admin/proyecto/estado/presupuesto', [ProyectoController::class, 'cambiarEstadoPresupuesto']);
+// buscar materiales de un determinado presupuesto de proyecto
+Route::post('/admin/buscar/material/soloproyecto',  [ProyectoController::class,'buscadorMaterialRequisicion']);
 
 
 // --- VISTA DE PROYECTO ---

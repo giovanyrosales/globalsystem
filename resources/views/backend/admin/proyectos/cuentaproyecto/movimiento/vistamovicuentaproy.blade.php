@@ -289,15 +289,15 @@
             var selectcuenta = document.getElementById('select-cuentaproy').value;
             var fecha = document.getElementById('fecha-nuevo').value;
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(saldomodificar === ''){
                 toastr.error('Saldo a modificar es requerido');
                 return;
             }
 
-            if(!saldomodificar.match(reglaNumeroDecimal)) {
-                toastr.error('Saldo a modificar debe ser decimal y no negativo');
+            if(!saldomodificar.match(reglaNumeroDosDecimal)) {
+                toastr.error('Saldo a modificar debe ser Decimal Positivo. Solo se permite 2 Decimales');
                 return;
             }
 
@@ -306,7 +306,7 @@
                 return;
             }
 
-            if(saldomodificar.length > 1000000){
+            if(saldomodificar > 1000000){
                 toastr.error('Saldo a modificar debe tener máximo 1 millón');
                 return;
             }

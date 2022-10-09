@@ -246,13 +246,13 @@
 
             // validar que unidades y periodo existan para calcular total
             var reglaNumeroEntero = /^[0-9]\d*$/;
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(unidades.value.length > 0) {
                 // validar
 
-                if(!unidades.value.match(reglaNumeroDecimal)) {
-                    modalMensaje('Error', 'Unidades debe ser número decimal');
+                if(!unidades.value.match(reglaNumeroDosDecimal)) {
+                    modalMensaje('Error', 'Unidades debe ser número Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -346,7 +346,7 @@
             var periodo = $("input[name='periodo[]']").map(function(){return $(this).val();}).get();
 
             var reglaNumeroEntero = /^[0-9]\d*$/;
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             // verificar que todos las unidades y periodos ingresados sean validos
             for(var a = 0; a < unidades.length; a++){
@@ -357,8 +357,8 @@
 
                     // revisar si es decimal
 
-                    if(!datoUnidades.match(reglaNumeroDecimal)) {
-                        modalMensaje('Presupuesto Base','Unidades ingresada no es valido');
+                    if(!datoUnidades.match(reglaNumeroDosDecimal)) {
+                        modalMensaje('Presupuesto Base','Unidades debe ser Decimal Positivo. Solo se permite 2 Decimales');
                         return;
                     }
 
@@ -444,8 +444,8 @@
                         return;
                     }
 
-                    if(!datoCostoExtra.match(reglaNumeroDecimal)) {
-                        modalMensaje('Nuevos Materiales', 'Fila: #' + (d+1) + ', el Costo debe ser Número Decimal. Borrar fila y agregar de nuevo');
+                    if(!datoCostoExtra.match(reglaNumeroDosDecimal)) {
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (d+1) + ', el Costo debe ser Número Decimal Positivo y 2 Decimales Máximo. Borrar fila y agregar de nuevo');
                         return;
                     }
 
@@ -469,8 +469,8 @@
                         return;
                     }
 
-                    if(!datoCantidadExtra.match(reglaNumeroDecimal)) {
-                        modalMensaje('Nuevos Materiales', 'Fila: #' + (t+1) + ', la Cantidad debe ser Número Decimal. Borrar fila y agregar de nuevo');
+                    if(!datoCantidadExtra.match(reglaNumeroDosDecimal)) {
+                        modalMensaje('Nuevos Materiales', 'Fila: #' + (t+1) + ', la Cantidad debe ser Número Decimal Positivo y Máximo 2 Decimales. Borrar fila y agregar de nuevo');
                         return;
                     }
 
@@ -693,7 +693,7 @@
             var periodo = document.getElementById('periodo-nuevo').value;
             var medida = document.getElementById('select-medida-nuevo').value;
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
             var reglaNumeroEntero = /^[0-9]\d*$/;
 
             // ****
@@ -715,8 +715,8 @@
                 return;
             }
 
-            if(!costo.match(reglaNumeroDecimal)) {
-                toastr.error('Costo debe ser número Decimal y No Negativos');
+            if(!costo.match(reglaNumeroDosDecimal)) {
+                toastr.error('Costo debe ser número Decimal Positivo. Solo se permite 2 Decimales');
                 return;
             }
 
@@ -725,8 +725,8 @@
                 return;
             }
 
-            if(costo.length > 10){
-                toastr.error('Costo máximo 10 dígitos de límite');
+            if(costo > 99000000){
+                toastr.error('Costo máximo 99 millones de límite');
                 return;
             }
 
@@ -747,8 +747,8 @@
                 return;
             }
 
-            if(cantidad.length > 10){
-                toastr.error('Cantidad máximo 10 dígitos de límite');
+            if(cantidad > 99000000){
+                toastr.error('Cantidad máximo 99 millones de límite');
                 return;
             }
 
@@ -769,8 +769,8 @@
                 return;
             }
 
-            if(periodo.length > 3){
-                toastr.error('Periodo máximo 3 dígitos de límite');
+            if(periodo > 3){
+                toastr.error('Periodo máximo Número 999 de límite');
                 return;
             }
 

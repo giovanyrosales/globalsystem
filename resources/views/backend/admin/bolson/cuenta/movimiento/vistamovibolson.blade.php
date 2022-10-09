@@ -320,11 +320,11 @@
                 return;
             }
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(aumenta.length > 0){
-                if(!aumenta.match(reglaNumeroDecimal)) {
-                    toastr.error('Aumenta debe ser decimal y no negativo');
+                if(!aumenta.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Aumenta debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -333,8 +333,8 @@
                     return;
                 }
 
-                if(aumenta.length > 10){
-                    toastr.error('Aumenta debe tener máximo 10 caracteres');
+                if(aumenta > 99000000){
+                    toastr.error('Aumenta debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -342,18 +342,18 @@
             }
 
             if(disminuye.length > 0){
-                if(!disminuye.match(reglaNumeroDecimal)) {
-                    toastr.error('Aumenta debe ser decimal y no negativo');
+                if(!disminuye.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Disminuye debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
                 if(disminuye < 0){
-                    toastr.error('Aumenta no debe ser negativo');
+                    toastr.error('Disminuye no debe ser negativo');
                     return;
                 }
 
-                if(disminuye.length > 10){
-                    toastr.error('Aumenta debe tener máximo 10 caracteres');
+                if(disminuye > 99000000){
+                    toastr.error('Disminuye debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -473,11 +473,11 @@
                 return;
             }
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(aumenta.length > 0){
-                if(!aumenta.match(reglaNumeroDecimal)) {
-                    toastr.error('Aumenta debe ser decimal y no negativo');
+                if(!aumenta.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Aumenta debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -486,8 +486,8 @@
                     return;
                 }
 
-                if(aumenta.length > 10){
-                    toastr.error('Aumenta debe tener máximo 10 caracteres');
+                if(aumenta > 99000000){
+                    toastr.error('Aumenta debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -495,18 +495,18 @@
             }
 
             if(disminuye.length > 0){
-                if(!disminuye.match(reglaNumeroDecimal)) {
-                    toastr.error('Aumenta debe ser decimal y no negativo');
+                if(!disminuye.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Disminuye debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
                 if(disminuye < 0){
-                    toastr.error('Aumenta no debe ser negativo');
+                    toastr.error('Disminuye no debe ser negativo');
                     return;
                 }
 
-                if(disminuye.length > 10){
-                    toastr.error('Aumenta debe tener máximo 10 caracteres');
+                if(disminuye > 99000000){
+                    toastr.error('Disminuye debe tener máximo 99 millones');
                     return;
                 }
             }else{

@@ -326,11 +326,11 @@
                 return;
             }
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(monto.length > 0){
-                if(!monto.match(reglaNumeroDecimal)) {
-                    toastr.error('Monto debe ser decimal y no negativo');
+                if(!monto.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Monto debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -339,8 +339,8 @@
                     return;
                 }
 
-                if(monto.length > 10){
-                    toastr.error('Monto debe tener máximo 10 caracteres');
+                if(monto > 99000000){
+                    toastr.error('Monto debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -438,11 +438,11 @@
                 return;
             }
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(monto.length > 0){
-                if(!monto.match(reglaNumeroDecimal)) {
-                    toastr.error('Monto debe ser decimal y no negativo');
+                if(!monto.match(reglaNumeroDosDecimal)) {
+                    toastr.error('Monto debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -451,8 +451,8 @@
                     return;
                 }
 
-                if(monto.length > 10){
-                    toastr.error('Monto debe tener máximo 10 caracteres');
+                if(monto > 99000000){
+                    toastr.error('Monto debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -487,7 +487,7 @@
                     }
                 })
                 .catch((error) => {
-                   
+
                     toastr.error('Error al actualizar');
                     closeLoading();
                 });

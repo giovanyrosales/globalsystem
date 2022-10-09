@@ -407,10 +407,10 @@
                 return;
             }
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
-            if (!precio.match(reglaNumeroDecimal)) {
-                toastr.error('Precio debe ser número Decimal y no Negativo');
+            if (!precio.match(reglaNumeroDosDecimal)) {
+                toastr.error('Precio debe ser número Decimal Positivo. Solo se permite 2 Decimales');
                 return;
             }
 
@@ -419,8 +419,8 @@
                 return;
             }
 
-            if (precio.length > 10) {
-                toastr.error('Precio máximo 10 dígitos de límite');
+            if (precio > 99000000) {
+                toastr.error('Precio máximo 99 millones de límite');
                 return;
             }
 

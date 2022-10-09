@@ -157,12 +157,6 @@ class ProyectoController extends Controller
             if($ll->fechaini != null) {
                 $ll->fechaini = date("d-m-Y", strtotime($ll->fechaini));
             }
-
-            if($ll->presu_aprobado == 0){
-                $ll->estadoPresupuesto = false;
-            }else{
-                $ll->estadoPresupuesto = true;
-            }
         }
 
         return view('backend.admin.proyectos.listaproyectos.tablalistaproyecto', compact('lista'));
@@ -711,13 +705,15 @@ class ProyectoController extends Controller
                 // aquí se obtiene el Saldo Restante del código
                 $totalRestanteSaldo = $totalMoviCuenta + $infoPresupuesto->saldo_inicial - $totalRestante;
 
-                //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
+                $totalCalculado = $totalRestanteSaldo - $totalRetenido;
 
                 // verificar cantidad * dinero del material nuevo.
                 // este dinero se esta solicitando para la fila.
                 $saldoMaterial = $request->cantidad[$i] * $infoCatalogo->pu;
 
-                if($this->redondear_dos_decimal($totalRestanteSaldo) < $this->redondear_dos_decimal($saldoMaterial)){
+                Log::info('ss ' . $saldoMaterial);
+
+                if($this->redondear_dos_decimal($totalCalculado) < $this->redondear_dos_decimal($saldoMaterial)){
 
                     // retornar que no alcanza el saldo
 
@@ -1942,6 +1938,77 @@ class ProyectoController extends Controller
 
         return ['success' => 3];
     }
+
+    public function buscadorMaterialRequisicion(Request $request){
+
+        if($request->get('query')){
+            $query = $request->get('query');
+
+            $listado = Partida::where('proyecto_id', $request->idpro)->get();
+
+            $pila = array();
+
+            foreach ($listado as $dd){
+                array_push($pila, $dd->id);
+            }
+
+            $data = DB::table('partida_detalle AS pd')
+                ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
+                ->select('m.id')
+                ->whereIn('pd.partida_id', $pila)
+                ->where('m.nombre', 'LIKE', "%{$query}%")
+                ->groupBy('m.id')
+                ->get();
+
+            foreach ($data as $dd){
+
+                $infoMaterial = CatalogoMateriales::where('id', $dd->id)->first();
+
+                $medida = '';
+                if($infoUnidad = UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
+                    $medida = $infoUnidad->medida;
+                }
+
+                if($medida === ''){
+                    $dd->unido = $infoMaterial->nombre;
+                }else{
+                    $dd->unido = $infoMaterial->nombre . ' - ' . $medida;
+                }
+            }
+
+            $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
+            $tiene = true;
+            foreach($data as $row){
+
+                // si solo hay 1 fila, No mostrara el hr, salto de linea
+                if(count($data) == 1){
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValorRequisicion(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->unido.'</a></li>
+                ';
+                    }
+                }
+
+                else{
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValorRequisicion(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->unido.'</a></li>
+                   <hr>
+                ';
+                    }
+                }
+            }
+
+            $output .= '</ul>';
+            if($tiene){
+                $output = '';
+            }
+            echo $output;
+        }
+    }
+
 
     // busca materiales para crear una requisición, solo muestra materiales asignado a presupuesto de proyecto
     public function verCatalogoMaterialRequisicion($id){

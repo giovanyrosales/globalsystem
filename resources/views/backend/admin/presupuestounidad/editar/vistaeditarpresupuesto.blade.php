@@ -243,7 +243,7 @@
             var periodo = document.getElementById('periodo-nuevo').value;
             var medida = document.getElementById('select-medida-nuevo').value;
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
             var reglaNumeroEntero = /^[0-9]\d*$/;
 
             // ****
@@ -265,8 +265,8 @@
                 return;
             }
 
-            if(!costo.match(reglaNumeroDecimal)) {
-                toastr.error('Costo debe ser número Decimal y No Negativos');
+            if(!costo.match(reglaNumeroDosDecimal)) {
+                toastr.error('Costo debe ser número Decimal Positivo. Solo se permite 2 Decimales');
                 return;
             }
 
@@ -275,8 +275,8 @@
                 return;
             }
 
-            if(costo.length > 10){
-                toastr.error('Costo máximo 10 dígitos de límite');
+            if(costo > 99000000){
+                toastr.error('Costo máximo 99 millones');
                 return;
             }
 
@@ -297,8 +297,8 @@
                 return;
             }
 
-            if(cantidad.length > 10){
-                toastr.error('Cantidad máximo 10 dígitos de límite');
+            if(cantidad > 99000000){
+                toastr.error('Cantidad máximo 99 millones');
                 return;
             }
 
@@ -319,8 +319,8 @@
                 return;
             }
 
-            if(periodo.length > 3){
-                toastr.error('Periodo máximo 3 dígitos de límite');
+            if(periodo > 999){
+                toastr.error('Periodo máximo Número 999 de límite');
                 return;
             }
 

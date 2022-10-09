@@ -347,14 +347,14 @@
         var boolPeriodo = false;
 
         // validar que unidades y periodo existan para calcular total
-        var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+        var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
         var reglaNumeroEntero = /^[0-9]\d*$/;
 
         if(unidades.value.length > 0) {
             // validar
 
-            if(!unidades.value.match(reglaNumeroDecimal)) {
-                modalMensaje('Error', 'unidades debe ser número decimal');
+            if(!unidades.value.match(reglaNumeroDosDecimal)) {
+                modalMensaje('Error', 'unidades debe ser número Decimal Positivo. Solo se permite 2 Decimales');
                 return;
             }
 
@@ -415,7 +415,7 @@
         var periodo = $("input[name='periodo[]']").map(function(){return $(this).val();}).get();
 
         var reglaNumeroEntero = /^[0-9]\d*$/;
-        var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+        var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
         // verificar que todos las unidades y periodos ingresados sean validos
 
@@ -427,8 +427,8 @@
 
                 // revisar si es decimal
 
-                if(!datoUnidades.match(reglaNumeroDecimal)) {
-                    modalMensaje('Presupuesto Base','unidades ingresada no es valido');
+                if(!datoUnidades.match(reglaNumeroDosDecimal)) {
+                    modalMensaje('Presupuesto Base','unidades Debe ser Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -517,8 +517,8 @@
                     return;
                 }
 
-                if(!datoCostoExtra.match(reglaNumeroDecimal)) {
-                    modalMensaje('Nuevos Materiales', 'Fila: #' + (d+1) + ', el Costo debe ser Número Decimal. Borrar fila y agregar de nuevo');
+                if(!datoCostoExtra.match(reglaNumeroDosDecimal)) {
+                    modalMensaje('Nuevos Materiales', 'Fila: #' + (d+1) + ', el Costo debe ser Número Decimal Positivo y 2 Decimales Máximo. Borrar fila y agregar de nuevo');
                     return;
                 }
 
@@ -542,8 +542,8 @@
                     return;
                 }
 
-                if(!datoCantidadExtra.match(reglaNumeroDecimal)) {
-                    modalMensaje('Nuevos Materiales', 'Fila: #' + (t+1) + ', la Cantidad debe ser Número Decimal. Borrar fila y agregar de nuevo');
+                if(!datoCantidadExtra.match(reglaNumeroDosDecimal)) {
+                    modalMensaje('Nuevos Materiales', 'Fila: #' + (t+1) + ', la Cantidad debe ser Número Decimal Positivo y 2 Decimales Máximo. Borrar fila y agregar de nuevo');
                     return;
                 }
 

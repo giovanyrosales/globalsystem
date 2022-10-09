@@ -974,7 +974,7 @@
             var cantidad = $("input[name='cantidadarray[]']").map(function(){return $(this).val();}).get();
             var descripcion = $("input[name='descripcionarray[]']").map(function(){return $(this).val();}).get();
             var descripcionAtributo = $("input[name='descripcionarray[]']").map(function(){return $(this).attr("data-info");}).get();
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             for(var a = 0; a < cantidad.length; a++){
                 let detalle = descripcionAtributo[a];
@@ -993,9 +993,9 @@
                     return;
                 }
 
-                if(!datoCantidad.match(reglaNumeroDecimal)) {
+                if(!datoCantidad.match(reglaNumeroDosDecimal)) {
                     colorRojoTablaRequisicion(a);
-                    toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
+                    toastr.error('Fila #' + (a+1) + ' Cantidad debe ser Número Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
 
@@ -1005,7 +1005,7 @@
                     return;
                 }
 
-                if(datoCantidad.length > 1000000){
+                if(datoCantidad > 1000000){
                     colorRojoTablaRequisicion(a);
                     toastr.error('Fila #' + (a+1) + ' Cantidad máximo 1 millón');
                     return;
@@ -1028,6 +1028,7 @@
             // como tienen la misma cantidad de filas, podemos recorrer
             // todas las filas de una vez
             for(var p = 0; p < cantidad.length; p++){
+                console.log(cantidad[p]);
                 formData.append('cantidad[]', cantidad[p]);
                 formData.append('datainfo[]', descripcionAtributo[p]);
             }
@@ -1059,8 +1060,8 @@
                         // en true, mostramos el saldo Retenido
                         if(retenido > 0){
                             texto = "Fila #" + (fila+1) + ", el objeto específico: " + obj + "<br>" +
-                                ", Tiene Saldo Restante $" + restanteFormat + "<br>" +
-                                ",Saldo Retenido $" + retenidoFormat + "<br>" +
+                                "Tiene Saldo Restante $" + restanteFormat + "<br>" +
+                                "Saldo Retenido $" + retenidoFormat + "<br>" +
                                 " Y se esta solicitando $" + solicita;
                         }else{
                             texto = "Fila #" + (fila+1) + ", el objeto específico: " + obj + "<br>" +
@@ -1632,7 +1633,7 @@
         function vistaBitacora(id) {
             window.location.href = "{{ url('/admin/proyecto/vista/bitacora-detalle') }}/" + id;
         }
-    
+
     </script>
 
     <script>
@@ -1810,7 +1811,7 @@
             var nombrePartida = document.getElementById('nombre-partida-nuevo').value; // 600 caracteres
             var tipopartida = document.getElementById('select-partida-nuevo').value;
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(cantidadPartida.length > 50){
                 toastr.error('Cantidad Partida debe tener máximo 50 caracteres');
@@ -1871,9 +1872,9 @@
                             return;
                         }
 
-                        if (!datoCantidad.match(reglaNumeroDecimal)) {
+                        if (!datoCantidad.match(reglaNumeroDosDecimal)) {
                             colorRojoTablaPresupuesto(a);
-                            toastr.error('Fila #' + (a + 1) + ' Cantidad debe ser decimal y no negativo');
+                            toastr.error('Fila #' + (a + 1) + ' Cantidad debe ser decimal Positivo. Solo se permite 2 Decimales');
                             return;
                         }
 
@@ -1883,7 +1884,7 @@
                             return;
                         }
 
-                        if (datoCantidad > 9000000) {
+                        if (datoCantidad > 99000000) {
                             colorRojoTablaPresupuesto(a);
                             toastr.error('Fila #' + (a + 1) + ' Cantidad no puede superar 9 millones');
                             return;
@@ -2307,7 +2308,7 @@
             var idpartida = document.getElementById('id-partida-editar').value;
             var cantidadPartida = document.getElementById('cantidad-partida-editar').value; // decimal
             var nombre = document.getElementById('nombre-partida-editar').value; // 300 caracteres
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(cantidadPartida.length > 50){
                 toastr.error('Cantidad Partida debe tener máximo 50 caracteres');
@@ -2356,9 +2357,9 @@
                         return;
                     }
 
-                    if(!datoCantidad.match(reglaNumeroDecimal)) {
+                    if(!datoCantidad.match(reglaNumeroDosDecimal)) {
                         colorRojoTablaPresupuestoEditar(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
+                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser Decimal Positivo. Solo se permite 2 Decimales');
                         return;
                     }
 
@@ -2368,7 +2369,7 @@
                         return;
                     }
 
-                    if(datoCantidad > 9000000){
+                    if(datoCantidad > 99000000){
                         colorRojoTablaPresupuestoEditar(a);
                         toastr.error('Fila #' + (a+1) + ' Cantidad máximo 9 millones');
                         return;
@@ -2807,6 +2808,19 @@
                     toastr.error('Error al borrar');
                     closeLoading();
                 });
+        }
+
+        // cuando se busca un material en requisición y se hace clic en material se modifica el valor
+        function modificarValorRequisicion(edrop){
+
+            // obtener texto del li
+            let texto = $(edrop).text();
+            // setear el input de la descripcion
+            $(txtContenedorGlobal).val(texto);
+
+            // agregar el id al atributo del input descripcion
+            $(txtContenedorGlobal).attr('data-info', edrop.id);
+            //$(txtContenedorGlobal).data("info");
         }
 
 

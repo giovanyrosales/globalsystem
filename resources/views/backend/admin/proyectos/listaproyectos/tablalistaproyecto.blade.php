@@ -23,7 +23,7 @@
                                     <td>{{ $dato->fechaini }}</td>
                                     <td>{{ $dato->encargado }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="modalOpciones({{ $dato->id }}, {{ $dato->presu_aprobado }} )">
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="modalOpciones({{ $dato }})">
                                             <i class="fas fa-edit" title="Opciones"></i>&nbsp; Opciones
                                         </button>
                                     </td>
