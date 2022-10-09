@@ -993,6 +993,32 @@ class ProyectoController extends Controller
         return ['success' => 2];
     }
 
+    // borrar una requi detalle, específicamente una Fila, ya que ya no se puede Editar
+    public function borrarMaterialRequisicionFila(Request $request){
+        DB::beginTransaction();
+
+        try {
+
+            // verificar si hay una cotización con este material
+
+            if(CotizacionDetalle::where('id_requidetalle', $request->id)->first()){
+                return ['success' => 1];
+            }
+
+            if(RequisicionDetalle::where('id', $request->id)->first()){
+                CuentaProyRetenido::where('id_requi_detalle', $request->id)->delete();
+                RequisicionDetalle::where('id', $request->id)->delete();
+            }
+
+            DB::commit();
+            return ['success' => 2];
+        }catch(\Throwable $e){
+            Log::info('ee' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
     // borrar toda una requisición
     public function borrarRequisicion(Request $request){
 

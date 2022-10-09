@@ -450,7 +450,7 @@
             formData.append('fecha', fecha);
             formData.append('proveedor', proveedor);
             // ES EL ID DE REQUISICION
-            formData.append('idcotizar', $('#idcotizar').val());
+            formData.append('idrequisicion', $('#idcotizar').val());
 
             // EN LA LISTA VA EL ID: REQUISICION_DETALLE
             $("#mySideToSideSelect_to option").each(function(){

@@ -246,7 +246,7 @@
                             <div class="col-md-8">
                                 <div class="form-group">
                                     <label>Destino:</label>
-                                    <input  type="text" class="form-control" id="destino-requisicion-nuevo">
+                                    <input  type="text" class="form-control" autocomplete="off" id="destino-requisicion-nuevo">
                                 </div>
                             </div>
                         </div>
@@ -255,7 +255,7 @@
                             <div class="col-md-10">
                                 <div class="form-group">
                                     <label>Necesidad:</label>
-                                    <textarea class="form-control" id="necesidad-requisicion-nuevo" maxlength="15000" rows="2"></textarea>
+                                    <textarea class="form-control" id="necesidad-requisicion-nuevo" autocomplete="off" maxlength="15000" rows="2"></textarea>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -827,7 +827,7 @@
                 "</td>"+
 
                 "<td>"+
-                "<input name='descripcionarray[]' data-info='0' class='form-control' style='width:100%' onkeyup='buscarMaterialRequisicion(this)' maxlength='400'  type='text'>"+
+                "<input name='descripcionarray[]' data-info='0' autocomplete='off' class='form-control' style='width:100%' onkeyup='buscarMaterialRequisicion(this)' maxlength='400'  type='text'>"+
                 "<div class='droplista' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
                 "</td>"+
 
@@ -1149,7 +1149,9 @@
                         $('#destino-requisicion-editar').val(response.data.info.destino);
                         $('#necesidad-requisicion-editar').val(response.data.info.necesidad);
 
-                        if(response.data.btneditar){
+                        let nopuedoEditar = response.data.btneditar;
+
+                        if(nopuedoEditar){
                             // ocultar botón
                             document.getElementById("botonGuardarRequiDetalle").style.display = "none";
 
@@ -1223,12 +1225,21 @@
                                 }
 
                             }else{
-                                // no tiene cotizacion, asi que puede BORRAR
-                                markup += "<td>"+
-                                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
-                                    "</td>"+
 
-                                    "</tr>";
+                                if(nopuedoEditar){
+                                    markup += "<td>"+
+                                        "<button type='button' class='btn btn-block btn-danger' onclick='modalBorrarFilaRequiEditar(this)'>Borrar</button>"+
+                                        "</td>"+
+
+                                        "</tr>";
+                                }else{
+                                    // no tiene cotizacion, asi que puede BORRAR
+                                    markup += "<td>"+
+                                        "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
+                                        "</td>"+
+
+                                        "</tr>";
+                                }
                             }
 
                             // cotizacion aprobada, no puede borrar
@@ -1270,6 +1281,72 @@
                     cancelarMaterialCotizado(id);
                 }
             })
+        }
+
+        // borrar material requi detalle, aquí se hace especificamente a un material Fila
+        // porque el boton guardar desparece porque otros materiales ya tiene cotización
+        function modalBorrarFilaRequiEditar(e){
+            // ID REQUI_DETALLE
+            var id = $(e).closest('tr').attr('id');
+
+            Swal.fire({
+                title: 'Borrar Material',
+                text: "Este material no tiene Cotización aun. Se puede eliminar",
+                icon: 'info',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Borrar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    borrarRequiDetalleFila(id);
+                }
+            })
+        }
+
+        // solo elimina una fila
+        function borrarRequiDetalleFila(id){
+            openLoading();
+
+            axios.post(url+'/proyecto/requisicion/material/borrarfila', {
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    // el material ya tiene una cotización
+                    if(response.data.success === 1) {
+
+                        Swal.fire({
+                            title: "Cotización Encontrada",
+                            text: "No se puede Borrar el Material. Se encontro una cotización en Proceso",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#modalEditarRequisicion').modal('hide');
+                                recargarRequisicion();
+                            }
+                        })
+
+                    }else if(response.data.success === 2){
+                        toastr.success('Borrado correctamente');
+                        recargarRequisicion();
+                    }
+                    else{
+                        toastr.error('Error al borrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al borrar');
+                    closeLoading();
+                });
         }
 
         function cancelarMaterialCotizado(id){
@@ -1326,7 +1403,6 @@
                     toastr.error('error al actualizar');
                     closeLoading();
                 });
-
         }
 
         // ver modal para detalle requisicion editar

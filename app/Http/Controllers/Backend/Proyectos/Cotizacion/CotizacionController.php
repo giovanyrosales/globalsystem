@@ -406,44 +406,64 @@ class CotizacionController extends Controller
             // crear cotizacion
             $coti = new Cotizacion();
             $coti->proveedor_id = $request->proveedor;
-            $coti->requisicion_id = $request->idcotizar;
+            $coti->requisicion_id = $request->idrequisicion;
             $coti->fecha = $request->fecha;
             $coti->fecha_estado = null;
             $coti->estado = 0;
             $coti->save();
 
-            $infoRequisicion = Requisicion::where('id', $request->idcotizar)->first();
 
-            $lista = RequisicionDetalle::whereIn('id', $request->lista)
+            $infoRequisicion = Requisicion::where('id', $request->idrequisicion)->first();
+
+            // obtener todos los materiales de id requisiciín detalle
+            $arrayRequiDetalle = RequisicionDetalle::whereIn('id', $request->lista)
                 ->orderBy('id', 'ASC')
                 ->get();
 
+            foreach ($arrayRequiDetalle as $datainfo){
 
-            foreach ($lista as $datainfo){
-
-                // MATERIAL A COTIZACION FUE CANCELADO
+                // MATERIAL A COTIZAR FUE CANCELADO
                 if($datainfo->cancelado == 1){
                     return ['success' => 4];
                 }
 
                 if(CotizacionDetalle::where('id_requidetalle', $datainfo->id)->first()){
-                    // ENCONTRO MATERIAL COTIZADO, hoy se verificara si este material ya estaba aprobado o tiene una
-                    // cotización esperando (aprobación o denegación)
-                    $todos = CotizacionDetalle::where('id_requidetalle', $datainfo->id)->get();
 
-                    $pilaCoti = array();
+                    $arrayCotiDetalle = CotizacionDetalle::where('id_requidetalle', $datainfo->id)->get();
 
-                    foreach ($todos as $dd){
-                        array_push($pilaCoti, $dd->cotizacion_id);
+                    // como ese material puede estar en multiples cotizaciones
+                    $pilaArrayIDCoti = array();
+
+                    foreach ($arrayCotiDetalle as $dd){
+                        array_push($pilaArrayIDCoti, $dd->cotizacion_id);
                     }
 
-                    $conteoCoti = Cotizacion::whereIn('id', $pilaCoti)
-                        ->whereIn('estado', [0,1]) // estado default y aprobados
+                    // Por cada ID material de reui detalle, ya obtuve todos los ID
+                    // de cotización. Para comprobar si está denegada o aprobada
+
+                    // solo estado default
+                    $arrayCotiConteo = Cotizacion::whereIn('id', $pilaArrayIDCoti)
+                        ->whereIn('estado', [0]) // estado default
                         ->count();
 
-                    if($conteoCoti > 0){
-                        // SIGNIFICA QUE MATERIAL A COTIZAR YA TENIA UNA COTIZACIÓN EN ESPERA O APROBADA
+                    if($arrayCotiConteo > 0){
+                        // el material está esperando una respuesta de denegada o aprobada la cotización
                         return ['success' => 2];
+                    }
+
+                    // solo estado default
+                    $arrayCotiConteoAprobada = Cotizacion::whereIn('id', $pilaArrayIDCoti)
+                        ->whereIn('estado', [1]) // estado aprobadas
+                        ->get();
+
+                    foreach ($arrayCotiConteoAprobada as $dd){
+                        // conocer si la orden no está denegada para retornar
+
+                        if(!Orden::where('cotizacion_id', $dd->id)
+                        ->where('estado', 1)->first()){
+                            return ['success' => 2];
+                        }
+
                     }
                 }
 
@@ -480,7 +500,7 @@ class CotizacionController extends Controller
                 $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
                 // obtener lo guardado de ordenes de compra, para obtener su restante
-                $arrayRestante = DB::table('cuentaproy_detalle AS pd')
+                $arrayRestante = DB::table('cuentaproy_restante AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
                     ->where('pd.id_cuentaproy', $infoPresupuesto->id)
@@ -557,7 +577,7 @@ class CotizacionController extends Controller
             DB::commit();
             return ['success' => 5];
         }catch(\Throwable $e){
-           // Log::info('ee' . $e);
+            Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 99];
         }

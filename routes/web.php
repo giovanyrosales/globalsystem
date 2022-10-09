@@ -170,6 +170,9 @@ Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::cla
 Route::post('/admin/proyecto/requisicion/borrar/todo', [ProyectoController::class, 'borrarRequisicion']);
 // petición para cancelar un material de requisición
 Route::post('/admin/proyecto/requisicion/material/cancelar', [ProyectoController::class, 'cancelarMaterialRequisicion']);
+// borrar una requi detalle, específicamente una Fila, ya que ya no se puede Editar
+Route::post('/admin/proyecto/requisicion/material/borrarfila', [ProyectoController::class, 'borrarMaterialRequisicionFila']);
+
 
 
 // * LISTADO DE REQUERIMIENTOS PENDIENTES PARA SER COTIZADOS POR UACI
