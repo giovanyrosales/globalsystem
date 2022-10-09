@@ -261,7 +261,7 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <br>
-                                    <button type="button" onclick="addAgregarFilaNueva()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                    <button type="button" onclick="addAgregarFilaNuevaRequisicion()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
                                         <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                 </div>
                             </div>
@@ -419,7 +419,7 @@
     </div>
 </div>
 
-<!------------------ MODAL PARA EDITAR REQUISICION ---------------->
+<!------------------ MODAL PARA EDITAR REQUISICIÓN ---------------->
 <div class="modal fade" id="modalEditarRequisicion" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -520,7 +520,7 @@
                                 <div class="form-group">
                                     <label>Tipo Partida:</label>
 
-                                    <select id="select-partida-nuevo" class="form-control" onchange="verificarPartidaSelect()">
+                                    <select id="select-partida-nuevo" class="form-control">
                                         @foreach($tipospartida as $dd)
                                             <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
                                         @endforeach
@@ -771,6 +771,8 @@
 
     <script type="text/javascript">
 
+        //*********************** CÓDIGO PARA REQUISICIONES ********************************
+
         // para modal agregar Requisicion por parte de administradora
         function buscarMaterialRequisicion(e){
 
@@ -809,52 +811,7 @@
             }
         }
 
-        function buscarMaterialEditar(e){
-
-            // seguro para evitar errores de busqueda continua
-            if(seguroBuscador){
-                seguroBuscador = false;
-
-                var row = $(e).closest('tr');
-                txtContenedorGlobal = e;
-
-                let texto = e.value;
-
-                if(texto === ''){
-                    // si se limpia el input, setear el atributo id
-                    $(e).attr('data-info', 0);
-                }
-
-                axios.post(url+'/buscar/material/soloproyecto', {
-                    'query' : texto
-                })
-                    .then((response) => {
-                        seguroBuscador = true;
-                        $(row).each(function (index, element) {
-                            $(this).find(".droplistaeditar").fadeIn();
-                            $(this).find(".droplistaeditar").html(response.data);
-                        });
-                    })
-                    .catch((error) => {
-                        seguroBuscador = true;
-                    });
-            }
-        }
-
-        // al hacer clic en material buscado
-        function modificarValor(edrop){
-
-            // obtener texto del li
-            let texto = $(edrop).text();
-            // setear el input de la descripcion
-            $(txtContenedorGlobal).val(texto);
-
-            // agregar el id al atributo del input descripcion
-            $(txtContenedorGlobal).attr('data-info', edrop.id);
-            //$(txtContenedorGlobal).data("info");
-        }
-
-        function addAgregarFilaNueva(){
+        function addAgregarFilaNuevaRequisicion(){
 
             var nFilas = $('#matriz-requisicion >tbody >tr').length;
             nFilas += 1;
@@ -921,13 +878,6 @@
             }
         }
 
-        // recargar tabla solo para bitacoras
-        function recargarBitacora(){
-            var id = {{ $id }};
-            var ruta = "{{ URL::to('/admin/proyecto/vista/bitacora') }}/" + id;
-            $('#tablaDatatableBitacora').load(ruta);
-        }
-
         // recargar tabla de requisiciones
         function recargarRequisicion(){
             var id = {{ $id }};
@@ -935,41 +885,7 @@
             $('#tablaDatatableRequisicion').load(rutaR);
         }
 
-        // modal agregar bitacora
-        function modalAgregarBitacora(){
-
-            // verificar estado del proyecto
-            var estado = {{ $estado }};
-
-            if(estado !== 2){ // priorizado
-                alertaEstado('Información', 'No puede agregar Bitácoras, porque el Presupuesto no ha sido Aprobado');
-                return;
-            }
-
-            document.getElementById("formulario-bitacora-nuevo").reset();
-
-            var fecha = new Date();
-            document.getElementById('fecha-bitacora-nuevo').value = fecha.toJSON().slice(0,10);
-
-            $('#modalAgregarBitacora').modal('show');
-        }
-
-        function alertaEstado(titulo, mensaje){
-            Swal.fire({
-                title: titulo,
-                text: mensaje,
-                icon: 'info',
-                showCancelButton: false,
-                confirmButtonColor: '#707070',
-                confirmButtonText: 'Aceptar',
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                }
-            })
-        }
-
-        // ver modal requisicion
+        // ver modal requisición
         function verModalRequisicion(){
             document.getElementById("formulario-requisicion-nuevo").reset();
 
@@ -982,92 +898,6 @@
         function verModalDetalleRequisicion(){
             document.getElementById("formulario-requisicion-deta-nuevo").reset();
             $('#modalAgregarRequisicionDeta').modal('show');
-        }
-
-        // registro de bitacora
-        function guardarBitacora(){
-
-            var fecha = document.getElementById('fecha-bitacora-nuevo').value;
-            var observaciones = document.getElementById('descripcion-bitacora-nuevo').value;
-            var documento = document.getElementById('documento-bitacora'); // null file
-            var nombreDocumento = document.getElementById('nombre-bitacora-doc-nuevo').value;
-
-            if(fecha === ''){
-                toastr.error('Fecha para Bitacora es requerida');
-                return;
-            }
-
-            if(observaciones.length > 10000){
-                toastr.error('Descripción máximo 10,000 caracteres');
-                return;
-            }
-
-            if(documento.files && documento.files[0]){ // si trae doc
-                if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png')){
-                    toastr.error('formato para Imagen permitido: .png .jpg .jpeg');
-                    return;
-                }
-            }else{
-                // si imagen viene vacio, verificar texto
-                if(nombreDocumento.length > 0){
-                    toastr.error('Imagen es requerida si ingresa Nombre para Imagen');
-                    return;
-                }
-            }
-
-            if(nombreDocumento.length > 300){
-                toastr.error('Nombre para Documento máximo 300 caracteres');
-                return;
-            }
-
-            // id del proyecto
-            var id = {{ $id }};
-
-            openLoading();
-            var formData = new FormData();
-            formData.append('id', id);
-            formData.append('fecha', fecha);
-            formData.append('observaciones', observaciones);
-            formData.append('documento', documento.files[0]);
-            formData.append('nombredocumento', nombreDocumento);
-
-            axios.post(url+'/proyecto/vista/bitacora/registrar', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        $('#modalAgregarBitacora').modal('hide');
-                        recargarBitacora();
-                        toastr.success('Agregado correctamente');
-                    }
-                    else {
-                        toastr.error('Error al registrar');
-                    }
-
-                })
-                .catch((error) => {
-                    toastr.error('Error al registrar');
-                    closeLoading();
-                });
-        }
-
-        // preguntar si quiere borrar la bitacora
-        function preguntaBorrarBitacora(id){
-            Swal.fire({
-                title: 'Borrar Bitacora',
-                text: "Se eliminaran los registros",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    borrarBitacora(id);
-                }
-            })
         }
 
         // preguntar si quiere guardar la nueva requisicion
@@ -1108,106 +938,6 @@
                     verificarRequisicionEditar();
                 }
             })
-        }
-
-        // borrar la bitacora
-        function borrarBitacora(id){
-            openLoading();
-
-            axios.post(url+'/proyecto/vista/bitacora/borrar', {
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        recargarBitacora();
-                        toastr.success('Borrado correctamente');
-                    }
-                    else {
-                        toastr.error('Error al borrar');
-                    }
-
-                })
-                .catch((error) => {
-                    toastr.error('Error al borrar');
-                    closeLoading();
-                });
-        }
-
-        // ver modal para editar bitacora
-        function vistaEditarBitacora(id){
-
-            openLoading();
-            document.getElementById("formulario-bitacora-editar").reset();
-
-            axios.post(url+'/proyecto/vista/bitacora/informacion',{
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        $('#modalEditarBitacora').modal('show');
-                        $('#id-bitacora-editar').val(response.data.bitacora.id);
-                        $('#descripcion-bitacora-editar').val(response.data.bitacora.observaciones);
-                        $('#fecha-bitacora-editar').val(response.data.bitacora.fecha);
-
-                    }else{
-                        toastr.error('Información no encontrada');
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Información no encontrada');
-                });
-        }
-
-        // editar registro de bitacora
-        function editarBitacora(){
-            var id = document.getElementById('id-bitacora-editar').value;
-            var fecha = document.getElementById('fecha-bitacora-editar').value;
-            var observaciones = document.getElementById('descripcion-bitacora-editar').value;
-
-            if(fecha === ''){
-                toastr.error('Fecha para Bitacora es requerida');
-                return;
-            }
-
-            if(observaciones.length > 10000){
-                toastr.error('Descripción máximo 10,000 caracteres');
-                return;
-            }
-
-            openLoading();
-            var formData = new FormData();
-            formData.append('id', id);
-            formData.append('fecha', fecha);
-            formData.append('observaciones', observaciones);
-
-            axios.post(url+'/proyecto/vista/bitacora/editar', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        $('#modalEditarBitacora').modal('hide');
-                        recargarBitacora();
-                        toastr.success('Actualizado correctamente');
-                    }
-                    else {
-                        toastr.error('Error al actualizar');
-                    }
-
-                })
-                .catch((error) => {
-                    toastr.error('Error al actualizar');
-                    closeLoading();
-                });
-        }
-
-        // vista para bitacora detalle
-        function vistaBitacora(id){
-            window.location.href="{{ url('/admin/proyecto/vista/bitacora-detalle') }}/" + id;
         }
 
         // verificar la requisicin para agregar a la base
@@ -1253,7 +983,7 @@
                 // identifica si el 0 es tipo number o texto
                 if(detalle == 0){
                     colorRojoTablaRequisicion(a);
-                    alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
+                    alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material. Recordar que debe hacer clic en el Material para Seleccionarlo");
                     return;
                 }
 
@@ -1398,7 +1128,6 @@
             $("#matriz-requisicion tbody tr").remove();
         }
 
-        //******* VISTA EDITAR REQUISICION *********
 
         function vistaEditarRequisicion(id, conteo){
 
@@ -1438,14 +1167,14 @@
                         var infodetalle = response.data.detalle;
 
                         for (var i = 0; i < infodetalle.length; i++) {
-                                // id requi detalle
+                            // id requi detalle
                             var markup = "<tr id='"+infodetalle[i].id+"'>";
 
                             markup += "<td>"+
                                 "<p id='fila"+(i+1)+"' class='form-control' style='max-width: 65px'>"+(i+1)+"</p>"+
                                 "</td>"+
 
-                            "<td>"+
+                                "<td>"+
                                 "<input name='cantidadarrayeditar[]' disabled value='"+infodetalle[i].cantidad+"' class='form-control'>"+
                                 "</td>"+
 
@@ -1465,43 +1194,43 @@
                                 "<input class='form-control' disabled value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
                                 "</td>";
 
-                                // si hay cotización
-                                if(infodetalle[i].haycoti){
+                            // si hay cotización
+                            if(infodetalle[i].haycoti){
 
-                                    // cotizacion aprobada, no se puede borrar
-                                    if(infodetalle[i].cotizado === 1){
-                                        markup += "<td>" +
-                                            "<span class='badge bg-success'>Material Aprobado</span>"+
+                                // cotizacion aprobada, no se puede borrar
+                                if(infodetalle[i].cotizado === 1){
+                                    markup += "<td>" +
+                                        "<span class='badge bg-success'>Material Aprobado</span>"+
+                                        "</td>"+
+                                        "</tr>";
+
+                                    // cotizacion denegada, puede CANCELAR
+                                }else if(infodetalle[i].cotizado === 2){
+
+                                    if(infodetalle[i].cancelado === 0){
+                                        markup += "<td>"+
+                                            "<button type='button' class='btn btn-block btn-danger' onclick='cancelarFilaRequiEditar(this)'>Cancelar</button>"+
                                             "</td>"+
+
                                             "</tr>";
-
-                                        // cotizacion denegada, puede CANCELAR
-                                    }else if(infodetalle[i].cotizado === 2){
-
-                                        if(infodetalle[i].cancelado === 0){
-                                            markup += "<td>"+
-                                                "<button type='button' class='btn btn-block btn-danger' onclick='cancelarFilaRequiEditar(this)'>Cancelar</button>"+
-                                                "</td>"+
-
-                                                "</tr>";
-                                        }else { // cuando material esta cancelado
-                                            markup += "<td>"+
-                                                "<span class='badge bg-danger'>Material Cancelado</span>"+
-                                                "</tr>";
-                                        }
-
+                                    }else { // cuando material esta cancelado
+                                        markup += "<td>"+
+                                            "<span class='badge bg-danger'>Material Cancelado</span>"+
+                                            "</tr>";
                                     }
 
-                                }else{
-                                    // no tiene cotizacion, asi que puede BORRAR
-                                    markup += "<td>"+
-                                        "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
-                                        "</td>"+
-
-                                        "</tr>";
                                 }
 
-                                // cotizacion aprobada, no puede borrar
+                            }else{
+                                // no tiene cotizacion, asi que puede BORRAR
+                                markup += "<td>"+
+                                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
+                                    "</td>"+
+
+                                    "</tr>";
+                            }
+
+                            // cotizacion aprobada, no puede borrar
 
                             $("#matriz-requisicion-editar tbody").append(markup);
                         }
@@ -1556,6 +1285,7 @@
                         // si es 1, la coti fue aprobada, sino se esta esperando que sea
                         // aprobada o denegada
                         let tipo = response.data.tipo;
+
                         var mensaje = '';
                         var titulo = '';
                         if(tipo > 0){
@@ -1691,7 +1421,218 @@
                 });
         }
 
+        //*********************** CÓDIGO PARA BITACORAS ********************************
 
+
+        // recargar tabla solo para bitacoras
+        function recargarBitacora(){
+            var id = {{ $id }};
+            var ruta = "{{ URL::to('/admin/proyecto/vista/bitacora') }}/" + id;
+            $('#tablaDatatableBitacora').load(ruta);
+        }
+
+
+        // modal agregar bitacora
+        function modalAgregarBitacora() {
+
+            // verificar estado del proyecto
+            var estado = {{ $estado }};
+
+            if (estado !== 2) { // priorizado
+                alertaEstado('Información', 'No puede agregar Bitácoras, porque el Presupuesto no ha sido Aprobado');
+                return;
+            }
+
+            document.getElementById("formulario-bitacora-nuevo").reset();
+
+            var fecha = new Date();
+            document.getElementById('fecha-bitacora-nuevo').value = fecha.toJSON().slice(0, 10);
+
+            $('#modalAgregarBitacora').modal('show');
+        }
+
+        // registro de bitacora
+        function guardarBitacora() {
+
+            var fecha = document.getElementById('fecha-bitacora-nuevo').value;
+            var observaciones = document.getElementById('descripcion-bitacora-nuevo').value;
+            var documento = document.getElementById('documento-bitacora'); // null file
+            var nombreDocumento = document.getElementById('nombre-bitacora-doc-nuevo').value;
+
+            if (fecha === '') {
+                toastr.error('Fecha para Bitacora es requerida');
+                return;
+            }
+
+            if (observaciones.length > 10000) {
+                toastr.error('Descripción máximo 10,000 caracteres');
+                return;
+            }
+
+            if (documento.files && documento.files[0]) { // si trae doc
+                if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png')) {
+                    toastr.error('formato para Imagen permitido: .png .jpg .jpeg');
+                    return;
+                }
+            } else {
+                // si imagen viene vacio, verificar texto
+                if (nombreDocumento.length > 0) {
+                    toastr.error('Imagen es requerida si ingresa Nombre para Imagen');
+                    return;
+                }
+            }
+
+            if (nombreDocumento.length > 300) {
+                toastr.error('Nombre para Documento máximo 300 caracteres');
+                return;
+            }
+
+            // id del proyecto
+            var id = {{ $id }};
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('fecha', fecha);
+            formData.append('observaciones', observaciones);
+            formData.append('documento', documento.files[0]);
+            formData.append('nombredocumento', nombreDocumento);
+
+            axios.post(url + '/proyecto/vista/bitacora/registrar', formData, {})
+                .then((response) => {
+                    closeLoading();
+
+                    if (response.data.success === 1) {
+                        $('#modalAgregarBitacora').modal('hide');
+                        recargarBitacora();
+                        toastr.success('Agregado correctamente');
+                    } else {
+                        toastr.error('Error al registrar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al registrar');
+                    closeLoading();
+                });
+        }
+
+        // preguntar si quiere borrar la bitacora
+        function preguntaBorrarBitacora(id) {
+            Swal.fire({
+                title: 'Borrar Bitacora',
+                text: "Se eliminaran los registros",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    borrarBitacora(id);
+                }
+            })
+        }
+
+        // borrar la bitacora
+        function borrarBitacora(id) {
+            openLoading();
+
+            axios.post(url + '/proyecto/vista/bitacora/borrar', {
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if (response.data.success === 1) {
+                        recargarBitacora();
+                        toastr.success('Borrado correctamente');
+                    } else {
+                        toastr.error('Error al borrar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al borrar');
+                    closeLoading();
+                });
+        }
+
+        // ver modal para editar bitacora
+        function vistaEditarBitacora(id) {
+
+            openLoading();
+            document.getElementById("formulario-bitacora-editar").reset();
+
+            axios.post(url + '/proyecto/vista/bitacora/informacion', {
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if (response.data.success === 1) {
+                        $('#modalEditarBitacora').modal('show');
+                        $('#id-bitacora-editar').val(response.data.bitacora.id);
+                        $('#descripcion-bitacora-editar').val(response.data.bitacora.observaciones);
+                        $('#fecha-bitacora-editar').val(response.data.bitacora.fecha);
+
+                    } else {
+                        toastr.error('Información no encontrada');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Información no encontrada');
+                });
+        }
+
+        // editar registro de bitacora
+        function editarBitacora() {
+            var id = document.getElementById('id-bitacora-editar').value;
+            var fecha = document.getElementById('fecha-bitacora-editar').value;
+            var observaciones = document.getElementById('descripcion-bitacora-editar').value;
+
+            if (fecha === '') {
+                toastr.error('Fecha para Bitacora es requerida');
+                return;
+            }
+
+            if (observaciones.length > 10000) {
+                toastr.error('Descripción máximo 10,000 caracteres');
+                return;
+            }
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('fecha', fecha);
+            formData.append('observaciones', observaciones);
+
+            axios.post(url + '/proyecto/vista/bitacora/editar', formData, )
+                .then((response) => {
+                    closeLoading();
+
+                    if (response.data.success === 1) {
+                        $('#modalEditarBitacora').modal('hide');
+                        recargarBitacora();
+                        toastr.success('Actualizado correctamente');
+                    } else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+
+        // vista para bitacora detalle
+        function vistaBitacora(id) {
+            window.location.href = "{{ url('/admin/proyecto/vista/bitacora-detalle') }}/" + id;
+        }
+    
     </script>
 
     <script>
@@ -1725,65 +1666,40 @@
 
             // Esto para desactivar el input 'cantidad' si esta seleccionado Aporte Patronal
             // APORTE MANO DE OBRA
-            if(tipopartida == '4') {
 
-                var markup = "<tr>" +
+            var markup = "<tr>" +
 
-                    "<td>" +
-                    "<p id='fila" + (nFilas) + "' class='form-control' style='max-width: 65px'>" + (nFilas) + "</p>" +
-                    "</td>" +
+                "<td>" +
+                "<p id='fila" + (nFilas) + "' class='form-control' style='max-width: 65px'>" + (nFilas) + "</p>" +
+                "</td>";
 
-                    "<td>" +
+                if(tipopartida == '4') {
+                    markup += "<td>" +
                     "<input name='cantidadPresupuestoArray[]' disabled maxlength='10' class='form-control' type='number'>" +
-                    "</td>" +
+                    "</td>";
+                }
+                else{
+                    markup += "<td>" +
+                        "<input name='cantidadPresupuestoArray[]' maxlength='10' class='form-control' type='number'>" +
+                        "</td>";
+                }
 
-                    "<td>" +
-                    "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' autocomplete='off' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>" +
-                    "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
-                    "</td>" +
+                markup += "<td>" +
+                "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' autocomplete='off' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>" +
+                "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
+                "</td>" +
 
-                    "<td>" +
-                    "<input name='duplicarPresupuestoArray[]' maxlength='3' class='form-control' value='0' type='number'>" +
-                    "</td>" +
+                "<td>" +
+                "<input name='duplicarPresupuestoArray[]' maxlength='3' class='form-control' value='0' type='number'>" +
+                "</td>" +
 
-                    "<td>" +
-                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoDetalle(this)'>Borrar</button>" +
-                    "</td>" +
+                "<td>" +
+                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoDetalle(this)'>Borrar</button>" +
+                "</td>" +
 
-                    "</tr>";
+                "</tr>";
 
-                $("#matriz-presupuesto tbody").append(markup);
-
-            }else{
-
-                var markup = "<tr>" +
-
-                    "<td>" +
-                    "<p id='fila" + (nFilas) + "' class='form-control' style='max-width: 65px'>" + (nFilas) + "</p>" +
-                    "</td>" +
-
-                    "<td>" +
-                    "<input name='cantidadPresupuestoArray[]' maxlength='10' class='form-control' type='number'>" +
-                    "</td>" +
-
-                    "<td>" +
-                    "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' autocomplete='off' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>" +
-                    "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
-                    "</td>" +
-
-                    "<td>" +
-                    "<input name='duplicarPresupuestoArray[]' maxlength='3' class='form-control' value='0' type='number'>" +
-                    "</td>" +
-
-                    "<td>" +
-                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoDetalle(this)'>Borrar</button>" +
-                    "</td>" +
-
-                    "</tr>";
-
-                $("#matriz-presupuesto tbody").append(markup);
-
-            }
+            $("#matriz-presupuesto tbody").append(markup);
         }
 
         // borrar fila para tabla editar requisicion material
@@ -1891,7 +1807,7 @@
         function verificarPresupuesto(){
 
             var cantidadPartida = document.getElementById('cantidad-partida-nuevo').value; // decimal
-            var nombre = document.getElementById('nombre-partida-nuevo').value; // 600 caracteres
+            var nombrePartida = document.getElementById('nombre-partida-nuevo').value; // 600 caracteres
             var tipopartida = document.getElementById('select-partida-nuevo').value;
 
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
@@ -1901,12 +1817,12 @@
                 return;
             }
 
-            if(nombre === ''){
+            if(nombrePartida === ''){
                 toastr.error('Partida es requerida');
                 return;
             }
 
-            if(nombre.length > 600){
+            if(nombrePartida.length > 600){
                 toastr.error('Partida debe tener máximo 600 caracteres');
                 return;
             }
@@ -1924,8 +1840,6 @@
             var descripcionAtributo = $("input[name='descripcionPresupuestoArray[]']").map(function(){return $(this).attr("data-infopresupuesto");}).get();
             var duplicado = $("input[name='duplicarPresupuestoArray[]']").map(function(){return $(this).val();}).get();
 
-                // unicamente no sera verificado con: APORTE PATRONAL (aporte mano de obra)
-
                 for(var a = 0; a < cantidad.length; a++){
 
                     let detalle = descripcionAtributo[a];
@@ -1935,7 +1849,7 @@
                     // ESTO IDENTIFICA EL MATERIAL ID
                     if(detalle == 0){
                         colorRojoTablaPresupuesto(a);
-                        alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
+                        alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material. Recordar que debe hacer clic en el Material para Seleccionarlo");
                         return;
                     }
 
@@ -1946,6 +1860,8 @@
                     5- alquiler de maquinaria
                     6- trasporte de concreto fresco
                 */
+
+                    // unicamente no sera verificado con: APORTE PATRONAL (aporte mano de obra)
 
                     if(tipopartida != '4') {
 
@@ -1967,9 +1883,9 @@
                             return;
                         }
 
-                        if (datoCantidad > 1000000) {
+                        if (datoCantidad > 9000000) {
                             colorRojoTablaPresupuesto(a);
-                            toastr.error('Fila #' + (a + 1) + ' Cantidad no puede superar 1 millón');
+                            toastr.error('Fila #' + (a + 1) + ' Cantidad no puede superar 9 millones');
                             return;
                         }
 
@@ -1987,25 +1903,25 @@
 
                     if(datoDuplicado === ''){
                         colorRojoTablaPresupuesto(d);
-                        toastr.error('Fila #' + (d+1) + ' Duplicado debe ser 0 como mínimo');
+                        toastr.error('Fila #' + (d+1) + ' Multiplicar debe ser 0 como mínimo');
                         return;
                     }
 
                     if(!datoDuplicado.match(reglaNumeroEntero)) {
                         colorRojoTablaPresupuesto(d);
-                        toastr.error('Fila #' + (d+1) + ' Duplicado debe ser número Entero y no Negativo');
+                        toastr.error('Fila #' + (d+1) + ' Multiplicar debe ser número Entero y no Negativo');
                         return;
                     }
 
                     if(datoDuplicado < 0){
                         colorRojoTablaPresupuesto(d);
-                        toastr.error('Fila #' + (d+1) + ' Duplicado no debe ser negativo');
+                        toastr.error('Fila #' + (d+1) + ' Multiplicar no debe ser negativo');
                         return;
                     }
 
                     if(datoDuplicado > 999){
                         colorRojoTablaPresupuesto(d);
-                        toastr.error('Fila #' + (d+1) + ' Duplicado no debe superar Número 999');
+                        toastr.error('Fila #' + (d+1) + ' Multiplicar no debe superar Número 999');
                         return;
                     }
                 }
@@ -2029,7 +1945,7 @@
             openLoading();
 
             formData.append('cantidadpartida', cantidadPartida);
-            formData.append('nombrepartida', nombre);
+            formData.append('nombrepartida', nombrePartida);
             formData.append('id', id);
             formData.append('tipopartida', tipopartida);
 
@@ -2129,84 +2045,50 @@
 
                         var infodetalle = response.data.detalle;
 
-                        // APORTE MANO DE OBRA... NO LLEVA CANTIDAD
-                        if(response.data.info.id_tipopartida === 4){
+                        for (var i = 0; i < infodetalle.length; i++) {
 
-                            for (var i = 0; i < infodetalle.length; i++) {
+                            var markup = "<tr id='" + infodetalle[i].id + "'>" +
 
-                                var markup = "<tr id='" + infodetalle[i].id + "'>" +
+                                "<td>" +
+                                "<p id='fila" + (i + 1) + "' class='form-control' style='max-width: 65px'>" + (i + 1) + "</p>" +
+                                "</td>";
 
-                                    "<td>" +
-                                    "<p id='fila" + (i + 1) + "' class='form-control' style='max-width: 65px'>" + (i + 1) + "</p>" +
-                                    "</td>" +
+                            // APORTE MANO DE OBRA... NO LLEVA CANTIDAD
+                            if(response.data.info.id_tipopartida === 4){
+                                markup += "<td>" +
+                                "<input name='cantidadPresupuestoEditar[]' disabled maxlength='10' class='form-control' type='number'>" +
+                                "</td>";
 
-                                    "<td>" +
-                                    "<input name='cantidadPresupuestoEditar[]' disabled maxlength='10' class='form-control' type='number'>" +
-                                    "</td>" +
+                            }else{
 
-                                    "<td>" +
-                                    "<input name='descripcionPresupuestoEditar[]' disabled class='form-control' data-infopresupuestoeditar='" + infodetalle[i].material_id + "' value='" + infodetalle[i].descripcion + "' style='width:100%' type='text'>" +
-                                    "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
-                                    "</td>" +
+                                markup += "<td>" +
+                                "<input name='cantidadPresupuestoEditar[]' value='" + infodetalle[i].cantidad + "' maxlength='10' class='form-control' type='number'>" +
+                                "</td>";
 
-                                    "<td>" +
-                                    "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='" + infodetalle[i].duplicado + "' class='form-control' type='number'>" +
-                                    "</td>";
-
-                                // PRESUPUESTO EN DESARROLLO
-                                if(response.data.estado === 0){
-                                    markup += "<td>" +
-                                        "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>" +
-                                        "</td>" +
-
-                                        "</tr>";
-                                }else{
-                                    markup += "<td>" +"</tr>";
-                                }
-
-                                $("#matriz-presupuesto-editar tbody").append(markup);
                             }
 
-                        }else{
+                            markup += "<td>" +
+                            "<input name='descripcionPresupuestoEditar[]' disabled class='form-control' data-infopresupuestoeditar='" + infodetalle[i].material_id + "' value='" + infodetalle[i].descripcion + "' style='width:100%' type='text'>" +
+                            "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
+                            "</td>" +
 
-                            // TODOS LOS DEMÁS TIPOS DE PARTIDA
+                            "<td>" +
+                            "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='" + infodetalle[i].duplicado + "' class='form-control' type='number'>" +
+                            "</td>";
 
-                            for (var i = 0; i < infodetalle.length; i++) {
-
-                                var markup = "<tr id='" + infodetalle[i].id + "'>" +
-
-                                    "<td>" +
-                                    "<p id='fila" + (i + 1) + "' class='form-control' style='max-width: 65px'>" + (i + 1) + "</p>" +
+                            // PRESUPUESTO EN DESARROLLO
+                            if(response.data.estado === 0){
+                                markup += "<td>" +
+                                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>" +
                                     "</td>" +
 
-                                    "<td>" +
-                                    "<input name='cantidadPresupuestoEditar[]' value='" + infodetalle[i].cantidad + "' maxlength='10' class='form-control' type='number'>" +
-                                    "</td>" +
-
-                                    "<td>" +
-                                    "<input name='descripcionPresupuestoEditar[]' disabled class='form-control' data-infopresupuestoeditar='" + infodetalle[i].material_id + "' value='" + infodetalle[i].descripcion + "' style='width:100%' type='text'>" +
-                                    "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
-                                    "</td>" +
-
-                                    "<td>" +
-                                    "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='" + infodetalle[i].duplicado + "' class='form-control' type='number'>" +
-                                    "</td>";
-
-                                // PRESUPUESTO EN DESARROLLO
-                                if(response.data.estado === 0){
-                                    markup += "<td>" +
-                                        "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>" +
-                                        "</td>" +
-
-                                        "</tr>";
-                                }else{
-                                    markup += "<td>" +"</tr>";
-                                }
-
-                                $("#matriz-presupuesto-editar tbody").append(markup);
+                                "</tr>";
+                            }else{
+                                markup += "<td>" +"</tr>";
                             }
+
+                            $("#matriz-presupuesto-editar tbody").append(markup);
                         }
-
 
                         $('#modalEditarPresupuesto').css('overflow-y', 'auto');
                         $('#modalEditarPresupuesto').modal({backdrop: 'static', keyboard: false})
@@ -2245,18 +2127,24 @@
             var nFilas = $('#matriz-presupuesto-editar >tbody >tr').length;
             nFilas += 1;
 
-            if(tipopartida == '4'){
+            // APORTE MANO DE OBRA no lleva cantidad
                 var markup = "<tr>"+
 
                     "<td>"+
                     "<p id='fila"+(nFilas)+"' class='form-control' style='max-width: 65px'>"+(nFilas)+"</p>"+
-                    "</td>"+
+                    "</td>";
 
-                    "<td>"+
-                    "<input name='cantidadPresupuestoEditar[]' disabled maxlength='10' class='form-control' type='number'>"+
-                    "</td>"+
+                    if(tipopartida == '4'){ // desactivar cantidad
+                        markup += "<td>"+
+                            "<input name='cantidadPresupuestoEditar[]' disabled maxlength='10' class='form-control' type='number'>"+
+                            "</td>";
+                    }else{
+                        markup += "<td>"+
+                            "<input name='cantidadPresupuestoEditar[]' maxlength='10' class='form-control' type='number'>"+
+                            "</td>";
+                    }
 
-                    "<td>"+
+                    markup += "<td>"+
                     "<input name='descripcionPresupuestoEditar[]' data-infopresupuestoeditar='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuestoEditar(this)' maxlength='400'  type='text'>"+
                     "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
                     "</td>"+
@@ -2271,33 +2159,7 @@
 
                     "</tr>";
                 $("#matriz-presupuesto-editar tbody").append(markup);
-            }else{
-                var markup2 = "<tr>"+
 
-                    "<td>"+
-                    "<p id='fila"+(nFilas)+"' class='form-control' style='max-width: 65px'>"+(nFilas)+"</p>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<input name='cantidadPresupuestoEditar[]' maxlength='10' class='form-control' type='number'>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<input name='descripcionPresupuestoEditar[]' data-infopresupuestoeditar='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuestoEditar(this)' maxlength='400'  type='text'>"+
-                    "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='0' class='form-control' type='number'>"+
-                    "</td>"+
-
-                    "<td>"+
-                    "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoEditar(this)'>Borrar</button>"+
-                    "</td>"+
-
-                    "</tr>";
-                $("#matriz-presupuesto-editar tbody").append(markup2);
-            }
         }
 
         function buscarMaterialPresupuestoEditar(e){
@@ -2391,23 +2253,40 @@
                 .then((response) => {
                     closeLoading();
 
-                    // el presupuesto ya fue aprobado
+                    // el presupuesto esta en revisión
                     if(response.data.success === 1){
                         Swal.fire({
                             title: 'Error al Borrar',
-                            text: "El Presupuesto ya fue Aprobado",
+                            text: "El Presupuesto esta en Revisión",
                             icon: 'info',
                             showCancelButton: false,
+                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                location.reload();
                             }
                         })
                     }
                     else if(response.data.success === 2){
+                        Swal.fire({
+                            title: 'Error al Borrar',
+                            text: "El Presupuesto ya fue Aprobado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 3){
                         toastr.success('Borrado correctamente');
                         window.contadorGlobal = response.data.contador;
                         recargarPresupuesto();
@@ -2453,49 +2332,49 @@
                 return;
             }
 
-                var cantidad = $("input[name='cantidadPresupuestoEditar[]']").map(function(){return $(this).val();}).get();
-                var descripcion = $("input[name='descripcionPresupuestoEditar[]']").map(function(){return $(this).val();}).get();
-                var descripcionAtributo = $("input[name='descripcionPresupuestoEditar[]']").map(function(){return $(this).attr("data-infopresupuestoeditar");}).get();
-                var duplicado = $("input[name='duplicarPresupuestoEditarArray[]']").map(function(){return $(this).val();}).get();
+            var cantidad = $("input[name='cantidadPresupuestoEditar[]']").map(function(){return $(this).val();}).get();
+            var descripcion = $("input[name='descripcionPresupuestoEditar[]']").map(function(){return $(this).val();}).get();
+            var descripcionAtributo = $("input[name='descripcionPresupuestoEditar[]']").map(function(){return $(this).attr("data-infopresupuestoeditar");}).get();
+            var duplicado = $("input[name='duplicarPresupuestoEditarArray[]']").map(function(){return $(this).val();}).get();
 
-                for(let a = 0; a < cantidad.length; a++){
-                    let detalle = descripcionAtributo[a];
-                    let datoCantidad = cantidad[a];
+            for(let a = 0; a < cantidad.length; a++){
+                let detalle = descripcionAtributo[a];
+                let datoCantidad = cantidad[a];
 
-                    // identifica si el 0 es tipo number o texto
-                    if(detalle == 0){
+                // identifica si el 0 es tipo number o texto
+                if(detalle == 0){
+                    colorRojoTablaPresupuestoEditar(a);
+                    alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material. Recordar que debe hacer clic en el Material para Seleccionarlo");
+                    return;
+                }
+
+                if(tipopartida != '4'){
+
+                    if(datoCantidad === ''){
                         colorRojoTablaPresupuestoEditar(a);
-                        alertaMensaje('info', 'No encontrado', 'En la Fila #' + (a+1) + " El material no se encuentra. Por favor buscar de nuevo el Material");
+                        toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
                         return;
                     }
 
-                    if(tipopartida != '4'){
+                    if(!datoCantidad.match(reglaNumeroDecimal)) {
+                        colorRojoTablaPresupuestoEditar(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
+                        return;
+                    }
 
-                        if(datoCantidad === ''){
-                            colorRojoTablaPresupuestoEditar(a);
-                            toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
-                            return;
-                        }
+                    if(datoCantidad <= 0){
+                        colorRojoTablaPresupuestoEditar(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
+                        return;
+                    }
 
-                        if(!datoCantidad.match(reglaNumeroDecimal)) {
-                            colorRojoTablaPresupuestoEditar(a);
-                            toastr.error('Fila #' + (a+1) + ' Cantidad debe ser decimal y no negativo');
-                            return;
-                        }
-
-                        if(datoCantidad <= 0){
-                            colorRojoTablaPresupuestoEditar(a);
-                            toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
-                            return;
-                        }
-
-                        if(datoCantidad.length > 10){
-                            colorRojoTablaPresupuestoEditar(a);
-                            toastr.error('Fila #' + (a+1) + ' Cantidad máximo 10 caracteres');
-                            return;
-                        }
+                    if(datoCantidad > 9000000){
+                        colorRojoTablaPresupuestoEditar(a);
+                        toastr.error('Fila #' + (a+1) + ' Cantidad máximo 9 millones');
+                        return;
                     }
                 }
+            }
 
                 for(let b = 0; b < descripcion.length; b++){
 
@@ -2507,10 +2386,7 @@
                         return;
                     }
 
-                    if(datoDescripcion.length > 400){
-                        colorRojoTablaPresupuestoEditar(b);
-                        toastr.error('Fila #' + (b+1) + ' la descripción tiene más de 400 caracteres');
-                    }
+                    // MATERIAL CARACTERES NO ES NECESARIO VALIDAR, YA QUE NO SE ENVÍA
                 }
 
                 let reglaNumeroEntero = /^[0-9]\d*$/;
@@ -2521,26 +2397,26 @@
                     let datoDuplicado = duplicado[d];
 
                     if(datoDuplicado === ''){
-                        colorRojoTablaPresupuesto(d);
-                        toastr.error('Fila #' + (d+1) + ' Duplicado debe ser 0 como mínimo');
+                        colorRojoTablaPresupuestoEditar(d);
+                        toastr.error('Fila #' + (d+1) + ' Multiplicar debe ser 0 como mínimo');
                         return;
                     }
 
                     if(!datoDuplicado.match(reglaNumeroEntero)) {
-                        colorRojoTablaPresupuesto(d);
-                        toastr.error('Fila #' + (d+1) + ' Duplicado debe ser número Entero y no Negativo');
+                        colorRojoTablaPresupuestoEditar(d);
+                        toastr.error('Fila #' + (d+1) + ' Multiplicar debe ser número Entero y no Negativo');
                         return;
                     }
 
                     if(datoDuplicado < 0){
-                        colorRojoTablaPresupuesto(d);
-                        toastr.error('Fila #' + (d+1) + ' Duplicado no debe ser negativo');
+                        colorRojoTablaPresupuestoEditar(d);
+                        toastr.error('Fila #' + (d+1) + ' Multiplicar no debe ser negativo');
                         return;
                     }
 
-                    if(datoDuplicado.length > 3){
-                        colorRojoTablaPresupuesto(d);
-                        toastr.error('Fila #' + (d+1) + ' Duplicado máximo 3 caracteres');
+                    if(datoDuplicado > 999){
+                        colorRojoTablaPresupuestoEditar(d);
+                        toastr.error('Fila #' + (d+1) + ' Multiplicar máximo Número 999');
                         return;
                     }
                 }
@@ -2612,11 +2488,11 @@
                     }
 
                     else{
-                        toastr.error('error al actualizar');
+                        toastr.error('Error al actualizar');
                     }
                 })
                 .catch((error) => {
-                    toastr.error('error al actualizar');
+                    toastr.error('Error al actualizar');
                     closeLoading();
                 });
 
@@ -2670,27 +2546,6 @@
                     closeLoading();
                 });
         }
-
-        // Pasar a vacio campo cantidad para (Aporte de mano de obra)
-        function verificarPartidaSelect(){
-            var tipopartida = document.getElementById('select-partida-nuevo').value;
-            var table = document.getElementById('matriz-presupuesto');
-
-            if(tipopartida == '4'){
-                for (var r = 1, n = table.rows.length; r < n; r++) {
-                    var element = table.rows[r].cells[1].children[0];
-                    element.value = '';
-                    element.disabled = true;
-                }
-            }else{
-                for (var r = 1, n = table.rows.length; r < n; r++) {
-                    var element = table.rows[r].cells[1].children[0];
-                    element.value = '';
-                    element.disabled = false;
-                }
-            }
-        }
-
 
 
         // cambiar estado de presupuesto ingenieria para ser aprobado
@@ -2809,7 +2664,7 @@
                     if(response.data.success === 1){
                         Swal.fire({
                             title: 'Ya hay Cotización',
-                            text: "Uno o todos los materiales ya tiene una cotización",
+                            text: "Uno o todos los materiales ya tiene una cotización en proceso",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -2893,7 +2748,6 @@
                 return;
             }
 
-
             openLoading();
 
             let id = {{ $id }};
@@ -2953,6 +2807,25 @@
                     toastr.error('Error al borrar');
                     closeLoading();
                 });
+        }
+
+
+        //*************** OTROS *******************
+
+
+        function alertaEstado(titulo, mensaje){
+            Swal.fire({
+                title: titulo,
+                text: mensaje,
+                icon: 'info',
+                showCancelButton: false,
+                confirmButtonColor: '#707070',
+                confirmButtonText: 'Aceptar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                }
+            })
         }
 
 

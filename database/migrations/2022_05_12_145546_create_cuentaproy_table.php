@@ -16,8 +16,9 @@ class CreateCuentaproyTable extends Migration
         Schema::create('cuentaproy', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('proyecto_id')->unsigned();
-            $table->bigInteger('objespeci_id')->unsigned(); // objeto especifico
-            $table->decimal('saldo_inicial', 10,2); // no cambia nunca, mismo
+            $table->bigInteger('objespeci_id')->unsigned(); // objeto específico
+
+            $table->decimal('saldo_inicial', 10,2); // no cambia nunca
 
 
             $table->foreign('proyecto_id')->references('id')->on('proyectos');

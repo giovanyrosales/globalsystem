@@ -169,7 +169,7 @@
 
     <!-- modal editar -->
     <div class="modal fade" id="modalEditar">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Editar Planilla</h4>
@@ -349,6 +349,16 @@
                 return;
             }
 
+
+            var f1 = new Date(fechade);
+            var f2 = new Date(fechahasta);
+
+            if(f1 > f2){
+                toastr.error('Fecha De no puede ser Mayor');
+                return;
+            }
+
+
             var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
 
             if(salariototal.length > 0){
@@ -362,8 +372,8 @@
                     return;
                 }
 
-                if(salariototal.length > 10){
-                    toastr.error('Salario Total debe tener máximo 10 caracteres');
+                if(salariototal > 99000000){ // máximo 99 millones
+                    toastr.error('Salario Total debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -381,8 +391,8 @@
                     return;
                 }
 
-                if(horasextras.length > 10){
-                    toastr.error('Horas Extras Total debe tener máximo 10 caracteres');
+                if(horasextras > 99000000){ // máximo 99 millones
+                    toastr.error('Horas Extras Total debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -400,8 +410,8 @@
                     return;
                 }
 
-                if(insaforp.length > 10){
-                    toastr.error('Insaforp Total debe tener máximo 10 caracteres');
+                if(insaforp > 99000000){ // máximo 99 millones
+                    toastr.error('Insaforp Total debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -421,8 +431,8 @@
                     return;
                 }
 
-                if(issslaboral.length > 10){
-                    toastr.error('ISSS Laboral debe tener máximo 10 caracteres');
+                if(issslaboral > 99000000){ // máximo 99 millones
+                    toastr.error('ISSS Laboral debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -440,8 +450,8 @@
                     return;
                 }
 
-                if(issspatronal.length > 10){
-                    toastr.error('ISSS Patronal debe tener máximo 10 caracteres');
+                if(issspatronal > 99000000){ // máximo 99 millones
+                    toastr.error('ISSS Patronal debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -461,8 +471,8 @@
                     return;
                 }
 
-                if(confialaboral.length > 10){
-                    toastr.error('AFP Confía Laboral debe tener máximo 10 caracteres');
+                if(confialaboral > 99000000){ // máximo 99 millones
+                    toastr.error('AFP Confía Laboral debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -480,8 +490,8 @@
                     return;
                 }
 
-                if(confiapatronal.length > 10){
-                    toastr.error('AFP Confía Patronal debe tener máximo 10 caracteres');
+                if(confiapatronal > 99000000){ // máximo 99 millones
+                    toastr.error('AFP Confía Patronal debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -501,8 +511,8 @@
                     return;
                 }
 
-                if(crecerlaboral.length > 10){
-                    toastr.error('AFP Crecer Laboral debe tener máximo 10 caracteres');
+                if(crecerlaboral > 99000000){ // máximo 99 millones
+                    toastr.error('AFP Crecer Laboral debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -520,8 +530,8 @@
                     return;
                 }
 
-                if(crecerpatronal.length > 10){
-                    toastr.error('AFP Crecer Patronal debe tener máximo 10 caracteres');
+                if(crecerpatronal > 99000000){ // máximo 99 millones
+                    toastr.error('AFP Crecer Patronal debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -640,8 +650,8 @@
                     return;
                 }
 
-                if(salariototal.length > 10){
-                    toastr.error('Salario Total debe tener máximo 10 caracteres');
+                if(salariototal > 99000000){ // máximo 99 millones
+                    toastr.error('Salario Total debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -659,8 +669,8 @@
                     return;
                 }
 
-                if(horasextras.length > 10){
-                    toastr.error('Horas Extras Total debe tener máximo 10 caracteres');
+                if(horasextras > 99000000){ // máximo 99 millones
+                    toastr.error('Horas Extras Total debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -678,8 +688,8 @@
                     return;
                 }
 
-                if(insaforp.length > 10){
-                    toastr.error('Insaforp Total debe tener máximo 10 caracteres');
+                if(insaforp > 99000000){ // máximo 99 millones
+                    toastr.error('Insaforp Total debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -699,8 +709,8 @@
                     return;
                 }
 
-                if(issslaboral.length > 10){
-                    toastr.error('ISSS Laboral debe tener máximo 10 caracteres');
+                if(issslaboral > 99000000){ // máximo 99 millones
+                    toastr.error('ISSS Laboral debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -718,8 +728,8 @@
                     return;
                 }
 
-                if(issspatronal.length > 10){
-                    toastr.error('ISSS Patronal debe tener máximo 10 caracteres');
+                if(issspatronal > 99000000){ // máximo 99 millones
+                    toastr.error('ISSS Patronal debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -739,8 +749,8 @@
                     return;
                 }
 
-                if(confialaboral.length > 10){
-                    toastr.error('AFP Confía Laboral debe tener máximo 10 caracteres');
+                if(confialaboral > 99000000){ // máximo 99 millones
+                    toastr.error('AFP Confía Laboral debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -758,8 +768,8 @@
                     return;
                 }
 
-                if(confiapatronal.length > 10){
-                    toastr.error('AFP Confía Patronal debe tener máximo 10 caracteres');
+                if(confiapatronal > 99000000){ // máximo 99 millones
+                    toastr.error('AFP Confía Patronal debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -779,8 +789,8 @@
                     return;
                 }
 
-                if(crecerlaboral.length > 10){
-                    toastr.error('AFP Crecer Laboral debe tener máximo 10 caracteres');
+                if(crecerlaboral > 99000000){ // máximo 99 millones
+                    toastr.error('AFP Crecer Laboral debe tener máximo 99 millones');
                     return;
                 }
             }else{
@@ -798,8 +808,8 @@
                     return;
                 }
 
-                if(crecerpatronal.length > 10){
-                    toastr.error('AFP Crecer Patronal debe tener máximo 10 caracteres');
+                if(crecerpatronal > 99000000){ // máximo 99 millones
+                    toastr.error('AFP Crecer Patronal debe tener máximo 99 millones');
                     return;
                 }
             }else{

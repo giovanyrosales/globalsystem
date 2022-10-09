@@ -11,7 +11,6 @@ class CreateCuentaproyRestanteTable extends Migration
      * SALDO RESTANTE. SI SE ANULA LA ORDEN DE COMPRA, SE DEBERA BORRAR EL REGISTRO
      * BUSCANDOSE CON LA ID_ORDEN
      *
-     *
      * @return void
      */
     public function up()
@@ -35,6 +34,6 @@ class CreateCuentaproyRestanteTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cuentaproy_detalle');
+        Schema::dropIfExists('cuentaproy_restante');
     }
 }

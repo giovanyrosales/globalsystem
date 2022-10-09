@@ -168,8 +168,7 @@ Route::post('/admin/proyecto/vista/requisicion/editar', [ProyectoController::cla
 Route::post('/admin/proyecto/requisicion/borrar/todo', [ProyectoController::class, 'borrarRequisicion']);
 // petición para cancelar un material de requisición
 Route::post('/admin/proyecto/requisicion/material/cancelar', [ProyectoController::class, 'cancelarMaterialRequisicion']);
-// busca materiales solo del presupuesto proyecto
-Route::post('/admin/buscar/material/soloproyecto',  [ProyectoController::class,'buscadorMaterialRequisicion']);
+
 
 // * LISTADO DE REQUERIMIENTOS PENDIENTES PARA SER COTIZADOS POR UACI
 
@@ -357,7 +356,7 @@ Route::post('/admin/proyecto/editar/imprevisto', [AdministradoresController::cla
 
 
 
-// * CATALOGO DE MATERIALES
+// * CATALOGO DE MATERIALES PARA PROYECTO
 
 // retorna vista con catálogo de materiales para proyecto
 Route::get('/admin/catalogo/materiales/index', [MaterialesController::class,'indexCatalogoMaterial'])->name('admin.catalogo.materiales.index');

@@ -37,7 +37,7 @@
                     <h3 class="card-title">Listado</h3>
                 </div>
 
-                <form id="formu">
+                <form id="formulario-proyecto">
 
                 <div class="card-body">
                     <div class="row">
@@ -250,6 +250,11 @@
             var supervisor = document.getElementById('supervisor').value; // null
             var encargado = document.getElementById('encargado').value; // null
 
+            if(codigo === ''){
+                toastr.error('Código es requerido');
+                return;
+            }
+
             if(codigo.length > 100){
                 toastr.error('Código máximo 100 caracteres');
                 return;
@@ -337,11 +342,23 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        errorCodigo();
+                        Swal.fire({
+                            title: 'Código Repetido',
+                            text: "El código de Proyecto ya se encuentra registrado",
+                            icon: 'error',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
                     }
                     else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
-                        limpiar();
+                        limpiarFormulario();
                     }
                     else {
                         toastr.error('Error al registrar');
@@ -353,24 +370,8 @@
                 });
         }
 
-        function limpiar(){
-            $('#formu')[0].reset();
-        }
-
-        function errorCodigo(){
-            Swal.fire({
-                title: 'Código Erróneo',
-                text: "El código ya se encuentra registrado",
-                icon: 'error',
-                showCancelButton: false,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                }
-            })
+        function limpiarFormulario(){
+            $('#formulario-proyecto')[0].reset();
         }
 
 

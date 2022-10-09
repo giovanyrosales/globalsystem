@@ -937,7 +937,7 @@ class ProyectoController extends Controller
 
         // verificar que este material no este cotizado con una autorizada.
 
-        // obtener todas las cotizacion id donde este cotizado
+        // obtener todas las cotizaciones id donde esté cotizado
         $lista = CotizacionDetalle::where('id_requidetalle', $request->id)->get();
 
         $pila = array();
@@ -1071,76 +1071,7 @@ class ProyectoController extends Controller
         return ['success' => 1, 'lista' => $lista];
     }
 
-    // busca materiales solo del presupuesto proyecto
-    public function buscadorMaterialRequisicion(Request $request){
 
-        if($request->get('query')){
-            $query = $request->get('query');
-
-            $listado = Partida::where('proyecto_id', $request->idpro)->get();
-
-            $pila = array();
-
-            foreach ($listado as $dd){
-                array_push($pila, $dd->id);
-            }
-
-            $data = DB::table('partida_detalle AS pd')
-                ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
-                ->select('m.id')
-                ->whereIn('pd.partida_id', $pila)
-                ->where('m.nombre', 'LIKE', "%{$query}%")
-                ->groupBy('m.id')
-                ->get();
-
-            foreach ($data as $dd){
-
-                $infoMaterial = CatalogoMateriales::where('id', $dd->id)->first();
-
-                $medida = '';
-                if($infoUnidad = UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
-                    $medida = $infoUnidad->medida;
-                }
-
-                if($medida === ''){
-                    $dd->unido = $infoMaterial->nombre;
-                }else{
-                    $dd->unido = $infoMaterial->nombre . ' - ' . $medida;
-                }
-            }
-
-            $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
-            $tiene = true;
-            foreach($data as $row){
-
-                // si solo hay 1 fila, No mostrara el hr, salto de linea
-                if(count($data) == 1){
-                    if(!empty($row)){
-                        $tiene = false;
-                        $output .= '
-                 <li onclick="modificarValor(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->unido.'</a></li>
-                ';
-                    }
-                }
-
-                else{
-                    if(!empty($row)){
-                        $tiene = false;
-                        $output .= '
-                 <li onclick="modificarValor(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->unido.'</a></li>
-                   <hr>
-                ';
-                    }
-                }
-            }
-
-            $output .= '</ul>';
-            if($tiene){
-                $output = '';
-            }
-            echo $output;
-        }
-    }
 
     // buscador de material para crear una partida
     public function buscadorMaterialPresupuesto(Request $request){
@@ -1454,8 +1385,12 @@ class ProyectoController extends Controller
         if($info = Partida::where('id', $request->id)->first()){
 
             if($pro = Proyecto::where('id', $info->proyecto_id)->first()){
-                if($pro->presu_aprobado == 1){
+                if($pro->presu_aprobado == 1){ // en revisión
                     return ['success' => 1];
+                }
+
+                if($pro->presu_aprobado == 2){ // aprobado
+                    return ['success' => 2];
                 }
             }
 
@@ -1470,9 +1405,9 @@ class ProyectoController extends Controller
                 $conteoPartida += 1;
             }
 
-            return ['success' => 2, 'contador' => $conteoPartida];
+            return ['success' => 3, 'contador' => $conteoPartida];
         }else{
-            return ['success' => 3];
+            return ['success' => 99];
         }
     }
 
