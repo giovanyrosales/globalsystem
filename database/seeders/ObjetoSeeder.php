@@ -542,5 +542,59 @@ class ObjetoSeeder extends Seeder
         ]);
 
 
+        ObjEspecifico::create([
+            'id_cuenta' => '9',
+            'codigo' => '54121',
+            'nombre' => 'ESPECIES MUNICIPALES DIVERSAS',
+        ]);
+
+        ObjEspecifico::create([
+            'id_cuenta' => '12',
+            'codigo' => '54401',
+            'nombre' => 'PASAJES AL INTERIOR',
+        ]);
+
+        ObjEspecifico::create([
+            'id_cuenta' => '24',
+            'codigo' => '61603',
+            'nombre' => 'DE EDUCACION Y RECREACION',
+        ]);
+
+        ObjEspecifico::create([
+            'id_cuenta' => '24',
+            'codigo' => '61601',
+            'nombre' => 'VIALES',
+        ]);
+
+        ObjEspecifico::create([
+            'id_cuenta' => '24',
+            'codigo' => '61602',
+            'nombre' => 'DE SALUD Y SANEAMIENTO AMBIENTAL',
+        ]);
+
+        ObjEspecifico::create([
+            'id_cuenta' => '24',
+            'codigo' => '61604',
+            'nombre' => 'DE VIVIENDA Y OFICINA',
+        ]);
+
+        ObjEspecifico::create([
+            'id_cuenta' => '24',
+            'codigo' => '61606',
+            'nombre' => 'ELECTRICAS Y COMUNICACIONES',
+        ]);
+
+        ObjEspecifico::create([
+            'id_cuenta' => '24',
+            'codigo' => '61607',
+            'nombre' => 'DE PRODUCCION DE BIENES Y SERVICIOS',
+        ]);
+
+        ObjEspecifico::create([
+            'id_cuenta' => '24',
+            'codigo' => '61699',
+            'nombre' => 'OBRAS DE INFRAESTRUCTURA DIVERSAS',
+        ]);
+
     }
 }

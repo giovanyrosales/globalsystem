@@ -34,15 +34,6 @@ class RequerimientosUnidadController extends Controller
            return ['success' => 1];
         }
 
-        // verificar si hay permiso para realizar requerimientos
-        if($infoPres = P_AnioPresupuesto::where('id', $request->anio)->first()){
-
-            // sin permiso global de este año para realizar requerimiento
-            if($infoPres->permiso == 0){
-                return ['success' => 2];
-            }
-        }
-
         $infoUsuario = P_UsuarioDepartamento::where('id_usuario', $idusuario)->first();
 
         // verificar que presupuesto este aprobado
@@ -57,20 +48,20 @@ class RequerimientosUnidadController extends Controller
             //* 3- Aprobado
 
             if($info->id_estado == 1){
-                return ['success' => 3];
+                return ['success' => 2];
             }
 
             if($info->id_estado == 2){
-                return ['success' => 4];
+                return ['success' => 3];
             }
 
         }else{
             // no está creado aun, asi que agregar a pendientes
-            return ['success' => 5];
+            return ['success' => 4];
         }
 
         // procede
-        return ['success' => 6];
+        return ['success' => 5];
     }
 
 }

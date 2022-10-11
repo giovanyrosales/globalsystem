@@ -191,6 +191,10 @@ class PunidadMedidaSeeder extends Seeder
         P_UnidadMedida::create([
             'nombre' => 'VARA',
         ]);
+
+        P_UnidadMedida::create([
+            'nombre' => 'TALONARIO',
+        ]);
     }
 
 

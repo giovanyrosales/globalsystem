@@ -135,24 +135,29 @@ class CuentaSeeder extends Seeder
             'nombre' => 'BIENES MUEBLES'
         ]);
 
-        Cuenta::create([  // 21
+        Cuenta::create([
             'id_rubro' => '5',
             'codigo' => '612',
             'nombre' => 'BIENES INMUEBLES'
         ]);
 
-        Cuenta::create([  // 22
+        Cuenta::create([
             'id_rubro' => '5',
             'codigo' => '614',
             'nombre' => 'INTANGIBLES'
         ]);
 
-        Cuenta::create([  // 23
+        Cuenta::create([
             'id_rubro' => '5',
             'codigo' => '721',
             'nombre' => 'CUENTAS POR PAGAR DE AÑOS ANTERIORES'
         ]);
 
+        Cuenta::create([
+            'id_rubro' => '5',
+            'codigo' => '616',
+            'nombre' => 'INFRAESTRUCTURAS'
+        ]);
 
     }
 }
