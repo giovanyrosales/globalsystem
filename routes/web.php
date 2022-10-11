@@ -35,7 +35,7 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\UnidadMedida\UnidadMedidaPres
 use App\Http\Controllers\Backend\PresupuestoUnidad\Materiales\MaterialesPresupuestoUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ConfiguracionPresupuestoUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ReportesPresupuestoUnidadController;
-
+use App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos\RequerimientosUnidadController;
 
 // --- LOGIN ---
 
@@ -558,50 +558,6 @@ Route::get('/admin/recursos/index', [RecursosController::class,'indexRecursosHum
 
 
 
-
-// ************************************************** REQUERIMIENTOS, COTIZACIONES Y ORDENES DE LAS UNIDADES O DEPARTAMENTOS ***********************
-
-// --- REQUERIMIENTOS de una unidad mostrados en usuario de uaciunidad---
-/*Route::get('/admin/listar/requerimientosunidad/index', [RequerimientoController::class,'indexListarRequerimientos'])->name('admin.listar.requerimientosunidad.index');
-Route::get('/admin/listar/requerimientosunidad/tabla', [RequerimientoController::class,'indexTablaListarRequerimientosUnidad']);
-Route::get('/admin/requerimientosunidad/listado/{id}', [RequerimientoController::class,'listadoRequerimientoPorUnidad']);
-Route::get('/admin/requerimientosunidad/listado/tabla/{id}', [RequerimientoController::class,'tablaRequerimientosUnidadIndividual']);
-Route::post('/admin/requerimientosunidad/informacion', [RequerimientoController::class, 'informacionRequerimientoUnidad']);
-Route::post('/admin/requerimientosunidad/cotizacion/guardar', [RequerimientoController::class, 'guardarNuevaCotizacionUnidad']);
-*/
-// --- VISTA COTIZACIONES PENDIENTES DE LOS DEPARTAMENTOS ---
-/*Route::get('/admin/cotizacion/pendiente/index', [CotizacionUnidadController::class,'indexPendiente'])->name('cotizaciones.pendientes.index');
-Route::get('/admin/cotizacion/pendiente/tabla-index', [CotizacionUnidadController::class,'indexPendienteTabla']);
-Route::get('/admin/cotizacion/individual/index/{id}', [CotizacionUnidadController::class,'indexCotizacion']);
-Route::post('/admin/cotizacion/autorizar',  [CotizacionUnidadController::class,'autorizarCotizacion']);
-Route::post('/admin/cotizacion/denegar',  [CotizacionUnidadController::class,'denegarCotizacion']);*/
-
-// vista de cotizacion detalle DE DEPARTAMENTOS para procesadas o denegadas
-//Route::get('/admin/cotizacion/detalle/{id}', [CotizacionUnidadController::class,'vistaDetalleCotizacion']);
-
-
-// --------------- VISTA COTIZACIONES DE DEPARTAMENTOS AUTORIZADAS -----------------------------
-//Route::get('/admin/cotizacion/autorizadas/index', [CotizacionUnidadController::class,'indexAutorizadas'])->name('cotizaciones.autorizadas.index');
-//Route::get('/admin/cotizacion/autorizadas/tabla-index', [CotizacionUnidadController::class,'indexAutorizadasTabla']);
-
-// ------------ VISTA COTIZACIONES DE DEPARTAMENTOS DENEGADAS ---------------------------------
-//Route::get('/admin/cotizacion/denegadas/index', [CotizacionUnidadController::class,'indexDenegadas'])->name('cotizaciones.denegadas.index');
-//Route::get('/admin/cotizacion/denegadas/tabla-index', [CotizacionUnidadController::class,'indexDenegadasTabla']);
-
-// ------------ ORDENES DE DEPARTAMENTOS--------------------------------------------------
-//Route::post('/admin/ordenes/generar/nuevo',  [OrdenUnidadController::class,'generarOrden']);
-//Route::get('/admin/ordenes/pdf/{id}', [OrdenUnidadController::class,'vistaPdfOrden']);
-
-// --------------- ORDENES DE COMPRAS DE DEPARTAMENTOS -------------------------------------
-/*Route::get('/admin/ordenes/compras/index', [OrdenUnidadController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
-Route::get('/admin/ordenes/compras/tabla-index', [OrdenUnidadController::class,'tablaOrdenesCompras']);
-Route::post('/admin/ordenes/anular/compra',  [OrdenUnidadController::class,'anularCompra']);
-Route::post('/admin/ordenes/generar/acta',  [OrdenUnidadController::class,'generarActa']);
-Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenUnidadController::class,'reporteActaGenerada']);*/
-
-
-
-
 // ************************************** PRESUPUESTO DE UNIDADES **********************************************************************************
 
 // --- AÑO DE PRESUPUESTO ---
@@ -690,8 +646,6 @@ Route::post('/admin/p/presupuesto/unidad/cambiar/estado', [ConfiguracionPresupue
 // verifica si todos los presupuestos esten aprobados para generar consolidado PDF
 Route::post('/admin/p/generador/verificar/consolidado/presupuesto', [ConfiguracionPresupuestoUnidadController::class,'verificarConsolidadoPresupuesto']);
 
-
-
 // retornar PDF con los totales, se envía el ID año
 Route::get('/admin/p/generador/pdf/totales/{anio}', [ReportesPresupuestoUnidadController::class,'generarTotalesPdfPresupuesto']);
 // retorna Excel con los totales, se envía el ID año
@@ -704,6 +658,14 @@ Route::get('/admin/p/generador/excel/consolidado/{anio}', [ReportesPresupuestoUn
 Route::get('/admin/p/generador/pdf/porunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalPdfPorUnidades']);
 // retorna Excel con los totales por unidad que se seleccionó
 Route::get('/admin/p/generador/excel/porunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalExcelPorUnidades']);
+
+
+// * REQUERIMIENTOS DE UNA UNIDAD
+
+// retornar vista para poder elegir año de presupuesto para solicitar requerimiento
+Route::get('/admin/p/anio/presupuesto/requerimiento/index', [RequerimientosUnidadController::class,'indexBuscarAñoPresupuesto'])->name('admin.p.unidad.requerimientos.index');
+// verifica si puede hacer requerimientos segun año de presupuesto
+Route::post('/admin/p/anio/permiso/requerimiento', [RequerimientosUnidadController::class,'verificarEstadoPresupuesto']);
 
 
 

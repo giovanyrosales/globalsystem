@@ -17,6 +17,14 @@ class CreatePPresupUnidadTable extends Migration
             $table->id();
             $table->bigInteger('id_anio')->unsigned();
             $table->bigInteger('id_departamento')->unsigned();
+
+            /*
+             *  * 1- En Desarrollo
+                * 2- Listo para Revisión
+                * 3- Aprobado
+             *
+             * */
+
             $table->bigInteger('id_estado')->unsigned();
 
             $table->foreign('id_anio')->references('id')->on('p_anio_presupuesto');

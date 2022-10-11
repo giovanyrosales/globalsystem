@@ -363,7 +363,7 @@
                 return;
             }
 
-            if(unidades.value > 1000000){
+            if(unidades > 1000000){
                 modalMensaje('Error', 'unidades máximo 1 millón');
                 return;
             }
@@ -384,7 +384,7 @@
                 return;
             }
 
-            if(periodo.value > 1000000){
+            if(periodo > 1000000){
                 modalMensaje('Error', 'periodo máximo 1 millón');
                 return;
             }
@@ -612,6 +612,7 @@
         axios.post(url+'/p/editar/presupuesto/editar', formData, {
         })
             .then((response) => {
+
                 if(response.data.success === 1){
                     Swal.fire({
                         title: 'Información',

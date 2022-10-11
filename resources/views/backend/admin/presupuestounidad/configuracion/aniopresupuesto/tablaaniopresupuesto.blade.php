@@ -8,6 +8,7 @@
                             <thead>
                             <tr>
                                 <th>Año</th>
+                                <th>Permiso Requerimiento</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -16,6 +17,13 @@
                             @foreach($lista as $dato)
                                 <tr>
                                     <td>{{ $dato->nombre }}</td>
+
+                                    @if($dato->permiso == 0)
+                                        <td><span class="badge bg-danger">Requerimientos Denegados</span></td>
+                                    @else
+                                        <td><span class="badge bg-success">Requerimientos Autorizados</span></td>
+                                    @endif
+
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar

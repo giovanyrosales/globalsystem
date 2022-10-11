@@ -548,27 +548,40 @@
 
                         <ul class="nav nav-treeview">
 
-                                @can('p.crear.presupuesto.unidad')
+                            @can('p.crear.presupuesto.unidad')
+                            <li class="nav-item">
+                                <a href="{{ route('p.admin.crear.presupuesto.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Crear</p>
+                                </a>
+                            </li>
+                            @endcan
+
+                            @can('p.editar.presupuesto.unidad')
                                 <li class="nav-item">
-                                    <a href="{{ route('p.admin.crear.presupuesto.index') }}" target="frameprincipal" class="nav-link">
+                                    <a href="{{ route('p.admin.editar.presupuesto.index') }}" target="frameprincipal" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Crear</p>
+                                        <p>Editar</p>
                                     </a>
                                 </li>
-                                @endcan
-
-                                @can('p.editar.presupuesto.unidad')
-                                    <li class="nav-item">
-                                        <a href="{{ route('p.admin.editar.presupuesto.index') }}" target="frameprincipal" class="nav-link">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            <p>Editar</p>
-                                        </a>
-                                    </li>
-                                @endcan
+                            @endcan
 
                         </ul>
                     </li>
                 @endcan
+
+
+
+                <li class="nav-item has-treeview">
+                    <a href="{{ route('admin.p.unidad.requerimientos.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="nav-icon fas fa-list-alt"></i>
+                        <p>
+                            Requerimientos
+                        </p>
+                    </a>
+                </li>
+
+
 
 
             </ul>

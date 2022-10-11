@@ -43,6 +43,7 @@ class AnioPresupuestoUnidadController extends Controller
 
         $dato = new P_AnioPresupuesto();
         $dato->nombre = $request->nombre;
+        $dato->permiso = 0;
 
         if($dato->save()){
             return ['success' => 2];
@@ -90,6 +91,7 @@ class AnioPresupuestoUnidadController extends Controller
 
             P_AnioPresupuesto::where('id', $request->id)->update([
                 'nombre' => $request->nombre,
+                'permiso' => $request->toggle
             ]);
 
             return ['success' => 2];

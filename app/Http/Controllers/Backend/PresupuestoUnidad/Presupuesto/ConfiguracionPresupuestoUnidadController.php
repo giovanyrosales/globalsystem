@@ -263,13 +263,13 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         // obtener lista de anios del departamento
         $listaAnios = P_PresupUnidad::where('id_departamento', $infoDepa->id_departamento)->get();
 
-        $pilaAños = array();
+        $pilaAnios = array();
 
         foreach ($listaAnios as $p){
-            array_push($pilaAños, $p->id_anio);
+            array_push($pilaAnios, $p->id_anio);
         }
 
-        $listado = P_AnioPresupuesto::whereIn('id', $pilaAños)->get();
+        $listado = P_AnioPresupuesto::whereIn('id', $pilaAnios)->get();
 
         return view('backend.admin.presupuestounidad.editar.vistaanioeditarpresupuesto', compact('listado'));
     }
@@ -434,6 +434,10 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             return ['success' => 0];
         }
 
+        DB::beginTransaction();
+
+        try {
+
         $infoPresu = P_PresupUnidad::where('id', $request->idpresupuesto)->first();
 
         if($infoPresu->estado == 2){
@@ -445,10 +449,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             // presupuesto esta aprobado
             return ['success' => 2];
         }
-
-        DB::beginTransaction();
-
-        try {
 
             // borrar todos el presupuesto base
             P_PresupUnidadDetalle::where('id_presup_unidad', $request->idpresupuesto)->delete();
@@ -489,6 +489,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
             return ['success' => 3];
         }catch(\Throwable $e){
+            Log::info('err ' . $e);
             DB::rollback();
             return ['success' => 99];
         }

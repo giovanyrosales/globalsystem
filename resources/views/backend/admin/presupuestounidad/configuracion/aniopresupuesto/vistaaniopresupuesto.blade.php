@@ -4,6 +4,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
 @stop
 
 <style>
@@ -97,6 +98,17 @@
                                         <label>Año</label>
                                         <input type="hidden" id="id-editar">
                                         <input type="number" autocomplete="off" maxlength="4" class="form-control" id="nombre-editar">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Autorización de Requerimientos</label><br>
+                                        <label class="switch" style="margin-top:10px">
+                                            <input type="checkbox" id="toggle-editar">
+                                            <div class="slider round">
+                                                <span class="on">Autorizar</span>
+                                                <span class="off">Denegar</span>
+                                            </div>
+                                        </label>
                                     </div>
 
                                 </div>
@@ -228,6 +240,15 @@
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(id);
                         $('#nombre-editar').val(response.data.lista.nombre);
+
+
+                        if(response.data.lista.permiso === 0){
+                            $("#toggle-editar").prop("checked", false);
+                        }else{
+                            $("#toggle-editar").prop("checked", true);
+                        }
+
+
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -242,6 +263,9 @@
         function editar(){
             var id = document.getElementById('id-editar').value;
             var nombre = document.getElementById('nombre-editar').value;
+
+            var t = document.getElementById('toggle-editar').checked;
+            var toggle = t ? 1 : 0;
 
             if(nombre === ''){
                 toastr.error('Año es requerido');
@@ -274,6 +298,7 @@
             var formData = new FormData();
             formData.append('id', id);
             formData.append('nombre', nombre);
+            formData.append('toggle', toggle);
 
             axios.post(url+'/p/anio/presupuesto/editar', formData, {
             })
@@ -295,7 +320,7 @@
                             }
                         })
                     }
-                    else if(response.data.success === 1){
+                    else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
                         recargar();
