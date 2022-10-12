@@ -405,6 +405,17 @@ Route::get('/admin/bolson/index', [BolsonController::class,'indexBolson'])->name
 Route::get('/admin/bolson/tabla', [BolsonController::class,'tablaBolson']);
 
 
+Route::post('/admin/bolson/verificar/saldo/objetos', [BolsonController::class, 'verificarSaldosObjetos']);
+
+
+
+
+
+
+
+
+
+
 // * CLASIFICACIONES
 
 // retorna vista con las clasificaciones de material

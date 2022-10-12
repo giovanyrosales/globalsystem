@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Bolson;
 use App\Models\Cuenta;
 use App\Models\MovimientoBolson;
+use App\Models\ObjEspecifico;
+use App\Models\P_AnioPresupuesto;
+use App\Models\P_Departamento;
+use App\Models\P_PresupUnidad;
 use App\Models\Proyecto;
 use App\Models\TipoMovimiento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -21,7 +26,21 @@ class BolsonController extends Controller
 
     // retorna vista con lista de bolsones
     public function indexBolson(){
-        return view('backend.admin.proyectos.bolson.registro.vistabolson');
+
+        // obtener listado de bolsones para buscar que año han sido creados
+        $listaAniosBolson = Bolson::all();
+
+        $pilaArrayAnio = array();
+
+        foreach ($listaAniosBolson as $p){
+            array_push($pilaArrayAnio, $p->id_anio);
+        }
+
+        $listadoanios = P_AnioPresupuesto::whereNotIn('id', $pilaArrayAnio)->get();
+
+        $arrayobj = ObjEspecifico::orderBy('codigo', 'ASC')->get();
+
+        return view('backend.admin.proyectos.bolson.registro.vistabolson', compact('listadoanios', 'arrayobj'));
     }
 
     // retorna tabla con lista de bolsones
@@ -39,6 +58,87 @@ class BolsonController extends Controller
 
         return view('backend.admin.proyectos.bolson.registro.tablabolson', compact('lista'));
     }
+
+
+    public function verificarSaldosObjetos(Request $request){
+
+        // presupuesto para este año ya esta creado
+        if(Bolson::where('id_anio', $request->anio)->first()){
+            return ['success' => 1];
+        }
+
+        // verificar que estén aprobados todos los presupuestos del x año
+
+        // obtener listado de departamentos
+        $depar = P_Departamento::all();
+        $pilaIDDepartamento = array();
+
+        foreach ($depar as $de){
+
+            if($pre = P_PresupUnidad::where('id_anio', $request->anio)
+                ->where('id_departamento', $de->id)->first()){
+
+                // estados
+                // 0: default
+                // 1: listo para revisión
+                // 2: aprobados
+
+                if($pre->id_estado == 0 || $pre->id_estado == 1){
+                    array_push($pilaIDDepartamento, $de->id);
+                }
+
+            }else{
+                // no está creado aun
+                array_push($pilaIDDepartamento, $de->id);
+            }
+        }
+
+        $listaDepa = P_Departamento::whereIn('id', $pilaIDDepartamento)
+            ->orderBy('nombre', 'ASC')
+            ->get();
+
+        // los departamentos que faltan por aprobarse su presupuesto
+        if(sizeof($listaDepa) > 0){
+            return ['success' => 2, 'lista' => $listaDepa];
+        }
+
+        // como todos están aprobados, obtener sus montos
+
+        $porciones = explode(",", $request->objetos);
+        $arrayObj = ObjEspecifico::whereIn('id', $porciones)->get();
+
+        // se mostrara un listado select con el código y el monto
+        $dataArray = array();
+
+        foreach ($arrayObj as $dd){
+
+            // por cada id objeto obtener suma de dinero de los presupuestos de año seleccionado
+
+            $infoarray = DB::table('p_presup_unidad_detalle AS pre')
+                ->join('p_materiales AS pm', 'pre.id_material', '=', 'pm.id')
+                ->select('pm.id_objespecifico', '')
+                ->where('pm.id_objespecifico', $dd->id) // todos los materiales con este id obj específico
+                ->get();
+
+           /* $dataArray[] = [
+                'codigo' => $dd->codigo,
+                'monto' => $monto,
+            ];*/
+
+
+        }
+
+        return 33;
+    }
+
+
+
+
+
+
+
+
+
 
     public function buscarNombreCuenta(Request $request){
 

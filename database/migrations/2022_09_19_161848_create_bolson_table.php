@@ -16,18 +16,18 @@ class CreateBolsonTable extends Migration
         Schema::create('bolson', function (Blueprint $table) {
             $table->id();
 
-            $table->string('nombre'); // nombre de la cuenta bancaria
-            $table->string('numero'); // num cuenta
-            $table->date('fecha'); // creacion
+            // año de presupuesto unidades
+            $table->bigInteger('id_anio')->unsigned();
 
-            // sera la suma de objetos específicos
-            $table->decimal('montoini', 8, 2);
-            //$table->decimal('saldo', 10, 2); // saldo restante
-            $table->string('estado'); // 1: activa por defecto, 0: inactiva
+            // nombre de la cuenta bolsón
+            $table->string('nombre', 200);
+            // fecha creación
+            $table->date('fecha');
 
-            // con esta cuenta, se va a buscar el dinero del presupuesto General
-            // que se mete en presupuesto,
+            // sera la suma de objetos específicos, del año de presupuesto de unidad
+            $table->decimal('monto_inicial', 10, 2);
 
+            $table->foreign('id_anio')->references('id')->on('cuenta');
         });
     }
 
