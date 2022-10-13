@@ -27,8 +27,21 @@
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
                                         </button>
+                                        <br><br>
+                                        <button type="button" class="btn btn-danger btn-xs" onclick="informacionOcultar({{ $dato->id }})">
+                                            <i class="fas fa-trash-alt" title="Ocultar"></i>&nbsp; Ocultar
+                                        </button>
                                     </td>
                                 </tr>
+
+                                @if($loop->last)
+                                    <script>
+                                        setTimeout(function () {
+                                            closeLoading();
+                                        }, 1000);
+                                    </script>
+                                @endif
+
                             @endforeach
 
                             </tbody>

@@ -82,10 +82,10 @@
                                                                                                             <input value="{{ $mm->descripcion }}" disabled class="form-control" type="text">
                                                                                                         </td>
                                                                                                         <td><input value="{{ $mm->unimedida }}" disabled class="form-control"  type="text"></td>
-                                                                                                        <td><input value="{{ $mm->precio }}" disabled class="form-control" style="max-width: 170px" ></td>
+                                                                                                        <td><input value="${{ $mm->precio }}" disabled class="form-control" style="max-width: 170px" ></td>
                                                                                                         <td><input value="{{ $mm->cantidad }}" disabled name="unidades[]" class="form-control" type="number" onchange="multiplicar(this)" maxlength="6"  style="max-width: 180px" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"></td>
                                                                                                         <td><input value="{{ $mm->periodo }}" disabled name="periodo[]" class="form-control" min="1" type="number" onchange="multiplicar(this)" maxlength="6"  style="max-width: 180px" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;"></td>
-                                                                                                        <td><input value="{{ $mm->total }}" disabled name="total[]" class="form-control" type="text" style="max-width: 180px"></td>
+                                                                                                        <td><input value="${{ $mm->total }}" disabled name="total[]" class="form-control" type="text" style="max-width: 180px"></td>
                                                                                                     </tr>
 
                                                                                                     <!-- fin foreach material -->

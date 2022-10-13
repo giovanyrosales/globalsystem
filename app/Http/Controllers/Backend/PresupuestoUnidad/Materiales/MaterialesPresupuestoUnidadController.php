@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\PresupuestoUnidad\Materiales;
 use App\Http\Controllers\Controller;
 use App\Models\Clasificaciones;
 use App\Models\ObjEspecifico;
+use App\Models\P_AnioPresupuesto;
 use App\Models\P_Materiales;
 use App\Models\P_UnidadMedida;
 use Illuminate\Http\Request;
@@ -165,4 +166,30 @@ class MaterialesPresupuestoUnidadController extends Controller
 
         return ['success' => 2];
     }
+
+    // oculta un material, pero siempre será visible si usuario ya había seleccionado ese material
+    public function ocultarMaterialesPresupuesto(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(P_Materiales::where('id', $request->id)->first()){
+
+            P_Materiales::where('id', $request->id)->update([
+                'visible' => 0,
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 99];
+        }
+
+    }
+
+
 }

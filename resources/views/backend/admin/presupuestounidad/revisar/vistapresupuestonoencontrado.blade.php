@@ -7,7 +7,6 @@
     <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
 @stop
 
-
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">

@@ -21,10 +21,12 @@ class CreateBolsonTable extends Migration
 
             // nombre de la cuenta bolsón
             $table->string('nombre', 200);
+            $table->string('numero', 100); // num cuenta
+
             // fecha creación
             $table->date('fecha');
 
-            // sera la suma de objetos específicos, del año de presupuesto de unidad
+            // será la suma de objetos específicos, del año de presupuesto de unidad
             $table->decimal('monto_inicial', 10, 2);
 
             $table->foreign('id_anio')->references('id')->on('cuenta');

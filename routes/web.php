@@ -92,6 +92,9 @@ Route::get('sin-permisos', [ControlController::class,'indexSinPermiso'])->name('
 Route::get('/admin/inicio/index', [EstadisticasController::class,'indexEstadisticas'])->name('admin.estadisticas.index');
 
 
+Route::post('/admin/realizar/copia', [EstadisticasController::class, 'realizarCopia']);
+
+
 // * NUEVO PROYECTO
 
 // retorna vista para registrar nuevo proyecto
@@ -403,9 +406,9 @@ Route::get('/admin/vista/catalogo/material/tabla', [MaterialesController::class,
 Route::get('/admin/bolson/index', [BolsonController::class,'indexBolson'])->name('admin.bolson.index');
 // retorna tabla con lista de bolsones
 Route::get('/admin/bolson/tabla', [BolsonController::class,'tablaBolson']);
-
-
+// ver cuanto saldo hay en x obj especi, de x año, de un presupuesto unidad si existe
 Route::post('/admin/bolson/verificar/saldo/objetos', [BolsonController::class, 'verificarSaldosObjetos']);
+Route::post('/admin/bolson/registrar/nuevo', [BolsonController::class, 'nuevoRegistroBolson']);
 
 
 
@@ -622,6 +625,11 @@ Route::post('/admin/p/materiales/nuevo', [MaterialesPresupuestoUnidadController:
 Route::post('/admin/p/materiales/informacion', [MaterialesPresupuestoUnidadController::class, 'informacionMaterialesPresupuesto']);
 // editar un material
 Route::post('/admin/p/materiales/editar', [MaterialesPresupuestoUnidadController::class, 'editarMaterialesPresupuesto']);
+// oculta un material, pero siempre sera visible si usuario ya habia seleccionado ese material
+Route::post('/admin/p/basepresupuesto/materiales/ocultar', [MaterialesPresupuestoUnidadController::class, 'ocultarMaterialesPresupuesto']);
+
+
+
 
 // * CREACIÓN Y EDICIÓN DE PRESUPUESTO DE UNIDAD
 

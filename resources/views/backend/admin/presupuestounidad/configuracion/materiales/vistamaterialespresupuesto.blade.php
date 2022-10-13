@@ -200,6 +200,9 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
+
+            openLoading();
+
             var ruta = "{{ URL::to('/admin/p/materiales/tabla/index') }}";
             $('#tablaDatatable').load(ruta);
 
@@ -555,6 +558,50 @@
                 var cantidad = valor.value.length;
                 document.getElementById('res-caracter-editar').innerHTML = cantidad + '/300 ';
             },10);
+        }
+
+        function informacionOcultar(id){
+            Swal.fire({
+                title: 'Ocultar Material',
+                text: "No se mostrara el material para Crear el Presupuesto, solo se mostrara al Editar Presupuesto si el usuario " +
+                    "ya había seleccionado ese material anteriormente",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ocultar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    ocultarMaterial(id);
+                }
+            })
+        }
+
+        function ocultarMaterial(id){
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            axios.post(url+'/p/basepresupuesto/materiales/ocultar', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        toastr.success('Ocultado correctamente');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al ocultar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al ocultar');
+                    closeLoading();
+                });
+
         }
 
 

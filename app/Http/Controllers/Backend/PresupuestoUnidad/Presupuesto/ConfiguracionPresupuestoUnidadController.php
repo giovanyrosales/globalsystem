@@ -300,14 +300,15 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         $infoPresupUnidad = P_PresupUnidad::where('id_departamento', $infoDepa->id_departamento)
             ->where('id_anio', $idAnio)->first();
 
-        // listado de presupuesto por anio y departamento
-        $listadoPresupuesto = P_PresupUnidad::where('id_departamento', $infoDepa->id_departamento)
-            ->where('id_anio', $idAnio)->get();
 
-        $pila = array();
+        $pilaArrayMaterialVisib = array();
 
-        foreach ($listadoPresupuesto as $lp){
-            array_push($pila, $lp->id);
+        // estos materiales de mi presupuesto, pudieron haber sido ocultados, siempre
+        // quiero que se muestren
+        $arrayPresUniDetalle = P_PresupUnidadDetalle::where('id_presup_unidad', $infoPresupUnidad->id)->get();
+
+        foreach ($arrayPresUniDetalle as $p){
+            array_push($pilaArrayMaterialVisib, $p->id_material);
         }
 
         $idpresupuesto = $infoPresupUnidad->id;
@@ -318,7 +319,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         $unidad = P_UnidadMedida::orderBy('nombre')->get();
         $rubro = Rubro::orderBy('codigo')->get();
 
-
         $resultsBloque = array();
         $index = 0;
         $resultsBloque2 = array();
@@ -327,7 +327,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         $index3 = 0;
 
         $totalvalor = 0;
-
 
         // agregar cuentas
         foreach($rubro as $secciones){
@@ -361,6 +360,8 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
                     $subSecciones3 = P_Materiales::where('id_objespecifico', $ll->id)
                         ->where('visible', 1)
+                        ->whereIn('id', $pilaArrayMaterialVisib) // si material fue ocultado, aun puede verse
+                                                            // si lo tengo a mi presu uni detalle
                         ->orderBy('descripcion', 'ASC')
                         ->get();
 
@@ -560,6 +561,17 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             array_push($pila, $lp->id);
         }
 
+        $pilaArrayMaterialUnicos = array();
+
+        // unicos materiales, para no mostrar la gran lista
+        $arrayPresUniDetalle = P_PresupUnidadDetalle::where('id_presup_unidad', $presupuesto->id)->get();
+
+        foreach ($arrayPresUniDetalle as $p){
+            array_push($pilaArrayMaterialUnicos, $p->id_material);
+        }
+
+
+
         // agregar cuentas
         foreach($rubro as $secciones){
             array_push($resultsBloque,$secciones);
@@ -591,6 +603,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                     }
 
                     $subSecciones3 = P_Materiales::where('id_objespecifico', $ll->id)
+                        ->whereIn('id', $pilaArrayMaterialUnicos) // solo materiales que tienen en presupuesto
                         ->orderBy('descripcion', 'ASC')
                         ->get();
 

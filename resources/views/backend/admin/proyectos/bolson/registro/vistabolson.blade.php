@@ -88,19 +88,23 @@
                                         <input type="text" autocomplete="off" class="form-control" maxlength="200" id="nombre-nuevo">
                                     </div>
 
+                                    <div class="form-group">
+                                        <label>Número de Cuenta Bolsón:</label>
+                                        <input type="text" autocomplete="off" class="form-control" maxlength="100" id="numero-nuevo">
+                                    </div>
+
                                     <hr>
 
                                     <div class="form-group">
                                         <label>Seleccionar Objeto Específico</label>
                                         <select id="select-obj" class="form-control" multiple="multiple">
                                             @foreach($arrayobj as $dd)
-                                                <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
+                                                <option value="{{ $dd->id }}">{{ $dd->codigo }} - {{ $dd->nombre }}</option>
                                             @endforeach
                                         </select>
                                     </div>
 
                                     <button type="button" class="btn btn-info" onclick="verificarCuentaSaldo()">Verificar</button>
-
 
 
                                 </div>
@@ -116,6 +120,78 @@
         </div>
     </div>
 
+
+    <div class="modal fade" id="modalPendiente">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Presupuestos aun sin Aprobar</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="formulario">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <select class="form-control" id="select-departamento">
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalSaldosVerificados">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Objetos Específicos</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="formulario">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <label id="totalverificado"></label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <select class="form-control" id="select-saldos-verificados">
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
@@ -194,68 +270,133 @@
                 .then((response) => {
                     closeLoading();
 
-                    console.log(response);
-                    return;
+                    if(response.data.success === 1) {
+                        toastr.error('El Bolsón ya esta creado para este Año');
+                    }
+                    // departamentos que su presupuesto no está aprobado aun
+                    else if(response.data.success === 2){
+                        $('#modalPendiente').modal('show');
 
-                    if(response.data.success === 1){
-                        toastr.success('Registrado correctamente');
-                        $('#modalAgregar').modal('hide');
-                        recargar();
+                        document.getElementById("select-departamento").options.length = 0;
+
+                        $.each(response.data.lista, function( key, val ){
+                            $('#select-departamento').append('<option value="0">'+val.nombre+'</option>');
+                        });
                     }
                     else if(response.data.success === 3){
-                        Swal.fire({
-                            title: 'Medida Repetida',
-                            text: "La medida ya se encuentra registrada",
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
+                        // viene el saldo según los códigos
 
-                            }
-                        })
+                        let total = response.data.total;
+
+                        $('#modalSaldosVerificados').modal('show');
+
+                        document.getElementById("select-saldos-verificados").options.length = 0;
+
+                        document.getElementById("totalverificado").innerHTML = "Total: $" + total;
+
+                        $.each(response.data.lista, function( key, val ){
+                            $('#select-saldos-verificados').append('<option value="0">'+val.unido+'</option>');
+                        });
+
                     }
                     else {
-                        toastr.error('Error al registrar');
+                        toastr.error('Error al buscar');
                     }
                 })
                 .catch((error) => {
-                    toastr.error('Error al registrar');
+                    toastr.error('Error al buscar');
                     closeLoading();
                 });
-
         }
 
-
-
         function nuevo(){
-            var medida = document.getElementById('medida-nuevo').value;
 
-            if(medida === ''){
-                toastr.error('Medida es requerido');
+            var anio = document.getElementById('select-anio').value;
+            var fecha = document.getElementById('fecha-nuevo').value;
+            var nombre = document.getElementById('nombre-nuevo').value;
+            var numero = document.getElementById('numero-nuevo').value; // null
+
+            if(anio === ''){
+                toastr.error('Año Presupuesto es requerido');
                 return;
             }
 
-            if(medida.length > 100){
-                toastr.error('Medida máximo 100 caracteres');
+            if(fecha === ''){
+                toastr.error('Fecha es requerido');
                 return;
             }
+
+            if(nombre === ''){
+                toastr.error('Nombre Bolsón es requerido');
+                return;
+            }
+
+            if(nombre.length > 200){
+                toastr.error('Máximo 200 caracteres para nombre');
+                return;
+            }
+
+            if(numero.length > 0){
+                if(numero.length > 100){
+                    toastr.error('Máximo 100 caracteres para número de cuenta');
+                    return;
+                }
+            }
+
+            var valores = $('#select-obj').val();
+            if(valores.length ==  null || valores.length === 0){
+                toastr.error('Seleccionar mínimo 1 objeto específico');
+                return;
+            }
+
+            var selected = [];
+            for (var option of document.getElementById('select-obj').options){
+                if (option.selected) {
+                    selected.push(option.value);
+                }
+            }
+
 
             openLoading();
             var formData = new FormData();
-            formData.append('medida', medida);
+            formData.append('anio', anio);
+            formData.append('fecha', fecha);
+            formData.append('nombre', nombre);
+            formData.append('numero', numero);
+            formData.append('objeto', selected);
 
             axios.post(url+'/unidadmedida/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
+
+                    // bolson ya creado para este año
                     if(response.data.success === 1){
-                        toastr.success('Registrado correctamente');
-                        $('#modalAgregar').modal('hide');
-                        recargar();
+                        Swal.fire({
+                            title: 'Año Repetido',
+                            text: "El Bolsón para este año " + anio + " Ya se encuentra registrado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
                     }
+                    else if(response.data.success === 2){
+                        $('#modalPendiente').modal('show');
+
+                        document.getElementById("select-departamento").options.length = 0;
+
+                        $.each(response.data.lista, function( key, val ){
+                            $('#select-departamento').append('<option value="0">'+val.nombre+'</option>');
+                        });
+                    }
+
+
                     else if(response.data.success === 3){
                         Swal.fire({
                             title: 'Medida Repetida',
@@ -281,84 +422,7 @@
                 });
         }
 
-        function informacion(id){
-            openLoading();
-            document.getElementById("formulario-editar").reset();
 
-            axios.post(url+'/unidadmedida/informacion',{
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        $('#modalEditar').modal('show');
-                        $('#id-editar').val(response.data.medida.id);
-                        $('#medida-editar').val(response.data.medida.medida);
-
-                    }else{
-                        toastr.error('Información no encontrada');
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Información no encontrada');
-                });
-        }
-
-        function editar(){
-            var id = document.getElementById('id-editar').value;
-            var medida = document.getElementById('medida-editar').value;
-
-            if(medida === ''){
-                toastr.error('Medida es requerido');
-                return;
-            }
-
-            if(medida.length > 100){
-                toastr.error('Medida máximo 100 caracteres');
-                return;
-            }
-
-            openLoading();
-            var formData = new FormData();
-            formData.append('id', id);
-            formData.append('medida', medida);
-
-            axios.post(url+'/unidadmedida/editar', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        toastr.success('Actualizado correctamente');
-                        $('#modalEditar').modal('hide');
-                        recargar();
-                    }
-                    else if(response.data.success === 3){
-                        Swal.fire({
-                            title: 'Medida Repetida',
-                            text: "La medida ya se encuentra registrada",
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-                    else {
-                        toastr.error('Error al actualizar');
-                    }
-
-                })
-                .catch((error) => {
-                    toastr.error('Error al actualizar');
-                    closeLoading();
-                });
-        }
 
 
     </script>

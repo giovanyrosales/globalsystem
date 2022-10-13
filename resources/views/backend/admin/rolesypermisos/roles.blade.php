@@ -29,6 +29,14 @@
                 <i class="fas fa-list-alt"></i>
                 Lista de Permisos
             </button>
+
+            <button type="button" onclick="realizarCopia()" class="btn btn-success btn-sm">
+                <i class="fas fa-list-alt"></i>
+                Copiar Precios
+            </button>
+
+
+
         </div>
     </section>
 
@@ -230,6 +238,29 @@
         function recargar(){
             var ruta = "{{ url('/admin/roles/tabla') }}";
             $('#tablaDatatable').load(ruta);
+        }
+
+        function realizarCopia(){
+
+
+            openLoading()
+
+            axios.post(url+'/realizar/copia', {
+            })
+                .then((response) => {
+                    closeLoading()
+
+                    if (response.data.success === 1) {
+                        toastr.success('copiado');
+                    }
+                    else {
+                        toastr.error('Error al copiar');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading()
+                    toastr.error('Error al copiar');
+                });
         }
 
 

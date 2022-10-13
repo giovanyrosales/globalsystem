@@ -62,10 +62,11 @@ class BolsonController extends Controller
 
     public function verificarSaldosObjetos(Request $request){
 
-        // presupuesto para este año ya esta creado
+        // verificar que no haya bolsón con este año
         if(Bolson::where('id_anio', $request->anio)->first()){
             return ['success' => 1];
         }
+
 
         // verificar que estén aprobados todos los presupuestos del x año
 
@@ -102,121 +103,45 @@ class BolsonController extends Controller
             return ['success' => 2, 'lista' => $listaDepa];
         }
 
+
         // como todos están aprobados, obtener sus montos
 
         $porciones = explode(",", $request->objetos);
         $arrayObj = ObjEspecifico::whereIn('id', $porciones)->get();
 
-        // se mostrara un listado select con el código y el monto
-        $dataArray = array();
+        // se mostrará un listado select con el código y el monto
+
+        $total = 0;
 
         foreach ($arrayObj as $dd){
 
             // por cada id objeto obtener suma de dinero de los presupuestos de año seleccionado
 
-            $infoarray = DB::table('p_presup_unidad_detalle AS pre')
+            $infoPresuUniDeta = DB::table('p_presup_unidad_detalle AS pre')
                 ->join('p_materiales AS pm', 'pre.id_material', '=', 'pm.id')
-                ->select('pm.id_objespecifico', '')
+                ->select('pm.id_objespecifico', 'pre.cantidad', 'pre.precio', 'pre.periodo')
                 ->where('pm.id_objespecifico', $dd->id) // todos los materiales con este id obj específico
                 ->get();
 
-           /* $dataArray[] = [
-                'codigo' => $dd->codigo,
-                'monto' => $monto,
-            ];*/
+            // dinero total por código
+            $multiplicado = 0;
 
+            foreach ($infoPresuUniDeta as $infodd){
+                $multiplicado += ($infodd->cantidad * $infodd->precio) * $infodd->periodo;
+            }
 
+            $total += $multiplicado;
+            $multiplicado = number_format((float)$multiplicado, 2, '.', ',');
+            $dd->unido = $dd->codigo . " - " . $dd->nombre . "   $" . $multiplicado;
         }
 
-        return 33;
+        $total = number_format((float)$total, 2, '.', ',');
+
+        return ['success' => 3, 'lista' => $arrayObj, 'total' => $total];
     }
 
 
-
-
-
-
-
-
-
-
-    public function buscarNombreCuenta(Request $request){
-
-        if($request->get('query')){
-            $query = $request->get('query');
-            $data = Cuenta::where('nombre', 'LIKE', "%{$query}%")->get();
-
-            $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
-            $tiene = true;
-            foreach($data as $row){
-
-                // si solo hay 1 fila, No mostrara el hr, salto de linea
-                if(count($data) == 1){
-                    if(!empty($row)){
-                        $tiene = false;
-                        $output .= '
-                 <li onclick="modificarValor('.$row->id.')" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->codigo .'</a></li>
-                ';
-                    }
-                }
-
-                else{
-                    if(!empty($row)){
-                        $tiene = false;
-                        $output .= '
-                 <li onclick="modificarValor('.$row->id.')" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->codigo .'</a></li>
-                   <hr>
-                ';
-                    }
-                }
-            }
-            $output .= '</ul>';
-            if($tiene){
-                $output = '';
-            }
-            echo $output;
-        }
-    }
-
-    public function buscarNombreCuentaEditar(Request $request){
-
-        if($request->get('query')){
-            $query = $request->get('query');
-            $data = Cuenta::where('nombre', 'LIKE', "%{$query}%")->get();
-
-            $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
-            $tiene = true;
-            foreach($data as $row){
-
-                // si solo hay 1 fila, No mostrara el hr, salto de linea
-                if(count($data) == 1){
-                    if(!empty($row)){
-                        $tiene = false;
-                        $output .= '
-                 <li onclick="modificarValorEditar('.$row->id.')" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->codigo .'</a></li>
-                ';
-                    }
-                }
-
-                else{
-                    if(!empty($row)){
-                        $tiene = false;
-                        $output .= '
-                 <li onclick="modificarValorEditar('.$row->id.')" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->nombre . ' - ' .$row->codigo .'</a></li>
-                   <hr>
-                ';
-                    }
-                }
-            }
-            $output .= '</ul>';
-            if($tiene){
-                $output = '';
-            }
-            echo $output;
-        }
-    }
-
-    public function nuevoRegistro(Request $request){
+    public function nuevoRegistroBolson(Request $request){
 
         $rules = array(
             'fecha' => 'required',
@@ -229,8 +154,86 @@ class BolsonController extends Controller
             return ['success' => 0];
         }
 
+        // bolsón para este año ya está creado
+        if(Bolson::where('id_anio', $request->anio)->first()){
+            return ['success' => 1];
+        }
+
+        // verificar que todos presupuesto este aprobados
+        $depar = P_Departamento::all();
+        $pilaIDDepartamento = array();
+
+        foreach ($depar as $de){
+
+            if($pre = P_PresupUnidad::where('id_anio', $request->anio)
+                ->where('id_departamento', $de->id)->first()){
+
+                // estados
+                // 0: default
+                // 1: listo para revisión
+                // 2: aprobados
+
+                if($pre->id_estado == 0 || $pre->id_estado == 1){
+                    array_push($pilaIDDepartamento, $de->id);
+                }
+
+            }else{
+                // no está creado aun
+                array_push($pilaIDDepartamento, $de->id);
+            }
+        }
+
+        $listaDepa = P_Departamento::whereIn('id', $pilaIDDepartamento)
+            ->orderBy('nombre', 'ASC')
+            ->get();
+
+        // los departamentos que faltan por aprobarse su presupuesto
+        if(sizeof($listaDepa) > 0){
+            return ['success' => 2, 'lista' => $listaDepa];
+        }
+
+
+
+
+        // obtener dinero según cuentas obj específico
+
+        $porciones = explode(",", $request->objetos);
+        $arrayObj = ObjEspecifico::whereIn('id', $porciones)->get();
+
+        // se mostrará un listado select con el código y el monto
+
+        $total = 0;
+
+        foreach ($arrayObj as $dd){
+
+            // por cada id objeto obtener suma de dinero de los presupuestos de año seleccionado
+
+            $infoPresuUniDeta = DB::table('p_presup_unidad_detalle AS pre')
+                ->join('p_materiales AS pm', 'pre.id_material', '=', 'pm.id')
+                ->select('pm.id_objespecifico', 'pre.cantidad', 'pre.precio', 'pre.periodo')
+                ->where('pm.id_objespecifico', $dd->id) // todos los materiales con este id obj específico
+                ->get();
+
+            // dinero total por código
+            $multiplicado = 0;
+
+            foreach ($infoPresuUniDeta as $infodd){
+                $multiplicado += ($infodd->cantidad * $infodd->precio) * $infodd->periodo;
+            }
+
+            $total += $multiplicado;
+            $multiplicado = number_format((float)$multiplicado, 2, '.', ',');
+            $dd->unido = $dd->codigo . " - " . $dd->nombre . "   $" . $multiplicado;
+        }
+
+
+        formData.append('anio', anio);
+        formData.append('fecha', fecha);
+        formData.append('nombre', nombre);
+        formData.append('numero', numero);
+        formData.append('objeto', selected);
+
         $or = new Bolson();
-        $or->id_cuenta = $request->idcuenta;
         $or->nombre = $request->nombre;
         $or->numero = $request->numero;
         $or->fecha = $request->fecha;
