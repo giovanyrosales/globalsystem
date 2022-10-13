@@ -156,7 +156,7 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Costo:</label>
+                                            <label>Costo Estimado:</label>
                                             <input type="text" class="form-control" autocomplete="off" id="costo-nuevo" placeholder="0.00">
                                         </div>
 

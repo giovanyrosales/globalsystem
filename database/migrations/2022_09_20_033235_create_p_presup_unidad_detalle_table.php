@@ -18,6 +18,7 @@ class CreatePPresupUnidadDetalleTable extends Migration
             $table->bigInteger('id_presup_unidad')->unsigned();
             $table->bigInteger('id_material')->unsigned();
             $table->decimal('cantidad', 10, 2);
+            $table->decimal('precio', 10, 2);
             $table->integer('periodo');
 
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');

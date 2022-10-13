@@ -22,10 +22,16 @@ class ExportarTotalesExcel implements FromCollection, WithHeadings
     public function collection()
     {
         // obtener todos los departamentos, que han creado el presupuesto
-        $presupuesto = P_PresupUnidad::where('id_anio', $this->anio)
-            ->where('id_estado', 3) // solo Presupuestos Aprobados
+        $arrayPresupuestoUni = P_PresupUnidad::where('id_anio', $this->anio)
+            ->where('id_estado', 3) // solo aprobados
             ->orderBy('id', 'ASC')
             ->get();
+
+        $pilaArrayPresuUni = array();
+
+        foreach ($arrayPresupuestoUni as $p){
+            array_push($pilaArrayPresuUni, $p->id);
+        }
 
         $dataArray = array();
 
@@ -36,28 +42,36 @@ class ExportarTotalesExcel implements FromCollection, WithHeadings
 
             $sumacantidad = 0;
 
-            $infoObjeto = ObjEspecifico::where('id', $mm->id_objespecifico)->first();
+            $codigo = ObjEspecifico::where('id', $mm->id_objespecifico)->first();
+
+            // dinero fila columna TOTAL
+            $multiFila = 0;
 
             // recorrer cada departamento y buscar
-            foreach ($presupuesto as $pp) {
+            foreach ($arrayPresupuestoUni as $pp) {
 
                 if ($info = P_PresupUnidadDetalle::where('id_presup_unidad', $pp->id)
                     ->where('id_material', $mm->id)
                     ->first()) {
-                    $multip = $info->cantidad * $info->periodo;
-                    $sumacantidad = $sumacantidad + $multip;
+
+                    $resultado = ($info->cantidad * $info->precio) * $info->periodo;
+                    $multiFila = $multiFila + $resultado;
+
+                    // solo obtener fila de columna CANTIDAD
+                    $sumacantidad = $sumacantidad + ($info->cantidad * $info->periodo);
                 }
             }
 
-            $total = number_format((float)($sumacantidad * $mm->costo), 2, '.', ',');
+            if($sumacantidad > 0){
 
-            if ($sumacantidad > 0) {
+                $multiFila = number_format((float)($multiFila), 2, '.', ',');
+                $sumacantidad = number_format((float)($sumacantidad), 2, '.', ',');
+
                 $dataArray[] = [
-                    'codigo' => $infoObjeto->codigo,
+                    'codigo' => $codigo->codigo,
                     'descripcion' => $mm->descripcion,
                     'sumacantidad' => $sumacantidad,
-                    'costo' => $mm->costo,
-                    'total' => $total,
+                    'total' => $multiFila,
                 ];
             }
         }
@@ -71,7 +85,7 @@ class ExportarTotalesExcel implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ["COD. ESPECIFICO", "NOMBRE", "CANTIDAD", "PRECIO UNITARIO", "TOTAL"];
+        return ["COD. ESPECIFICO", "NOMBRE", "CANTIDAD", "TOTAL"];
     }
 
 }

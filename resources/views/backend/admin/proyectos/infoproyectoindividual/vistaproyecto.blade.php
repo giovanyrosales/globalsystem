@@ -1130,7 +1130,10 @@
         }
 
 
-        function vistaEditarRequisicion(id, conteo){
+        function vistaEditarRequisicion(dato){
+
+            let id = dato.id;
+            let conteo = dato.numero;
 
             openLoading();
             document.getElementById("formulario-requisicion-editar").reset();

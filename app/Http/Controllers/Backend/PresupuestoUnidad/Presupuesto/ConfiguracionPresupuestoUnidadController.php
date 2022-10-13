@@ -193,7 +193,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         $idusuario = Auth::id();
         $infoDepa = P_UsuarioDepartamento::where('id_usuario', $idusuario)->first();
 
-        // verificar que aun no exista el presupuesto
+        // verificar que a un no exista el presupuesto
         if(P_PresupUnidad::where('id_anio', $request->anio)
             ->where('id_departamento', $infoDepa->id_departamento)
             ->first()){
@@ -213,10 +213,13 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             if($request->idmaterial != null) {
                 for ($i = 0; $i < count($request->idmaterial); $i++) {
 
+                    $infoMaterial = P_Materiales::where('id', $request->idmaterial[$i])->first();
+
                     $prDetalle = new P_PresupUnidadDetalle();
                     $prDetalle->id_presup_unidad = $pr->id;
                     $prDetalle->id_material = $request->idmaterial[$i];
                     $prDetalle->cantidad = $request->unidades[$i];
+                    $prDetalle->precio = $infoMaterial->costo;
                     $prDetalle->periodo = $request->periodo[$i];
                     $prDetalle->save();
                 }
@@ -376,39 +379,41 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
                             $subLista->cantidad = $data->cantidad;
                             $subLista->periodo = $data->periodo;
-                            $total = ($subLista->costo * $data->cantidad) * $data->periodo;
-                            $subLista->total = '$' . number_format((float)$total, 2, '.', '');
+                            $total = ($data->precio * $data->cantidad) * $data->periodo;
+                            $subLista->total = '$' . number_format((float)$total, 2, '.', ',');
+                            $subLista->precio = $data->precio;
 
                             $sumaObjeto = $sumaObjeto + $total;
                         }else{
                             $subLista->cantidad = '';
                             $subLista->periodo = '';
                             $subLista->total = '';
+                            $subLista->precio = $subLista->costo;
                         }
                     }
 
                     $sumaObjetoTotal = $sumaObjetoTotal + $sumaObjeto;
-                    $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', '');
+                    $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', ',');
 
                     $resultsBloque3[$index3]->material = $subSecciones3;
                     $index3++;
                 }
 
                 $sumaRubro = $sumaRubro + $sumaObjetoTotal;
-                $lista->sumaobjetototal = number_format((float)$sumaObjetoTotal, 2, '.', '');
+                $lista->sumaobjetototal = number_format((float)$sumaObjetoTotal, 2, '.', ',');
 
                 $resultsBloque2[$index2]->objeto = $subSecciones2;
                 $index2++;
             }
 
             $totalvalor = $totalvalor + $sumaRubro;
-            $secciones->sumarubro = number_format((float)$sumaRubro, 2, '.', '');
+            $secciones->sumarubro = number_format((float)$sumaRubro, 2, '.', ',');
 
             $resultsBloque[$index]->cuenta = $subSecciones;
             $index++;
         }
 
-        $totalvalor = number_format((float)$totalvalor, 2, '.', '');
+        $totalvalor = number_format((float)$totalvalor, 2, '.', ',');
 
         // obtener listado de materiales extra
         $listado = P_MaterialesDetalle::where('id_presup_unidad', $infoPresupUnidad->id)->get();
@@ -440,12 +445,12 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         $infoPresu = P_PresupUnidad::where('id', $request->idpresupuesto)->first();
 
-        if($infoPresu->estado == 2){
+        if($infoPresu->id_estado == 2){
             // presupuesto esta en revisión
             return ['success' => 1];
         }
 
-        if($infoPresu->estado == 3){
+        if($infoPresu->id_estado == 3){
             // presupuesto esta aprobado
             return ['success' => 2];
         }
@@ -460,10 +465,13 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                 // crear de nuevo presupuesto base
                 for ($i = 0; $i < count($request->unidades); $i++) {
 
+                    $infoMaterial = P_Materiales::where('id', $request->idmaterial[$i])->first();
+
                     $prDetalle = new P_PresupUnidadDetalle();
                     $prDetalle->id_presup_unidad = $request->idpresupuesto;
                     $prDetalle->id_material = $request->idmaterial[$i];
                     $prDetalle->cantidad = $request->unidades[$i];
+                    $prDetalle->precio = $infoMaterial->costo;
                     $prDetalle->periodo = $request->periodo[$i];
                     $prDetalle->save();
                 }
@@ -599,33 +607,35 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
                             $subLista->cantidad = $data->cantidad;
                             $subLista->periodo = $data->periodo;
-                            $total = ($subLista->costo * $data->cantidad) * $data->periodo;
-                            $subLista->total = number_format((float)$total, 2, '.', '');
+                            $total = ($data->precio * $data->cantidad) * $data->periodo;
+                            $subLista->total = number_format((float)$total, 2, '.', ',');
 
+                            $subLista->precio = $data->precio;
                             $sumaObjeto = $sumaObjeto + $total;
 
                         }else{
                             $subLista->cantidad = '';
                             $subLista->periodo = '';
                             $subLista->total = '';
+                            $subLista->precio = $subLista->costo;
                         }
                     }
 
                     $sumaObjetoTotal = $sumaObjetoTotal + $sumaObjeto;
-                    $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', '');
+                    $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', ',');
 
                     $resultsBloque3[$index3]->material = $subSecciones3;
                     $index3++;
                 }
 
                 $sumaRubro = $sumaRubro + $sumaObjetoTotal;
-                $lista->sumaobjetototal = number_format((float)$sumaObjetoTotal, 2, '.', '');
+                $lista->sumaobjetototal = number_format((float)$sumaObjetoTotal, 2, '.', ',');
 
                 $resultsBloque2[$index2]->objeto = $subSecciones2;
                 $index2++;
             }
             $totalvalor = $totalvalor + $sumaRubro;
-            $secciones->sumarubro = number_format((float)$sumaRubro, 2, '.', '');
+            $secciones->sumarubro = number_format((float)$sumaRubro, 2, '.', ',');
 
             $resultsBloque[$index]->cuenta = $subSecciones;
             $index++;
@@ -689,13 +699,14 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             $prDetalle->id_presup_unidad = $request->idpresupuesto;
             $prDetalle->id_material = $base->id;
             $prDetalle->cantidad = $info->cantidad;
+            $prDetalle->precio = $info->costo;
             $prDetalle->periodo = $info->periodo;
             $prDetalle->save();
 
             // borrar el material extra
             P_MaterialesDetalle::where('id', $request->idfila)->delete();
 
-            // DB::commit();
+             DB::commit();
             return ['success' => 2, 'unidad' => $infoDepa->nombre];
         }catch(\Throwable $e){
             Log::info('ee' . $e);
@@ -752,7 +763,8 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             if($pre = P_PresupUnidad::where('id_anio', $request->anio)
                 ->where('id_departamento', $de->id)->first()){
 
-                if($pre->id_estado == 1){
+                // en desarrollo o en revisión
+                if($pre->id_estado == 1 || $pre->id_estado == 2){
                     array_push($pila, $de->id);
                 }
 

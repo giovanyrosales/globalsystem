@@ -24,44 +24,69 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings
 
         $porciones = explode("-", $this->unidades);
 
-        $presupuesto = P_PresupUnidad::where('id_anio', $this->anio)
+        // filtrado por x departamento y x año
+        $arrayPresupUnidad = P_PresupUnidad::where('id_anio', $this->anio)
             ->whereIn('id_departamento', $porciones)
-            ->where('id_estado', 3) // solo Presupuesto aprobados
+            ->where('id_estado', 3) // solo aprobados
             ->orderBy('id', 'ASC')
             ->get();
+
+        $pilaArrayPresuUni = array();
+
+        foreach ($arrayPresupUnidad as $p){
+            array_push($pilaArrayPresuUni, $p->id);
+        }
 
         $dataArray = array();
 
         // listado
         $materiales = P_Materiales::orderBy('descripcion')->get();
 
+        $sumaCantidadGlobal = 0;
+        $sumaTotalGlobal = 0;
+
         // recorrer cada material
         foreach ($materiales as $mm) {
 
+            // para suma de cantidad para cada fila. columna CANTIDAD
             $sumacantidad = 0;
 
-            $infoObjeto = ObjEspecifico::where('id', $mm->id_objespecifico)->first();
+            $infoObj = ObjEspecifico::where('id', $mm->id_objespecifico)->first();
+
+            // dinero fila columna TOTAL
+            $multiFila = 0;
 
             // recorrer cada departamento y buscar
-            foreach ($presupuesto as $pp) {
+            foreach ($arrayPresupUnidad as $pp) {
 
+                // ya filtrado para x año y solo aprobados
                 if ($info = P_PresupUnidadDetalle::where('id_presup_unidad', $pp->id)
                     ->where('id_material', $mm->id)
                     ->first()) {
-                    $multip = $info->cantidad * $info->periodo;
-                    $sumacantidad = $sumacantidad + $multip;
+
+                    $resultado = ($info->cantidad * $info->precio) * $info->periodo;
+                    $multiFila = $multiFila + $resultado;
+
+                    // solo obtener fila de columna CANTIDAD
+                    $sumacantidad = $sumacantidad + ($info->cantidad * $info->periodo);
+
+                    // para colocar CANTIDAD TOTAL al final de la columna
+                    $sumaCantidadGlobal = $sumaCantidadGlobal + $sumacantidad;
                 }
             }
 
-            $total = number_format((float)($sumacantidad * $mm->costo), 2, '.', ',');
-
             if($sumacantidad > 0){
+
+                $multiFila = number_format((float)($multiFila), 2, '.', ',');
+
+                // para fila de columna CANTIDAD
+                $sumacantidad = number_format((float)($sumacantidad), 2, '.', ',');
+
                 $dataArray[] = [
-                    'codigo' => $infoObjeto->codigo,
+                    'codigo' => $infoObj->codigo,
                     'descripcion' => $mm->descripcion,
                     'sumacantidad' => $sumacantidad,
-                    'costo' => $mm->costo,
-                    'total' => $total,
+                    'total' => $multiFila,
                 ];
             }
         }
@@ -75,6 +100,6 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ["COD. ESPECIFICO", "NOMBRE", "CANTIDAD", "PRECIO UNITARIO", "TOTAL"];
+        return ["COD. ESPECIFICO", "NOMBRE", "CANTIDAD", "TOTAL"];
     }
 }

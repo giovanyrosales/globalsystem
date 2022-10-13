@@ -28,7 +28,7 @@
                                         @endcan
 
                                         @can('boton.editar.requisicion')
-                                        <button type="button" class="btn btn-info btn-xs" onclick="vistaEditarRequisicion('{{ $dato->id }}', '{{ $dato->numero }}')">
+                                        <button type="button" class="btn btn-info btn-xs" onclick="vistaEditarRequisicion({{ $dato }})">
                                             <i class="fas fa-pen-alt" title="{{ $dato->estado }}"></i> {{ $dato->estado }}
                                         </button>
                                         @endcan

@@ -508,27 +508,13 @@
             })
                 .then((response) => {
                     closeLoading();
-                    /*if(response.data.success === 1){
-                        // UN DATO CAMBIO Y NO TENDRÍA QUE HABER CAMBIADO
+                    if(response.data.success === 1){
+                        $('#modalEditar').modal('hide');
+                        recargar();
 
                         Swal.fire({
-                            title: 'Material Bloqueado',
-                            text: "La información no puede ser Actualizada porque ya esta utilizado en una Partida",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-                    }*/
-                    if(response.data.success === 1){
-                        Swal.fire({
                             title: 'Material Repetido',
-                            text: "El objeto específico, la clasificación, el nombre, y la unidad de medida están repetidos",
+                            text: "El objeto específico, la clasificación, el nombre, y la unidad de medida están repetidos. Pero se actualizo los datos del Material",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -546,11 +532,11 @@
                         recargar();
                     }
                     else {
-                        toastr.error('Error al registrar');
+                        toastr.error('Error al editar');
                     }
                 })
                 .catch((error) => {
-                    toastr.error('Error al registrar');
+                    toastr.error('Error al editar');
                     closeLoading();
                 });
         }

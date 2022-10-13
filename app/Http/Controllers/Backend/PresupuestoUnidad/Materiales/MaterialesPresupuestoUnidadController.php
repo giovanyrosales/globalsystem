@@ -28,7 +28,9 @@ class MaterialesPresupuestoUnidadController extends Controller
 
     // retorna tabla catálogo de materiales para presupuesto de unidades
     public function tablaMaterialesPresupuesto(){
-        $lista = P_Materiales::orderBy('descripcion', 'ASC')->get();
+        $lista = P_Materiales::orderBy('descripcion', 'ASC')
+        ->where('visible', 1) // solo materiales visibles
+        ->get();
 
         foreach ($lista as $item) {
 
@@ -133,25 +135,7 @@ class MaterialesPresupuestoUnidadController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
-        // VERIFICAR QUE LOS DATOS NO HAYAN CAMBIADO SI YA ESTABA EN UN PRESUPUESTO EL MATERIAL
-        /*if(PartidaDetalle::where('material_id', $request->id)->first()){
 
-            $infoCatalogo = CatalogoMateriales::where('id', '=', $request->id)->first();
-
-            // MISMOS RETORNOS QUE UN DATO HA CAMBIADO
-
-            if($infoCatalogo->nombre !== $request->nombre){
-                return ['success' => 1];
-            }
-
-            if($infoCatalogo->id_objespecifico !== $request->codigo){
-                return ['success' => 1];
-            }
-
-            if($infoCatalogo->id_unidadmedida !== $request->unidad){
-                return ['success' => 1];
-            }
-        }*/
 
         // VERIFICAR MATERIAL REPETIDO
         if(P_Materiales::where('id', '!=', $request->id)
@@ -159,6 +143,15 @@ class MaterialesPresupuestoUnidadController extends Controller
             ->where('descripcion', $request->nombre)
             ->where('id_unidadmedida', $request->unidad)
             ->first()){
+
+            // SIEMPRE ACTUALIZAR
+            P_Materiales::where('id', $request->id)->update([
+                'id_unidadmedida' => $request->unidad,
+                'id_objespecifico' => $request->codigo,
+                'descripcion' => $request->nombre,
+                'costo' => $request->precio
+            ]);
+
             return ['success' => 1];
         }
 

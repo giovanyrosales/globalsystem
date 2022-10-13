@@ -93,7 +93,7 @@ class ExportarConsolidadoExcel implements FromCollection, WithHeadings
                         foreach ($listaMateriales as $lm){
                             $sumaunidades = $sumaunidades + $lm->cantidad;
                             $sumaperiodos = $sumaperiodos + $lm->periodo;
-                            $multiunidades = $multiunidades + (($lm->cantidad * $subLista->costo) * $lm->periodo);
+                            $multiunidades = $multiunidades + (($lm->cantidad * $lm->precio) * $lm->periodo);
                         }
 
                         $sumaObjeto = $sumaObjeto + $multiunidades;
@@ -134,7 +134,7 @@ class ExportarConsolidadoExcel implements FromCollection, WithHeadings
 
         foreach($rubro as $item){
             $dataArray[] = [
-                'codigo' => $item->numero,
+                'codigo' => $item->codigo,
                 'especifico' => $item->nombre,
                 'obj_especifico' => "",
                 'cuenta' => "",
@@ -144,7 +144,7 @@ class ExportarConsolidadoExcel implements FromCollection, WithHeadings
             foreach($item->cuenta as $cc){
 
                 $dataArray[] = [
-                    'codigo' => $cc->numero,
+                    'codigo' => $cc->codigo,
                     'especifico' => $cc->nombre,
                     'obj_especifico' => "",
                     'cuenta' => "$".$cc->sumaobjetototal,
@@ -154,7 +154,7 @@ class ExportarConsolidadoExcel implements FromCollection, WithHeadings
                 foreach($cc->objeto as $obj){
 
                     $dataArray[] = [
-                        'codigo' => $obj->numero,
+                        'codigo' => $obj->codigo,
                         'especifico' => $obj->nombre,
                         'obj_especifico' => "$".$obj->sumaobjeto,
                         'cuenta' => "",
