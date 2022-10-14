@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Bolson;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bolson;
+use App\Models\BolsonDetalle;
 use App\Models\Cuenta;
 use App\Models\MovimientoBolson;
 use App\Models\ObjEspecifico;
@@ -28,19 +29,23 @@ class BolsonController extends Controller
     public function indexBolson(){
 
         // obtener listado de bolsones para buscar que año han sido creados
-        $listaAniosBolson = Bolson::all();
+        $listaBolson = Bolson::all();
 
         $pilaArrayAnio = array();
 
-        foreach ($listaAniosBolson as $p){
+        foreach ($listaBolson as $p){
             array_push($pilaArrayAnio, $p->id_anio);
         }
 
         $listadoanios = P_AnioPresupuesto::whereNotIn('id', $pilaArrayAnio)->get();
-
         $arrayobj = ObjEspecifico::orderBy('codigo', 'ASC')->get();
 
-        return view('backend.admin.proyectos.bolson.registro.vistabolson', compact('listadoanios', 'arrayobj'));
+        $puedeAgregar = false;
+        if(sizeof($listadoanios) > 0){
+            $puedeAgregar = true;
+        }
+
+        return view('backend.admin.proyectos.bolson.registro.vistabolson', compact('listadoanios', 'arrayobj', 'puedeAgregar'));
     }
 
     // retorna tabla con lista de bolsones
@@ -50,10 +55,8 @@ class BolsonController extends Controller
 
         foreach ($lista as $dd){
 
-            $infoCuenta = Cuenta::where('id', $dd->id_cuenta)->first();
-            $dd->cuenta = $infoCuenta->nombre;
-
-            $dd->montoini = number_format((float)$dd->montoini, 2, '.', ',');
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+            $dd->montoini = number_format((float)$dd->monto_inicial, 2, '.', ',');
         }
 
         return view('backend.admin.proyectos.bolson.registro.tablabolson', compact('lista'));
@@ -67,6 +70,7 @@ class BolsonController extends Controller
             return ['success' => 1];
         }
 
+        //---------------------------------------------------------------
 
         // verificar que estén aprobados todos los presupuestos del x año
 
@@ -104,6 +108,16 @@ class BolsonController extends Controller
         }
 
 
+        //---------------------------------------------------------------
+
+        $infoArrayPresuUnidad = P_PresupUnidad::where('id_anio', $request->anio)->get();
+
+        $pilaArrayPresuUnidad = array();
+
+        foreach ($infoArrayPresuUnidad as $p){
+            array_push($pilaArrayPresuUnidad, $p->id);
+        }
+
         // como todos están aprobados, obtener sus montos
 
         $porciones = explode(",", $request->objetos);
@@ -120,6 +134,7 @@ class BolsonController extends Controller
             $infoPresuUniDeta = DB::table('p_presup_unidad_detalle AS pre')
                 ->join('p_materiales AS pm', 'pre.id_material', '=', 'pm.id')
                 ->select('pm.id_objespecifico', 'pre.cantidad', 'pre.precio', 'pre.periodo')
+                ->whereIn('pre.id_presup_unidad', $pilaArrayPresuUnidad)
                 ->where('pm.id_objespecifico', $dd->id) // todos los materiales con este id obj específico
                 ->get();
 
@@ -144,6 +159,7 @@ class BolsonController extends Controller
     public function nuevoRegistroBolson(Request $request){
 
         $rules = array(
+            'anio' => 'required',
             'fecha' => 'required',
             'nombre' => 'required',
         );
@@ -153,6 +169,11 @@ class BolsonController extends Controller
         if ( $validator->fails()){
             return ['success' => 0];
         }
+
+        DB::beginTransaction();
+
+        try {
+
 
         // bolsón para este año ya está creado
         if(Bolson::where('id_anio', $request->anio)->first()){
@@ -192,8 +213,15 @@ class BolsonController extends Controller
             return ['success' => 2, 'lista' => $listaDepa];
         }
 
+        //-----------------------------------------------------------------------------
 
+        $infoArrayPresuUnidad = P_PresupUnidad::where('id_anio', $request->anio)->get();
 
+        $pilaArrayPresuUnidad = array();
+
+        foreach ($infoArrayPresuUnidad as $p){
+            array_push($pilaArrayPresuUnidad, $p->id);
+        }
 
         // obtener dinero según cuentas obj específico
 
@@ -202,7 +230,7 @@ class BolsonController extends Controller
 
         // se mostrará un listado select con el código y el monto
 
-        $total = 0;
+        $totalSaldoInicial = 0;
 
         foreach ($arrayObj as $dd){
 
@@ -211,6 +239,7 @@ class BolsonController extends Controller
             $infoPresuUniDeta = DB::table('p_presup_unidad_detalle AS pre')
                 ->join('p_materiales AS pm', 'pre.id_material', '=', 'pm.id')
                 ->select('pm.id_objespecifico', 'pre.cantidad', 'pre.precio', 'pre.periodo')
+                ->whereIn('pre.id_presup_unidad',$pilaArrayPresuUnidad)
                 ->where('pm.id_objespecifico', $dd->id) // todos los materiales con este id obj específico
                 ->get();
 
@@ -221,80 +250,101 @@ class BolsonController extends Controller
                 $multiplicado += ($infodd->cantidad * $infodd->precio) * $infodd->periodo;
             }
 
-            $total += $multiplicado;
-            $multiplicado = number_format((float)$multiplicado, 2, '.', ',');
-            $dd->unido = $dd->codigo . " - " . $dd->nombre . "   $" . $multiplicado;
+            $totalSaldoInicial += $multiplicado;
         }
-
-
-        formData.append('anio', anio);
-        formData.append('fecha', fecha);
-        formData.append('nombre', nombre);
-        formData.append('numero', numero);
-        formData.append('objeto', selected);
 
         $or = new Bolson();
+        $or->id_anio = $request->anio;
         $or->nombre = $request->nombre;
-        $or->numero = $request->numero;
+        $or->num_cuenta = $request->numero;
         $or->fecha = $request->fecha;
-        $or->montoini = $request->monto;
-        $or->saldo = 0;
-        $or->estado = 0;
-        if($or->save()){
-            return ['success' => 1];
-        }else{
-            return ['success' => 2];
+        $or->monto_inicial = $totalSaldoInicial;
+        $or->save();
+
+        // guardar detalle bolsón de cada obj específico
+
+            foreach ($arrayObj as $dd){
+
+                $bolsonDeta = new BolsonDetalle();
+                $bolsonDeta->id_bolson = $or->id;
+                $bolsonDeta->id_objespecifico = $dd->id;
+                $bolsonDeta->save();
+            }
+
+        DB::commit();
+        return ['success' => 3];
+
+        }catch(\Throwable $e){
+            Log::info('error: ' . $e);
+            DB::rollback();
+            return ['success' => 99];
         }
     }
 
-    public function informacionBolson(Request $request){
-
-        $regla = array(
-            'id' => 'required',
-        );
-
-        $validar = Validator::make($request->all(), $regla);
-
-        if ($validar->fails()){ return ['success' => 0];}
-
-        if($lista = Bolson::where('id', $request->id)->first()){
-
-            $info = Cuenta::where('id', $lista->id_cuenta)->first();
-
-            return ['success' => 1, 'info' => $lista, 'cuenta' => $info->nombre];
-        }else{
-            return ['success' => 2];
-        }
+    public function indexDetalleBolson($id){
+        return view('backend.admin.proyectos.bolson.registro.vistadetallebolson', compact('id'));
     }
 
-    public function editarRegistro(Request $request){
-        $rules = array(
-            'fecha' => 'required',
-            'nombre' => 'required',
-            'id' => 'required'
-        );
+    public function tablaDetalleBolson($id){
 
-        $validator = Validator::make($request->all(), $rules);
+        $listado = BolsonDetalle::where('id_bolson', $id)->get();
 
-        if ( $validator->fails()){
-            return ['success' => 0];
+        $infoBolson = Bolson::where('id', $id)->first();
+
+        $infoArrayPresuUnidad = P_PresupUnidad::where('id_anio', $infoBolson->id_anio)->get();
+
+        $pilaArrayPresuUnidad = array();
+
+        foreach ($infoArrayPresuUnidad as $p){
+            array_push($pilaArrayPresuUnidad, $p->id);
         }
 
-        if(Bolson::where('id', $request->id)->first()){
+        foreach ($listado as $dd){
 
-            Bolson::where('id', $request->id)->update([
-                'id_cuenta' => $request->idcuenta,
-                'nombre' => $request->nombre,
-                'numero' => $request->numero,
-                'fecha' => $request->fecha,
-                'montoini' => $request->monto,
-            ]);
+            $infoObjeto = ObjEspecifico::where('id', $dd->id_objespecifico)->first();
+            $dd->codigo = $infoObjeto->codigo;
+            $dd->objeto = $infoObjeto->nombre;
 
-            return ['success' => 1];
-        }else{
-            return ['success' => 2];
+            $infoPresuUniDeta = DB::table('p_presup_unidad_detalle AS pre')
+                ->join('p_materiales AS pm', 'pre.id_material', '=', 'pm.id')
+                ->select('pm.id_objespecifico', 'pre.cantidad', 'pre.precio', 'pre.periodo')
+                ->whereIn('pre.id_presup_unidad',$pilaArrayPresuUnidad)
+                ->where('pm.id_objespecifico', $infoObjeto->id) // todos los materiales con este id obj específico
+                ->get();
+
+            // dinero total por código
+            $multiplicado = 0;
+
+            foreach ($infoPresuUniDeta as $infodd){
+                $multiplicado += ($infodd->cantidad * $infodd->precio) * $infodd->periodo;
+            }
+
+            $dd->monto = number_format((float)$multiplicado, 2, '.', ',');
         }
+
+        return view('backend.admin.proyectos.bolson.registro.tabladetallesbolson', compact('listado'));
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     //**** MOVIMIENTO DE CUENTA ****

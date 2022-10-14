@@ -209,74 +209,6 @@
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
-
-            window.idGlobalCuenta = 0;
-            window.idGlobalCuentaEditar = 0;
-
-            $('#nombre-cuenta-nuevo').keyup(function(){
-
-                idGlobalCuenta = 0;
-
-                var query = $(this).val();
-                if(query != ''){
-                    axios.post(url+'/bolson/buscar/cuenta', {
-                        'query' : query
-                    })
-                        .then((response) => {
-
-                            $('#cuentaLista').fadeIn();
-                            $('#cuentaLista').html(response.data);
-
-                            if(response.data == ''){
-                                idGlobalCuenta = 0;
-                            }
-                        })
-                        .catch((error) => {
-                        });
-                }else{
-                    idGlobalCuenta = 0;
-                }
-            });
-
-            $('#nombre-cuenta-editar').keyup(function(){
-
-                idGlobalCuentaEditar = 0;
-
-                var query = $(this).val();
-                if(query != ''){
-                    axios.post(url+'/bolson/buscar/cuenta-editar', {
-                        'query' : query
-                    })
-                        .then((response) => {
-
-                            $('#cuentaListaEditar').fadeIn();
-                            $('#cuentaListaEditar').html(response.data);
-
-                            if(response.data == ''){
-                                idGlobalCuentaEditar = 0;
-                            }
-                        })
-                        .catch((error) => {
-                        });
-                }else{
-                    idGlobalCuentaEditar = 0;
-                }
-            });
-
-            $(document).on('click', 'li', function(){
-                $('#nombre-cuenta-nuevo').val($(this).text());
-                $('#cuentaLista').fadeOut();
-
-                $('#nombre-cuenta-editar').val($(this).text());
-                $('#cuentaListaEditar').fadeOut();
-            });
-
-            $(document).click(function(){
-                $('#cuentaLista').fadeOut();
-                $('#cuentaListaEditar').fadeOut();
-            });
-
-
         });
     </script>
 
@@ -305,11 +237,6 @@
             var numero = document.getElementById('numero-nuevo').value;
             var monto = document.getElementById('monto-nuevo').value;
             var fecha = document.getElementById('fecha-nuevo').value;
-
-            if(idGlobalCuenta == 0){
-                toastr.error('Se debe buscar nombre de la Cuenta');
-                return;
-            }
 
             if(nombre === ''){
                 toastr.error('Nombre de Cuenta es Requerido');
@@ -378,6 +305,9 @@
                     closeLoading();
                 });
         }
+
+
+
 
         function informacion(id){
             openLoading();

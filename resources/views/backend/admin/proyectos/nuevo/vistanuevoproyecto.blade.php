@@ -43,7 +43,7 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label>Código:</label>
+                                <label>Código *:</label>
                                 <input type="text" maxlength="100" id="codigo" class="form-control" placeholder="Código de proyecto" autocomplete="off">
                             </div>
                         </div>

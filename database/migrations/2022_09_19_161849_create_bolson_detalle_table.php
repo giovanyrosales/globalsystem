@@ -16,9 +16,10 @@ class CreateBolsonDetalleTable extends Migration
         Schema::create('bolson_detalle', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_bolson')->unsigned();
+            $table->bigInteger('id_objespecifico')->unsigned();
 
             $table->foreign('id_bolson')->references('id')->on('bolson');
-
+            $table->foreign('id_objespecifico')->references('id')->on('obj_especifico');
         });
     }
 

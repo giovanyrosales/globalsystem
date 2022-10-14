@@ -91,7 +91,7 @@ class ProyectoController extends Controller
                 $p->fechaini = $request->fechainicio;
                 $p->acuerdoapertura = $nomDocumento;
                 $p->ejecutor = $request->ejecutor;
-                $p->id_estado = 1; // priorizado
+                $p->id_estado = 1; // en espera
                 $p->formulador = $request->formulador;
                 $p->supervisor = $request->supervisor;
                 $p->encargado = $request->encargado;
@@ -124,7 +124,7 @@ class ProyectoController extends Controller
             $p->codcontable = $request->codcontable;
             $p->fechaini = $request->fechainicio;
             $p->ejecutor = $request->ejecutor;
-            $p->id_estado = 1; // priorizado
+            $p->id_estado = 1; // en espera
             $p->formulador = $request->formulador;
             $p->supervisor = $request->supervisor;
             $p->encargado = $request->encargado;

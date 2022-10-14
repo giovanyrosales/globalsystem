@@ -13,6 +13,11 @@
         /*Ajustar tablas*/
         table-layout:fixed;
     }
+
+    #modalAgregar {
+        max-height: 700px;
+        overflow-y: auto;
+    }
 </style>
 
 <div id="divcontenedor" style="display: none">
@@ -20,10 +25,12 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus-square"></i>
-                    Nuevo Bolsón
-                </button>
+                @if($puedeAgregar)
+                    <button type="button" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus-square"></i>
+                        Nuevo Bolsón
+                    </button>
+                @endif
             </div>
 
             <div class="col-sm-6">
@@ -105,7 +112,6 @@
                                     </div>
 
                                     <button type="button" class="btn btn-info" onclick="verificarCuentaSaldo()">Verificar</button>
-
 
                                 </div>
                             </div>
@@ -229,12 +235,13 @@
     <script>
 
         function recargar(){
-            var ruta = "{{ url('/admin/unidadmedida/tabla/index') }}";
+            var ruta = "{{ url('/admin/bolson/tabla') }}";
             $('#tablaDatatable').load(ruta);
         }
 
         function modalAgregar(){
             document.getElementById("formulario-nuevo").reset();
+            $("#select-obj").val([]).change();
             $('#modalAgregar').modal('show');
         }
 
@@ -356,6 +363,8 @@
                 }
             }
 
+            var sel = document.getElementById("select-anio");
+            var textoanio = sel.options[sel.selectedIndex].text;
 
             openLoading();
             var formData = new FormData();
@@ -363,18 +372,18 @@
             formData.append('fecha', fecha);
             formData.append('nombre', nombre);
             formData.append('numero', numero);
-            formData.append('objeto', selected);
+            formData.append('objetos', selected);
 
-            axios.post(url+'/unidadmedida/nuevo', formData, {
+            axios.post(url+'/bolson/registrar/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
 
-                    // bolson ya creado para este año
+                    // bolsón ya creado para este año
                     if(response.data.success === 1){
                         Swal.fire({
                             title: 'Año Repetido',
-                            text: "El Bolsón para este año " + anio + " Ya se encuentra registrado",
+                            text: "El Bolsón para este año " + textoanio + " Ya se encuentra registrado",
                             icon: 'info',
                             showCancelButton: false,
                             confirmButtonColor: '#28a745',
@@ -396,21 +405,10 @@
                         });
                     }
 
-
                     else if(response.data.success === 3){
-                        Swal.fire({
-                            title: 'Medida Repetida',
-                            text: "La medida ya se encuentra registrada",
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
+                       toastr.success('Bolsón Creado');
+                       recargar();
+                        $('#modalAgregar').modal('hide');
                     }
                     else {
                         toastr.error('Error al registrar');
@@ -423,6 +421,10 @@
         }
 
 
+        function informacion(id){
+            // id bolson
+            window.location.href="{{ url('/admin/bolson/detalle/index/') }}/"+id;
+        }
 
 
     </script>

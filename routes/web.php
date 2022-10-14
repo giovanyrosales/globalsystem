@@ -408,9 +408,12 @@ Route::get('/admin/bolson/index', [BolsonController::class,'indexBolson'])->name
 Route::get('/admin/bolson/tabla', [BolsonController::class,'tablaBolson']);
 // ver cuanto saldo hay en x obj especi, de x año, de un presupuesto unidad si existe
 Route::post('/admin/bolson/verificar/saldo/objetos', [BolsonController::class, 'verificarSaldosObjetos']);
+// registrar nuevo bolsón
 Route::post('/admin/bolson/registrar/nuevo', [BolsonController::class, 'nuevoRegistroBolson']);
-
-
+// retorna vista para detalle de bolsón
+Route::get('/admin/bolson/detalle/index/{id}', [BolsonController::class,'indexDetalleBolson']);
+// retorna tabla con detalle de bolsón
+Route::get('/admin/bolson/detalle/tabla/{id}', [BolsonController::class,'tablaDetalleBolson']);
 
 
 

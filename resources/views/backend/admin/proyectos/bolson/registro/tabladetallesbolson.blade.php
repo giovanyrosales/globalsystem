@@ -7,28 +7,18 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th># Cuenta</th>
-                                <th>Monto Inicial</th>
-                                <th>Monto Restante</th>
-                                <th>Monto Retenido</th>
-                                <th>Opciones</th>
+                                <th>Código</th>
+                                <th>Objeto Específico</th>
+                                <th>Monto</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($lista as $dato)
+                            @foreach($listado as $dato)
                                 <tr>
-                                    <td>{{ $dato->nombre }}</td>
-                                    <td>{{ $dato->num_cuenta }}</td>
-                                    <td>{{ $dato->montoini }}</td>
-                                    <td>xx</td>
-                                    <td>xx</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Información"></i>&nbsp; Información
-                                        </button>
-                                    </td>
+                                    <td>{{ $dato->codigo }}</td>
+                                    <td>{{ $dato->objeto }}</td>
+                                    <td>{{ $dato->monto }}</td>
                                 </tr>
                             @endforeach
 
