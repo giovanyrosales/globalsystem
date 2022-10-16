@@ -8,6 +8,7 @@ use App\Models\Acta;
 use App\Models\AreaGestion;
 use App\Models\Bitacora;
 use App\Models\BitacoraDetalle;
+use App\Models\Bolson;
 use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
@@ -2064,109 +2065,316 @@ class ProyectoController extends Controller
 
         if ($validar->fails()){return ['success' => 0];}
 
-        $infoProyecto = Proyecto::where('id', $request->id)->first();
+        DB::beginTransaction();
 
-        // ESTADOS
-        // 1: priorizado: solo si presu no esta aprobado se puede volver a colocar
-        // 2: iniciado: // siempre se puede volver a colocar
-        // 3: en pausa: // siempre se puede volver a colocar
-        // 4: finalizado: // solo 1 vez se puede colocar en el proyecto
+        try {
 
-        // cualquier intento de modificar si presupuesto esta finalizado, retornar error;
-        if($infoProyecto->idestado == 4){
-            $mensaje = "El Proyecto fue Finalizado";
-            return ['success' => 1, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
-        }
+            $infoProyecto = Proyecto::where('id', $request->id)->first();
 
-        // PRIORIZADO
-        if($request->idestado == 1){
+            // ESTADOS
+            // 1: priorizado: solo si presu no esta aprobado se puede volver a colocar
+            // 2: iniciado: // siempre se puede volver a colocar
+            // 3: en pausa: // siempre se puede volver a colocar
+            // 4: finalizado: // solo 1 vez se puede colocar en el proyecto
 
-            // puede cambiarse se está en modo desarrollo, el modo revisión
-            // es solo por evitar alguna cosa rara
-            if($infoProyecto->presu_aprobado == 0 || $infoProyecto->presu_aprobado == 1){
-                // puede actualizarse, á priorizado
-                return ['success' => 2];
-            }else{
-                // presupuesto ya aprobado, no puede volver a colocar estado priorizado
-                $mensaje = "El Presupuesto ya esta Aprobado";
-                return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+            // cualquier intento de modificar si presupuesto esta finalizado, retornar error;
+            if($infoProyecto->idestado == 4){
+                $mensaje = "El Proyecto fue Finalizado";
+                return ['success' => 1, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
             }
-        }
 
-        // INICIADO: puede crear requerimientos y necesita bolsón
-        else if($request->idestado == 2){
+            // PRIORIZADO
+            if($request->idestado == 1){
 
-            if($infoProyecto->presu_aprobado == 0 || $infoProyecto->presu_aprobado == 1){
-                // presupuesto no aprobado aun
-                $mensaje = "El Presupuesto No esta Aprobado";
-                return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
-            }else{
-                // presupuesto ya aprobado. Y verificar que haya bolsón.
+                // puede cambiarse se está en modo desarrollo, el modo revisión
+                // es solo por evitar alguna cosa rara
+                if($infoProyecto->presu_aprobado == 0 || $infoProyecto->presu_aprobado == 1){
 
-                if($infoProyecto->id_bolson == null){
+                    // puede actualizarse, a PRIORIZADO
+                    Proyecto::where('id', $request->id)->update([
+                        'id_estado' => 1,
+                    ]);
 
-                    // bolsón no encontrado
-                    $mensaje = "Verificar Proyecto, no se encuentra Bolsón asignado";
+                    DB::commit();
+                    return ['success' => 2];
+                }else{
+                    // presupuesto ya aprobado, no puede volver a colocar estado priorizado
+                    $mensaje = "El Presupuesto ya esta Aprobado";
                     return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
-
-                }else{
-                    // bolsón encontrado, se puede crear requerimientos
-                    return ['success' => 4];
                 }
             }
-        }
 
-        // EN PAUSA: no se puede crear requerimientos.
-        else if($request->idestado == 3){
+            // INICIADO: puede crear requerimientos y necesita bolsón
+            else if($request->idestado == 2){
 
-            if($infoProyecto->presu_aprobado == 0){
-                // presupuesto no aprobado aun
-                $mensaje = "El Presupuesto No esta Aprobado";
-                return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+                if($infoProyecto->presu_aprobado == 0 || $infoProyecto->presu_aprobado == 1){
+                    // presupuesto no aprobado aun
+                    $mensaje = "El Presupuesto No esta Aprobado";
+                    return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+                }else{
+                    // presupuesto ya aprobado. Y verificar que haya bolsón.
+
+                    if($infoProyecto->id_bolson == null){
+
+                        // bolsón no encontrado
+                        $mensaje = "Verificar Proyecto, no se encuentra Bolsón asignado";
+                        return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+
+                    }else{
+                        // bolsón encontrado, se puede crear requerimientos
+
+                        // puede actualizarse, a INICIADO
+                        Proyecto::where('id', $request->id)->update([
+                            'id_estado' => 2,
+                        ]);
+
+                        DB::commit();
+                        return ['success' => 4];
+                    }
+                }
+            }
+
+            // EN PAUSA: no se puede crear requerimientos.
+            else if($request->idestado == 3){
+
+                if($infoProyecto->presu_aprobado == 0){
+                    // presupuesto no aprobado aun
+                    $mensaje = "El Presupuesto No esta Aprobado";
+                    return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+                }else{
+                    // presupuesto ya aprobado. Y verificar que haya bolsón.
+
+                    if($infoProyecto->id_bolson != null){
+
+                        // se puede PAUSAR
+
+                        Proyecto::where('id', $request->id)->update([
+                            'id_estado' => 3,
+                        ]);
+
+                        DB::commit();
+                        return ['success' => 5];
+
+                    }else{
+                        // esto fuera raro, ya que al aprobar presupuesto se debe seleccionar a una cuenta bolsón
+                        $mensaje = "Verificar que bolsón exista en el Proyecto";
+                        return ['success' => 3, 'titulo' => 'No Encontrado', 'mensaje' => $mensaje];
+                    }
+                }
+            }
+            // FINALIZADO: se devuelve dinero a bolsón
+            else if($request->idestado == 4){
+
+                if($infoProyecto->presu_aprobado == 0){
+                    // presupuesto no aprobado aun
+                    $mensaje = "El Presupuesto No esta Aprobado";
+                    return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+                }else{
+                    // presupuesto ya aprobado. Y verificar que haya bolsón.
+
+                    if($infoProyecto->id_bolson != null){
+
+                        // se puede FINALIZAR proyecto
+                        Proyecto::where('id', $request->id)->update([
+                            'id_estado' => 4,
+                        ]);
+
+                        DB::commit();
+                        return ['success' => 6];
+
+                    }else{
+                        // null, aunque cuando se aprueba el presupuesto se dice a que
+                        // bolsón utilizar
+                        $mensaje = "Verificar que bolsón exista en el Proyecto";
+                        return ['success' => 3, 'titulo' => 'No Encontrado', 'mensaje' => $mensaje];
+                    }
+                }
             }else{
-                // presupuesto ya aprobado. Y verificar que haya bolsón.
-
-                if($infoProyecto->id_bolson != null){
-
-                    // se puede PAUSAR
-                    return ['success' => 5];
-
-                }else{
-                    // esto fuera raro, ya que al aprobar presupuesto se debe seleccionar a una cuenta bolsón
-                    $mensaje = "Verificar que bolsón exista en el Proyecto";
-                    return ['success' => 3, 'titulo' => 'No Encontrado', 'mensaje' => $mensaje];
-                }
+                // Error
+                return ['success' => 99];
             }
-        }
-        // FINALIZADO: se devuelve dinero a bolsón
-        else if($request->idestado == 4){
 
-            if($infoProyecto->presu_aprobado == 0){
-                // presupuesto no aprobado aun
-                $mensaje = "El Presupuesto No esta Aprobado";
-                return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
-            }else{
-                // presupuesto ya aprobado. Y verificar que haya bolsón.
-
-                if($infoProyecto->id_bolson != null){
-
-                    // se puede FINALIZAR proyecto
-
-                    return ['success' => 6];
-
-                }else{
-                    // null, aunque cuando se aprueba el presupuesto se dice a que
-                    // bolsón utilizar
-                    $mensaje = "Verificar que bolsón exista en el Proyecto";
-                    return ['success' => 3, 'titulo' => 'No Encontrado', 'mensaje' => $mensaje];
-                }
-            }
-        }else{
-            // Error
+        }catch(\Throwable $e){
+            DB::rollback();
             return ['success' => 99];
         }
     }
 
+    public function obtenerLosBolsones(Request $request){
+
+        // OBTENER EL TOTAL DE LAS PARTIDAS. PARA MOSTRAR AL USUARIO CUANTO DINERO SE USARA Y
+        // ELEGIR EL BOLSÓN
+
+        $partida1 = Partida::where('proyecto_id', $request->id)
+            ->whereIn('id_tipopartida', [1, 2, 5])
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        $infoPro = Proyecto::where('id', $request->id)->first();
+
+        $resultsBloque = array();
+        $index = 0;
+        $resultsBloque3 = array();
+        $index3 = 0;
+
+        $item = 0;
+        $sumaMateriales = 0;
+
+        foreach ($partida1 as $secciones){
+            array_push($resultsBloque, $secciones);
+            $item = $item + 1;
+            $secciones->item = $item;
+
+            $secciones->cantidadp = number_format((float)$secciones->cantidadp, 2, '.', ',');
+
+            $detalle1 = PartidaDetalle::where('partida_id', $secciones->id)->get();
+
+            $total = 0;
+
+            foreach ($detalle1 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+
+                $multi = $lista->cantidad * $infomaterial->pu;
+                $total = $total + $multi;
+
+                // suma de materiales
+                if($secciones->id_tipopartida == 1){
+                    $sumaMateriales = $sumaMateriales + $multi;
+                }
+            }
+
+            $resultsBloque[$index]->bloque1 = $detalle1;
+            $index++;
+        }
+
+        $manoobra = Partida::where('proyecto_id', $request->id)
+            ->where('id_tipopartida', 3)
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        $totalManoObra = 0;
+
+        foreach ($manoobra as $secciones3){
+            array_push($resultsBloque3, $secciones3);
+            $item = $item + 1;
+            $secciones3->item = $item;
+
+            $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+            $total3 = 0;
+
+            foreach ($detalle3 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+
+                $multi = $lista->cantidad * $infomaterial->pu;
+                if($lista->duplicado != 0){
+                    $multi = $multi * $lista->duplicado;
+                }
+
+                $totalManoObra = $totalManoObra + $multi;
+                $total3 = $total3 + $multi;
+            }
+
+            $secciones3->total = "$" . number_format((float)$total3, 2, '.', ',');
+
+            $resultsBloque3[$index3]->bloque3 = $detalle3;
+            $index3++;
+        }
+
+
+        // APORTE DE MANO DE OBRA
+
+        $aporteManoObra = Partida::where('proyecto_id', $request->id)
+            ->where('id_tipopartida', 4)
+            ->get();
+
+        $totalAporteManoObra = 0;
+
+        foreach ($aporteManoObra as $secciones3){
+
+            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+            foreach ($detalle4 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+
+                $multi = $lista->cantidad * $infomaterial->pu;
+
+                $totalAporteManoObra = $totalAporteManoObra + $multi;
+            }
+        }
+
+        // ALQUILER DE MAQUINARIA
+
+        $alquilerMaquinaria = Partida::where('proyecto_id', $request->id)
+            ->where('id_tipopartida', 5)
+            ->get();
+
+        $totalAlquilerMaquinaria = 0;
+
+        foreach ($alquilerMaquinaria as $secciones3){
+
+            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+            foreach ($detalle4 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                $lista->material = $infomaterial->nombre;
+                $multi = $lista->cantidad * $infomaterial->pu;
+
+                $totalAlquilerMaquinaria = $totalAporteManoObra + $multi;
+            }
+        }
+
+        // TRANSPORTE CONCRETO FRESCO
+
+        $trasportePesado = Partida::where('proyecto_id', $request->id)
+            ->where('id_tipopartida', 6)
+            ->get();
+
+        $totalTransportePesado = 0;
+
+        foreach ($trasportePesado as $secciones3){
+
+            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+            foreach ($detalle4 as $lista){
+
+                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                $lista->material = $infomaterial->nombre;
+                $multi = $lista->cantidad * $infomaterial->pu;
+
+                $totalTransportePesado = $totalAporteManoObra + $multi;
+            }
+        }
+
+        $afp =  ($totalManoObra * 7.75) / 100;
+        $isss = ($totalManoObra * 7.5) / 100;
+        $insaforp = ($totalManoObra * 1) / 100;
+
+        $totalDescuento = $afp + $isss + $insaforp;
+
+        $herramienta2Porciento = ($sumaMateriales * 2) / 100;
+
+        // subtotal del presupuesto partida
+        $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalDescuento
+            + $totalAlquilerMaquinaria + $totalTransportePesado);
+
+
+        // imprevisto obtenido del proyecto
+        $imprevisto = ($subtotalPartida * $infoPro->imprevisto) / 100;
+
+        // total de la partida final
+        $totalPartidaFinal = $subtotalPartida + $imprevisto;
+
+        $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
+
+        $lista = Bolson::orderBy('nombre')->get();
+
+        return ['success' => 1, 'lista' => $lista, 'presupuesto' => $totalPartidaFinal];
+    }
 
 
 }

@@ -127,6 +127,10 @@ Route::post('/admin/buscar/material/soloproyecto',  [ProyectoController::class,'
 Route::post('/admin/proyecto/estado/informacion',  [ProyectoController::class,'informacionEstadoProyecto']);
 // editar estado de un proyecto
 Route::post('/admin/proyecto/estado/editar',  [ProyectoController::class,'editarEstadoProyecto']);
+// obtener todos los bolsones
+Route::post('/admin/bolsones/todos/informacion',  [ProyectoController::class,'obtenerLosBolsones']);
+
+
 
 // --- VISTA DE PROYECTO ---
 

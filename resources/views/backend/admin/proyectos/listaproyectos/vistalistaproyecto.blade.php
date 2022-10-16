@@ -248,7 +248,7 @@
                                     </div>
                                 @endcan
 
-                            <!-- ver planilla de proyecto -->
+                                <!-- ver planilla de proyecto -->
                                 @can('boton.ver.planilla')
                                     <div class="form-group" id="divBtnPlanilla" >
                                         <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionPlanilla()">
@@ -394,6 +394,56 @@
         </div>
     </div>
 
+
+    <!-- modal para seleccionar bolsón para asignar a un proyecto. USADO CUANDO SE APRUEBA PRESUPUESTO PROYECTO -->
+
+    <div class="modal fade" id="modalBolsonPendiente" tabindex="-10">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Aprobar Presupuesto</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="formulario">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <label>Presupuesto de Proyecto</label>
+                                        <label id="texto-presupuesto" class="form-control"></label>
+                                    </div>
+
+                                    <hr>
+                                    <br>
+
+                                    <div class="form-group">
+                                        <select class="form-control" id="select-bolson-pendiente" onchange="infoSaldoBolson(this)">
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Saldo de Bolsón</label>
+                                        <label id="texto-bolson-pendiente" class="form-control"></label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" onclick="aprobarPresupuesto()">Aprobar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </div>
@@ -805,22 +855,50 @@
             window.location.href="{{ url('/admin/movicuentaproy/indexmovicuentaproy') }}/"+id;
         }
 
+        // aquí se abre modal para asignar un bolsón al presupuesto
         function btnAprobarPresupuesto(){
 
-            Swal.fire({
-                title: 'Aprobar Presupuesto',
-                text: "",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aprobar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    aprobarPresupuesto();
-                }
+            var id = document.getElementById('id-proyecto').value;
+            document.getElementById("texto-presupuesto").innerHTML = '';
+
+            openLoading();
+            // solo obtener los bolsones
+
+            document.getElementById("texto-bolson-pendiente").innerHTML = "";
+
+            axios.post(url+'/bolsones/todos/informacion', {
+                'id' : id
             })
+                .then((response) => {
+                    closeLoading();
+
+                  if(response.data.success === 1){
+
+                      $('#modalOpcion').modal('hide');
+                      $('#modalPresupuesto').modal('hide');
+                      $('#modalBolsonPendiente').modal('show');
+
+                      let presupuesto = response.data.presupuesto;
+
+                      document.getElementById("texto-presupuesto").innerHTML = presupuesto;
+
+                      document.getElementById("select-bolson-pendiente").options.length = 0;
+
+                      $('#select-bolson-pendiente').append('<option value="0">Seleccionar Bolsón</option>');
+
+                      $.each(response.data.lista, function( key, val ){
+                          $('#select-bolson-pendiente').append('<option value='+val.id+'>'+val.nombre+'</option>');
+                      });
+
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
         }
 
         function aprobarPresupuesto(){
@@ -1017,11 +1095,96 @@
                 .then((response) => {
                     closeLoading();
 
+                    // cualquier intento de modificar estados si proyecto ya estaba finalizado
                     if(response.data.success === 1){
+
+                        let titulo = response.data.titulo;
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: titulo,
+                            text: mensaje,
+                            icon: 'error',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
+                    // puede actualizarse, a PRIORIZADO
+                    else if(response.data.success === 2) {
+
                         $('#modalEstadoProyecto').modal('hide');
-                        toastr.success('actualizado')
+                        toastr.success('Actualizado a PRIORIZADO');
+                        recargar();
 
                     }
+                    else if(response.data.success === 3){
+
+                        // varios estados cuando no se puede actualizar
+
+                        let titulo = response.data.titulo;
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: titulo,
+                            text: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    } else if(response.data.success === 4){
+
+                        // estado a INICIADO
+
+                        $('#modalEstadoProyecto').modal('hide');
+                        toastr.success('Actualizado a INICIADO');
+                        recargar();
+
+                    } else if(response.data.success === 5){
+
+                        // estado a PAUSADO
+
+                        $('#modalEstadoProyecto').modal('hide');
+                        toastr.success('Actualizado a PAUSADO');
+                        recargar();
+                    }
+
+                    else if(response.data.success === 6){
+
+                        // estado a FINALIZADO
+                        $('#modalEstadoProyecto').modal('hide');
+
+                        Swal.fire({
+                            title: "Finalizado",
+                            text: "Si el proyecto tiene saldo disponible, regresara al Bolsón que esta asignado",
+                            icon: 'success',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                recargar();
+                            }
+                        })
+                    }
+
                     else {
                         toastr.error('Error al Actualizar');
                     }
@@ -1030,6 +1193,13 @@
                     toastr.error('Error al Actualizar');
                     closeLoading();
                 });
+        }
+
+        function infoSaldoBolson(e){
+            let id = $(e).val();
+
+            console.log(id);
+
 
         }
 
