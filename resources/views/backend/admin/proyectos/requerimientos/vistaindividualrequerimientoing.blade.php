@@ -466,7 +466,6 @@
                 .then((response) => {
                     closeLoading();
 
-
                     if(response.data.success === 1){
 
                         Swal.fire({

@@ -22,6 +22,7 @@ class CreateProyectosTable extends Migration
             $table->bigInteger('id_areagestion')->nullable()->unsigned();
             $table->bigInteger('id_naturaleza')->nullable()->unsigned();
             $table->bigInteger('id_estado')->nullable()->unsigned();
+            $table->bigInteger('id_bolson')->nullable()->unsigned();
 
             $table->string('codigo',100)->unique();
             $table->string('nombre',300);
@@ -46,7 +47,7 @@ class CreateProyectosTable extends Migration
             // 0: default
             // 1: listo para revisión
             // 2: aprobado
-            $table->boolean('presu_aprobado');
+            $table->integer('presu_aprobado');
             $table->dateTime('fecha_aprobado')->nullable();
 
             // utilizado para que jefe presupuesto de permiso de 1 movimiento de cuenta
@@ -60,6 +61,7 @@ class CreateProyectosTable extends Migration
             $table->foreign('id_areagestion')->references('id')->on('areagestion');
             $table->foreign('id_naturaleza')->references('id')->on('naturaleza');
             $table->foreign('id_estado')->references('id')->on('estado_proyecto');
+            $table->foreign('id_bolson')->references('id')->on('bolson');
         });
     }
 

@@ -26,6 +26,14 @@
                                         <button type="button" class="btn btn-primary btn-xs" onclick="modalOpciones({{ $dato }})">
                                             <i class="fas fa-edit" title="Opciones"></i>&nbsp; Opciones
                                         </button>
+
+                                        @can('boton.modal.estados.proyectos')
+                                        <br><br>
+                                        <button type="button" class="btn btn-info btn-xs" onclick="modalEstados({{ $dato->id }})">
+                                            <i class="fas fa-list-alt" title="Estados"></i>&nbsp; Estados
+                                        </button>
+                                        @endcan
+
                                     </td>
                                 </tr>
                             @endforeach

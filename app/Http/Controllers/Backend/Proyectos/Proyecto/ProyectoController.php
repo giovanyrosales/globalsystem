@@ -63,83 +63,38 @@ class ProyectoController extends Controller
             return ['success' => 1];
         }
 
-        if($request->hasFile('documento')) {
-
-            $cadena = Str::random(15);
-            $tiempo = microtime();
-            $union = $cadena . $tiempo;
-            $nombre = str_replace(' ', '_', $union);
-
-            $extension = '.' . $request->documento->getClientOriginalExtension();
-            $nomDocumento = $nombre . strtolower($extension);
-            $avatar = $request->file('documento');
-            $archivo = Storage::disk('archivos')->put($nomDocumento, \File::get($avatar));
-
-            if($archivo){
-
-                $p = new Proyecto();
-                $p->codigo = $request->codigo;
-                $p->nombre = $request->nombre;
-                $p->ubicacion = $request->ubicacion;
-                $p->id_naturaleza = $request->naturaleza;
-                $p->id_areagestion = $request->areagestion;
-                $p->id_linea = $request->linea;
-                $p->id_fuentef = $request->fuentef;
-                $p->id_fuenter = $request->fuenter;
-                $p->contraparte = $request->contraparte;
-                $p->codcontable = $request->codcontable;
-                $p->fechaini = $request->fechainicio;
-                $p->acuerdoapertura = $nomDocumento;
-                $p->ejecutor = $request->ejecutor;
-                $p->id_estado = 1; // en espera
-                $p->formulador = $request->formulador;
-                $p->supervisor = $request->supervisor;
-                $p->encargado = $request->encargado;
-                $p->fecha = Carbon::now('America/El_Salvador');
-                $p->presu_aprobado = 0;
-                $p->fecha_aprobado = null;
-                $p->imprevisto = 5; // por default, después se puede modificar
-                $p->permiso = 0;
-
-                if($p->save()){
-                    return ['success' => 2];
-                }else{
-                    return ['success' => 99];
-                }
-            }
-            else{
-                return ['success' => 99];
-            }
-        }else{
             $p = new Proyecto();
-            $p->codigo = $request->codigo;
-            $p->nombre = $request->nombre;
-            $p->ubicacion = $request->ubicacion;
-            $p->id_naturaleza = $request->naturaleza;
-            $p->id_areagestion = $request->areagestion;
-            $p->id_linea = $request->linea;
-            $p->id_fuentef = $request->fuentef;
-            $p->id_fuenter = $request->fuenter;
-            $p->contraparte = $request->contraparte;
-            $p->codcontable = $request->codcontable;
-            $p->fechaini = $request->fechainicio;
-            $p->ejecutor = $request->ejecutor;
-            $p->id_estado = 1; // en espera
-            $p->formulador = $request->formulador;
-            $p->supervisor = $request->supervisor;
-            $p->encargado = $request->encargado;
-            $p->fecha = Carbon::now('America/El_Salvador');
-            $p->monto = 0;
-            $p->presu_aprobado = 0;
-            $p->fecha_aprobado = null;
-            $p->imprevisto = 5; // por default, después se puede modificar
-            $p->permiso = 0;
+        $p->id_linea = $request->linea;
+        $p->id_fuentef = $request->fuentef;
+        $p->id_fuenter = $request->fuenter;
+        $p->id_areagestion = $request->areagestion;
+        $p->id_naturaleza = $request->naturaleza;
+        $p->id_estado = null;
+        $p->id_bolson = null;
+        $p->codigo = $request->codigo;
+        $p->nombre = $request->nombre;
+        $p->ubicacion = $request->ubicacion;
+        $p->contraparte = $request->contraparte;
+        $p->fechaini = null;
+        $p->fechafin = null;
+        $p->fecha = Carbon::now('America/El_Salvador');
+        $p->ejecutor = $request->ejecutor;
+        $p->formulador = $request->formulador;
+        $p->supervisor = $request->supervisor;
+        $p->encargado = $request->encargado;
+        $p->codcontable = $request->codcontable;
+        $p->acuerdoapertura = null;
+        $p->acuerdocierre = null;
+        $p->monto = 0;
+        $p->imprevisto = 5; // por default, después se puede modificar
+        $p->presu_aprobado = 0;
+        $p->fecha_aprobado = null;
+        $p->permiso = 0;
 
-            if($p->save()){
-                return ['success' => 2];
-            }else{
-                return ['success' => 99];
-            }
+        if($p->save()){
+            return ['success' => 2];
+        }else{
+            return ['success' => 99];
         }
     }
 
@@ -233,75 +188,88 @@ class ProyectoController extends Controller
             return ['success' => 1];
         }
 
-        if ($request->hasFile('documento')) {
+        DB::beginTransaction();
 
-            $cadena = Str::random(15);
-            $tiempo = microtime();
-            $union = $cadena . $tiempo;
-            $nombre = str_replace(' ', '_', $union);
+        try {
 
-            $extension = '.' . $request->documento->getClientOriginalExtension();
-            $nomDocumento = $nombre . strtolower($extension);
-            $avatar = $request->file('documento');
-            $archivo = Storage::disk('archivos')->put($nomDocumento, \File::get($avatar));
+            $infoProyecto = Proyecto::where('id', $request->id)->first();
 
-            if ($archivo) {
+            if ($request->hasFile('documento')) {
 
-                $info = Proyecto::where('id', $request->id)->first();
-                $documentoOld = $info->acuerdoapertura;
+                $cadena = Str::random(15);
+                $tiempo = microtime();
+                $union = $cadena . $tiempo;
+                $nombre = str_replace(' ', '_', $union);
 
-                Proyecto::where('id', $request->id)->update([
-                    'codigo' => $request->codigo,
-                    'nombre' => $request->nombre,
-                    'ubicacion' => $request->ubicacion,
-                    'id_naturaleza' => $request->naturaleza,
-                    'id_areagestion' => $request->areagestion,
-                    'id_linea' => $request->linea,
-                    'id_fuentef' => $request->fuentef,
-                    'id_fuenter' => $request->fuenter,
-                    'contraparte' => $request->contraparte,
-                    'codcontable' => $request->codcontable,
-                    'fechaini' => $request->fechainicio,
-                    'acuerdoapertura' => $nomDocumento,
-                    'ejecutor' => $request->ejecutor,
-                    'formulador' => $request->formulador,
-                    'supervisor' => $request->supervisor,
-                    'encargado' => $request->encargado,
-                    'monto' => $request->monto,
-                    'id_estado' => $request->estado,
-                ]);
+                $extension = '.' . $request->documento->getClientOriginalExtension();
+                $nomDocumento = $nombre . strtolower($extension);
+                $avatar = $request->file('documento');
+                $archivo = Storage::disk('archivos')->put($nomDocumento, \File::get($avatar));
 
-                // borrar documento anterior
-                if (Storage::disk('archivos')->exists($documentoOld)) {
-                    Storage::disk('archivos')->delete($documentoOld);
+                if ($archivo) {
+
+                    $documentoOld = $infoProyecto->acuerdoapertura;
+
+                    $pro = Proyecto::find($request->id);
+                    $pro->codigo = $request->codigo;
+                    $pro->nombre = $request->nombre;
+                    $pro->ubicacion = $request->ubicacion;
+                    $pro->id_naturaleza = $request->naturaleza;
+                    $pro->id_areagestion = $request->areagestion;
+                    $pro->id_linea = $request->linea;
+                    $pro->id_fuentef = $request->fuentef;
+                    $pro->id_fuenter = $request->fuenter;
+                    $pro->contraparte = $request->contraparte;
+                    $pro->codcontable = $request->codcontable;
+                    if($infoProyecto->presu_aprobado == 2){ // aprobado
+                        $pro->fechaini = $request->fechainicio;
+                        $pro->acuerdoapertura = $nomDocumento;
+                    }
+                    $pro->ejecutor = $request->ejecutor;
+                    $pro->formulador = $request->formulador;
+                    $pro->supervisor = $request->supervisor;
+                    $pro->encargado = $request->encargado;
+                    $pro->save();
+
+                    // borrar documento anterior
+                    if (Storage::disk('archivos')->exists($documentoOld)) {
+                        Storage::disk('archivos')->delete($documentoOld);
+                    }
+
+                    DB::commit();
+                    return ['success' => 2];
+                } else {
+                    return ['success' => 99];
                 }
-
-                return ['success' => 2];
             } else {
-                return ['success' => 3];
-            }
-        } else {
-            Proyecto::where('id', $request->id)->update([
-                'codigo' => $request->codigo,
-                'nombre' => $request->nombre,
-                'ubicacion' => $request->ubicacion,
-                'id_naturaleza' => $request->naturaleza,
-                'id_areagestion' => $request->areagestion,
-                'id_linea' => $request->linea,
-                'id_fuentef' => $request->fuentef,
-                'id_fuenter' => $request->fuenter,
-                'contraparte' => $request->contraparte,
-                'codcontable' => $request->codcontable,
-                'fechaini' => $request->fechainicio,
-                'ejecutor' => $request->ejecutor,
-                'formulador' => $request->formulador,
-                'supervisor' => $request->supervisor,
-                'encargado' => $request->encargado,
-                'monto' => $request->monto,
-                'id_estado' => $request->estado,
-            ]);
 
-            return ['success' => 2];
+                $pro = Proyecto::find($request->id);
+                $pro->codigo = $request->codigo;
+                $pro->nombre = $request->nombre;
+                $pro->ubicacion = $request->ubicacion;
+                $pro->id_naturaleza = $request->naturaleza;
+                $pro->id_areagestion = $request->areagestion;
+                $pro->id_linea = $request->linea;
+                $pro->id_fuentef = $request->fuentef;
+                $pro->id_fuenter = $request->fuenter;
+                $pro->contraparte = $request->contraparte;
+                $pro->codcontable = $request->codcontable;
+                if($infoProyecto->presu_aprobado == 2){ // aprobado
+                    $pro->fechaini = $request->fechainicio;
+                }
+                $pro->ejecutor = $request->ejecutor;
+                $pro->formulador = $request->formulador;
+                $pro->supervisor = $request->supervisor;
+                $pro->encargado = $request->encargado;
+                $pro->save();
+
+                DB::commit();
+                return ['success' => 2];
+            }
+
+        }catch(\Throwable $e){
+            DB::rollback();
+            return ['success' => 99];
         }
     }
 
@@ -2073,6 +2041,132 @@ class ProyectoController extends Controller
 
         return view('backend.admin.proyectos.modal.modalcatalogomaterial', compact('presupuesto'));
     }
+
+    // información de un estado de proyecto
+    public function informacionEstadoProyecto(Request $request){
+
+        $arrayEstado = EstadoProyecto::orderBy('id', 'ASC')->get();
+        $infoProyecto = Proyecto::where('id', $request->id)->first();
+
+
+        return ['success' => 1, 'info' => $infoProyecto, 'arrayEstado' => $arrayEstado];
+    }
+
+    // editar estado de un proyecto
+    public function editarEstadoProyecto(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+            'idestado' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        $infoProyecto = Proyecto::where('id', $request->id)->first();
+
+        // ESTADOS
+        // 1: priorizado: solo si presu no esta aprobado se puede volver a colocar
+        // 2: iniciado: // siempre se puede volver a colocar
+        // 3: en pausa: // siempre se puede volver a colocar
+        // 4: finalizado: // solo 1 vez se puede colocar en el proyecto
+
+        // cualquier intento de modificar si presupuesto esta finalizado, retornar error;
+        if($infoProyecto->idestado == 4){
+            $mensaje = "El Proyecto fue Finalizado";
+            return ['success' => 1, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+        }
+
+        // PRIORIZADO
+        if($request->idestado == 1){
+
+            // puede cambiarse se está en modo desarrollo, el modo revisión
+            // es solo por evitar alguna cosa rara
+            if($infoProyecto->presu_aprobado == 0 || $infoProyecto->presu_aprobado == 1){
+                // puede actualizarse, á priorizado
+                return ['success' => 2];
+            }else{
+                // presupuesto ya aprobado, no puede volver a colocar estado priorizado
+                $mensaje = "El Presupuesto ya esta Aprobado";
+                return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+            }
+        }
+
+        // INICIADO: puede crear requerimientos y necesita bolsón
+        else if($request->idestado == 2){
+
+            if($infoProyecto->presu_aprobado == 0 || $infoProyecto->presu_aprobado == 1){
+                // presupuesto no aprobado aun
+                $mensaje = "El Presupuesto No esta Aprobado";
+                return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+            }else{
+                // presupuesto ya aprobado. Y verificar que haya bolsón.
+
+                if($infoProyecto->id_bolson == null){
+
+                    // bolsón no encontrado
+                    $mensaje = "Verificar Proyecto, no se encuentra Bolsón asignado";
+                    return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+
+                }else{
+                    // bolsón encontrado, se puede crear requerimientos
+                    return ['success' => 4];
+                }
+            }
+        }
+
+        // EN PAUSA: no se puede crear requerimientos.
+        else if($request->idestado == 3){
+
+            if($infoProyecto->presu_aprobado == 0){
+                // presupuesto no aprobado aun
+                $mensaje = "El Presupuesto No esta Aprobado";
+                return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+            }else{
+                // presupuesto ya aprobado. Y verificar que haya bolsón.
+
+                if($infoProyecto->id_bolson != null){
+
+                    // se puede PAUSAR
+                    return ['success' => 5];
+
+                }else{
+                    // esto fuera raro, ya que al aprobar presupuesto se debe seleccionar a una cuenta bolsón
+                    $mensaje = "Verificar que bolsón exista en el Proyecto";
+                    return ['success' => 3, 'titulo' => 'No Encontrado', 'mensaje' => $mensaje];
+                }
+            }
+        }
+        // FINALIZADO: se devuelve dinero a bolsón
+        else if($request->idestado == 4){
+
+            if($infoProyecto->presu_aprobado == 0){
+                // presupuesto no aprobado aun
+                $mensaje = "El Presupuesto No esta Aprobado";
+                return ['success' => 3, 'titulo' => 'No Actualizado', 'mensaje' => $mensaje];
+            }else{
+                // presupuesto ya aprobado. Y verificar que haya bolsón.
+
+                if($infoProyecto->id_bolson != null){
+
+                    // se puede FINALIZAR proyecto
+
+                    return ['success' => 6];
+
+                }else{
+                    // null, aunque cuando se aprueba el presupuesto se dice a que
+                    // bolsón utilizar
+                    $mensaje = "Verificar que bolsón exista en el Proyecto";
+                    return ['success' => 3, 'titulo' => 'No Encontrado', 'mensaje' => $mensaje];
+                }
+            }
+        }else{
+            // Error
+            return ['success' => 99];
+        }
+    }
+
 
 
 }

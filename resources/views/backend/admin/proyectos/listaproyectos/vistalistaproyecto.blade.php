@@ -190,42 +190,6 @@
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <hr>
-                                    <label>Sección de Prespuesto</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Monto de proyecto $:</label>
-                                    <input type="number" id="monto"  class="form-control" step="any">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <hr>
-                                    <label>Sección de UACI</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-5">
-                                <div class="form-group">
-                                    <label>Estado del Proyecto:</label>
-                                    <select id="select-estado" class="form-control">
-
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
                     </form>
                 </div>
                 <div class="modal-footer justify-content-between">
@@ -376,6 +340,62 @@
         </div>
     </div>
 
+    <!-- modal para cambiar estado de un proyecto -->
+    <div class="modal fade" id="modalEstadoProyecto">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Estado de Proyecto</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-nuevo">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" id="idproyecto-estado">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Nombre del Proyecto:</label>
+                                        <input type="text" disabled class="form-control" id="nombreproyecto-estado">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Presupuesto de Proyecto</label>
+                                        <input type="text" disabled id="nompresupuesto-estado" class="form-control">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Bolsón Asignado</label>
+                                        <input type="text" disabled id="nombolson-estado" class="form-control">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Estado de Proyecto</label>
+                                        <select class="form-control" id="select-estado-proyecto">
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="actualizarEstado()">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </div>
 
 
@@ -427,19 +447,31 @@
                             $("body").removeClass("modal-open")
                         });
 
-
                         $('#id-editar').val(response.data.info.id);
                         $('#codigo').val(response.data.info.codigo);
                         $('#nombre').val(response.data.info.nombre);
                         $('#ubicacion').val(response.data.info.ubicacion);
-                        $('#fecha-inicio').val(response.data.info.fechaini);
                         $('#ejecutor').val(response.data.info.ejecutor);
                         $('#formulador').val(response.data.info.formulador);
                         $('#supervisor').val(response.data.info.supervisor);
                         $('#encargado').val(response.data.info.encargado);
                         $('#contraparte').val(response.data.info.contraparte);
                         $('#codcontable').val(response.data.info.codcontable);
-                        $('#monto').val(response.data.info.monto);
+
+
+                        // cuando presupuesto este aprobado, se puede agregar
+                        // fecha de inicio y acuerdo.
+                        // MODO DESARROLLO Y REVISIÓN
+                        if(response.data.info.presu_aprobado === 0 || response.data.info.presu_aprobado === 1){
+                            document.getElementById('fecha-inicio').disabled = true;
+                            document.getElementById('acuerdo-apertura').disabled = true;
+                            $('#fecha-inicio').val('');
+                        }else{
+                            // presupuesto aprobado
+                            document.getElementById('fecha-inicio').disabled = false;
+                            document.getElementById('acuerdo-apertura').disabled = false;
+                            $('#fecha-inicio').val(response.data.info.fechaini);
+                        }
 
                         if(response.data.info.acuerdoapertura === null){
                             document.getElementById("hayAcuerdo").innerHTML = '';
@@ -450,7 +482,6 @@
                         document.getElementById("select-naturaleza").options.length = 0;
                         document.getElementById("select-area-gestion").options.length = 0;
                         document.getElementById("select-linea").options.length = 0;
-                        document.getElementById("select-estado").options.length = 0;
 
                         $.each(response.data.arrayNaturaleza, function( key, val ){
                             if(response.data.info.id_naturaleza == val.id){
@@ -522,22 +553,6 @@
                         });
 
 
-
-                        // *** estado de proyecto
-                        if(response.data.info.id_estado == null){
-                            $('#select-estado').append('<option value="" selected="selected">Ninguna</option>');
-                        }else{
-                            $('#select-estado').append('<option value="">Ninguna</option>');
-                        }
-
-                        $.each(response.data.arrayEstado, function( key, val ){
-                            if (response.data.info.id_estado == val.id) {
-                                $('#select-estado').append('<option value="' + val.id + '" selected="selected">'+ val.nombre + '</option>');
-                            } else {
-                                $('#select-estado').append('<option value="' + val.id + '">' + val.nombre + '</option>');
-                            }
-                        });
-
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -584,8 +599,7 @@
             var formulador = document.getElementById('formulador').value; // null
             var supervisor = document.getElementById('supervisor').value; // null
             var encargado = document.getElementById('encargado').value; // null
-            var monto = document.getElementById('monto').value; // null
-            var estado = document.getElementById('select-estado').value; // null
+
 
             if(codigo.length > 100){
                 toastr.error('Código máximo 100 caracteres');
@@ -649,27 +663,6 @@
                 return;
             }
 
-            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
-
-            if(monto.length > 0){
-                if(!monto.match(reglaNumeroDosDecimal)) {
-                    toastr.error('valor debe ser número Decimal Positivo. Solo se permite 2 Decimales');
-                    return;
-                }
-
-                if(monto < 0){
-                    toastr.error('monto no permite números negativos');
-                    return;
-                }
-
-                if(monto > 99000000){
-                    toastr.error('monto máximo 99 millones de límite');
-                    return;
-                }
-            }else{
-                monto = 0;
-            }
-
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
@@ -689,8 +682,6 @@
             formData.append('formulador', formulador);
             formData.append('supervisor', supervisor);
             formData.append('encargado', encargado);
-            formData.append('monto', monto);
-            formData.append('estado', estado);
 
             axios.post(url+'/proyecto/lista/editar', formData, {
             })
@@ -754,7 +745,7 @@
             let estado = dato.presu_aprobado;
 
             // 1: LISTO PARA REVISIÓN
-            // el boton aparecera si usuario tiene permiso y el estado presupuesto sea 1 o 2
+            // el botón aparecerá si usuario tiene permiso y el estado presupuesto sea 1 o 2
             if(estado === 1 || estado === 2){
                 if (document.getElementById('divModalPresupuesto') !== null) {
                     document.getElementById("divModalPresupuesto").style.display = "block";
@@ -960,6 +951,86 @@
                     toastr.error('error al buscar');
                     closeLoading();
                 });
+        }
+
+        // estados de un proyecto
+        function modalEstados(id){
+            // ID PROYECTO
+
+            let formData = new FormData();
+            formData.append('id', id);
+
+            axios.post(url+'/proyecto/estado/informacion', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                     if(response.data.success === 1){
+
+                         $('#modalEstadoProyecto').modal('show');
+                         $('#idproyecto-estado').val(id);
+
+                         $('#nombreproyecto-estado').val(response.data.info.nombre);
+                         $('#nombolson-estado').val('xxx');
+
+                         // presupuesto total
+                         $('#nompresupuesto-estado').val('xxx');
+
+                        document.getElementById("select-estado-proyecto").options.length = 0;
+
+                        if(response.data.info.id_estado == null){
+                            $('#select-estado-proyecto').append('<option value="" selected="selected">Seleccionar Estado</option>');
+                        }
+
+                        $.each(response.data.arrayEstado, function( key, val ){
+                            if (response.data.info.id_estado == val.id) {
+                                $('#select-estado-proyecto').append('<option value="' + val.id + '" selected="selected">'+ val.nombre + '</option>');
+                            } else {
+                                $('#select-estado-proyecto').append('<option value="' + val.id + '">' + val.nombre + '</option>');
+                            }
+                        });
+
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
+        }
+
+        function actualizarEstado(){
+
+            openLoading();
+
+            var idproy = document.getElementById('idproyecto-estado').value;
+            var idselect = document.getElementById('select-estado-proyecto').value;
+
+            let formData = new FormData();
+            formData.append('id', idproy);
+            formData.append('idestado', idselect);
+
+            axios.post(url+'/proyecto/estado/editar', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalEstadoProyecto').modal('hide');
+                        toastr.success('actualizado')
+
+                    }
+                    else {
+                        toastr.error('Error al Actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al Actualizar');
+                    closeLoading();
+                });
+
         }
 
 

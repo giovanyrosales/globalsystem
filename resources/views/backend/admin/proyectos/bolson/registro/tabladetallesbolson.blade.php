@@ -18,7 +18,7 @@
                                 <tr>
                                     <td>{{ $dato->codigo }}</td>
                                     <td>{{ $dato->objeto }}</td>
-                                    <td>{{ $dato->monto }}</td>
+                                    <td>${{ $dato->monto }}</td>
                                 </tr>
                             @endforeach
 

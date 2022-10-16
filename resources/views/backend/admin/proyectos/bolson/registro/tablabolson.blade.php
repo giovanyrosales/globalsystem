@@ -21,12 +21,12 @@
                                 <tr>
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->num_cuenta }}</td>
-                                    <td>{{ $dato->montoini }}</td>
+                                    <td>${{ $dato->montoini }}</td>
                                     <td>xx</td>
                                     <td>xx</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Información"></i>&nbsp; Información
+                                            <i class="fas fa-eye" title="Información"></i>&nbsp; Cuentas
                                         </button>
                                     </td>
                                 </tr>

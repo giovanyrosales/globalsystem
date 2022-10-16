@@ -123,7 +123,10 @@ Route::get('/admin/ver/presupuesto/saldo/{id}', [ProyectoController::class,'info
 Route::post('/admin/proyecto/estado/presupuesto', [ProyectoController::class, 'cambiarEstadoPresupuesto']);
 // buscar materiales de un determinado presupuesto de proyecto
 Route::post('/admin/buscar/material/soloproyecto',  [ProyectoController::class,'buscadorMaterialRequisicion']);
-
+// información de un estado de proyecto
+Route::post('/admin/proyecto/estado/informacion',  [ProyectoController::class,'informacionEstadoProyecto']);
+// editar estado de un proyecto
+Route::post('/admin/proyecto/estado/editar',  [ProyectoController::class,'editarEstadoProyecto']);
 
 // --- VISTA DE PROYECTO ---
 
@@ -135,7 +138,7 @@ Route::get('/admin/proyecto/lista/tabla/index', [ProyectoController::class,'tabl
 // retorna vista con información del proyecto individual por ID
 Route::get('/admin/proyecto/vista/index/{id}', [ProyectoController::class,'indexProyectoVista']);
 
-// * Bitacoras
+// * Bitácoras
 
 // retorna vista de tabla de las bitácoras de un proyecto por ID
 Route::get('/admin/proyecto/vista/bitacora/{id}', [ProyectoController::class,'tablaProyectoListaBitacora']);

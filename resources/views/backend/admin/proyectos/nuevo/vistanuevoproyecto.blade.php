@@ -136,19 +136,7 @@
                                 <input type="text" maxlength="150" id="codcontable" class="form-control" placeholder="Código contable" autocomplete="off">
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label>Fecha de Inicio:</label>
-                                <input type="date" id="fecha-inicio" class="form-control">
-                            </div>
-                        </div>
 
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Acuerdo Apertura:</label>
-                                <input type="file" id="acuerdo-apertura" class="form-control" accept="image/jpeg, image/jpg, image/png, .pdf"/>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="row">
@@ -243,8 +231,7 @@
             var fuenter = document.getElementById('select-fuente-recursos').value; // null
             var contraparte = document.getElementById('contraparte').value; // null
             var codcontable = document.getElementById('codcontable').value; // null
-            var fechainicio = document.getElementById('fecha-inicio').value; // null
-            var acuerdoApertura = document.getElementById('acuerdo-apertura'); // null file
+
             var ejecutor = document.getElementById('ejecutor').value; // null
             var formulador = document.getElementById('formulador').value; // null
             var supervisor = document.getElementById('supervisor').value; // null
@@ -290,13 +277,6 @@
                 return;
             }
 
-            if(acuerdoApertura.files && acuerdoApertura.files[0]){ // si trae doc
-                if (!acuerdoApertura.files[0].type.match('image/jpeg|image/jpeg|image/png|pdf')){
-                    toastr.error('formato de acuerdo apertura permitido: .png .jpg .jpeg .pdf');
-                    return;
-                }
-            }
-
             if(ejecutor.length > 300){
                 toastr.error('Ejecutor máximo 300 caracteres');
                 return;
@@ -329,8 +309,6 @@
             formData.append('fuenter', fuenter);
             formData.append('contraparte', contraparte);
             formData.append('codcontable', codcontable);
-            formData.append('fechainicio', fechainicio);
-            formData.append('documento', acuerdoApertura);
             formData.append('ejecutor', ejecutor);
             formData.append('formulador', formulador);
             formData.append('supervisor', supervisor);

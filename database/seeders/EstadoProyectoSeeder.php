@@ -14,9 +14,6 @@ class EstadoProyectoSeeder extends Seeder
      */
     public function run()
     {
-        EstadoProyecto::create([
-            'nombre' => 'En Espera'
-        ]);
 
         EstadoProyecto::create([
             'nombre' => 'Priorizado'

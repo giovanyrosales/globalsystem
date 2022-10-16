@@ -144,7 +144,7 @@ class AdministradoresController extends Controller
         if ($info = Proyecto::where('id', $request->id)->first()) {
 
             if($info->presu_aprobado == 1){
-                // presupuesto esta en revisión
+                // presupuesto esta en desarrollo
                 return ['success' => 1];
             }
 

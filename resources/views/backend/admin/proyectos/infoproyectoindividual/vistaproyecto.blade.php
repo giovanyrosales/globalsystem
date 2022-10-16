@@ -70,7 +70,7 @@
                                     </tr>
                                 </table>
 
-                                <!-- Solo se podra modificar el imprevisto, si no esta en revisión o aprobado el presupuesto -->
+                                <!-- Solo se podrá modificar el imprevisto si el Presupuesto esta en Desarrollo -->
                                 @if($proyecto->presu_aprobado == 0)
                                     @can('boton.editar.imprevisto.administrador')
                                     <button type="button" style="margin-top: 15px" onclick="modalImprevisto()" class="btn btn-success btn-sm">
@@ -145,23 +145,32 @@
 
                         @if($proyecto->presu_aprobado == 0 || $proyecto->presu_aprobado == 1)
 
-                            <div class="form-group">
-                                <label>Estado Presupuesto:</label>
-                                <select class="form-control" id="select-estado" onchange="cambiarEstado()" style="width: 45%">
-                                    @if($estado == 0)
-                                        <option value="0" selected>Presupuesto Pendiente</option>
-                                        <option value="1">Listo para Revisión</option>
-                                    @else
-                                        <option value="0">Presupuesto Pendiente</option>
-                                        <option value="1" selected>Listo para Revisión</option>
-                                    @endif
-                                </select>
-                            </div>
+                            <!-- solo cuando proyecto esta PRIORIZADO -->
+                            @if($proyecto->id_estado == 1)
+                                <div class="form-group">
+                                    <label>Estado Presupuesto:</label>
+                                    <select class="form-control" id="select-estado" onchange="cambiarEstado()" style="width: 45%">
+                                        @if($estado == 0)
+                                            <option value="0" selected>Presupuesto Pendiente</option>
+                                            <option value="1">Listo para Revisión</option>
+                                        @else
+                                            <option value="0">Presupuesto Pendiente</option>
+                                            <option value="1" selected>Listo para Revisión</option>
+                                        @endif
+                                    </select>
+                                </div>
+                            @endif
 
+                            <!-- el presupuesto no debe estar aprobado -->
                             @if($proyecto->presu_aprobado == 0)
-                                <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
-                                    Agregar Partida
-                                </button>
+                                <!-- solo se puede agregar partidas si esta priorizado el proyecto -->
+                                @if($proyecto->id_estado == 1)
+                                    <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
+                                        Agregar Partida
+                                    </button>
+                                @else
+                                    <span class="badge bg-info" style="float: right; font-size: 15px">Sin Permiso para Crear Presupuesto</span>
+                                @endif
                             @endif
 
                         @else
