@@ -1037,7 +1037,7 @@
             // como tienen la misma cantidad de filas, podemos recorrer
             // todas las filas de una vez
             for(var p = 0; p < cantidad.length; p++){
-                console.log(cantidad[p]);
+
                 formData.append('cantidad[]', cantidad[p]);
                 formData.append('datainfo[]', descripcionAtributo[p]);
             }
@@ -2094,7 +2094,7 @@
                     }
                 })
                 .catch((error) => {
-                    console.log(error)
+
                     toastr.error('error al crear presupuesto');
                     closeLoading();
                 });

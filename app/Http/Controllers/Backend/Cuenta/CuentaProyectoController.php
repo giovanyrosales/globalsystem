@@ -363,11 +363,10 @@ class CuentaProyectoController extends Controller
             $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
             // obtener todas las salidas de material
-            $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
+            $infoSalidaDetalle = DB::table('cuentaproy_retenido AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $lista->id)
-                ->where('pd.tipo', 0) // salidas, la orden compra es válida
                 ->where('rd.cancelado', 0)
                 ->get();
 
@@ -375,11 +374,10 @@ class CuentaProyectoController extends Controller
                 $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
             }
 
-            $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
+            $infoEntradaDetalle = DB::table('cuentaproy_retenido AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $lista->id)
-                ->where('pd.tipo', 1) // entradas, la orden compra fue cancelada
                 ->where('rd.cancelado', 0)
                 ->get();
 
@@ -676,11 +674,10 @@ class CuentaProyectoController extends Controller
             $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
             // obtener todas las salidas de material
-            $infoSalidaDetalle = DB::table('cuentaproy_detalle AS pd')
+            $infoSalidaDetalle = DB::table('cuentaproy_retenido AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $infoCuentaProyBaja->id)
-                ->where('pd.tipo', 0) // salidas, la orden compra es válida
                 ->where('rd.cancelado', 0)
                 ->get();
 
@@ -688,11 +685,10 @@ class CuentaProyectoController extends Controller
                 $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
             }
 
-            $infoEntradaDetalle = DB::table('cuentaproy_detalle AS pd')
+            $infoEntradaDetalle = DB::table('cuentaproy_retenido AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuentaproy', $infoCuentaProyBaja->id)
-                ->where('pd.tipo', 1) // entradas, la orden compra fue cancelada
                 ->where('rd.cancelado', 0)
                 ->get();
 

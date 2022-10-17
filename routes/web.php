@@ -129,7 +129,8 @@ Route::post('/admin/proyecto/estado/informacion',  [ProyectoController::class,'i
 Route::post('/admin/proyecto/estado/editar',  [ProyectoController::class,'editarEstadoProyecto']);
 // obtener todos los bolsones
 Route::post('/admin/bolsones/todos/informacion',  [ProyectoController::class,'obtenerLosBolsones']);
-
+// información de saldo de bolsón, ya con todos sus descuentos
+Route::post('/admin/bolson/saldo/detalle/informacion',  [ProyectoController::class,'infoSaldoBolson']);
 
 
 // --- VISTA DE PROYECTO ---

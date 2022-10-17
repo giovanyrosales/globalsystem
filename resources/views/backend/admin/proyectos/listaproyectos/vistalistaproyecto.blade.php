@@ -367,7 +367,7 @@
 
                                     <div class="form-group">
                                         <label>Presupuesto de Proyecto</label>
-                                        <input type="text" disabled id="nompresupuesto-estado" class="form-control">
+                                        <input type="text" style="font-weight: bold" disabled id="nompresupuesto-estado" class="form-control">
                                     </div>
 
                                     <div class="form-group">
@@ -421,6 +421,7 @@
                                     <hr>
                                     <br>
 
+                                    <label>Asignar Bolsón a Proyecto</label>
                                     <div class="form-group">
                                         <select class="form-control" id="select-bolson-pendiente" onchange="infoSaldoBolson(this)">
                                         </select>
@@ -439,7 +440,7 @@
 
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-success" onclick="aprobarPresupuesto()">Aprobar</button>
+                    <button type="button" class="btn btn-success" onclick="preguntaAprobarPresupuesto()">Aprobar</button>
                 </div>
             </div>
         </div>
@@ -901,8 +902,30 @@
                 });
         }
 
+        function preguntaAprobarPresupuesto(){
+
+            Swal.fire({
+                title: 'Aprobar Presupuesto',
+                text: "Se asignara Cuenta Bolsón a Proyecto",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: "Cancelar",
+                confirmButtonText: 'Aprobar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    aprobarPresupuesto();
+                }
+            })
+        }
+
         function aprobarPresupuesto(){
+
+            openLoading();
+
             var id = document.getElementById('id-proyecto').value;
+
             $('#modalOpcion').modal('hide');
 
             axios.post(url+'/proyecto/aprobar/presupuesto', {
@@ -910,6 +933,7 @@
             })
                 .then((response) => {
                     closeLoading();
+
                     if(response.data.success === 1){
                         // el estado ha cambiado para su aprobación
                         $('#modalPresupuesto').modal('hide');
@@ -1049,10 +1073,20 @@
                          $('#idproyecto-estado').val(id);
 
                          $('#nombreproyecto-estado').val(response.data.info.nombre);
-                         $('#nombolson-estado').val('xxx');
 
-                         // presupuesto total
-                         $('#nompresupuesto-estado').val('xxx');
+                         // Presupuesto aprobado
+                         if(response.data.info.presu_aprobado === 2){
+                             let monto = response.data.info.monto;
+                             $('#nompresupuesto-estado').val('$' + monto);
+                         }else{
+                             $('#nompresupuesto-estado').val('Pendiente de Aprobación');
+                         }
+
+                         if(response.data.info.id_bolson != null) {
+                             $('#nombolson-estado').val('');
+                         }else{
+                             $('#nombolson-estado').val('Pendiente de Asignación');
+                         }
 
                         document.getElementById("select-estado-proyecto").options.length = 0;
 
@@ -1195,10 +1229,38 @@
                 });
         }
 
+        // información de saldo bolsón
         function infoSaldoBolson(e){
+
+            // id select bolson
             let id = $(e).val();
 
-            console.log(id);
+            if(id == '0'){
+                document.getElementById("texto-bolson-pendiente").innerHTML = '';
+                return;
+            }
+
+            openLoading();
+
+            axios.post(url+'/bolson/saldo/detalle/informacion', {
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        document.getElementById("texto-bolson-pendiente").innerHTML = response.data.monto;
+
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
 
 
         }

@@ -29,7 +29,7 @@ class CreateBolsonTable extends Migration
             // será la suma de objetos específicos, del año de presupuesto de unidad
             $table->decimal('monto_inicial', 10, 2);
 
-            $table->foreign('id_anio')->references('id')->on('cuenta');
+            $table->foreign('id_anio')->references('id')->on('p_anio_presupuesto');
         });
     }
 

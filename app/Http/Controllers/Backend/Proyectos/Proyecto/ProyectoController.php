@@ -1713,11 +1713,34 @@ class ProyectoController extends Controller
                     return ['success' => 3];
                 }
 
+
+                //-------------------------------------------------------------
+                // OBTENER MONTO INICIAL DE PRESUPUESTO PROYECTO PARA VER SI HAY
+                // FONDOS EN BOLSÓN
+
+                // dinero monto partida
+
+                 $montoPartida = $this->montoFinalPartidaProyecto($request->id);
+
+                // verificar que haya saldo en bolsón
+
+                // - verificar dinero restado a bolsón por presupuesto de proyecto
+                // - verificar cuando proyecto finaliza y devuelve dinero a bolsón
+                // hasta de las partidas adicionales
+
+
+
+
+
+                //-------------------------------------------------------------
+
                 // pasar a modo aprobado
                 Proyecto::where('id', $request->id)->update([
                     'fecha_aprobado' => Carbon::now('America/El_Salvador'),
                     'presu_aprobado' => 2]);
 
+
+                //*************** OBTENER SALDO DE CADA CÓDIGO */
 
                 $partidas = Partida::where('proyecto_id', $request->id)
                     ->orderBy('id')
@@ -1826,6 +1849,9 @@ class ProyectoController extends Controller
                     $presu->saldo_inicial = $suma;
                     $presu->save();
                 }
+
+
+                // Saldos de cada código guardados.
 
                 DB::commit();
                 return ['success' => 2];
@@ -2049,7 +2075,6 @@ class ProyectoController extends Controller
         $arrayEstado = EstadoProyecto::orderBy('id', 'ASC')->get();
         $infoProyecto = Proyecto::where('id', $request->id)->first();
 
-
         return ['success' => 1, 'info' => $infoProyecto, 'arrayEstado' => $arrayEstado];
     }
 
@@ -2200,17 +2225,53 @@ class ProyectoController extends Controller
         }
     }
 
+    // obtener todos los bolsones
     public function obtenerLosBolsones(Request $request){
 
         // OBTENER EL TOTAL DE LAS PARTIDAS. PARA MOSTRAR AL USUARIO CUANTO DINERO SE USARA Y
         // ELEGIR EL BOLSÓN
 
-        $partida1 = Partida::where('proyecto_id', $request->id)
+        $montoPartida = $this->montoFinalPartidaProyecto($request->id);
+        $montoPartida = "$" . number_format((float)$montoPartida, 2, '.', ',');
+
+        $lista = Bolson::orderBy('nombre')->get();
+
+        return ['success' => 1, 'lista' => $lista, 'presupuesto' => $montoPartida];
+    }
+
+    // información de saldo de bolsón, ya con todos sus descuentos
+    public function infoSaldoBolson(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($info = Bolson::where('id', $request->id)->first()){
+
+            // obtner salidas y entradas de un bolson
+
+            $monto = "$" . number_format((float)$info->monto_inicial, 2, '.', ',');
+
+            return ['success' => 1, 'monto' => $monto];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+    // utilizado para obtener monto final de una partida. llamado solo de controlador
+    function montoFinalPartidaProyecto($id){
+
+        $partida1 = Partida::where('proyecto_id', $id)
             ->whereIn('id_tipopartida', [1, 2, 5])
             ->orderBy('id', 'ASC')
             ->get();
 
-        $infoPro = Proyecto::where('id', $request->id)->first();
+        $infoPro = Proyecto::where('id', $id)->first();
 
         $resultsBloque = array();
         $index = 0;
@@ -2248,7 +2309,7 @@ class ProyectoController extends Controller
             $index++;
         }
 
-        $manoobra = Partida::where('proyecto_id', $request->id)
+        $manoobra = Partida::where('proyecto_id', $id)
             ->where('id_tipopartida', 3)
             ->orderBy('id', 'ASC')
             ->get();
@@ -2286,7 +2347,7 @@ class ProyectoController extends Controller
 
         // APORTE DE MANO DE OBRA
 
-        $aporteManoObra = Partida::where('proyecto_id', $request->id)
+        $aporteManoObra = Partida::where('proyecto_id', $id)
             ->where('id_tipopartida', 4)
             ->get();
 
@@ -2308,7 +2369,7 @@ class ProyectoController extends Controller
 
         // ALQUILER DE MAQUINARIA
 
-        $alquilerMaquinaria = Partida::where('proyecto_id', $request->id)
+        $alquilerMaquinaria = Partida::where('proyecto_id', $id)
             ->where('id_tipopartida', 5)
             ->get();
 
@@ -2330,7 +2391,7 @@ class ProyectoController extends Controller
 
         // TRANSPORTE CONCRETO FRESCO
 
-        $trasportePesado = Partida::where('proyecto_id', $request->id)
+        $trasportePesado = Partida::where('proyecto_id', $id)
             ->where('id_tipopartida', 6)
             ->get();
 
@@ -2367,13 +2428,7 @@ class ProyectoController extends Controller
         $imprevisto = ($subtotalPartida * $infoPro->imprevisto) / 100;
 
         // total de la partida final
-        $totalPartidaFinal = $subtotalPartida + $imprevisto;
-
-        $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
-
-        $lista = Bolson::orderBy('nombre')->get();
-
-        return ['success' => 1, 'lista' => $lista, 'presupuesto' => $totalPartidaFinal];
+        return ($this->redondear_dos_decimal($subtotalPartida + $imprevisto));
     }
 
 
