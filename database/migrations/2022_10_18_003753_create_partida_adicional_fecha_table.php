@@ -19,6 +19,8 @@ class CreatePartidaAdicionalFechaTable extends Migration
             $table->bigInteger('id_proyecto')->unsigned();
 
             $table->date('fecha');
+
+            // acuerdo de obra adicional
             $table->string('documento', 100)->nullable();
 
             // 0: en desarrollo
