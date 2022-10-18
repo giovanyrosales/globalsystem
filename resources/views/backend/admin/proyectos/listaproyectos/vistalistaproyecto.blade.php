@@ -904,6 +904,14 @@
 
         function preguntaAprobarPresupuesto(){
 
+
+            var sel = document.getElementById('select-bolson-pendiente').value;
+
+            if(sel == '0'){
+                toastr.error('Cuenta Bolsón es requerido');
+                return;
+            }
+
             Swal.fire({
                 title: 'Aprobar Presupuesto',
                 text: "Se asignara Cuenta Bolsón a Proyecto",
@@ -915,21 +923,23 @@
                 confirmButtonText: 'Aprobar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    aprobarPresupuesto();
+                    aprobarPresupuesto(sel);
                 }
             })
         }
 
-        function aprobarPresupuesto(){
+        function aprobarPresupuesto(sel){
 
             openLoading();
-
             var id = document.getElementById('id-proyecto').value;
+
+            let formData = new FormData();
+            formData.append('id', id);
+            formData.append('idbolson', sel);
 
             $('#modalOpcion').modal('hide');
 
-            axios.post(url+'/proyecto/aprobar/presupuesto', {
-                'id' : id
+            axios.post(url+'/proyecto/aprobar/presupuesto', formData, {
             })
                 .then((response) => {
                     closeLoading();

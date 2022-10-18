@@ -9,6 +9,7 @@ use App\Models\AreaGestion;
 use App\Models\Bitacora;
 use App\Models\BitacoraDetalle;
 use App\Models\Bolson;
+use App\Models\BolsonProyecto;
 use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
@@ -1687,6 +1688,9 @@ class ProyectoController extends Controller
     // petición para aprobar el presupuesto y guardar las cuentas proyecto
     public function aprobarPresupuesto(Request $request){
 
+        // id   (ID PROYECTO)
+        // idbolson
+
         if($pro = Proyecto::where('id', $request->id)->first()){
 
             DB::beginTransaction();
@@ -1713,6 +1717,11 @@ class ProyectoController extends Controller
                     return ['success' => 3];
                 }
 
+                if(!Bolson::where('id', $request->idbolson)->first()){
+                    // solo mostrar error, ya que no podría enviar bolsón sin ID
+                    return ['success' => 99];
+                }
+
 
                 //-------------------------------------------------------------
                 // OBTENER MONTO INICIAL DE PRESUPUESTO PROYECTO PARA VER SI HAY
@@ -1727,6 +1736,20 @@ class ProyectoController extends Controller
                 // - verificar dinero restado a bolsón por presupuesto de proyecto
                 // - verificar cuando proyecto finaliza y devuelve dinero a bolsón
                 // hasta de las partidas adicionales
+
+                // obtener cuanto dinero queda en bolsón ya que muchos proyectos asignados a un bolsón
+
+                $arrayBolsonMonto = BolsonProyecto::where('id_bolson', $request->idbolson)->get();
+
+                $proyectoMontoBolson = 0; // esto sobra del bolsón solo de proyectos asignados
+
+                foreach ($arrayBolsonMonto as $dd){
+                    $infoPro = Proyecto::where('id', $dd->id_proyecto)->first();
+
+                    $proyectoMontoBolson += $infoPro->monto;
+                }
+
+                // obtener dinero descontado cuando una partida adicional está aprobada
 
 
 
