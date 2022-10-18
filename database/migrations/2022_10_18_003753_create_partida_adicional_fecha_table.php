@@ -27,6 +27,9 @@ class CreatePartidaAdicionalFechaTable extends Migration
 
             $table->integer('estado');
 
+            // solo tendrá un valor cuando es aprobada la partida adicional
+            $table->decimal('monto', 10, 2);
+
             $table->foreign('id_proyecto')->references('id')->on('proyectos');
         });
     }
