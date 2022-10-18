@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Backend\Proyectos\Proyecto;
 
 
 use App\Http\Controllers\Controller;
-use App\Models\Acta;
 use App\Models\AreaGestion;
 use App\Models\Bitacora;
 use App\Models\BitacoraDetalle;
 use App\Models\Bolson;
-use App\Models\BolsonProyecto;
 use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
@@ -24,6 +22,7 @@ use App\Models\Naturaleza;
 use App\Models\ObjEspecifico;
 use App\Models\Orden;
 use App\Models\Partida;
+use App\Models\PartidaAdicionalContenedor;
 use App\Models\PartidaDetalle;
 use App\Models\Proveedores;
 use App\Models\Proyecto;
@@ -65,7 +64,7 @@ class ProyectoController extends Controller
             return ['success' => 1];
         }
 
-            $p = new Proyecto();
+        $p = new Proyecto();
         $p->id_linea = $request->linea;
         $p->id_fuentef = $request->fuentef;
         $p->id_fuenter = $request->fuenter;
@@ -92,6 +91,7 @@ class ProyectoController extends Controller
         $p->presu_aprobado = 0;
         $p->fecha_aprobado = null;
         $p->permiso = 0;
+        $p->permiso_partida_adic = 0;
 
         if($p->save()){
             return ['success' => 2];
@@ -1696,12 +1696,12 @@ class ProyectoController extends Controller
             DB::beginTransaction();
             try {
 
-                if ($pro->presu_aprobado != 1) {
+                if ($pro->presu_aprobado == 0) {
                     // presupuesto cambio estado y está en desarrollo
                     return ['success' => 1];
                 }
 
-                if ($pro->presu_aprobado === 2) {
+                if ($pro->presu_aprobado == 2) {
                     // presupuesto ya aprobado y no hacer nada
                     return ['success' => 2];
                 }
@@ -1737,147 +1737,187 @@ class ProyectoController extends Controller
                 // - verificar cuando proyecto finaliza y devuelve dinero a bolsón
                 // hasta de las partidas adicionales
 
-                // obtener cuanto dinero queda en bolsón ya que muchos proyectos asignados a un bolsón
+                //*****************
 
-                $arrayBolsonMonto = BolsonProyecto::where('id_bolson', $request->idbolson)->get();
+                // obtener cuanto dinero queda en bolsón, ya que muchos proyectos asignados a un bolsón
 
-                $proyectoMontoBolson = 0; // esto sobra del bolsón solo de proyectos asignados
+                $proyectoMontoBolson = Proyecto::where('id_bolson', $request->idbolson)
+                    ->sum('monto');
 
-                foreach ($arrayBolsonMonto as $dd){
-                    $infoPro = Proyecto::where('id', $dd->id_proyecto)->first();
-
-                    $proyectoMontoBolson += $infoPro->monto;
-                }
+                //*****************
 
                 // obtener dinero descontado cuando una partida adicional está aprobada
 
+                $partidaAdicionalMonto = PartidaAdicionalContenedor::where('id_proyecto', $request->id)
+                    ->where('estado', 2) // partidas aprobadas
+                    ->sum('monto');
+
+                //*****************
+
+                // obtener monto de los proyectos que han finalizado
+
+                $proyectoFinalizadoMonto = Proyecto::where('id_bolson', $request->idbolson)
+                    ->where('id_estado', 4)
+                    ->sum('monto_finalizado');
+
+                //*****************
+
+                // dinero inicial de bolsón
+
+                $montoBolsonInicial = Bolson::where('id', $request->idbolson)->sum('monto_inicial');
+
+                // montoPartida: es el monto de las partidas presupuesto de proyecto para aprobar
+                // proyectoMontoBolson: es el monto de las partidas aprobadas de todos los proyectos a bolson
+                // partidaAdicionalMonto: es el monto de las partidas adicionales aprobadas
+                // proyectoFinalizadoMonto: es el monto sobrante de un proyecto cuando se finaliza
+
+                $sumatoria = $montoPartida + $proyectoMontoBolson + $partidaAdicionalMonto + $proyectoFinalizadoMonto;
+
+                if($this->redondear_dos_decimal($montoBolsonInicial) < $this->redondear_dos_decimal($sumatoria)){
+                    // el bolsón no tiene fondos suficientes
+                    // se necesita
+
+                    $bolsonActual = $montoBolsonInicial - ($proyectoMontoBolson + $partidaAdicionalMonto + $proyectoFinalizadoMonto);
+                    $montoRequerido = $montoBolsonInicial - $sumatoria;
+                    $montoRequerido = abs($montoRequerido);
+
+                    $bolsonActual = number_format((float)$bolsonActual, 2, '.', ',');
+                    $montoRequerido = number_format((float)$montoRequerido, 2, '.', ',');
+
+                    return ['success' => 4, 'actual' => $bolsonActual, 'requerido' => $montoRequerido];
+                }else{
+
+                    // si hay fondos en bolsón
+
+                    //-------------------------------------------------------------
+
+                    // pasar a modo aprobado
+                    Proyecto::where('id', $request->id)->update([
+                        'fecha_aprobado' => Carbon::now('America/El_Salvador'),
+                        'presu_aprobado' => 2]);
 
 
+                    //*************** OBTENER SALDO DE CADA CÓDIGO */
 
-
-                //-------------------------------------------------------------
-
-                // pasar a modo aprobado
-                Proyecto::where('id', $request->id)->update([
-                    'fecha_aprobado' => Carbon::now('America/El_Salvador'),
-                    'presu_aprobado' => 2]);
-
-
-                //*************** OBTENER SALDO DE CADA CÓDIGO */
-
-                $partidas = Partida::where('proyecto_id', $request->id)
-                    ->orderBy('id')
-                    ->get();
-
-                $pilaDetalle = array();
-
-                foreach ($partidas as $pp){
-                    array_push($pilaDetalle, $pp->id);
-                }
-
-                // verificar cada detalle de la partida para ver si tiene objeto especifico
-                $todoDetalle = DB::table('partida_detalle AS p')
-                    ->join('materiales AS m', 'p.material_id', '=', 'm.id')
-                    ->select('m.id_objespecifico', 'm.nombre')
-                    ->whereIn('p.partida_id', $pilaDetalle)
-                    ->get();
-
-                $conteo = 0;
-                foreach ($todoDetalle as $tt){
-                    if($tt->id_objespecifico == null){
-                        $conteo = $conteo + 1;
-                    }
-                }
-
-                if($conteo > 0){
-                    return ['success' => 4, 'conteo' => $conteo];
-                }
-
-                $totalManoObra = 0;
-
-                // CALCULAR LA MANO DE OBRA (POR ADMINISTRACIÓN)
-                foreach ($manoobra as $secciones3) {
-                    $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
-
-                    foreach ($detalle3 as $lista) {
-                        $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                        $multi = $lista->cantidad * $infomaterial->pu;
-                        if ($lista->duplicado != 0) {
-                            $multi = $multi * $lista->duplicado;
-                        }
-
-                        $totalManoObra = $totalManoObra + $multi;
-                    }
-                }
-
-                // cálculos
-                $afp = ($totalManoObra * 7.75) / 100;
-                $isss = ($totalManoObra * 7.5) / 100;
-                $insaforp = ($totalManoObra * 1) / 100;
-
-                $pila = array();
-
-                foreach ($partidas as $dd){
-                    array_push($pila, $dd->id);
-                }
-
-                // agrupando para obtener solo los ID de objetos específicos.
-                $detalles = DB::table('partida_detalle AS pd')
-                    ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
-                    ->select('m.id_objespecifico')
-                    ->whereIn('pd.partida_id', $pila)
-                    ->groupBy('m.id_objespecifico')
-                    ->get();
-
-                // recorrer lista de objetos específicos
-                foreach ($detalles as $det){
-
-                    // obtener lista de materiales
-                    $info = DB::table('partida_detalle AS pd')
-                        ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
-                        ->join('obj_especifico AS obj', 'm.id_objespecifico', '=', 'obj.id')
-                        ->select('m.id_objespecifico', 'pd.cantidad', 'pd.duplicado', 'm.pu', 'obj.codigo')
-                        ->where('m.id_objespecifico', $det->id_objespecifico)
+                    $partidas = Partida::where('proyecto_id', $request->id)
+                        ->orderBy('id')
                         ->get();
 
-                    $suma = 0;
+                    $pilaDetalle = array();
 
-                    // obtener sumatoria de los materiales
-                    foreach ($info as $dato) {
+                    foreach ($partidas as $pp){
+                        array_push($pilaDetalle, $pp->id);
+                    }
 
-                        // SUMA DE ISSS Y AFP
-                        // LOS CÓDIGOS FIJOS
-                        //51402: POR REMUNERACIONES EVENTUALES
-                        if($dato->codigo == 51402){
-                            $suma = $isss + $insaforp;
-                            break;
-                        }
-                        // 51502: POR REMUNERACIONES EVENTUALES (igual al de arriba)
-                        else if($dato->codigo == 51502){
-                            $suma = $afp;
-                            break;
-                        }
+                    // verificar cada detalle de la partida para ver si tiene objeto especifico
+                    $todoDetalle = DB::table('partida_detalle AS p')
+                        ->join('materiales AS m', 'p.material_id', '=', 'm.id')
+                        ->select('m.id_objespecifico', 'm.nombre')
+                        ->whereIn('p.partida_id', $pilaDetalle)
+                        ->get();
 
-                        if ($dato->duplicado > 0) {
-                            $suma = $suma + (($dato->cantidad * $dato->duplicado) * $dato->pu);
-                        } else {
-                            $suma = $suma + ($dato->cantidad * $dato->pu);
+                    $conteo = 0;
+                    foreach ($todoDetalle as $tt){
+                        if($tt->id_objespecifico == null){
+                            $conteo += 1;
                         }
                     }
 
-                    // GUARDAR REGISTRO
-                    $presu = new CuentaProy();
-                    $presu->proyecto_id = $request->id;
-                    $presu->objespeci_id = $det->id_objespecifico;
-                    $presu->saldo_inicial = $suma;
-                    $presu->save();
+                    if($conteo > 0){
+                        return ['success' => 5, 'conteo' => $conteo];
+                    }
+
+                    $totalManoObra = 0;
+
+                    // CALCULAR LA MANO DE OBRA (POR ADMINISTRACIÓN)
+                    foreach ($manoobra as $secciones3) {
+                        $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+                        foreach ($detalle3 as $lista) {
+                            $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                            $multi = $lista->cantidad * $infomaterial->pu;
+                            if ($lista->duplicado != 0) {
+                                $multi = $multi * $lista->duplicado;
+                            }
+
+                            $totalManoObra = $totalManoObra + $multi;
+                        }
+                    }
+
+                    // cálculos
+                    $afp = ($totalManoObra * 7.75) / 100;
+                    $isss = ($totalManoObra * 7.5) / 100;
+                    $insaforp = ($totalManoObra * 1) / 100;
+
+                    $pila = array();
+
+                    foreach ($partidas as $dd){
+                        array_push($pila, $dd->id);
+                    }
+
+                    // agrupando para obtener solo los ID de objetos específicos.
+                    $detalles = DB::table('partida_detalle AS pd')
+                        ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
+                        ->select('m.id_objespecifico')
+                        ->whereIn('pd.partida_id', $pila)
+                        ->groupBy('m.id_objespecifico')
+                        ->get();
+
+                    // recorrer lista de objetos específicos
+                    foreach ($detalles as $det){
+
+                        // obtener lista de materiales
+                        $info = DB::table('partida_detalle AS pd')
+                            ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
+                            ->join('obj_especifico AS obj', 'm.id_objespecifico', '=', 'obj.id')
+                            ->select('m.id_objespecifico', 'pd.cantidad', 'pd.duplicado', 'm.pu', 'obj.codigo')
+                            ->where('m.id_objespecifico', $det->id_objespecifico)
+                            ->get();
+
+                        $suma = 0;
+
+                        // obtener sumatoria de los materiales
+                        foreach ($info as $dato) {
+
+                            // SUMA DE ISSS Y AFP
+                            // LOS CÓDIGOS FIJOS
+                            //51402: POR REMUNERACIONES EVENTUALES
+                            if($dato->codigo == 51402){
+                                $suma = $isss + $insaforp;
+                                break;
+                            }
+                            // 51502: POR REMUNERACIONES EVENTUALES (igual al de arriba)
+                            else if($dato->codigo == 51502){
+                                $suma = $afp;
+                                break;
+                            }
+
+                            if ($dato->duplicado > 0) {
+                                $suma = $suma + (($dato->cantidad * $dato->duplicado) * $dato->pu);
+                            } else {
+                                $suma = $suma + ($dato->cantidad * $dato->pu);
+                            }
+                        }
+
+                        // GUARDAR REGISTRO
+                        $presu = new CuentaProy();
+                        $presu->proyecto_id = $request->id;
+                        $presu->objespeci_id = $det->id_objespecifico;
+                        $presu->saldo_inicial = $suma;
+                        $presu->save();
+                    }
+
+                    // actualizar monto a partida y asignar bolsón
+
+                    Proyecto::where('id', $request->id)->update([
+                        'monto' => $montoPartida,
+                        'id_bolson' => $request->idbolson,
+                    ]);
+
+                    DB::commit();
+                    return ['success' => 2];
                 }
 
-
-                // Saldos de cada código guardados.
-
-                DB::commit();
-                return ['success' => 2];
             }catch(\Throwable $e){
                 Log::info('error: ' . $e);
                 DB::rollback();
@@ -2098,7 +2138,15 @@ class ProyectoController extends Controller
         $arrayEstado = EstadoProyecto::orderBy('id', 'ASC')->get();
         $infoProyecto = Proyecto::where('id', $request->id)->first();
 
-        return ['success' => 1, 'info' => $infoProyecto, 'arrayEstado' => $arrayEstado];
+        $monto = number_format((float)$infoProyecto->monto, 2, '.', ',');
+        
+        $nombolson = '';
+        if($infoBolson = Bolson::where('id', $infoProyecto->id_bolson)->first()){
+            $nombolson = $infoBolson->nombre;
+        }
+
+        return ['success' => 1, 'info' => $infoProyecto, 'arrayEstado' => $arrayEstado, 'monto' => $monto,
+            'nombolson' => $nombolson];
     }
 
     // editar estado de un proyecto
@@ -2266,20 +2314,47 @@ class ProyectoController extends Controller
     public function infoSaldoBolson(Request $request){
 
         $regla = array(
-            'id' => 'required',
+            'idbolson' => 'required',
+            'idproyecto' => 'required',
         );
 
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()){ return ['success' => 0];}
 
-        if($info = Bolson::where('id', $request->id)->first()){
+        if(Bolson::where('id', $request->idbolson)->first()){
 
-            // obtner salidas y entradas de un bolson
+            DB::beginTransaction();
 
-            $monto = "$" . number_format((float)$info->monto_inicial, 2, '.', ',');
+            try {
 
-            return ['success' => 1, 'monto' => $monto];
+                // proyectoMontoBolson: es el monto de las partidas aprobadas de todos los proyectos a bolson
+                // partidaAdicionalMonto: es el monto de las partidas adicionales aprobadas
+                // proyectoFinalizadoMonto: es el monto sobrante de un proyecto cuando se finaliza
+
+                $proyectoMontoBolson = Proyecto::where('id_bolson', $request->idbolson)
+                    ->sum('monto');
+
+                $partidaAdicionalMonto = PartidaAdicionalContenedor::where('id_proyecto', $request->idproyecto)
+                    ->where('estado', 2) // partidas aprobadas
+                    ->sum('monto');
+
+                $proyectoFinalizadoMonto = Proyecto::where('id_bolson', $request->idbolson)
+                    ->where('id_estado', 4)
+                    ->sum('monto_finalizado');
+
+                $montoBolsonInicial = Bolson::where('id', $request->idbolson)->sum('monto_inicial');
+
+                $montoActual = $montoBolsonInicial - ($proyectoMontoBolson + $partidaAdicionalMonto + $proyectoFinalizadoMonto);
+
+                $montoActual = "$" . number_format((float)$montoActual, 2, '.', ',');
+
+                return ['success' => 1, 'monto' => $montoActual];
+            } catch(\Throwable $e){
+                Log::info('ee ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+            }
         }else{
             return ['success' => 2];
         }
@@ -2454,5 +2529,22 @@ class ProyectoController extends Controller
         return ($this->redondear_dos_decimal($subtotalPartida + $imprevisto));
     }
 
+    // obtener información del proyecto
+    public function informacionProyectoIndividual(Request $request){
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($info = Proyecto::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'info' => $info];
+        }else{
+            return ['success' => 2];
+        }
+    }
 
 }

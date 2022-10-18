@@ -131,6 +131,11 @@ Route::post('/admin/proyecto/estado/editar',  [ProyectoController::class,'editar
 Route::post('/admin/bolsones/todos/informacion',  [ProyectoController::class,'obtenerLosBolsones']);
 // información de saldo de bolsón, ya con todos sus descuentos
 Route::post('/admin/bolson/saldo/detalle/informacion',  [ProyectoController::class,'infoSaldoBolson']);
+// obtener información del proyecto
+Route::post('/admin/proyecto/informacion/individual',  [ProyectoController::class,'informacionProyectoIndividual']);
+
+
+
 
 
 // --- VISTA DE PROYECTO ---
@@ -264,6 +269,17 @@ Route::post('/admin/movimientohistorico/verificar/informacion',  [CuentaProyecto
 Route::post('/admin/movimientohistorico/denegar/borrar',  [CuentaProyectoController::class,'denegarBorrarMovimientoCuenta']);
 // autorizar y verificar el movimiento de cuenta
 Route::post('/admin/movimientohistorico/autorizar/actualizar',  [CuentaProyectoController::class,'autorizarMovimientoCuenta']);
+
+
+// * PARTIDAS ADICIONALES
+// retorna vista con las partidas adicionales de un x proyecto
+Route::get('/admin/partida/adicional/contenedor/index/{id}', [CuentaProyectoController::class,'indexPartidaAdicionalContenedor']);
+// retorna tabla con las partidas adicionales de un x proyecto
+Route::get('/admin/partida/adicional/contenedor/tabla/{id}', [CuentaProyectoController::class,'tablaPartidaAdicionalContenedor']);
+// autorizar que se pueda crear partidas adicionales
+Route::post('/admin/partida/adicional/permiso/autorizar',  [CuentaProyectoController::class,'autorizarPartidaAdicionalPermiso']);
+// denegar que se pueda crear partidas adicionales
+Route::post('/admin/partida/adicional/permiso/denegar',  [CuentaProyectoController::class,'denegarPartidaAdicionalPermiso']);
 
 
 

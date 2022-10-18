@@ -80,6 +80,9 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'boton.descargar.reforma.movimiento.cuenta', 'description' => 'utilizado para descargar la reforma de movimiento de cuenta'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'boton.revision.movimiento.cuenta', 'description' => 'utilizado para autorizar o denegar un movimiento de cuenta'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'boton.modal.estados.proyectos', 'description' => 'Ver modal con estado de proyecto'])->syncRoles($roleUaci);
+            Permission::create(['name' => 'boton.modal.vista.partida.adicionales', 'description' => 'para opciones de proyecto, visible para presupuesto'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'boton.autorizar.denegar.partida.adicional', 'description' => 'botón para autorizar crear x partidas adicionales'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'boton.crear.vista.partida.adicionales', 'description' => 'redirecciona a vista contenedor de partida adicional'])->syncRoles($roleAdministrador);
 
 
 

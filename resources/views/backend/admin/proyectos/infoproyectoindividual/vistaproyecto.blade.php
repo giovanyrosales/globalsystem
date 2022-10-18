@@ -80,6 +80,22 @@
                                     @endcan
                                 @endif
 
+                                <!-- permiso para habilitar botón y agregar partidas adicionales -->
+                                <!-- debe estar proyecto en estado INICIADO -->
+                                @if($proyecto->permiso_partida_adic == 1)
+                                    @if($proyecto->id_estado == 2)
+                                        @can('boton.crear.vista.partida.adicionales')
+                                            <button type="button" style="margin-top: 15px" onclick="vistaPartidaAdicional()" class="btn btn-info btn-sm">
+                                                <i class="fas fa-list-alt"></i>
+                                                Partidas Adicionales
+                                            </button>
+                                        @endcan
+                                    @else
+                                        <br>
+                                        <label style="float: left">Proyecto No esta Iniciado</label>
+                                    @endif
+                                @endif
+
                             </div>
                         </div>
                     </div>
@@ -106,11 +122,16 @@
                                   </button>
                               </div>
 
-                              @can('boton.agregar.requisicion')
-                                  <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-success btn-sm">
-                                      Agregar Requisición
-                                  </button>
-                              @endcan
+                            <!-- unicamente puede agregar requisición si proyecto esta iniciado -->
+                                  @can('boton.agregar.requisicion')
+                                      @if($proyecto->id_estado == 2)
+                                          <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-success btn-sm">
+                                              Agregar Requisición
+                                          </button>
+                                      @else
+                                              <label style="float: right">Proyecto No esta Iniciado</label>
+                                      @endif
+                                  @endcan
                           @endif
 
                       </div>
@@ -2928,6 +2949,12 @@
 
                 }
             })
+        }
+
+
+        function vistaPartidaAdicional(){
+            var id = {{ $id }}; // id proyecto
+            window.location.href = "{{ url('/admin/partida/adicional/contenedor/index') }}/" + id;
         }
 
 

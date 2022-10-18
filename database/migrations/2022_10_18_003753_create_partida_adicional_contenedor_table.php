@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePartidaAdicionalFechaTable extends Migration
+class CreatePartidaAdicionalContenedorTable extends Migration
 {
     /**
      * CONTENEDOR PRINCIPAL PARA ALMACENAR LAS PARTIDAS ADICIONALES,
@@ -14,7 +14,7 @@ class CreatePartidaAdicionalFechaTable extends Migration
      */
     public function up()
     {
-        Schema::create('partida_adicional_fecha', function (Blueprint $table) {
+        Schema::create('partida_adicional_contenedor', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_proyecto')->unsigned();
 
@@ -43,6 +43,6 @@ class CreatePartidaAdicionalFechaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('partida_adicional_fecha');
+        Schema::dropIfExists('partida_adicional_contenedor');
     }
 }

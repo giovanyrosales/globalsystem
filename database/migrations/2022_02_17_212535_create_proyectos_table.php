@@ -38,7 +38,11 @@ class CreateProyectosTable extends Migration
             $table->string('codcontable', 150)->nullable();
             $table->string('acuerdoapertura', 100)->nullable(); // file
             $table->string('acuerdocierre', 100)->nullable(); // file
-            $table->decimal('monto', 12, 2)->nullable();
+            $table->decimal('monto', 12, 2); // defecto sera 0
+
+            // cuando se finaliza un proyecto se calcula los montos restantes
+            $table->decimal('monto_finalizado', 12, 2);
+
 
             // el imprevisto para aumentar dinero a proyecto
             $table->integer('imprevisto');
@@ -54,6 +58,11 @@ class CreateProyectosTable extends Migration
             // 0: no permiso
             // 1: permiso
             $table->boolean('permiso');
+
+            // utilizado para habilitar botón para agregar partidas adicionales
+            $table->boolean('permiso_partida_adic');
+
+
 
             $table->foreign('id_linea')->references('id')->on('linea');
             $table->foreign('id_fuentef')->references('id')->on('fuentef');

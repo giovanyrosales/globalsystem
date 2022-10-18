@@ -274,6 +274,14 @@
                                     </div>
                                 @endcan
 
+                                @can('boton.modal.vista.partida.adicionales')
+                                    <div class="form-group" id="divContenedorPartidaAdicional" >
+                                        <button type="button" style="width: 100%;" class="btn btn-info" onclick="vistaPartidaAdicional()">
+                                            <i class="fas fa-list-alt" title="Partida Adicional"></i>&nbsp; Partida Adicional
+                                        </button>
+                                    </div>
+                                @endcan
+
                             </div>
                         </div>
                     </div>
@@ -772,9 +780,6 @@
         // modal para varias opciones de proyecto
         function modalOpciones(dato){
 
-            // VIENE ID PROYECTO
-            $('#id-proyecto').val(dato.id);
-
             // ocultar botones
 
             if (document.getElementById('divModalPresupuesto') !== null) {
@@ -793,31 +798,65 @@
                 document.getElementById("divContenedorMovimiento").style.display = "none";
             }
 
-            let estado = dato.presu_aprobado;
-
-            // 1: LISTO PARA REVISIÓN
-            // el botón aparecerá si usuario tiene permiso y el estado presupuesto sea 1 o 2
-            if(estado === 1 || estado === 2){
-                if (document.getElementById('divModalPresupuesto') !== null) {
-                    document.getElementById("divModalPresupuesto").style.display = "block";
-                }
-
-                if(estado === 2){
-                    if (document.getElementById('divBtnPlanilla') !== null) {
-                        document.getElementById("divBtnPlanilla").style.display = "block";
-                    }
-
-                    if (document.getElementById('divContenedorSaldos') !== null) {
-                        document.getElementById("divContenedorSaldos").style.display = "block";
-                    }
-
-                    if (document.getElementById('divContenedorMovimiento') !== null) {
-                        document.getElementById("divContenedorMovimiento").style.display = "block";
-                    }
-                }
+            if (document.getElementById('divContenedorPartidaAdicional') !== null) {
+                document.getElementById("divContenedorPartidaAdicional").style.display = "none";
             }
 
-            $('#modalOpcion').modal('show');
+
+            // VIENE ID PROYECTO
+            $('#id-proyecto').val(dato.id);
+
+            // OBTENER INFORMACION DEL PROYECTO POR SEGUIRIDAD
+
+            openLoading();
+            axios.post(url+'/proyecto/informacion/individual', {
+                'id' : dato.id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        let estado = response.data.info.presu_aprobado;
+
+
+                        // 1: LISTO PARA REVISIÓN
+                        // el botón aparecerá si usuario tiene permiso y el estado presupuesto sea 1 o 2
+                        if(estado === 1 || estado === 2){
+                            if (document.getElementById('divModalPresupuesto') !== null) {
+                                document.getElementById("divModalPresupuesto").style.display = "block";
+                            }
+
+                            if(estado === 2){
+                                if (document.getElementById('divBtnPlanilla') !== null) {
+                                    document.getElementById("divBtnPlanilla").style.display = "block";
+                                }
+
+                                if (document.getElementById('divContenedorSaldos') !== null) {
+                                    document.getElementById("divContenedorSaldos").style.display = "block";
+                                }
+
+                                if (document.getElementById('divContenedorMovimiento') !== null) {
+                                    document.getElementById("divContenedorMovimiento").style.display = "block";
+                                }
+
+                                if (document.getElementById('divContenedorPartidaAdicional') !== null) {
+                                    document.getElementById("divContenedorPartidaAdicional").style.display = "block";
+                                }
+                            }
+                        }
+
+                        $('#modalOpcion').modal('show');
+                    }
+                    else {
+                        toastr.error('Error al buscar información');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar información');
+                    closeLoading();
+                });
         }
 
 
@@ -854,6 +893,12 @@
             // ID PROYECTO
             var id = document.getElementById('id-proyecto').value;
             window.location.href="{{ url('/admin/movicuentaproy/indexmovicuentaproy') }}/"+id;
+        }
+
+        function vistaPartidaAdicional(){
+            // ID PROYECTO
+            var id = document.getElementById('id-proyecto').value;
+            window.location.href="{{ url('/admin/partida/adicional/contenedor/index') }}/"+id;
         }
 
         // aquí se abre modal para asignar un bolsón al presupuesto
@@ -999,7 +1044,34 @@
                             }
                         })
                     }
+
                     else if(response.data.success === 4){
+                        $('#modalPresupuesto').modal('hide');
+
+                        let actual = response.data.actual;
+                        let requerido = response.data.requerido;
+
+                        var texto = "El Bolsón no cuenta con suficientes Fondos. " + "<br>" +
+                            "Monto Actual $" + actual + "<br>" +
+                            "Monto Requerido $" + requerido + "<br>";
+
+                        Swal.fire({
+                            title: 'Fondo Insuficientes',
+                            html: texto,
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
+                    else if(response.data.success === 5){
                        let conteo = response.data.conteo;
 
                         document.getElementById('modalPresupuesto').style.overflowY = 'auto';
@@ -1018,7 +1090,6 @@
 
                             }
                         })
-
                     }
                     else{
                         toastr.error('error al aprobar');
@@ -1086,14 +1157,15 @@
 
                          // Presupuesto aprobado
                          if(response.data.info.presu_aprobado === 2){
-                             let monto = response.data.info.monto;
-                             $('#nompresupuesto-estado').val('$' + monto);
+
+                             $('#nompresupuesto-estado').val('$' + response.data.monto);
                          }else{
                              $('#nompresupuesto-estado').val('Pendiente de Aprobación');
                          }
 
                          if(response.data.info.id_bolson != null) {
-                             $('#nombolson-estado').val('');
+
+                             $('#nombolson-estado').val(response.data.nombolson);
                          }else{
                              $('#nombolson-estado').val('Pendiente de Asignación');
                          }
@@ -1243,17 +1315,23 @@
         function infoSaldoBolson(e){
 
             // id select bolson
-            let id = $(e).val();
+            let idbolson = $(e).val();
+            var idproyecto = document.getElementById('id-proyecto').value;
 
-            if(id == '0'){
+
+            if(idbolson == '0'){
                 document.getElementById("texto-bolson-pendiente").innerHTML = '';
                 return;
             }
 
             openLoading();
 
-            axios.post(url+'/bolson/saldo/detalle/informacion', {
-                'id' : id
+            let formData = new FormData();
+            formData.append('idproyecto', idproyecto);
+            formData.append('idbolson', idbolson);
+
+            axios.post(url+'/bolson/saldo/detalle/informacion', formData, {
+
             })
                 .then((response) => {
                     closeLoading();

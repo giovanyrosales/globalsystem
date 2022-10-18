@@ -7,6 +7,7 @@ use App\Models\Cuenta;
 use App\Models\CuentaProy;
 use App\Models\MoviCuentaProy;
 use App\Models\ObjEspecifico;
+use App\Models\PartidaAdicionalContenedor;
 use App\Models\Planilla;
 use App\Models\Proyecto;
 use Illuminate\Http\Request;
@@ -882,5 +883,61 @@ class CuentaProyectoController extends Controller
             return ['success' => 99];
         }
     }
+
+
+    //***************  PARTIDAS ADICIONALES  *********************
+
+
+    public function indexPartidaAdicionalContenedor($id){
+        // id PROYECTO
+
+        $infoPro = Proyecto::where('id', $id)->first();
+
+        return view('backend.admin.proyectos.partidaadicional.contenedor.vistacontenedorpartidaadicional', compact('id', 'infoPro'));
+    }
+
+
+    public function tablaPartidaAdicionalContenedor($id){
+        // id PROYECTO
+
+        $lista = PartidaAdicionalContenedor::where('id_proyecto', $id)
+            ->orderBy('fecha', 'ASC')
+            ->get();
+
+        foreach ($lista as $dd){
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+        }
+
+        return view('backend.admin.proyectos.partidaadicional.contenedor.tablacontenedorpartidaadicional', compact('lista'));
+    }
+
+    // autorizar que se pueda crear partidas adicionales
+    public function autorizarPartidaAdicionalPermiso(Request $request){
+        if(Proyecto::where('id', $request->id)->first()){
+
+            Proyecto::where('id', $request->id)->update([
+                'permiso_partida_adic' => 1
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    // denegar que se pueda crear partidas adicionales
+    public function denegarPartidaAdicionalPermiso(Request $request){
+        if(Proyecto::where('id', $request->id)->first()){
+
+            Proyecto::where('id', $request->id)->update([
+                'permiso_partida_adic' => 0
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
 
 }

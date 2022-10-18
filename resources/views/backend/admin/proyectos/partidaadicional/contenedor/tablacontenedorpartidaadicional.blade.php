@@ -7,22 +7,20 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Código</th>
-                                <th>Obj Específico</th>
-                                <th>Saldo Inicial</th>
-                                <th>Saldo Restante</th>
-                                <th>Saldo Retenido</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Monto</th>
+                                <th>Documento</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($presupuesto as $dato)
+                            @foreach($lista as $dato)
 
-                                    <td>{{ $dato->codigo }}</td>
-                                    <td>{{ $dato->nombre }}</td>
-                                    <td>${{ $dato->saldo_inicial }}</td>
-                                    <td>${{ $dato->saldo_restante }}</td>
+                                    <td>{{ $dato->fecha }}</td>
+                                    <td>{{ $dato->estado }}</td>
+                                    <td>${{ $dato->monto }}</td>
                                     <td>${{ $dato->total_retenido }}</td>
 
                                     <td>
@@ -35,6 +33,7 @@
                                             @endif
                                         @endcan
                                     </td>
+                                </tr>
                             @endforeach
 
                             </tbody>
