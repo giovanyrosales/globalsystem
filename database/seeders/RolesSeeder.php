@@ -82,7 +82,10 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'boton.modal.estados.proyectos', 'description' => 'Ver modal con estado de proyecto'])->syncRoles($roleUaci);
             Permission::create(['name' => 'boton.modal.vista.partida.adicionales', 'description' => 'para opciones de proyecto, visible para presupuesto'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'boton.autorizar.denegar.partida.adicional', 'description' => 'botón para autorizar crear x partidas adicionales'])->syncRoles($rolePresupuesto);
-            Permission::create(['name' => 'boton.crear.vista.partida.adicionales', 'description' => 'redirecciona a vista contenedor de partida adicional'])->syncRoles($roleAdministrador);
+            Permission::create(['name' => 'boton.crear.vista.partida.adicionales', 'description' => 'redirecciona a vista contenedor de partida adicional'])->syncRoles($roleIng);
+            Permission::create(['name' => 'boton.modal.crear.solicitud.partida.adicional', 'description' => 'abrir modal para crear solicitud partida adicional'])->syncRoles($roleIng);
+            Permission::create(['name' => 'boton.borrar.contenedor.partida.adicional', 'description' => 'borra el contenedor con todas las partidas adicionales'])->syncRoles($roleIng);
+            Permission::create(['name' => 'boton.crear.partida.adicional', 'description' => 'boton para abrir modal y crear una partida adicional'])->syncRoles($roleIng);
 
 
 

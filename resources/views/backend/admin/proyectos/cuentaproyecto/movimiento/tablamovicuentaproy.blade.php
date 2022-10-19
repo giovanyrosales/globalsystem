@@ -18,7 +18,7 @@
                             <tbody>
 
                             @foreach($presupuesto as $dato)
-
+                                <tr>
                                     <td>{{ $dato->codigo }}</td>
                                     <td>{{ $dato->nombre }}</td>
                                     <td>${{ $dato->saldo_inicial }}</td>
@@ -35,6 +35,7 @@
                                             @endif
                                         @endcan
                                     </td>
+                                </tr>
                             @endforeach
 
                             </tbody>

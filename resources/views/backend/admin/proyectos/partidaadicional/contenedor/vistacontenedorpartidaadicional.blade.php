@@ -22,11 +22,7 @@
         <div class="container-fluid">
             <div class="row mb-6">
                 <div class="col-sm-5">
-                    <h1>Partidas Adicionales</h1>
-                    <button type="button" style="margin-top: 15px" onclick="verHistorico()" class="btn btn-primary btn-sm">
-                        <i class="fas fa-list-alt"></i>
-                        Histórico
-                    </button>
+                    <h1>Solicitudes para Partidas Adicionales</h1>
 
                     <!-- Botón para dar permiso y crear x partidas adicionales. Para jefe presupuesto -->
                     @can('boton.autorizar.denegar.partida.adicional')
@@ -41,6 +37,14 @@
                                 Autorizar Partidas Adicionales
                             </button>
                         @endif
+                    @endcan
+
+                <!-- Botón para crear solicitud de partida adicional -->
+                    @can('boton.modal.crear.solicitud.partida.adicional')
+                    <button type="button" style="margin-top: 15px" onclick="modalSolicitudPartidaAdicional()" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus"></i>
+                        Crear Solicitud Partida Adicional
+                    </button>
                     @endcan
 
                 </div>
@@ -67,11 +71,12 @@
         </div>
     </section>
 
+
     <div class="modal fade" id="modalAgregar">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nuevo Movimiento</h4>
+                    <h4 class="modal-title">Nueva Solicitud de Partida Adicional</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -82,59 +87,10 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-                                    <div class="form-group">
-                                        <input type="hidden" class="form-control" id="id-editar">
-                                    </div>
-
-                                    <label>Cuenta a Aumentar</label>
-                                    <hr style="height:1px;border:none;color:#333;background-color:#333;">
-
-
                                     <div class="col-md-8">
                                         <div class="form-group">
-                                            <label>Objeto Específico</label>
-                                            <input type="text" disabled class="form-control" id="codigo">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-8">
-                                        <div class="form-group">
-                                            <label>Cuenta</label>
-                                            <input type="text" disabled class="form-control" id="cuenta">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Saldo Restante</label>
-                                            <input type="text" disabled placeholder="0.00" class="form-control" id="saldo-restante">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Aumento de Saldo</label>
-                                            <input type="text" class="form-control" placeholder="0.00" id="saldo-modificar">
-                                        </div>
-                                    </div>
-
-                                    <hr style="height:1px;border:none;color:#333;background-color:#333;">
-
-                                    <div class="form-group">
-                                        <label>Obj. Específico a Modificar para Disminuir Saldo</label>
-                                        <select class="form-control" id="select-cuentaproy" onchange="buscarSaldoRestante()" style="width: 100%">
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-12 row">
-                                        <div class="form-group col-md-6">
-                                            <label>Fecha:</label>
-                                            <input type="date" class="form-control" id="fecha-nuevo">
-                                        </div>
-
-                                        <div class="form-group col-md-6">
-                                            <label style="font-weight: bold">Saldo Actual:</label>
-                                            <input type="text" disabled class="form-control" id="restante">
+                                            <label>Fecha de Solicitud</label>
+                                            <input type="date" class="form-control" id="fecha-solicitud">
                                         </div>
                                     </div>
 
@@ -145,7 +101,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="verificar()">Guardar</button>
+                    <button type="button" class="btn btn-primary" onclick="crearSolicitudPartida()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -181,13 +137,6 @@
             let id = {{ $id }}; // id PROYECTO
             var ruta = "{{ URL::to('/admin/partida/adicional/contenedor/tabla') }}/" + id;
             $('#tablaDatatable').load(ruta);
-        }
-
-        // historico de partidas adicionales
-        function verHistorico(){
-            let id = {{ $id }}; // ID PROYECTO
-
-
         }
 
         function modalPermisoAprobar(){
@@ -304,12 +253,148 @@
                 });
         }
 
+        function modalSolicitudPartidaAdicional(){
+            document.getElementById("formulario-nuevo").reset();
+            $('#modalAgregar').modal('show');
+        }
+
+        function crearSolicitudPartida(){
+
+            var fecha = document.getElementById('fecha-solicitud').value;
+
+            if(fecha === ''){
+                toastr.error('Fecha es Requerida');
+                return;
+            }
+
+            let idpro = {{ $id }};
+
+            let formData = new FormData();
+            formData.append('idproyecto', idpro);
+            formData.append('fecha', fecha);
+
+            axios.post(url+'/partida/adicional/crear/solicitud', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalAgregar').modal('hide');
+
+                        recargar();
+
+                        Swal.fire({
+                            title: 'Solicitud Creada',
+                            text: "Ya puede crear Partidas Adicionales",
+                            icon: 'success',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else {
+                        toastr.error('Error al registrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al registrar');
+                    closeLoading();
+                });
+        }
+
+        function infoBorrarContenedor(id){
+
+            Swal.fire({
+                title: 'Borrar Solicitud',
+                text: "No se podrá eliminar si ya esta en modo Revisión o Aprobado",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                closeOnClickOutside: false,
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Borrar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    peticionBorrarContenedor(id);
+                }
+            });
+        }
+
+        function peticionBorrarContenedor(id){
+
+            openLoading();
+
+            axios.post(url+'/partida/adicional/borrar/contenedor', {
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    // esta en modo revisión
+                    if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'Estado Cambio',
+                            text: "La solicitud de Partida esta en modo Revisión",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                               location.reload();
+                            }
+                        })
+                    }
+
+                    // esta aprobado
+                    else if(response.data.success === 2){
+
+                        Swal.fire({
+                            title: 'Estado Cambio',
+                            text: "La solicitud de Partida ya fue Aprobada",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    // borrado
+                    else if(response.data.success === 3){
+                        toastr.success('Solicitud Eliminada');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al borrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al borrar');
+                    closeLoading();
+                });
+        }
 
 
+        function vistaPartidasAdicionales(id){
+            // id Contenedor
 
-
-
-
+            window.location.href="{{ url('/admin/partida/adicional/creacion/index') }}/" + id;
+        }
 
 
     </script>

@@ -18,47 +18,48 @@
                             <tbody>
 
                             @foreach($infoMovimiento as $dato)
+                                <tr>
+                                    <td>{{ $dato->fecha }}</td>
+                                    <td>{{ $dato->cuentaaumenta }}</td>
+                                    <td>{{ $dato->cuentabaja }}</td>
+                                    <td>${{ $dato->dinero }}</td>
 
-                                <td>{{ $dato->fecha }}</td>
-                                <td>{{ $dato->cuentaaumenta }}</td>
-                                <td>{{ $dato->cuentabaja }}</td>
-                                <td>${{ $dato->dinero }}</td>
+                                    @if($dato->autorizado == 0)
+                                        <td><span class="badge bg-warning">Pendiente</span></td>
+                                    @else
+                                        <td><span class="badge bg-success">Autorizada</span></td>
+                                    @endif
 
-                                @if($dato->autorizado == 0)
-                                    <td><span class="badge bg-warning">Pendiente</span></td>
-                                @else
-                                    <td><span class="badge bg-success">Autorizada</span></td>
-                                @endif
+                                    <td>
+                                            @can('boton.agregar.reforma.movimiento.cuenta')
+                                                @if($dato->reforma != null)
+                                                    <a href="{{ url('/admin/movicuentaproy/documento/'.$dato->id) }}">
+                                                        <button class="btn btn-success btn-xs"><i class="fa fa-download"></i> Descargar</button>
+                                                    </a>
+                                                @endif
+                                            @endcan
 
-                                <td>
-                                        @can('boton.agregar.reforma.movimiento.cuenta')
-                                            @if($dato->reforma != null)
-                                                <a href="{{ url('/admin/movicuentaproy/documento/'.$dato->id) }}">
-                                                    <button class="btn btn-success btn-xs"><i class="fa fa-download"></i> Descargar</button>
-                                                </a>
-                                            @endif
-                                        @endcan
+                                            @can('boton.descargar.reforma.movimiento.cuenta')
 
-                                        @can('boton.descargar.reforma.movimiento.cuenta')
-
-                                            @if($dato->reforma == null && $dato->autorizado == 1)
-                                                <button type="button" class="btn btn-success btn-xs" onclick="infoSubirDoc({{ $dato->id }})">
-                                                    <i class="fas fa-upload" title="Cargar Reforma"></i>&nbsp; Cargar Reforma
-                                                </button>
-                                            @endif
-                                        @endcan
-
-                                        @can('boton.revision.movimiento.cuenta')
-
-                                                @if($dato->autorizado == 0)
-                                                    <button type="button" class="btn btn-info btn-xs" onclick="infoRevisarMovimiento({{ $dato->id }})">
-                                                        <i class="fas fa-check" title="Cargar Reforma"></i>&nbsp; Revisar
+                                                @if($dato->reforma == null && $dato->autorizado == 1)
+                                                    <button type="button" class="btn btn-success btn-xs" onclick="infoSubirDoc({{ $dato->id }})">
+                                                        <i class="fas fa-upload" title="Cargar Reforma"></i>&nbsp; Cargar Reforma
                                                     </button>
                                                 @endif
+                                            @endcan
 
-                                        @endcan
+                                            @can('boton.revision.movimiento.cuenta')
 
-                                </td>
+                                                    @if($dato->autorizado == 0)
+                                                        <button type="button" class="btn btn-info btn-xs" onclick="infoRevisarMovimiento({{ $dato->id }})">
+                                                            <i class="fas fa-check" title="Cargar Reforma"></i>&nbsp; Revisar
+                                                        </button>
+                                                    @endif
+
+                                            @endcan
+
+                                    </td>
+                                </tr>
                             @endforeach
 
                             </tbody>

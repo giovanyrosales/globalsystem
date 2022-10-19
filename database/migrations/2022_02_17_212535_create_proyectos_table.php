@@ -41,7 +41,7 @@ class CreateProyectosTable extends Migration
             $table->decimal('monto', 12, 2); // defecto sera 0
 
             // cuando se finaliza un proyecto se calcula los montos restantes
-            $table->decimal('monto_finalizado', 12, 2);
+            $table->decimal('monto_finalizado', 10, 2);
 
 
             // el imprevisto para aumentar dinero a proyecto

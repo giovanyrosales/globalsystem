@@ -10,28 +10,52 @@
                                 <th>Fecha</th>
                                 <th>Estado</th>
                                 <th>Monto</th>
-                                <th>Documento</th>
+                                <th>Documento Obra</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($lista as $dato)
-
+                                <tr>
                                     <td>{{ $dato->fecha }}</td>
-                                    <td>{{ $dato->estado }}</td>
+                                    <td>
+                                        @if($dato->estado == 0)
+                                            <span class="badge bg-info">En Desarrollo</span>
+                                        @elseif($dato->estado == 1)
+                                            <span class="badge bg-gray">En Revisión</span>
+                                        @else
+                                            <span class="badge bg-success">Partida Adicional Aprobada</span>
+                                        @endif
+                                    </td>
+
                                     <td>${{ $dato->monto }}</td>
-                                    <td>${{ $dato->total_retenido }}</td>
+                                    <td>
+                                        @if($dato->documento != null)
+                                            <a href="{{ url('/admin/partida/adicional/obraadicional/doc/'.$dato->id) }}">
+                                                <button class="btn btn-success btn-xs"><i class="fa fa-download"></i> Descargar</button>
+                                            </a>
+                                        @endif
+                                    </td>
 
                                     <td>
-                                        <!-- solo administrador puede hacer un movimiento, si esta autorizado -->
-                                        @can('boton.agregar.movimiento.cuenta')
-                                            @if($dato->permiso == 1)
-                                                <button type="button" class="btn btn-primary btn-xs" onclick="informacionAgregar({{ $dato->id }})">
-                                                    <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aumentar
-                                                </button>
-                                            @endif
+
+                                        <!-- ver todas las partidas detalle -->
+
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="vistaPartidasAdicionales({{ $dato->id }})">
+                                            <i class="fas fa-list-alt" title="Partidas Adicionales"></i>&nbsp; Partidas
+                                        </button>
+
+
+                                        <!-- solo autorizado podra borrar contenedor de partidas adicionales -->
+
+                                        @can('boton.borrar.contenedor.partida.adicional')
+                                        <br><br>
+                                        <button type="button" class="btn btn-danger btn-xs" onclick="infoBorrarContenedor({{ $dato->id }})">
+                                            <i class="fas fa-list-alt" title="Borrar"></i>&nbsp; Borrar
+                                        </button>
                                         @endcan
+
                                     </td>
                                 </tr>
                             @endforeach

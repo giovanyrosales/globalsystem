@@ -7,7 +7,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 10%">Num</th>
+                                <th style="width: 10%">Item</th>
                                 <th style="width: 30%">Nombre</th>
                                 <th style="width: 12%">Opciones</th>
                             </tr>
@@ -21,7 +21,7 @@
 
                                     <td>
                                         @if($presuaprobado == 0)
-                                            <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto('{{ $dato->id }}', '{{ $dato->item }}')">
+                                            <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto({{ $dato }})">
                                                 <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar
                                             </button>
                                             <br> <br>
@@ -29,12 +29,10 @@
                                                 <i class="fas fa-trash-alt" title="Borrar"></i>&nbsp; Borrar
                                             </button>
                                         @else
-                                            <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto('{{ $dato->id }}', '{{ $dato->item }}')">
+                                            <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto({{ $dato }})">
                                                 <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
                                             </button>
                                         @endif
-
-
                                     </td>
                                 </tr>
                             @endforeach

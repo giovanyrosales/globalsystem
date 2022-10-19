@@ -280,6 +280,19 @@ Route::get('/admin/partida/adicional/contenedor/tabla/{id}', [CuentaProyectoCont
 Route::post('/admin/partida/adicional/permiso/autorizar',  [CuentaProyectoController::class,'autorizarPartidaAdicionalPermiso']);
 // denegar que se pueda crear partidas adicionales
 Route::post('/admin/partida/adicional/permiso/denegar',  [CuentaProyectoController::class,'denegarPartidaAdicionalPermiso']);
+// crear solicitud de partida
+Route::post('/admin/partida/adicional/crear/solicitud',  [CuentaProyectoController::class,'crearSolicitudPartidaAdicional']);
+// vista donde se crean ya las partidas adicionales
+Route::get('/admin/partida/adicional/creacion/index/{id}', [CuentaProyectoController::class,'indexCreacionPartidasAdicionales']);
+// tabla donde se crean ya las partidas adicionales
+Route::get('/admin/partida/adicional/creacion/tabla/{id}', [CuentaProyectoController::class,'tablaCreacionPartidasAdicionales']);
+// borrar contenedor de partidas adicionales
+Route::post('/admin/partida/adicional/borrar/contenedor',  [CuentaProyectoController::class,'borrarContenedorPartidaAdicional']);
+// descargar documento de obra adicional
+Route::get('/admin/partida/adicional/obraadicional/doc/{id}', [CuentaProyectoController::class,'documentoObraAdicional']);
+
+
+
 
 
 

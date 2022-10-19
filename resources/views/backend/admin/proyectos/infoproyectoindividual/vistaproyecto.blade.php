@@ -2131,8 +2131,10 @@
             $("#matriz-presupuesto tbody tr").remove();
         }
 
-        function informacionPresupuesto(id, numero){
+        function informacionPresupuesto(dato){
             // habilitar boton
+            let id = dato.id;
+            let numero = dato.item;
 
             openLoading();
             document.getElementById("formulario-presupuesto-editar").reset();
