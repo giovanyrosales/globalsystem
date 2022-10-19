@@ -290,7 +290,9 @@ Route::get('/admin/partida/adicional/creacion/tabla/{id}', [CuentaProyectoContro
 Route::post('/admin/partida/adicional/borrar/contenedor',  [CuentaProyectoController::class,'borrarContenedorPartidaAdicional']);
 // descargar documento de obra adicional
 Route::get('/admin/partida/adicional/obraadicional/doc/{id}', [CuentaProyectoController::class,'documentoObraAdicional']);
-
+// registrar partida adicional con su detalle, validando que no sobrepase el 20%
+// en este caso no se valida que haya fondos en bolsón, sino cuando se aprueba todas las partidas adicionales
+Route::post('/admin/proyecto/agregar/partida/adicional/presupuesto',  [CuentaProyectoController::class,'registrarPartidaAdicional']);
 
 
 

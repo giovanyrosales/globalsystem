@@ -23,6 +23,7 @@ class CreatePartidaDetalleTable extends Migration
             // multiplicar
             $table->integer('duplicado');
 
+            // sin uso
             $table->integer('estado');
 
             $table->foreign('partida_id')->references('id')->on('partida');

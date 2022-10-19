@@ -1024,7 +1024,17 @@ class CuentaProyectoController extends Controller
 
         $fecha = date("d-m-Y", strtotime($infoContenedor->fecha));
 
-        return view('backend.admin.proyectos.partidaadicional.partidas.vistapartidaadicional', compact('id', 'fecha', 'infoContenedor', 'nombreProyecto'));
+        $tipospartida = TipoPartida::orderBy('nombre')->get();
+
+        $conteoPartida = PartidaAdicional::where('id_partidaadic_conte', $id)->count();
+        if($conteoPartida == 0){
+            $conteoPartida = 1;
+        }else{
+            $conteoPartida += 1;
+        }
+
+        return view('backend.admin.proyectos.partidaadicional.partidas.vistapartidaadicional', compact('id', 'fecha',
+            'infoContenedor', 'nombreProyecto', 'tipospartida', 'conteoPartida'));
     }
 
 
@@ -1113,6 +1123,79 @@ class CuentaProyectoController extends Controller
         $nombre = "Doc." . $extension;
 
         return response()->download($pathToFile, $nombre);
+    }
+
+    // registrar partida adicional con su detalle, validando que no sobrepase el 20%
+    // en este caso no sé válida que haya fondos en bolsón, sino cuando se aprueba todas las partidas adicionales
+    public function registrarPartidaAdicional(Request $request){
+
+        $rules = array(
+            'nombrepartida' => 'required',
+            'tipopartida' => 'required',
+            'idcontenedor' => 'required'
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        if($infop = PartidaAdicionalContenedor::where('id', $request->idcontenedor)->first()){
+            //0: presupuesto en desarrollo
+            //1: listo para revision
+            //2: aprobado
+
+            if ($infop->estado == 1){
+                return ['success' => 1];
+            }
+
+            if ($infop->estado == 2){
+                return ['success' => 2];
+            }
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            $r = new PartidaAdicional();
+            $r->id_partidaadic_conte = $request->idcontenedor;
+            $r->nombre = $request->nombrepartida;
+            $r->cantidadp = $request->cantidadpartida;
+            $r->id_tipopartida = $request->tipopartida;
+            $r->save();
+
+            $conteoPartida = PartidaAdicional::where('id_partidaadic_conte', $request->idcontenedor)->count();
+            if($conteoPartida == 0){
+                $conteoPartida = 1;
+            }else{
+                $conteoPartida += 1;
+            }
+
+            // siempre habra registros
+
+            if($request->cantidad != null) {
+                for ($i = 0; $i < count($request->cantidad); $i++) {
+
+                    $rDetalle = new PartidaAdicionalDetalle();
+                    $rDetalle->id_partida_adicional = $r->id;
+                    $rDetalle->material_id = $request->datainfo[$i];
+                    $rDetalle->cantidad = $request->cantidad[$i];
+                    $rDetalle->estado = 0; // sin uso ahorita
+                    $rDetalle->duplicado = $request->duplicado[$i];
+                    $rDetalle->save();
+                }
+            }
+
+            DB::commit();
+            return ['success' => 3, 'contador' => $conteoPartida];
+
+        }catch(\Throwable $e){
+            Log::info('ee' . $e);
+            DB::rollback();
+            return ['success' => 4];
+        }
+
     }
 
 

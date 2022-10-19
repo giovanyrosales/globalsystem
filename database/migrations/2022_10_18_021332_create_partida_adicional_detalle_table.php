@@ -23,7 +23,7 @@ class CreatePartidaAdicionalDetalleTable extends Migration
             // multiplicar
             $table->integer('duplicado');
 
-            // mismo proceso hasta orden de compra, que puede ser cotizado o no
+            // sin uso
             $table->integer('estado');
 
             $table->foreign('id_partida_adicional')->references('id')->on('partida_adicional');

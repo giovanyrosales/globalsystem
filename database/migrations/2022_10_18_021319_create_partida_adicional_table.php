@@ -16,15 +16,13 @@ class CreatePartidaAdicionalTable extends Migration
     {
         Schema::create('partida_adicional', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('id_partidaadic_conte')->unsigned()->nullable();
-            $table->bigInteger('id_proyecto')->unsigned()->nullable();
-            $table->bigInteger('id_tipopartida')->unsigned()->nullable();
+            $table->bigInteger('id_partidaadic_conte')->unsigned();
+            $table->bigInteger('id_tipopartida')->unsigned();
 
             $table->string('nombre', 600);
             $table->string('cantidadp', 50)->nullable(); // cantidad partida
 
             $table->foreign('id_partidaadic_conte')->references('id')->on('partida_adicional_contenedor');
-            $table->foreign('id_proyecto')->references('id')->on('proyectos');
             $table->foreign('id_tipopartida')->references('id')->on('tipo_partida');
         });
     }

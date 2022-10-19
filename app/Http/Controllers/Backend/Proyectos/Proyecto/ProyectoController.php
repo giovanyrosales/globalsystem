@@ -92,6 +92,7 @@ class ProyectoController extends Controller
         $p->fecha_aprobado = null;
         $p->permiso = 0;
         $p->permiso_partida_adic = 0;
+        $p->monto_finalizado = 0;
 
         if($p->save()){
             return ['success' => 2];
@@ -2139,7 +2140,7 @@ class ProyectoController extends Controller
         $infoProyecto = Proyecto::where('id', $request->id)->first();
 
         $monto = number_format((float)$infoProyecto->monto, 2, '.', ',');
-        
+
         $nombolson = '';
         if($infoBolson = Bolson::where('id', $infoProyecto->id_bolson)->first()){
             $nombolson = $infoBolson->nombre;
