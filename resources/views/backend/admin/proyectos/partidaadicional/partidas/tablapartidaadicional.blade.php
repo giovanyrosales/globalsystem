@@ -7,22 +7,22 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Item</th>
-                                <th>Tipo Partida</th>
-                                <th>Nombre</th>
-                                <th>Cantidad Partida</th>
-                                <th>Opciones</th>
+                                <th style="width: 6%">Item</th>
+                                <th style="width: 10%">Tipo Partida</th>
+                                <th style="width: 13%">Nombre</th>
+                                <th style="width: 10%">Cantidad Partida</th>
+                                <th style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($lista as $dato)
                             <tr>
-                                <td>{{ $dato->item }}</td>
-                                <td>{{ $dato->tipopartida }}</td>
-                                <td>{{ $dato->nombre }}</td>
-                                <td>{{ $dato->cantidadp }}</td>
-                                <td>
+                                <td style="width: 6%">{{ $dato->item }}</td>
+                                <td style="width: 10%">{{ $dato->tipopartida }}</td>
+                                <td style="width: 13%">{{ $dato->nombre }}</td>
+                                <td style="width: 10%">{{ $dato->cantidadp }}</td>
+                                <td style="width: 10%">
                                     @if($infoContenedor->estado == 0)
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto({{ $dato }})">
                                             <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar

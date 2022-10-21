@@ -2257,7 +2257,7 @@
                     }
 
                     markup += "<td>"+
-                    "<input name='descripcionPresupuestoEditar[]' data-infopresupuestoeditar='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuestoEditar(this)' maxlength='400'  type='text'>"+
+                    "<input name='descripcionPresupuestoEditar[]' autocomplete='off' data-infopresupuestoeditar='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuestoEditar(this)' maxlength='400'  type='text'>"+
                     "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
                     "</td>"+
 
@@ -2607,7 +2607,6 @@
                     toastr.error('Error al actualizar');
                     closeLoading();
                 });
-
         }
 
         function colorBlancoTablaPresupuestoEditar(){

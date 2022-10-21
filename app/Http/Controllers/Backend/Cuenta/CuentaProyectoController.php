@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Backend\Cuenta;
 
 use App\Http\Controllers\Controller;
+use App\Models\CatalogoMateriales;
 use App\Models\Cuenta;
 use App\Models\CuentaProy;
 use App\Models\MoviCuentaProy;
 use App\Models\ObjEspecifico;
+use App\Models\Partida;
 use App\Models\PartidaAdicional;
 use App\Models\PartidaAdicionalContenedor;
 use App\Models\PartidaAdicionalDetalle;
 use App\Models\Planilla;
 use App\Models\Proyecto;
 use App\Models\TipoPartida;
+use App\Models\UnidadMedida;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -1046,12 +1049,14 @@ class CuentaProyectoController extends Controller
         $infoContenedor = PartidaAdicionalContenedor::where('id', $id)->first();
 
         $lista = PartidaAdicional::where('id_partidaadic_conte', $id)->get();
+        $item = 0;
 
         foreach ($lista as $dd){
 
             $infoTipoPartida = TipoPartida::where('id', $dd->id_tipopartida)->first();
-
             $dd->tipopartida = $infoTipoPartida->nombre;
+            $item += 1;
+            $dd->item = $item;
         }
 
         return view('backend.admin.proyectos.partidaadicional.partidas.tablapartidaadicional', compact('infoContenedor', 'lista'));
@@ -1179,7 +1184,7 @@ class CuentaProyectoController extends Controller
 
                     $rDetalle = new PartidaAdicionalDetalle();
                     $rDetalle->id_partida_adicional = $r->id;
-                    $rDetalle->material_id = $request->datainfo[$i];
+                    $rDetalle->id_material = $request->datainfo[$i];
                     $rDetalle->cantidad = $request->cantidad[$i];
                     $rDetalle->estado = 0; // sin uso ahorita
                     $rDetalle->duplicado = $request->duplicado[$i];
@@ -1193,9 +1198,163 @@ class CuentaProyectoController extends Controller
         }catch(\Throwable $e){
             Log::info('ee' . $e);
             DB::rollback();
-            return ['success' => 4];
+            return ['success' => 99];
+        }
+    }
+
+    // borrar una partida adicional
+    function borrarPartidaAdicional(Request $request){
+
+        // ID partida_adicional
+        $rules = array(
+            'id' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+        if ( $validator->fails()){
+            return ['success' => 0];
         }
 
+        if($infoPartida = PartidaAdicional::where('id', $request->id)->first()){
+
+            $infoContenedor = PartidaAdicionalContenedor::where('id', $infoPartida->id_partidaadic_conte)->first();
+
+            // modo revision
+            if($infoContenedor->estado == 1){
+                return ['success' => 1];
+            }
+
+            // modo aprobado
+            if($infoContenedor->estado == 2){
+                return ['success' => 2];
+            }
+
+            PartidaAdicionalDetalle::where('id_partida_adicional', $infoPartida->id)->delete();
+            PartidaAdicional::where('id', $request->id)->delete();
+
+            return ['success' => 3];
+        }else{
+            return ['success' => 0];
+        }
+    }
+
+
+    function informacionPartidaAdicional(Request $request){
+        // Id PARTIDA ADICIONAL
+
+        $rules = array(
+            'id' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()){
+            return ['success' => 0];
+        }
+
+        if($infoPartida = PartidaAdicional::where('id', $request->id)->first()){
+
+            $infoContenedor = PartidaAdicionalContenedor::where('id', $infoPartida->id_partidaadic_conte)->first();
+            $presuaprobado = $infoContenedor->estado;
+
+            $detalle = PartidaAdicionalDetalle::where('id_partida_adicional', $request->id)
+                ->orderBy('id', 'ASC')
+                ->get();
+
+            foreach ($detalle as $dd){
+
+                $infoMaterial = CatalogoMateriales::where('id', $dd->id_material)->first();
+
+                if($infoUnidad = UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
+                    $dd->descripcion = $infoMaterial->nombre . " - " . $infoUnidad->medida;
+                }else{
+                    $dd->descripcion = $infoMaterial->nombre;
+                }
+            }
+
+            return ['success' => 1, 'info' => $infoPartida, 'detalle' => $detalle, 'estado' => $presuaprobado];
+        }
+        return ['success' => 2];
+    }
+
+
+    public function editarPresupuesto(Request $request){
+
+        DB::beginTransaction();
+
+        try {
+
+            // idpartida   ID PARTIDA ADICIONAL
+
+
+            if($infoPartida = PartidaAdicional::where('id', $request->idpartida)->first()) {
+
+                $infoContenedor = PartidaAdicionalContenedor::where('id', $infoPartida->id_partidaadic_conte)->first();
+
+                // Modo revision
+                if ($infoContenedor->estado == 1) {
+                    return ['success' => 1];
+                }
+
+                // presupuesto aprobado
+                if ($infoContenedor->estado == 2) {
+                    return ['success' => 2];
+                }
+            }
+
+            // actualizar registros requisicion
+            PartidaAdicional::where('id', $request->idpartida)->update([
+                'cantidadp' => $request->cantidadpartida,
+                'nombre' => $request->nombrepartida,
+                'id_tipopartida' => $request->tipopartida
+            ]);
+
+            // agregar id a pila
+            $pila = array();
+            for ($i = 0; $i < count($request->idarray); $i++) {
+                // Los id que sean 0, seran nuevos registros
+                if($request->idarray[$i] != 0) {
+                    array_push($pila, $request->idarray[$i]);
+                }
+            }
+
+            // borrar todos los registros
+            // primero obtener solo la lista de requisición obtenido de la fila
+            // y no quiero que borre los que si vamos a actualizar con los ID
+            PartidaAdicionalDetalle::where('id_partida_adicional', $request->idpartida)
+                ->whereNotIn('id', $pila)
+                ->delete();
+
+            // actualizar registros
+            for ($i = 0; $i < count($request->cantidad); $i++) {
+                if($request->idarray[$i] != 0){
+                    PartidaAdicionalDetalle::where('id', $request->idarray[$i])->update([
+                        'cantidad' => $request->cantidad[$i],
+                        'duplicado' => $request->duplicado[$i],
+                    ]);
+                }
+            }
+
+            // hoy registrar los nuevos registros
+            for ($i = 0; $i < count($request->cantidad); $i++) {
+                if($request->idarray[$i] == 0){
+                    $rDetalle = new PartidaAdicionalDetalle();
+                    $rDetalle->id_partida_adicional = $request->idpartida;
+                    $rDetalle->cantidad = $request->cantidad[$i];
+                    $rDetalle->id_material = $request->datainfo[$i];
+                    $rDetalle->estado = 0;
+                    $rDetalle->duplicado = $request->duplicado[$i];
+                    $rDetalle->save();
+                }
+            }
+
+            DB::commit();
+            return ['success' => 3];
+
+        }catch(\Throwable $e){
+            DB::rollback();
+            return ['success' => 99];
+        }
     }
 
 

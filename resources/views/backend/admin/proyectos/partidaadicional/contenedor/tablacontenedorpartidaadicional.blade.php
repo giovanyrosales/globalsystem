@@ -47,13 +47,19 @@
                                         </button>
 
 
-                                        <!-- solo autorizado podra borrar contenedor de partidas adicionales -->
+                                        <!-- solo autorizado podrá cambiar estado a una partida -->
+                                        <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
+                                            <i class="fas fa-check" title="Estado"></i>&nbsp; Estado
+                                        </button>
+
+
+                                        <!-- solo autorizado podrá borrar contenedor de partidas adicionales -->
 
                                         @can('boton.borrar.contenedor.partida.adicional')
-                                        <br><br>
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="infoBorrarContenedor({{ $dato->id }})">
-                                            <i class="fas fa-list-alt" title="Borrar"></i>&nbsp; Borrar
-                                        </button>
+                                            <br><br>
+                                            <button type="button" class="btn btn-danger btn-xs" onclick="infoBorrarContenedor({{ $dato->id }})">
+                                                <i class="fas fa-list-alt" title="Borrar"></i>&nbsp; Borrar
+                                            </button>
                                         @endcan
 
                                     </td>
