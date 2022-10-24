@@ -898,7 +898,7 @@
         function vistaPartidaAdicional(){
             // ID PROYECTO
             var id = document.getElementById('id-proyecto').value;
-            window.location.href="{{ url('/admin/partida/adicional/contenedor/index') }}/"+id;
+            window.location.href="{{ url('/admin/partida/adici/conte/jefatura/index/') }}/"+id;
         }
 
         // aquí se abre modal para asignar un bolsón al presupuesto

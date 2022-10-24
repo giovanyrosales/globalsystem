@@ -3,6 +3,9 @@
         <div class="row">
             <div class="col-12">
                 <div class="card">
+
+                    <!-- ESTA TABLA SOLO LA MIRA JEFATURA,  -->
+
                     <div class="card-body">
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
@@ -10,6 +13,7 @@
                                 <th>Fecha</th>
                                 <th>Estado</th>
                                 <th>Monto</th>
+                                <th>Documento</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -29,6 +33,13 @@
                                     </td>
 
                                     <td>${{ $dato->monto }}</td>
+                                    <td>
+                                        @if($dato->documento != null)
+                                            <a href="{{ url('/admin/partida/adicional/obraadicional/doc/'.$dato->id) }}">
+                                                <button class="btn btn-success btn-xs"><i class="fa fa-download"></i> Descargar</button>
+                                            </a>
+                                        @endif
+                                    </td>
 
                                     <td>
 
@@ -37,21 +48,17 @@
                                             <i class="fas fa-list-alt" title="Partidas Adicionales"></i>&nbsp; Partidas
                                         </button>
 
-                                         @if($dato->estado != 2)
-                                            <!-- solo aparece el botón sino esta aprobada la partida adicional -->
-                                            <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
-                                                <i class="fas fa-check" title="Estado"></i>&nbsp; Estado
-                                            </button>
-                                        @endif
+                                        <!-- solo autorizado podrá cambiar estado a una partida -->
+                                        <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
+                                            <i class="fas fa-check" title="Estado"></i>&nbsp; Estado
+                                        </button>
 
                                         <!-- solo autorizado podrá borrar contenedor de partidas adicionales -->
                                         @can('boton.borrar.contenedor.partida.adicional')
-                                            @if($dato->estado == 0)
-                                                <br><br>
-                                                <button type="button" class="btn btn-danger btn-xs" onclick="infoBorrarContenedor({{ $dato->id }})">
-                                                    <i class="fas fa-list-alt" title="Borrar"></i>&nbsp; Borrar
-                                                </button>
-                                            @endif
+                                            <br><br>
+                                            <button type="button" class="btn btn-danger btn-xs" onclick="infoBorrarContenedor({{ $dato->id }})">
+                                                <i class="fas fa-list-alt" title="Borrar"></i>&nbsp; Borrar
+                                            </button>
                                         @endcan
 
                                     </td>

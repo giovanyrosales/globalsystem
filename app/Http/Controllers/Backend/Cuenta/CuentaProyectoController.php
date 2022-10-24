@@ -923,7 +923,7 @@ class CuentaProyectoController extends Controller
 
     //***************  PARTIDAS ADICIONALES  *********************
 
-
+    // retorna vista con las partidas adicionales de un x proyecto
     public function indexPartidaAdicionalContenedor($id)
     {
         // id PROYECTO
@@ -933,7 +933,7 @@ class CuentaProyectoController extends Controller
         return view('backend.admin.proyectos.partidaadicional.contenedor.vistacontenedorpartidaadicional', compact('id', 'infoPro'));
     }
 
-
+    // retorna tabla con las partidas adicionales de un x proyecto
     public function tablaPartidaAdicionalContenedor($id)
     {
         // id PROYECTO
@@ -948,6 +948,36 @@ class CuentaProyectoController extends Controller
 
         return view('backend.admin.proyectos.partidaadicional.contenedor.tablacontenedorpartidaadicional', compact('lista'));
     }
+
+    // vista de partidas adicionales, otras opciones solo para jefatura
+    public function indexPartidaAdicionalConteJefatura($id){
+        // id PROYECTO
+
+        $infoPro = Proyecto::where('id', $id)->first();
+
+        return view('backend.admin.proyectos.partidaadicional.contenedor.vistacontepartidaadicionaljefatura', compact('id', 'infoPro'));
+    }
+
+    // retorna tabla con las partidas adicionales de un x proyecto para jefatura
+    public function tablaPartidaAdicionalConteJefatura($id){
+
+        // id PROYECTO
+
+        $lista = PartidaAdicionalContenedor::where('id_proyecto', $id)
+            ->orderBy('fecha', 'ASC')
+            ->get();
+
+        foreach ($lista as $dd) {
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+        }
+
+        return view('backend.admin.proyectos.partidaadicional.contenedor.tablacontenedorpartidaadicional', compact('lista'));
+    }
+
+
+
+
+
 
     // autorizar que se pueda crear partidas adicionales
     public function autorizarPartidaAdicionalPermiso(Request $request)
@@ -1086,7 +1116,7 @@ class CuentaProyectoController extends Controller
                 return ['success' => 1];
             }
 
-            // ya esta aprobado
+            // ya está aprobado
             if($infoContenedor->estado == 2){
                 return ['success' => 2];
             }
@@ -1238,7 +1268,7 @@ class CuentaProyectoController extends Controller
         }
     }
 
-
+    // obtiene información de la partida adicional de un proyecto
     function informacionPartidaAdicional(Request $request){
         // Id PARTIDA ADICIONAL
 
@@ -1277,7 +1307,7 @@ class CuentaProyectoController extends Controller
         return ['success' => 2];
     }
 
-
+    // editar la información de una partida adicional
     public function editarPresupuesto(Request $request){
 
         DB::beginTransaction();
@@ -1357,5 +1387,67 @@ class CuentaProyectoController extends Controller
         }
     }
 
+    // información de contenedor partida adicional
+    public function informacionEstadoContenedorPartidaAdic(Request $request){
+        // ID CONTENEDOR partida adicional
+        $rules = array(
+            'id' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()){
+            return ['success' => 0];
+        }
+
+        if($infoPartida = PartidaAdicionalContenedor::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'info' => $infoPartida];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    // actualizar estado de contenedor partida adicional
+    public function actualizarEstadoContenedorPartidaAdic(Request $request){
+
+        Log::info($request->all());
+
+        // ID CONTENEDOR partida adicional
+        $rules = array(
+            'id' => 'required',
+            'estado' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()){
+            return ['success' => 0];
+        }
+
+        if($infoPartida = PartidaAdicionalContenedor::where('id', $request->id)->first()){
+
+            // ya esta aprobada
+            if($infoPartida->estado == 2){
+                return ['success' => 1];
+            }
+
+            $conteo = PartidaAdicional::where('id_partidaadic_conte', $infoPartida->id)->count();
+
+            if($conteo <= 0){
+                // es decir, no tiene partidas el contenedor, así que no se puede actualizar
+                return ['success' => 2];
+            }
+
+            PartidaAdicionalContenedor::where('id', $infoPartida->id)->update([
+                'estado' => $request->estado,
+            ]);
+
+            return ['success' => 3];
+        }else{
+            return ['success' => 99];
+        }
+
+    }
 
 }
