@@ -262,6 +262,7 @@
             window.location.href="{{ url('/admin/partida/adicional/creacion/index') }}/" + id;
         }
 
+        // MODAL PARA REVISAR CUANDO MONTO TIENE LAS PARTIDAS Y ASIGNAR UN BOLSÓN
         function vistaInformacionEstado(id){
 
             openLoading();
@@ -272,8 +273,10 @@
                 .then((response) => {
                     closeLoading();
 
-                    // esta en modo revisión
+                    // está en modo revisión
                     if(response.data.success === 1){
+
+
 
                         $('#id-contenedor').val(id);
 

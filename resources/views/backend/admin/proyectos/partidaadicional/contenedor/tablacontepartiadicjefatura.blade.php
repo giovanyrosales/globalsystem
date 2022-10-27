@@ -48,10 +48,15 @@
                                             <i class="fas fa-list-alt" title="Partidas Adicionales"></i>&nbsp; Partidas
                                         </button>
 
-                                        <!-- solo autorizado podrá cambiar estado a una partida -->
-                                        <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
-                                            <i class="fas fa-check" title="Estado"></i>&nbsp; Estado
-                                        </button>
+                                        <!-- botón para aprobar partidas -->
+                                        @if($dato->estado == 1)
+
+                                            <!-- abrir modal para verificar a que bolsón asignar -->
+                                            <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
+                                                <i class="fas fa-check" title="Revisar"></i>&nbsp; Revisar
+                                            </button>
+
+                                        @endif
 
                                         <!-- solo autorizado podrá borrar contenedor de partidas adicionales -->
                                         @can('boton.borrar.contenedor.partida.adicional')
