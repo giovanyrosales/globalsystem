@@ -307,6 +307,11 @@ Route::post('/admin/partida/adicio/contenedor/estado/actualizar', [CuentaProyect
 Route::get('/admin/partida/adici/conte/jefatura/index/{id}', [CuentaProyectoController::class,'indexPartidaAdicionalConteJefatura']);
 // retorna tabla con las partidas adicionales de un x proyecto para jefatura
 Route::get('/admin/partida/adici/conte/jefatura/tabla/{id}', [CuentaProyectoController::class,'tablaPartidaAdicionalConteJefatura']);
+// información de porcentaje de obra adicional
+Route::post('/admin/partida/adicional/porcentaje/info', [CuentaProyectoController::class, 'informacionPorcentajeObra']);
+// actualizar porcentaje de obra adicional
+Route::post('/admin/partida/adicional/porcentaje/actualizar', [CuentaProyectoController::class, 'actualizarPorcentajeObra']);
+
 
 
 

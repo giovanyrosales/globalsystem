@@ -62,7 +62,9 @@ class CreateProyectosTable extends Migration
             // utilizado para habilitar botón para agregar partidas adicionales
             $table->boolean('permiso_partida_adic');
 
-
+            // porcentaje de obra adicional, por defecto 20% al crear proyecto
+            $table->decimal('porcentaje_obra', 10, 2);
+            
 
             $table->foreign('id_linea')->references('id')->on('linea');
             $table->foreign('id_fuentef')->references('id')->on('fuentef');

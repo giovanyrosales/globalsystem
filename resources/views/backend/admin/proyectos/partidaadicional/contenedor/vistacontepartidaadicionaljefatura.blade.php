@@ -39,11 +39,11 @@
                         @endif
                     @endcan
 
-                    <!-- Botón para crear solicitud de partida adicional -->
-                    @can('boton.modal.crear.solicitud.partida.adicional')
-                        <button type="button" style="margin-top: 15px" onclick="modalSolicitudPartidaAdicional()" class="btn btn-success btn-sm">
+                    <!-- Botón para modificar porcentaje de obre adicional, por defecto sera 20% -->
+                    @can('boton.modal.porcentaje.obra.dicional')
+                        <button type="button" style="margin-top: 15px" onclick="infoPorcentajeObra()" class="btn btn-success btn-sm">
                             <i class="fas fa-plus"></i>
-                            Crear Solicitud Partida Adicional
+                            Porcentaje Obra Adicional
                         </button>
                     @endcan
 
@@ -110,6 +110,42 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="modalPorcentaje">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Porcentaje Máximo de Obra Adicional</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-porcentaje">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <label>Porcentaje:</label>
+                                        <input type="number" autocomplete="off" class="form-control" id="porcentaje-obra">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="actualizarPorcentajeObra()">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 </div>
 
@@ -276,8 +312,6 @@
                     // está en modo revisión
                     if(response.data.success === 1){
 
-
-
                         $('#id-contenedor').val(id);
 
                         let estado = response.data.info.estado;
@@ -382,8 +416,90 @@
                     toastr.error('Error al actualizar');
                     closeLoading();
                 });
-
         }
+
+
+        function infoPorcentajeObra(){
+
+            openLoading();
+            let id = {{ $id }}; // id PROYECTO
+
+            document.getElementById("formulario-porcentaje").reset();
+
+            axios.post(url+'/partida/adicional/porcentaje/info', {
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalPorcentaje').modal('show');
+                        $('#porcentaje-obra').val(response.data.porcentaje);
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+        function actualizarPorcentajeObra(){
+
+            var porcentaje = document.getElementById('porcentaje-obra').value;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
+
+            if(porcentaje === ''){
+                toastr.error('Porcentaje es requerido');
+                return;
+            }
+
+            if(!porcentaje.match(reglaNumeroDosDecimal)) {
+                toastr.error('Porcentaje debe ser número Decimal Positivo. Solo se permite 2 Decimales');
+                return;
+            }
+
+            if(porcentaje < 0){
+                toastr.error('Porcentaje no permite números negativos');
+                return;
+            }
+
+            if(porcentaje > 100){
+                toastr.error('Porcentaje Máximo sera 100%');
+                return;
+            }
+
+            openLoading();
+            let id = {{ $id }}; // id PROYECTO
+
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('porcentaje', porcentaje);
+
+            document.getElementById("formulario-porcentaje").reset();
+
+            axios.post(url+'/partida/adicional/porcentaje/actualizar', formData, {
+
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalEstado').modal('hide');
+                        toastr.success('Actualizado');
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
 
     </script>
 

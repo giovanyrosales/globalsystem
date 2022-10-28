@@ -86,6 +86,8 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'boton.modal.crear.solicitud.partida.adicional', 'description' => 'abrir modal para crear solicitud partida adicional'])->syncRoles($roleIng);
             Permission::create(['name' => 'boton.borrar.contenedor.partida.adicional', 'description' => 'borra el contenedor con todas las partidas adicionales'])->syncRoles($roleIng);
             Permission::create(['name' => 'boton.crear.partida.adicional', 'description' => 'boton para abrir modal y crear una partida adicional'])->syncRoles($roleIng);
+            Permission::create(['name' => 'boton.modal.porcentaje.obra.dicional', 'description' => 'boton para abrir modal y ver porcentaje de obra adicional'])->syncRoles($rolePresupuesto);
+
 
 
 

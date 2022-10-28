@@ -974,14 +974,55 @@ class CuentaProyectoController extends Controller
         return view('backend.admin.proyectos.partidaadicional.contenedor.tablacontenedorpartidaadicional', compact('lista'));
     }
 
+    // información de porcentaje de obra adicional
+    public function informacionPorcentajeObra(Request $request){
 
+        $regla = array(
+            'id' => 'required',
+        );
 
+        $validar = Validator::make($request->all(), $regla);
 
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
 
+        if($info = Proyecto::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'porcentaje' => $info->porcentaje_obra];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    // actualizar porcentaje de obra adicional
+    public function actualizarPorcentajeObra(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+            'porcentaje' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        if (Proyecto::where('id', $request->id)->first()) {
+
+            Proyecto::where('id', $request->id)->update([
+                'porcentaje_obra' => $request->porcentaje
+            ]);
+
+            return ['success' => 1];
+        } else {
+            return ['success' => 2];
+        }
+    }
 
     // autorizar que se pueda crear partidas adicionales
-    public function autorizarPartidaAdicionalPermiso(Request $request)
-    {
+    public function autorizarPartidaAdicionalPermiso(Request $request){
         if (Proyecto::where('id', $request->id)->first()) {
 
             Proyecto::where('id', $request->id)->update([
@@ -1010,8 +1051,7 @@ class CuentaProyectoController extends Controller
     }
 
     // crear solicitud de partida
-    public function crearSolicitudPartidaAdicional(Request $request)
-    {
+    public function crearSolicitudPartidaAdicional(Request $request){
 
         $regla = array(
             'idproyecto' => 'required',

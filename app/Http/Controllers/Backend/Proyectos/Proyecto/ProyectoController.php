@@ -93,6 +93,7 @@ class ProyectoController extends Controller
         $p->permiso = 0;
         $p->permiso_partida_adic = 0;
         $p->monto_finalizado = 0;
+        $p->porcentaje_obra = 20; // porcentaje obra adicional por defecto
 
         if($p->save()){
             return ['success' => 2];
