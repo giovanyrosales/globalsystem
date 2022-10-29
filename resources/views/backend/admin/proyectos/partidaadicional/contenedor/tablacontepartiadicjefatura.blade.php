@@ -48,23 +48,14 @@
                                             <i class="fas fa-list-alt" title="Partidas Adicionales"></i>&nbsp; Partidas
                                         </button>
 
-                                        <!-- botón para aprobar partidas -->
-                                        @if($dato->estado == 1)
-
+                                        <!-- botón para aprobar partidas adicionales-->
+                                        @if($dato->estado == 2)
+                                            <br><br>
                                             <!-- abrir modal para verificar a que bolsón asignar -->
                                             <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
                                                 <i class="fas fa-check" title="Revisar"></i>&nbsp; Revisar
                                             </button>
-
                                         @endif
-
-                                        <!-- solo autorizado podrá borrar contenedor de partidas adicionales -->
-                                        @can('boton.borrar.contenedor.partida.adicional')
-                                            <br><br>
-                                            <button type="button" class="btn btn-danger btn-xs" onclick="infoBorrarContenedor({{ $dato->id }})">
-                                                <i class="fas fa-list-alt" title="Borrar"></i>&nbsp; Borrar
-                                            </button>
-                                        @endcan
 
                                     </td>
                                 </tr>

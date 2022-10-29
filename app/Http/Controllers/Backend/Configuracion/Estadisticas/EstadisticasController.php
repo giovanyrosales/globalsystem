@@ -19,31 +19,5 @@ class EstadisticasController extends Controller
         return view('backend.admin.estadisticas.vistaestadisticas');
     }
 
-    public function realizarCopia(Request $request){
 
-
-        DB::beginTransaction();
-
-        try {
-
-            $arrayPresup = P_PresupUnidadDetalle::all();
-
-            foreach ($arrayPresup as $dd){
-
-                if($info = P_Materiales::where('id', $dd->id_material)->first()){
-
-                    P_PresupUnidadDetalle::where('id', $dd->id)->update([
-                        'precio' => $info->costo,
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return ['success' => 1];
-        }catch(\Throwable $e){
-            DB::rollback();
-            return ['success' => 99];
-        }
-    }
 }

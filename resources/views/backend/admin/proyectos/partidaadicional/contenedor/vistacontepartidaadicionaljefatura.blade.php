@@ -90,11 +90,21 @@
                                     <div class="form-group">
                                         <input id="id-contenedor" type="hidden">
 
-                                        <select class="form-control" id="select-estado">
-                                            <option value="0">En Desarrollo</option>
-                                            <option value="1">Listo para Revisión</option>
-                                            <option value="2">Aprobar Partida</option>
-                                        </select>
+                                        <div class="form-group">
+                                            <label>Monto de Partida Adicional</label>
+                                            <label id="txt-monto-partida" class="form-control"></label>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Bolsón asignado a Proyecto</label>
+                                            <label id="txt-nombre-bolson" class="form-control"></label>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Monto Restantes de Bolsón </label>
+                                            <label id="txt-restante-bolson" class="form-control"></label>
+                                        </div>
+
                                     </div>
 
                                 </div>
@@ -105,15 +115,14 @@
 
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="btnGuardarU" onclick="actualizarEstado()">Actualizar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarU" onclick="preguntarAprobar()">Aprobar</button>
                 </div>
             </div>
         </div>
     </div>
 
-
     <div class="modal fade" id="modalPorcentaje">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Porcentaje Máximo de Obra Adicional</h4>
@@ -128,7 +137,7 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Porcentaje:</label>
+                                        <label>Porcentaje %:</label>
                                         <input type="number" autocomplete="off" class="form-control" id="porcentaje-obra">
                                     </div>
 
@@ -144,7 +153,6 @@
             </div>
         </div>
     </div>
-
 
 
 </div>
@@ -301,34 +309,42 @@
         // MODAL PARA REVISAR CUANDO MONTO TIENE LAS PARTIDAS Y ASIGNAR UN BOLSÓN
         function vistaInformacionEstado(id){
 
+            document.getElementById("txt-monto-partida").innerHTML = '';
+            document.getElementById("txt-nombre-bolson").innerHTML = '';
+            document.getElementById("txt-restante-bolson").innerHTML = '';
+
             openLoading();
 
-            axios.post(url+'/partida/adicio/contenedor/estado/informacion', {
+            axios.post(url+'/partida/adicio/infojefatura/estado/informacion', {
                 'id' : id
             })
                 .then((response) => {
                     closeLoading();
 
-                    // está en modo revisión
-                    if(response.data.success === 1){
+                    // está en modo desarrollo
+                    if(response.data.success === 1) {
 
-                        $('#id-contenedor').val(id);
-
-                        let estado = response.data.info.estado;
-
-                        if(estado === 0){
-                            $('#select-estado').prop('selectedIndex', 0).change();
-                            $('#modalEstado').modal('show');
-                        }
-                        else if(estado === 1){
-                            $('#select-estado').prop('selectedIndex', 1).change();
-                            $('#modalEstado').modal('show');
-                        }else{
-                            // la partida adicional esta aprobada
+                        Swal.fire({
+                            title: 'Partida En Desarrollo',
+                            text: "La Partida Adicional se encuentra en modo desarrollo",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
+                            // ya estaba aprobada
 
                             Swal.fire({
-                                title: 'Partida Aprobada',
-                                text: "No se puede modificar el Estado",
+                                title: 'Partida Ya Aprobada',
+                                text: "La Partida Adicional ya se encontraba Aprobada",
                                 icon: 'info',
                                 showCancelButton: false,
                                 allowOutsideClick: false,
@@ -340,7 +356,55 @@
                                     location.reload();
                                 }
                             })
-                        }
+
+                    }else if(response.data.success === 3){
+                        //no tiene partidas el contenedor, así que no se puede actualizar
+
+                        Swal.fire({
+                            title: 'No hay Partidas',
+                            text: "No se se encuentra ninguna Partida Adicional Registrada",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 4){
+                        //no tiene partidas el contenedor, así que no se puede actualizar
+
+                        Swal.fire({
+                            title: 'Sin Bolsón',
+                            text: "El proyecto no tiene bolsón asignado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 5){
+                            // viene la información
+
+                        $('#modalEstado').modal('show');
+
+                        // asignar ID contenedor
+                        $('#id-contenedor').val(id);
+
+                        document.getElementById("txt-monto-partida").innerHTML = response.data.montopartida;
+                        document.getElementById("txt-nombre-bolson").innerHTML = response.data.nombolson;
+                        document.getElementById("txt-restante-bolson").innerHTML = response.data.bolsonrestante;
+
                     }
                     else {
                         toastr.error('Error al buscar');
@@ -351,73 +415,6 @@
                     closeLoading();
                 });
         }
-
-        function actualizarEstado(){
-
-            openLoading();
-            var estado = document.getElementById('select-estado').value;
-            var id = document.getElementById('id-contenedor').value;
-
-            let formData = new FormData();
-            formData.append('estado', estado);
-            formData.append('id', id);
-
-            axios.post(url+'/partida/adicio/contenedor/estado/actualizar', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        $('#modalEstado').modal('hide');
-                        recargar();
-
-                        Swal.fire({
-                            title: 'No Actualizado',
-                            text: "La Partida ya fue Aprobada",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2){
-                        Swal.fire({
-                            title: 'No Actualizado',
-                            text: "No se encuentras Partidas Adicionales",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-
-                    else if(response.data.success === 3){
-                        toastr.success('Estado Actualizado');
-                        $('#modalEstado').modal('hide');
-                        recargar();
-                    }
-                    else {
-                        toastr.error('Error al actualizar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('Error al actualizar');
-                    closeLoading();
-                });
-        }
-
 
         function infoPorcentajeObra(){
 
@@ -487,7 +484,7 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        $('#modalEstado').modal('hide');
+                        $('#modalPorcentaje').modal('hide');
                         toastr.success('Actualizado');
                     }
                     else {
@@ -496,6 +493,51 @@
                 })
                 .catch((error) => {
                     toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+
+        function preguntarAprobar(){
+
+            Swal.fire({
+                title: 'Aprobar Partida Adicional',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aprobar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    aprobarPartidaAdicional();
+                }
+            })
+        }
+
+        function aprobarPartidaAdicional(){
+
+            openLoading();
+            var idcontenedor = document.getElementById('id-contenedor').value;
+
+            axios.post(url+'/partida/adicional/aprobar', {
+                'id' : idcontenedor
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        toastr.success('aprobados');
+                    }
+                    else {
+                        toastr.error('Error al Aprobar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al Aprobar');
                     closeLoading();
                 });
         }

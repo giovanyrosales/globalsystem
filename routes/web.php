@@ -92,8 +92,6 @@ Route::get('sin-permisos', [ControlController::class,'indexSinPermiso'])->name('
 Route::get('/admin/inicio/index', [EstadisticasController::class,'indexEstadisticas'])->name('admin.estadisticas.index');
 
 
-Route::post('/admin/realizar/copia', [EstadisticasController::class, 'realizarCopia']);
-
 
 // * NUEVO PROYECTO
 
@@ -133,9 +131,6 @@ Route::post('/admin/bolsones/todos/informacion',  [ProyectoController::class,'ob
 Route::post('/admin/bolson/saldo/detalle/informacion',  [ProyectoController::class,'infoSaldoBolson']);
 // obtener información del proyecto
 Route::post('/admin/proyecto/informacion/individual',  [ProyectoController::class,'informacionProyectoIndividual']);
-
-
-
 
 
 // --- VISTA DE PROYECTO ---
@@ -311,9 +306,10 @@ Route::get('/admin/partida/adici/conte/jefatura/tabla/{id}', [CuentaProyectoCont
 Route::post('/admin/partida/adicional/porcentaje/info', [CuentaProyectoController::class, 'informacionPorcentajeObra']);
 // actualizar porcentaje de obra adicional
 Route::post('/admin/partida/adicional/porcentaje/actualizar', [CuentaProyectoController::class, 'actualizarPorcentajeObra']);
-
-
-
+// información del contenedor para jefatura
+Route::post('/admin/partida/adicio/infojefatura/estado/informacion', [CuentaProyectoController::class, 'infoContenedorJefatura']);
+// aprobar una partida adicional
+Route::post('/admin/partida/adicional/aprobar', [CuentaProyectoController::class, 'aprobarPartidaAdicional']);
 
 
 

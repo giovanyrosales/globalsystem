@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Cuenta;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bolson;
 use App\Models\CatalogoMateriales;
 use App\Models\Cuenta;
 use App\Models\CuentaProy;
@@ -1487,7 +1488,110 @@ class CuentaProyectoController extends Controller
         }else{
             return ['success' => 99];
         }
+    }
+
+    // información del contenedor para jefatura
+    public function infoContenedorJefatura(Request $request){
+        // ID CONTENEDOR partida adicional
+        $rules = array(
+            'id' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()){
+            return ['success' => 0];
+        }
+
+        if($infoPartidaConte = PartidaAdicionalContenedor::where('id', $request->id)->first()){
+
+            if($infoPartidaConte->estado == 0){
+                // en modo desarrollo
+                return ['success' => 1];
+            }
+
+            if($infoPartidaConte->estado == 2){
+                // ya fue aprobada
+                return ['success' => 2];
+            }
+
+            $conteo = PartidaAdicional::where('id_partidaadic_conte', $infoPartidaConte->id)->count();
+
+            if($conteo <= 0){
+                // es decir, no tiene partidas el contenedor, así que no se puede actualizar
+                return ['success' => 3];
+            }
+
+            $infoProyecto = Proyecto::where('id', $infoPartidaConte->id_proyecto)->first();
+
+            if($infoProyecto->id_bolson == null){
+                return ['success' => 4];
+            }
+
+            $infoBolson = Bolson::where('id', $infoProyecto->id_bolson)->first();
+
+            // obtener monto de partidas adicionales
+            $arrayPartidaAdicional = PartidaAdicional::where('id_partidaadic_conte', $infoPartidaConte->id)->get();
+
+            $montoPartida = 0;
+
+            foreach ($arrayPartidaAdicional as $dd){
+
+                $arrayPartidaDeta = PartidaAdicionalDetalle::where('id_partida_adicional', $dd->id)->get();
+
+                foreach ($arrayPartidaDeta as $infoDD){
+
+                        $infoMaterial = CatalogoMateriales::where('id', $infoDD->id_material)->first();
+
+                        $multi = ($infoDD->cantidad * $infoMaterial->pu) * $infoDD->duplicado;
+                        $montoPartida += $multi;
+                }
+            }
+
+            $montoPartida = '$' . number_format((float)$montoPartida, 2, '.', ',');
+
+            // buscar restante saldo bolsón
+
+            // proyectoMontoBolson: es el monto de las partidas aprobadas de todos los proyectos a bolson
+            // partidaAdicionalMonto: es el monto de las partidas adicionales aprobadas
+            // proyectoFinalizadoMonto: es el monto sobrante de un proyecto cuando se finaliza
+
+            $proyectoMontoBolson = Proyecto::where('id_bolson', $infoBolson->id)->sum('monto');
+
+            $partidaAdicionalMonto = PartidaAdicionalContenedor::where('id_proyecto', $infoProyecto->id)
+                ->where('estado', 2) // partidas adicionales aprobadas
+                ->sum('monto');
+
+            $proyectoFinalizadoMonto = Proyecto::where('id_bolson', $infoBolson->id)
+                ->where('id_estado', 4)
+                ->sum('monto_finalizado');
+
+            $montoBolsonInicial = Bolson::where('id', $infoBolson->id)->sum('monto_inicial');
+
+            $montoBolsonActual = $montoBolsonInicial - ($proyectoMontoBolson + $partidaAdicionalMonto + $proyectoFinalizadoMonto);
+
+            $montoBolsonActual = "$" . number_format((float)$montoBolsonActual, 2, '.', ',');
+
+            return ['success' => 5, 'info' => $infoPartidaConte, 'montopartida' => $montoPartida,
+                'nombolson' => $infoBolson->nombre, 'bolsonrestante' => $montoBolsonActual];
+        }else{
+            return ['success' => 99];
+        }
+    }
+
+    // aprobar una partida adicional
+    public function aprobarPartidaAdicional(Request $request){
+
+        // se debe verificar el porcentaje maximo de obra adicional
+        // que haya dinero en bolsón
+        // asignar dinero a cuenta proy y diferenciar cual es de obra adicional
+        // guardar en una tabla cuales fueron las cuentas aprobadas ?
+
+
+        return ['success' => 1];
 
     }
+
+
 
 }
