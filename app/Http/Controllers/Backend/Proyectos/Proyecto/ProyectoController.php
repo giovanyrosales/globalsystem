@@ -1048,25 +1048,6 @@ class ProyectoController extends Controller
             'requisicionDetalle', 'id'));
     }
 
-    public function obtenerListaCotizaciones(Request $request){
-
-        // obtener lista de detalle requisicion por array ID
-        $lista = RequisicionDetalle::whereIn('id', $request->lista)->get();
-
-        foreach ($lista as $dd){
-
-            $info = CatalogoMateriales::where('id', $dd->material_id)->first();
-            $unidad = UnidadMedida::where('id', $info->id_unidadmedida)->first();
-
-            $dd->descripcion = $info->nombre;
-            $dd->medida = $unidad->medida;
-        }
-
-        return ['success' => 1, 'lista' => $lista];
-    }
-
-
-
     // buscador de material para crear una partida
     public function buscadorMaterialPresupuesto(Request $request){
 

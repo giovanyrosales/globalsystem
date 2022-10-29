@@ -17,6 +17,7 @@ use App\Models\Planilla;
 use App\Models\Proyecto;
 use App\Models\TipoPartida;
 use App\Models\UnidadMedida;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,14 +27,12 @@ use Illuminate\Support\Str;
 
 class CuentaProyectoController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(){
         $this->middleware('auth');
     }
 
     // retorna vista con los movimientos de cuenta para un proyecto ID
-    public function indexMoviCuentaProy($id)
-    {
+    public function indexMoviCuentaProy($id){
         // ID: PROYECTO
 
         $infoProyecto = Proyecto::where('id', $id)->first();
@@ -43,15 +42,13 @@ class CuentaProyectoController extends Controller
     }
 
     // retorna vista con los historicos movimientos por proyecto ID
-    public function indexMoviCuentaProyHistorico($id)
-    {
+    public function indexMoviCuentaProyHistorico($id){
         // ID: PROYECTO
         return view('backend.admin.proyectos.cuentaproyecto.historico.vistamovicuentahistorico', compact('id'));
     }
 
     // retorna tabla con los historicos movimientos por proyecto ID
-    public function tablaMoviCuentaProyHistorico($id)
-    {
+    public function tablaMoviCuentaProyHistorico($id){
 
         // ID PROYECTO
         $pila = array();
@@ -945,6 +942,25 @@ class CuentaProyectoController extends Controller
 
         foreach ($lista as $dd) {
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+
+            $montoPartidaActual = 0;
+
+            $arrayPartidaAdicional = PartidaAdicional::where('id_partidaadic_conte', $dd->id)->get();
+
+            foreach ($arrayPartidaAdicional as $datainfo){
+
+                $arrayPartidaDeta = PartidaAdicionalDetalle::where('id_partida_adicional', $datainfo->id)->get();
+
+                foreach ($arrayPartidaDeta as $infoDD){
+
+                    $infoMaterial = CatalogoMateriales::where('id', $infoDD->id_material)->first();
+
+                    $multi = ($infoDD->cantidad * $infoMaterial->pu) * $infoDD->duplicado;
+                    $montoPartidaActual += $multi;
+                }
+            }
+
+            $dd->montopartidas = '$' . number_format((float)$montoPartidaActual, 2, '.', ',');
         }
 
         return view('backend.admin.proyectos.partidaadicional.contenedor.tablacontenedorpartidaadicional', compact('lista'));
@@ -970,9 +986,28 @@ class CuentaProyectoController extends Controller
 
         foreach ($lista as $dd) {
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+
+            $montoPartidaActual = 0;
+
+            $arrayPartidaAdicional = PartidaAdicional::where('id_partidaadic_conte', $dd->id)->get();
+
+            foreach ($arrayPartidaAdicional as $datainfo){
+
+                $arrayPartidaDeta = PartidaAdicionalDetalle::where('id_partida_adicional', $datainfo->id)->get();
+
+                foreach ($arrayPartidaDeta as $infoDD){
+
+                    $infoMaterial = CatalogoMateriales::where('id', $infoDD->id_material)->first();
+
+                    $multi = ($infoDD->cantidad * $infoMaterial->pu) * $infoDD->duplicado;
+                    $montoPartidaActual += $multi;
+                }
+            }
+
+            $dd->montopartidas = '$' . number_format((float)$montoPartidaActual, 2, '.', ',');
         }
 
-        return view('backend.admin.proyectos.partidaadicional.contenedor.tablacontenedorpartidaadicional', compact('lista'));
+        return view('backend.admin.proyectos.partidaadicional.contenedor.tablacontepartiadicjefatura', compact('lista'));
     }
 
     // información de porcentaje de obra adicional
@@ -1084,6 +1119,12 @@ class CuentaProyectoController extends Controller
             DB::rollback();
             return ['success' => 99];
         }
+    }
+
+    function obtenerPorcentaje($cantidad, $total) {
+        $porcentaje = ((float)$cantidad * 100) / $total; // Regla de tres
+        $porcentaje = round($porcentaje, 2);  // Quitar los decimales
+        return $porcentaje;
     }
 
     // vista donde se crean ya las partidas adicionales
@@ -1452,8 +1493,6 @@ class CuentaProyectoController extends Controller
     // actualizar estado de contenedor partida adicional
     public function actualizarEstadoContenedorPartidaAdic(Request $request){
 
-        Log::info($request->all());
-
         // ID CONTENEDOR partida adicional
         $rules = array(
             'id' => 'required',
@@ -1585,11 +1624,224 @@ class CuentaProyectoController extends Controller
         // se debe verificar el porcentaje maximo de obra adicional
         // que haya dinero en bolsón
         // asignar dinero a cuenta proy y diferenciar cual es de obra adicional
-        // guardar en una tabla cuales fueron las cuentas aprobadas ?
+
+        DB::beginTransaction();
+
+        try {
+
+            $infoContenedor = PartidaAdicionalContenedor::where('id', $request->idcontenedor)->first();
+            $infoProyecto = Proyecto::where('id', $infoContenedor->id_proyecto)->first();
 
 
-        return ['success' => 1];
+            //************
+            // ESTE ES EL DINERO DE LA PARTIDA ADICIONAL QUE QUIERO APROBAR
 
+            // obtener monto de partidas adicionales
+            $arrayPartidaAdicional = PartidaAdicional::where('id_partidaadic_conte', $request->idcontenedor)->get();
+
+            $montoPartidaActual = 0;
+
+            foreach ($arrayPartidaAdicional as $dd){
+
+                $arrayPartidaDeta = PartidaAdicionalDetalle::where('id_partida_adicional', $dd->id)->get();
+
+                foreach ($arrayPartidaDeta as $infoDD){
+
+                    $infoMaterial = CatalogoMateriales::where('id', $infoDD->id_material)->first();
+
+                    $multi = ($infoDD->cantidad * $infoMaterial->pu) * $infoDD->duplicado;
+                    $montoPartidaActual += $multi;
+                }
+            }
+            //************
+
+            // // OBTENER DINERO DE TODAS LAS PARTIDAS ADICIONALES APROBADAS PARA NO SUPERAR EL X PORCIENTO DE OBRA
+
+            $totalAprobadasConte = PartidaAdicionalContenedor::where('id_proyecto', $infoProyecto->id)
+                ->where('estado', 2) // solo aprobadados
+                ->sum('monto');
+
+            $montoMaximoObra = ($infoProyecto->monto * $infoProyecto->porcentaje_obra) / 100;
+
+            // COMPROBACIÓN
+
+            // se suma la partida adicionales actual a aprobar + todas las partidas aprobadas
+            $sumatoria = $montoPartidaActual + $totalAprobadasConte;
+
+            if($this->redondear_dos_decimal($sumatoria) <= $montoMaximoObra){
+                // si podrá guardarse
+
+                if ($request->hasFile('documento')) {
+
+                    $cadena = Str::random(15);
+                    $tiempo = microtime();
+                    $union = $cadena . $tiempo;
+                    $nombre = str_replace(' ', '_', $union);
+
+                    $extension = '.' . $request->documento->getClientOriginalExtension();
+                    $nomDocumento = $nombre . strtolower($extension);
+                    $avatar = $request->file('documento');
+                    $archivo = Storage::disk('archivos')->put($nomDocumento, \File::get($avatar));
+
+                    if ($archivo) {
+
+
+
+                        //DB::commit();
+                        return ['success' => 1];
+                    }else{
+                        return ['success' => 99];
+                    }
+                }else{
+
+                    // guardar cuentas
+
+                    //-------------------------------------------------------------
+
+                    // pasar a modo aprobado
+                   /* Proyecto::where('id', $request->id)->update([
+                        'fecha_aprobado' => Carbon::now('America/El_Salvador'),
+                        'presu_aprobado' => 2]);*/
+
+
+                    //*************** OBTENER SALDO DE CADA CÓDIGO */
+
+                   /* $partidas = Partida::where('proyecto_id', $request->id)
+                        ->orderBy('id')
+                        ->get();
+
+                    $pilaDetalle = array();
+
+                    foreach ($partidas as $pp){
+                        array_push($pilaDetalle, $pp->id);
+                    }
+
+                    // verificar cada detalle de la partida para ver si tiene objeto especifico
+                    $todoDetalle = DB::table('partida_detalle AS p')
+                        ->join('materiales AS m', 'p.material_id', '=', 'm.id')
+                        ->select('m.id_objespecifico', 'm.nombre')
+                        ->whereIn('p.partida_id', $pilaDetalle)
+                        ->get();
+
+                    $conteo = 0;
+                    foreach ($todoDetalle as $tt){
+                        if($tt->id_objespecifico == null){
+                            $conteo += 1;
+                        }
+                    }
+
+                    if($conteo > 0){
+                        return ['success' => 5, 'conteo' => $conteo];
+                    }
+
+                    $totalManoObra = 0;
+
+                    // CALCULAR LA MANO DE OBRA (POR ADMINISTRACIÓN)
+                    foreach ($manoobra as $secciones3) {
+                        $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
+
+                        foreach ($detalle3 as $lista) {
+                            $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+                            $multi = $lista->cantidad * $infomaterial->pu;
+                            if ($lista->duplicado != 0) {
+                                $multi = $multi * $lista->duplicado;
+                            }
+
+                            $totalManoObra = $totalManoObra + $multi;
+                        }
+                    }
+
+                    // cálculos
+                    $afp = ($totalManoObra * 7.75) / 100;
+                    $isss = ($totalManoObra * 7.5) / 100;
+                    $insaforp = ($totalManoObra * 1) / 100;
+
+                    $pila = array();
+
+                    foreach ($partidas as $dd){
+                        array_push($pila, $dd->id);
+                    }
+
+
+
+                    // agrupando para obtener solo los ID de objetos específicos.
+                    $detalles = DB::table('partida_detalle AS pd')
+                        ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
+                        ->select('m.id_objespecifico')
+                        ->whereIn('pd.partida_id', $pila)
+                        ->groupBy('m.id_objespecifico')
+                        ->get();
+
+                    // recorrer lista de objetos específicos
+                    foreach ($detalles as $det){
+
+                        // obtener lista de materiales
+                        $info = DB::table('partida_detalle AS pd')
+                            ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
+                            ->join('obj_especifico AS obj', 'm.id_objespecifico', '=', 'obj.id')
+                            ->select('m.id_objespecifico', 'pd.cantidad', 'pd.duplicado', 'm.pu', 'obj.codigo')
+                            ->where('m.id_objespecifico', $det->id_objespecifico)
+                            ->get();
+
+                        $suma = 0;
+
+                        // obtener sumatoria de los materiales
+                        foreach ($info as $dato) {
+
+                            // SUMA DE ISSS Y AFP
+                            // LOS CÓDIGOS FIJOS
+                            //51402: POR REMUNERACIONES EVENTUALES
+                            if($dato->codigo == 51402){
+                                $suma = $isss + $insaforp;
+                                break;
+                            }
+                            // 51502: POR REMUNERACIONES EVENTUALES (igual al de arriba)
+                            else if($dato->codigo == 51502){
+                                $suma = $afp;
+                                break;
+                            }
+
+                            if ($dato->duplicado > 0) {
+                                $suma = $suma + (($dato->cantidad * $dato->duplicado) * $dato->pu);
+                            } else {
+                                $suma = $suma + ($dato->cantidad * $dato->pu);
+                            }
+                        }
+
+                        // GUARDAR REGISTRO
+                        $presu = new CuentaProy();
+                        $presu->proyecto_id = $request->id;
+                        $presu->objespeci_id = $det->id_objespecifico;
+                        $presu->saldo_inicial = $suma;
+                        $presu->save();
+                    }*/
+
+
+
+
+
+                    //DB::commit();
+                    return ['success' => 1];
+                }
+            }else{
+                // no puede guardarse, porque monto supera al máximo
+
+                $porcentajeObra = $infoProyecto->porcentaje_obra;
+                $montoMaximoObra = number_format((float)$montoMaximoObra, 2, '.', ',');
+
+                $resta = $montoMaximoObra - $sumatoria; // se excede por esto
+
+                $resta = number_format((float)$resta, 2, '.', ',');
+
+                return ['success' => 2, 'porcentaje' => $porcentajeObra, 'restado' => $resta,
+                    'montomaximo' => $montoMaximoObra];
+            }
+
+        } catch (\Throwable $e) {
+            Log::info('ee' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
     }
 
 

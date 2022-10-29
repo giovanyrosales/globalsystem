@@ -105,6 +105,11 @@
                                             <label id="txt-restante-bolson" class="form-control"></label>
                                         </div>
 
+                                        <div class="form-group">
+                                            <label>Documento</label>
+                                            <input type="file" id="documento-obra" class="form-control" accept="image/jpeg, image/jpg, image/png, .pdf"/>
+                                        </div>
+
                                     </div>
 
                                 </div>
@@ -519,18 +524,57 @@
 
         function aprobarPartidaAdicional(){
 
-            openLoading();
             var idcontenedor = document.getElementById('id-contenedor').value;
+            var documento = document.getElementById('documento-obra'); // null file
 
-            axios.post(url+'/partida/adicional/aprobar', {
-                'id' : idcontenedor
+            if(documento.files && documento.files[0]){ // si trae doc
+                if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png|.pdf')){
+                    toastr.error('formato permitidos: .png .jpg .jpeg .pdf');
+                    return;
+                }
+            }
+
+            openLoading();
+
+            var formData = new FormData();
+            formData.append('idcontenedor', idcontenedor);
+            formData.append('documento', documento.files[0]);
+
+            axios.post(url+'/partida/adicional/aprobar', formData, {
             })
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1){
 
-                        toastr.success('aprobados');
+                    if(response.data.success === 1) {
+
+                        toastr.success('bien');
+
+                    }
+                    else if(response.data.success === 2){
+
+                        let porcentaje = response.data.porcentaje + "%";
+                        let montomaximo = response.data.montomaximo;
+                        let resta = response.data.restado;
+
+                        Swal.fire({
+                            title: 'Monto Excedido',
+                            html: "El Proyecto Supero el monto para Partida Adicional." + "<br>"
+                                + "Porcentaje para Obra Adicional: "+ porcentaje + "<br>"
+                                + "Monto máximo para Obra Adicional es $"+ montomaximo +"<br>"
+                                + "Se esta Excediendo por $"+ resta +"<br>"
+                            ,
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
                     }
                     else {
                         toastr.error('Error al Aprobar');

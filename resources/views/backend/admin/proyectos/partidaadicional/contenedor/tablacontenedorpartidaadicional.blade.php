@@ -28,7 +28,7 @@
                                         @endif
                                     </td>
 
-                                    <td>${{ $dato->monto }}</td>
+                                    <td>{{ $dato->montopartidas }}</td>
 
                                     <td>
 

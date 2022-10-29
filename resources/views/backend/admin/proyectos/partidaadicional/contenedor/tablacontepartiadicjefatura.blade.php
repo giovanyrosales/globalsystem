@@ -32,7 +32,7 @@
                                         @endif
                                     </td>
 
-                                    <td>${{ $dato->monto }}</td>
+                                    <td>{{ $dato->montopartidas }}</td>
                                     <td>
                                         @if($dato->documento != null)
                                             <a href="{{ url('/admin/partida/adicional/obraadicional/doc/'.$dato->id) }}">
@@ -49,7 +49,7 @@
                                         </button>
 
                                         <!-- botón para aprobar partidas adicionales-->
-                                        @if($dato->estado == 2)
+                                        @if($dato->estado == 1)
                                             <br><br>
                                             <!-- abrir modal para verificar a que bolsón asignar -->
                                             <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
