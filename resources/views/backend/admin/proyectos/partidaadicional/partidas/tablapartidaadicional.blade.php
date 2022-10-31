@@ -10,6 +10,7 @@
                                 <th style="width: 6%">Item</th>
                                 <th style="width: 10%">Tipo Partida</th>
                                 <th style="width: 13%">Nombre</th>
+                                <th style="width: 13%">Monto</th>
                                 <th style="width: 10%">Cantidad Partida</th>
                                 <th style="width: 10%">Opciones</th>
                             </tr>
@@ -21,6 +22,7 @@
                                 <td style="width: 6%">{{ $dato->item }}</td>
                                 <td style="width: 10%">{{ $dato->tipopartida }}</td>
                                 <td style="width: 13%">{{ $dato->nombre }}</td>
+                                <td style="width: 13%">{{ $dato->montopartidas }}</td>
                                 <td style="width: 10%">{{ $dato->cantidadp }}</td>
                                 <td style="width: 10%">
                                     @if($infoContenedor->estado == 0)
@@ -32,7 +34,7 @@
                                             <i class="fas fa-trash-alt" title="Borrar"></i>&nbsp; Borrar
                                         </button>
                                     @else
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto({{ $dato->id }})">
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto({{ $dato }})">
                                             <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
                                         </button>
                                     @endif

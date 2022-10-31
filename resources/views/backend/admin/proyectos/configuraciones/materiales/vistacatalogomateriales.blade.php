@@ -54,7 +54,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nuevo Material</h4>
+                    <h4 class="modal-title">Nuevo Material</h4> <br>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -63,12 +63,13 @@
                     <form id="formulario-nuevo">
                         <div class="card-body">
 
+                            <p>Todos los Campos son Requeridos</p>
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Obj. Específico:</label>
                                         <select class="form-control" id="select-codigo-nuevo">
-                                            <option value="" selected>Seleccione una opción...</option>
                                             @foreach($lObjEspeci as $sel)
                                                 <option value="{{ $sel->id }}">{{ $sel->codigo}} - {{ $sel->nombre }}</option>
                                             @endforeach
@@ -79,7 +80,6 @@
                                     <div class="form-group">
                                         <label>Clasificación:</label>
                                         <select class="form-control" id="select-clasi-nuevo">
-                                            <option value="" disabled selected>Seleccione una opción...</option>
                                             @foreach($lClasificacion as $sel)
                                                 <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
                                             @endforeach
@@ -89,7 +89,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Nombre *:</label>
+                                <label>Nombre:</label>
                                 <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresIngreso();" onkeyup="contarcaracteresIngreso();" maxlength="300" id="nombre-nuevo" placeholder="Nombre del material">
                                 <div id="res-caracter-nuevo" style="float: right">0/300</div>
                             </div>
@@ -101,7 +101,6 @@
                                         <label>Unidad de Medida:</label>
                                         <br>
                                         <select width="60%"  class="form-control" id="select-unidad-nuevo">
-                                            <option value="" selected>Seleccione una opción...</option>
                                             @foreach($lUnidad as $sel)
                                                 <option value="{{ $sel->id }}">{{ $sel->medida }}</option>
                                             @endforeach
@@ -111,7 +110,7 @@
 
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Precio Unitario *:</label>
+                                        <label>Precio Unitario:</label>
                                         <input type="number" class="form-control" autocomplete="off" id="precio-nuevo" maxlength="10" placeholder="0.00">
                                     </div>
                                 </div>
@@ -165,7 +164,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Nombre *:</label>
+                                        <label>Nombre:</label>
                                         <input type="text" class="form-control" autocomplete="off" onpaste="contarcaracteresEditar();" onkeyup="contarcaracteresEditar();" maxlength="300" id="nombre-editar" placeholder="Nombre del material">
                                         <div id="res-caracter-editar" style="float: right">0/300</div>
                                     </div>
@@ -184,7 +183,7 @@
 
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label>Precio Unitario *:</label>
+                                                <label>Precio Unitario:</label>
                                                 <input type="number" class="form-control" autocomplete="off" id="precio-editar" maxlength="10">
                                             </div>
                                         </div>
@@ -229,7 +228,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -238,7 +237,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -247,7 +246,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -256,7 +255,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -265,7 +264,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -274,7 +273,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -337,11 +336,18 @@
 
         function nuevo(){
 
-            var codigo = document.getElementById('select-codigo-nuevo').value; // nullable
+            var codigo = document.getElementById('select-codigo-nuevo').value;
             var nombre = document.getElementById('nombre-nuevo').value;
             var precio = document.getElementById('precio-nuevo').value;
-            var unidad = document.getElementById('select-unidad-nuevo').value; // nullable
-            var clasificacion = document.getElementById('select-clasi-nuevo').value; // nullable
+            var unidad = document.getElementById('select-unidad-nuevo').value;
+            var clasificacion = document.getElementById('select-clasi-nuevo').value;
+
+            // TODOS SON REQUERIDOS PARA EVITAR ERRORES
+
+            if(codigo === ''){
+                toastr.error('Código Específico es requerido');
+                return;
+            }
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -355,6 +361,16 @@
 
             if(precio === ''){
                 toastr.error('Precio unitario es requerido');
+                return;
+            }
+
+            if(unidad === ''){
+                toastr.error('Unidad de Medida es requerido');
+                return;
+            }
+
+            if(clasificacion === ''){
+                toastr.error('Clasificación es requerido');
                 return;
             }
 
@@ -442,21 +458,6 @@
                         document.getElementById("select-codigo-editar").options.length = 0;
                         document.getElementById("select-unidad-editar").options.length = 0;
                         document.getElementById("select-class-editar").options.length = 0;
-
-                        // codigo especifico
-                        if(response.data.arraydatos['idcodigo'] == null){
-                            $('#select-codigo-editar').append('<option value="0">Seleccionar una opción</option>');
-                        }
-
-                        // unidad medida
-                        if(response.data.arraydatos['idmedida'] == null){
-                            $('#select-unidad-editar').append('<option value="0">Seleccionar una opción</option>');
-                        }
-
-                        // clasificacion
-                        if(response.data.arraydatos['idclasifi'] == null){
-                            $('#select-class-editar').append('<option value="0">Seleccionar una opción</option>');
-                        }
 
                         // objeto especifico
                         $.each(response.data.codigo, function( key, val ){

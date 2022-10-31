@@ -548,10 +548,30 @@
 
                     if(response.data.success === 1) {
 
-                        toastr.success('bien');
+                        let conteo = response.data.conteo;
+
+                        Swal.fire({
+                            title: 'Materiales Incompleto',
+                            text: "Hay " + conteo + " Materiales que no tiene asignado un Objeto Específico",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
 
                     }
                     else if(response.data.success === 2){
+
+                        toastr.success('completado');
+
+                    }
+                    else if(response.data.success === 3){
 
                         let porcentaje = response.data.porcentaje + "%";
                         let montomaximo = response.data.montomaximo;

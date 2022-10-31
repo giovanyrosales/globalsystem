@@ -1807,6 +1807,7 @@ class ProyectoController extends Controller
                     }
 
                     if($conteo > 0){
+                        // HAY X MATERIALES QUE NO TIENEN OBJ ESPECÍFICO
                         return ['success' => 5, 'conteo' => $conteo];
                     }
 

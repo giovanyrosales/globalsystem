@@ -1072,7 +1072,7 @@
                     }
 
                     else if(response.data.success === 5){
-                       let conteo = response.data.conteo;
+                        let conteo = response.data.conteo;
 
                         document.getElementById('modalPresupuesto').style.overflowY = 'auto';
 

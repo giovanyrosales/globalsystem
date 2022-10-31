@@ -39,10 +39,17 @@
 
                                          @if($dato->estado != 2)
                                             <!-- solo aparece el botón sino esta aprobada la partida adicional -->
+                                            <br><br>
                                             <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
                                                 <i class="fas fa-check" title="Estado"></i>&nbsp; Estado
                                             </button>
-                                        @endif
+                                         @endif
+
+                                        <!-- sacar pdf -->
+                                        <br><br>
+                                        <button type="button" class="btn btn-success btn-xs" onclick="infoPdf({{ $dato->id }})">
+                                            <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
+                                        </button>
 
                                         <!-- solo autorizado podrá borrar contenedor de partidas adicionales -->
                                         @can('boton.borrar.contenedor.partida.adicional')

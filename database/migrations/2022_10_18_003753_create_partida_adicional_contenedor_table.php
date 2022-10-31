@@ -32,6 +32,8 @@ class CreatePartidaAdicionalContenedorTable extends Migration
             // solo tendrá un valor cuando es aprobada la partida adicional
             $table->decimal('monto', 10, 2);
 
+            $table->date('fecha_aprobado')->nullable();
+
             $table->foreign('id_proyecto')->references('id')->on('proyectos');
         });
     }

@@ -7,6 +7,7 @@ use App\Models\CatalogoMateriales;
 use App\Models\Clasificaciones;
 use App\Models\ObjEspecifico;
 use App\Models\Cuenta;
+use App\Models\PartidaAdicionalDetalle;
 use App\Models\PartidaDetalle;
 use App\Models\SoliMaterialIng;
 use App\Models\UnidadMedida;
@@ -122,6 +123,10 @@ class MaterialesController extends Controller
             // OBJETO ESPECIFICO, NOMBRE, UNIDAD MEDIDA
             $bloqueo = false;
             if(PartidaDetalle::where('material_id', $request->id)->first()){
+                $bloqueo = true;
+            }
+
+            if(PartidaAdicionalDetalle::where('id_material', $request->id)->first()){
                 $bloqueo = true;
             }
 

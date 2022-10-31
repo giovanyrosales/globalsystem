@@ -307,6 +307,11 @@
             window.location.href="{{ url('/admin/partida/adicional/creacion/index') }}/" + id;
         }
 
+        function infoPdf(id){
+            // id Contenedor
+            window.location.href="{{ url('/admin/partida/adicional/verpdf') }}/" + id;
+        }
+
         function vistaInformacionEstado(id){
 
             openLoading();
