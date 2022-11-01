@@ -4,6 +4,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -17,19 +18,19 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="col-sm-12">
-                <h1>Roles</h1>
+                <h1>Rol y Permisos</h1>
             </div>
             <br>
-            <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
-                <i class="fas fa-pencil-alt"></i>
+
+            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" value="Nuevo Rol" onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
+                <i class="fas fa-edit"></i>
                 Nuevo Rol
             </button>
 
-            <button type="button" onclick="vistaPermisos()" class="btn btn-success btn-sm">
+            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" value="Lista de Permisos" onclick="vistaPermisos()" class="button button-3d button-rounded button-pill button-small">
                 <i class="fas fa-list-alt"></i>
                 Lista de Permisos
             </button>
-
 
         </div>
     </section>

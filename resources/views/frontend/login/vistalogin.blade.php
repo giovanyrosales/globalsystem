@@ -17,6 +17,9 @@
     <!-- estilo de sweet -->
     <link href="{{ asset('css/sweetalert2.min.css') }}" rel="stylesheet">
 
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
+
+
     <style>
         html, body {
             height: 100%;
@@ -75,14 +78,14 @@
                         </div>
                         <div class="p-5 bg-white rounded shadow-lg">
                             <h3 class="mb-2 text-center pt-5"><strong>Alcaldía Municipal de Metapán</strong></h3>
-                            <p class="text-center lead">Control de Requerimientos</p>
+                            <p class="text-center lead" style="font-weight: bold">Control de Presupuesto</p>
                             <form>
                                 <label style="margin-top: 10px" class="font-500">Usuario</label>
                                 <input class="form-control form-control-lg mb-3" id="usuario" autocomplete="off" type="text">
                                 <label class="font-500">Contraseña</label>
                                 <input class="form-control form-control-lg" id="password" type="password">
 
-                                <input type="button" value="Entrar" style="margin-top: 15px" onclick="login()" class="btn btn-primary btn-lg w-100 shadow-lg">
+                                <input type="button" value="ACCEDER" style="margin-top: 25px; width: 100%; font-weight: bold" onclick="login()" class="button button-uppercase button-primary button-pill">
                             </form>
                         </div>
                     </div>
@@ -117,12 +120,12 @@
         var password = document.getElementById('password').value;
 
         if(usuario === ''){
-            toastr.error('usuario es requerido');
+            toastr.error('Usuario es requerido');
             return;
         }
 
         if(password === ''){
-            toastr.error('contraseña es requerida');
+            toastr.error('Contraseña es requerida');
             return;
         }
 
@@ -148,13 +151,13 @@
     function verificar(response) {
 
         if (response.data.success === 0) {
-            toastr.error('validación incorrecta')
+            toastr.error('Validación incorrecta')
         } else if (response.data.success === 1) {
             window.location = response.data.ruta;
         } else if (response.data.success === 2) {
-            toastr.error('contraseña incorrecta');
+            toastr.error('Contraseña incorrecta');
         } else if (response.data.success === 3) {
-            toastr.error('usuario no encontrado')
+            toastr.error('Usuario no encontrado')
         } else if (response.data.success === 5) {
             Swal.fire({
                 title: 'Usuario Bloqueado',
@@ -171,7 +174,7 @@
             })
         }
         else {
-            toastr.error('error al iniciar sesión');
+            toastr.error('Error al iniciar sesión');
         }
     }
 

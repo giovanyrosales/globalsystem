@@ -8,9 +8,8 @@
                             <thead>
                             <tr>
                                 <th style="width: 15%">Nombre</th>
-                                <th style="width: 15%">Usuario</th>
+                                <th style="width: 10%">Usuario</th>
                                 <th style="width: 15%">Departamento</th>
-
                                 <th style="width: 12%">Opciones</th>
                             </tr>
                             </thead>

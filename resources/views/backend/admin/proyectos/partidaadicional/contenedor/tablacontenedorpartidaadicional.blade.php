@@ -9,7 +9,6 @@
                             <tr>
                                 <th>Fecha</th>
                                 <th>Estado</th>
-                                <th>Monto</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -27,8 +26,6 @@
                                             <span class="badge bg-success">Partida Adicional Aprobada</span>
                                         @endif
                                     </td>
-
-                                    <td>{{ $dato->montopartidas }}</td>
 
                                     <td>
 

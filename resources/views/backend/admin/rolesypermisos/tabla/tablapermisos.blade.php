@@ -7,11 +7,11 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>Rol</th>
-                                <th>Usuario</th>
-                                <th>Activo</th>
-                                <th>Opciones</th>
+                                <th style="width: 10%">Nombre</th>
+                                <th style="width: 10%">Rol</th>
+                                <th style="width: 10%">Usuario</th>
+                                <th style="width: 8%">Activo</th>
+                                <th style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>

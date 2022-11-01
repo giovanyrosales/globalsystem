@@ -418,32 +418,17 @@
                             </li>
                         @endcan
 
+                        @can('sidebar.vista.bolson')
+                            <li class="nav-item">
+                                <a href="{{ route('admin.bolson.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Bolsón</p>
+                                </a>
+                            </li>
+                        @endcan
                     </ul>
                 </li>
                 @endcan
-
-
-                <li class="nav-item">
-
-                    <a href="#" class="nav-link nav-">
-                        <i class="far fa-edit"></i>
-                        <p>
-                            modificando
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
-
-                    <ul class="nav nav-treeview">
-
-                        <li class="nav-item">
-                            <a href="{{ route('admin.bolson.index') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Bolsón</p>
-                            </a>
-                        </li>
-
-                    </ul>
-                </li>
 
 
                 @can('sidebar.seccion.configuraciones.presupuesto.unidades')

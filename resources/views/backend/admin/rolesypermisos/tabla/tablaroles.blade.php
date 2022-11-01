@@ -8,19 +8,19 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Rol</th>
-                                <th>Opciones</th>
+                                <th style="width: 4%">ID</th>
+                                <th style="width: 10%">Rol</th>
+                                <th style="width: 8%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($roles as $key => $value)
                                 <tr>
-                                    <td>{{ $key }}</td>
-                                    <td>{{ $value }}</td>
+                                    <td style="width: 4%">{{ $key }}</td>
+                                    <td style="width: 10%">{{ $value }}</td>
 
-                                    <td>
+                                    <td style="width: 8%">
                                         <button type="button" class="btn btn-primary btn-xs" onclick="verInformacion({{ $key }})">
                                             <i class="fas fa-pencil-alt" title="Editar"></i>&nbsp; Editar
                                         </button>

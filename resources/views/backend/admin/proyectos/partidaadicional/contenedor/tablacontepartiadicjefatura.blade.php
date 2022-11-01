@@ -12,7 +12,6 @@
                             <tr>
                                 <th>Fecha</th>
                                 <th>Estado</th>
-                                <th>Monto</th>
                                 <th>Documento</th>
                                 <th>Opciones</th>
                             </tr>
@@ -32,7 +31,6 @@
                                         @endif
                                     </td>
 
-                                    <td>{{ $dato->montopartidas }}</td>
                                     <td>
                                         @if($dato->documento != null)
                                             <a href="{{ url('/admin/partida/adicional/obraadicional/doc/'.$dato->id) }}">

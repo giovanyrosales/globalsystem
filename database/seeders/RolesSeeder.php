@@ -138,10 +138,13 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'sidebar.obj.especifico', 'description' => 'sidebar objeto específico'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'sidebar.solicitud.material.uaci', 'description' => 'sidebar solicitud de materiales presupuesto ingenieria'])->syncRoles($roleUaci, $roleIng);
             Permission::create(['name' => 'sidebar.vista.catalogo.materiales.ing', 'description' => 'sidebar vista catalogo de materiales para ver lista por parte de ing'])->syncRoles($roleIng);
+            Permission::create(['name' => 'sidebar.vista.bolson', 'description' => 'sidebar - vista para ir a bolson'])->syncRoles($rolePresupuesto);
 
 
             Permission::create(['name' => 'boton.solicitar.material.ing', 'description' => 'boton para solicitar nuevo material por parte de ing'])->syncRoles($roleIng);
             Permission::create(['name' => 'boton.agregar.material.solicitado.ing', 'description' => 'boton para agregar el material solicitado por ing'])->syncRoles($roleUaci);
+
+
 
 
             //nuevos

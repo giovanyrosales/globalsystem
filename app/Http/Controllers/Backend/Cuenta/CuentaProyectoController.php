@@ -1842,7 +1842,6 @@ class CuentaProyectoController extends Controller
                             }
                         }
 
-
                         if(CuentaProy::where('proyecto_id', $infoProyecto->id)
                             ->where('objespeci_id', $det->id_objespecifico)->first()){
 
@@ -1869,7 +1868,6 @@ class CuentaProyectoController extends Controller
                     PartidaAdicionalContenedor::where('id', $request->idcontenedor)->update([
                         'fecha_aprobado' => Carbon::now('America/El_Salvador'),
                         'estado' => 2, // aprobado
-                        'monto' =>
                     ]);
 
                     DB::commit();
