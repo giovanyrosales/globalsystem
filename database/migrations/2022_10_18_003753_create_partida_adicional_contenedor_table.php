@@ -29,6 +29,9 @@ class CreatePartidaAdicionalContenedorTable extends Migration
 
             $table->integer('estado');
 
+            // imprevisto
+            $table->decimal('imprevisto', 10, 2);
+
             // solo tendrá un valor cuando es aprobada la partida adicional
             $table->decimal('monto', 10, 2);
 

@@ -20,6 +20,9 @@ class CreateCuentaproyTable extends Migration
 
             $table->decimal('saldo_inicial', 10,2); // no cambia nunca
 
+            // 0: no es partida adicional
+            // 1: si es partida adicional
+            $table->boolean('partida_adicional');
 
             $table->foreign('proyecto_id')->references('id')->on('proyectos');
             $table->foreign('objespeci_id')->references('id')->on('obj_especifico');

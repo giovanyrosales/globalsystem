@@ -70,15 +70,13 @@
                                     </tr>
                                 </table>
 
-                                <!-- Solo se podrá modificar el imprevisto si el Presupuesto esta en Desarrollo -->
-                                @if($proyecto->presu_aprobado == 0)
-                                    @can('boton.editar.imprevisto.administrador')
-                                    <button type="button" style="margin-top: 15px" onclick="modalImprevisto()" class="btn btn-success btn-sm">
-                                        <i class="fas fa-money-bill"></i>
-                                        Imprevisto
-                                    </button>
-                                    @endcan
-                                @endif
+                                @can('boton.editar.imprevisto.administrador')
+                                <button type="button" style="margin-top: 15px" onclick="modalImprevisto()" class="btn btn-success btn-sm">
+                                    <i class="fas fa-money-bill"></i>
+                                    Imprevisto
+                                </button>
+                                @endcan
+
 
                                 <!-- permiso para habilitar botón y agregar partidas adicionales -->
                                 <!-- debe estar proyecto en estado INICIADO -->
@@ -2837,15 +2835,15 @@
 
             let imprevisto = document.getElementById('imprevisto-editar').value;
 
-            var reglaNumeroEntero = /^[0-9]\d*$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             if(imprevisto === ''){
                 toastr.error('Imprevisto es requerido');
                 return;
             }
 
-            if(!imprevisto.match(reglaNumeroEntero)) {
-                toastr.error('Imprevisto debe ser número Entero y no Negativo');
+            if(!imprevisto.match(reglaNumeroDosDecimal)) {
+                toastr.error('Imprevisto debe ser número Decimal y no Negativo, solo se permite 2 decimales');
                 return;
             }
 
@@ -2888,25 +2886,7 @@
                             }
                         })
                     }
-
-                    else if(response.data.success === 2) {
-
-                        Swal.fire({
-                            title: 'No Modificado',
-                            text: "El Presupuesto ya esta Aprobado",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-                    }
-                    else if(response.data.success === 3){
+                    else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         $('#modalImprevisto').modal('hide');
                     }

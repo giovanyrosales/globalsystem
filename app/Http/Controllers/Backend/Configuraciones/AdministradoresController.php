@@ -121,7 +121,7 @@ class AdministradoresController extends Controller
 
         if ($info = Proyecto::where('id', $request->id)->first()) {
 
-            return ['success' => 1, 'numero' => $info->imprevisto];
+            return ['success' => 1, 'numero' => $info->imprevisto_modificable];
         } else {
             return ['success' => 2];
         }
@@ -148,16 +148,11 @@ class AdministradoresController extends Controller
                 return ['success' => 1];
             }
 
-            if($info->presu_aprobado == 2){
-                // presupuesto esta en revisión
-                return ['success' => 2];
-            }
-
             Proyecto::where('id', $request->id)->update([
-                'imprevisto' => $request->imprevisto,
+                'imprevisto_modificable' => $request->imprevisto,
             ]);
 
-            return ['success' => 3];
+            return ['success' => 2];
         } else {
             return ['success' => 99];
         }

@@ -88,7 +88,8 @@ class ProyectoController extends Controller
         $p->acuerdoapertura = null;
         $p->acuerdocierre = null;
         $p->monto = 0;
-        $p->imprevisto = 5; // por default, después se puede modificar
+        $p->imprevisto = 0; // este sera usado cuando sea aprobado presupuesto
+        $p->imprevisto_modificable = 5; // por defecto
         $p->presu_aprobado = 0;
         $p->fecha_aprobado = null;
         $p->permiso = 0;
@@ -1641,9 +1642,15 @@ class ProyectoController extends Controller
         $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalDescuento
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
+        // obtener el imprevisto actual
+        if($infoPro->presu_aprobado == 2){
+            $imprevistoActual = $infoPro->imprevisto;
+        }else{
+            $imprevistoActual = $infoPro->imprevisto_modificable;
+        }
 
         // imprevisto obtenido del proyecto
-        $imprevisto = ($subtotalPartida * $infoPro->imprevisto) / 100;
+        $imprevisto = ($subtotalPartida * $imprevistoActual) / 100;
 
         // total de la partida final
         $totalPartidaFinal = $subtotalPartida + $imprevisto;
@@ -1661,7 +1668,7 @@ class ProyectoController extends Controller
         $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
 
         $preAprobado = $infoPro->presu_aprobado;
-        $numimprevisto = $infoPro->imprevisto;
+        $numimprevisto = $imprevistoActual;
 
         return view('backend.admin.proyectos.modal.pdfpresupuesto', compact('partida1',
             'manoobra', 'mes', 'fuenter', 'nombrepro', 'afp', 'isss', 'insaforp', 'totalDescuento',
@@ -1778,7 +1785,9 @@ class ProyectoController extends Controller
                     // pasar a modo aprobado
                     Proyecto::where('id', $request->id)->update([
                         'fecha_aprobado' => Carbon::now('America/El_Salvador'),
-                        'presu_aprobado' => 2]);
+                        'presu_aprobado' => 2,
+                        'imprevisto' => $pro->imprevisto_modificable
+                        ]);
 
 
                     //*************** OBTENER SALDO DE CADA CÓDIGO */
@@ -1889,6 +1898,7 @@ class ProyectoController extends Controller
                         $presu->proyecto_id = $request->id;
                         $presu->objespeci_id = $det->id_objespecifico;
                         $presu->saldo_inicial = $suma;
+                        $presu->partida_adicional = 0; // no es partida adicional
                         $presu->save();
                     }
 
@@ -2528,9 +2538,14 @@ class ProyectoController extends Controller
         $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalDescuento
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
+        if($infoPro->presu_aprobado == 2){
+            $imprevistoActual = $infoPro->imprevisto;
+        }else{
+            $imprevistoActual = $infoPro->imprevisto_modificable;
+        }
 
         // imprevisto obtenido del proyecto
-        $imprevisto = ($subtotalPartida * $infoPro->imprevisto) / 100;
+        $imprevisto = ($subtotalPartida * $imprevistoActual) / 100;
 
         // total de la partida final
         return ($this->redondear_dos_decimal($subtotalPartida + $imprevisto));

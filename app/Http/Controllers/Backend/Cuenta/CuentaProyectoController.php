@@ -1116,12 +1116,15 @@ class CuentaProyectoController extends Controller
 
         try {
 
+            $infoProyecto = Proyecto::where('id', $request->idproyecto)->first();
+
             $co = new PartidaAdicionalContenedor();
             $co->id_proyecto = $request->idproyecto;
             $co->fecha = $request->fecha;
             $co->documento = null;
             $co->estado = 0; // 0: en desarrollo, 1: listo para revisión, 2: aprobado
             $co->monto = 0;
+            $co->imprevisto = $infoProyecto->imprevisto_modificable;
             $co->fecha_aprobado = null;
             $co->save();
 
@@ -1134,11 +1137,6 @@ class CuentaProyectoController extends Controller
         }
     }
 
-    function obtenerPorcentaje($cantidad, $total) {
-        $porcentaje = ((float)$cantidad * 100) / $total; // Regla de tres
-        $porcentaje = round($porcentaje, 2);  // Quitar los decimales
-        return $porcentaje;
-    }
 
     // vista donde se crean ya las partidas adicionales
     public function indexCreacionPartidasAdicionales($id)
@@ -1706,6 +1704,17 @@ class CuentaProyectoController extends Controller
             if($this->redondear_dos_decimal($sumatoria) <= $montoMaximoObra){
                 // si podrá guardarse
 
+                // todos los objetos específicos que contiene el proyecto, para agregar
+                // si no existe
+
+                $arrayObjEspec = CuentaProy::where('proyecto_id', $infoContenedor->id_proyecto)->get();
+
+                $pilaObjEspecificos = array();
+
+                foreach ($arrayObjEspec as $pp){
+                    array_push($pilaObjEspecificos, $pp->objespeci_id);
+                }
+
                 if ($request->hasFile('documento')) {
 
                     $cadena = Str::random(15);
@@ -1833,17 +1842,34 @@ class CuentaProyectoController extends Controller
                             }
                         }
 
-                        // GUARDAR REGISTRO
-                        $presu = new CuentaproyPartidaAdicional();
-                        $presu->id_proyecto = $infoProyecto->id;
-                        $presu->objespeci_id = $det->id_objespecifico;
-                        $presu->monto = $suma;
-                        $presu->save();
+
+                        if(CuentaProy::where('proyecto_id', $infoProyecto->id)
+                            ->where('objespeci_id', $det->id_objespecifico)->first()){
+
+                            // si existe, asi que solo guardar un registro a parte
+
+                            $presu = new CuentaproyPartidaAdicional();
+                            $presu->id_proyecto = $infoProyecto->id;
+                            $presu->objespeci_id = $det->id_objespecifico;
+                            $presu->monto = $suma;
+                            $presu->id_partida_adic_conte = $infoContenedor->id;
+                            $presu->save();
+                        }else{
+                            // no existe, asi que guardar registro en cuenta proy con un boolean
+                            $presu = new CuentaProy();
+                            $presu->proyecto_id = $infoProyecto->id;
+                            $presu->objespeci_id = $det->id_objespecifico;
+                            $presu->saldo_inicial = $suma;
+                            $presu->partida_adicional = 1;
+                            $presu->save();
+                        }
                     }
 
                     // actualizar estado
                     PartidaAdicionalContenedor::where('id', $request->idcontenedor)->update([
                         'fecha_aprobado' => Carbon::now('America/El_Salvador'),
+                        'estado' => 2, // aprobado
+                        'monto' =>
                     ]);
 
                     DB::commit();

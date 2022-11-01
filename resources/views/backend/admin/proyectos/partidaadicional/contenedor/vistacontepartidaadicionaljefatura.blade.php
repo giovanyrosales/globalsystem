@@ -567,9 +567,9 @@
 
                     }
                     else if(response.data.success === 2){
-
-                        toastr.success('completado');
-
+                        $('#modalEstado').modal('hide');
+                        toastr.success('Partida Adicional Aprobada');
+                        recargar();
                     }
                     else if(response.data.success === 3){
 
