@@ -188,7 +188,7 @@ class ControlPdfController extends Controller
 
                 $multi = $lista->cantidad * $infomaterial->pu;
 
-                $totalAporteManoObra = $totalAporteManoObra + $multi;
+                $totalAporteManoObra += $multi;
             }
         }
 
@@ -210,7 +210,7 @@ class ControlPdfController extends Controller
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
 
-                $totalAlquilerMaquinaria = $totalAporteManoObra + $multi;
+                $totalAlquilerMaquinaria += $multi;
             }
         }
 
@@ -232,7 +232,7 @@ class ControlPdfController extends Controller
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
 
-                $totalTransportePesado = $totalAporteManoObra + $multi;
+                $totalTransportePesado += $multi;
             }
         }
 

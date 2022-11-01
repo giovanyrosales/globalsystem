@@ -117,21 +117,10 @@
             @foreach($dd->bloque1 as $gg)
 
                 <tr>
-                    @if($gg->objespecifico == null)
-                        <td width="10%" style="background: red"></td>
-                    @else
-                        <td width="10%">{{ $gg->objespecifico }}</td>
-                    @endif
 
-
+                    <td width="10%">{{ $gg->objespecifico }}</td>
                     <td width="15%">{{ $gg->material }}</td>
-
-                    @if($gg->medida == null)
-                        <td width="10%" style="background: red"></td>
-                    @else
-                        <td width="10%">{{ $gg->medida }}</td>
-                    @endif
-
+                    <td width="10%">{{ $gg->medida }}</td>
                     <td width="10%">{{ $gg->cantidad }}</td>
                     <td width="10%">{{ $gg->pu }}</td>
                     <td width="12%">{{ $gg->subtotal }}</td>

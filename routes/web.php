@@ -111,7 +111,7 @@ Route::get('/admin/proyecto/lista/tabla/index', [ProyectoController::class,'tabl
 Route::post('/admin/proyecto/lista/informacion', [ProyectoController::class, 'informacionProyecto']);
 // edita la información de un proyecto
 Route::post('/admin/proyecto/lista/editar', [ProyectoController::class, 'editarProyecto']);
-// retorna vista para MODAL, aquí se visualiza el presupuesto. aquí se visualiza botón para aprobar el presupuesto
+// retorna vista para MODAL, aquí se visualiza el presupuesto. Aquí se visualiza botón para aprobar el presupuesto
 Route::get('/admin/ver/presupuesto/uaci/{id}', [ProyectoController::class,'informacionPresupuestoParaAprobacion']);
 // petición para aprobar el presupuesto y guardar las cuentas proyecto
 Route::post('/admin/proyecto/aprobar/presupuesto', [ProyectoController::class, 'aprobarPresupuesto']);
@@ -312,6 +312,8 @@ Route::post('/admin/partida/adicio/infojefatura/estado/informacion', [CuentaProy
 Route::post('/admin/partida/adicional/aprobar', [CuentaProyectoController::class, 'aprobarPartidaAdicional']);
 // generar un documento PDF
 Route::get('/admin/partida/adicional/verpdf/{id}', [CuentaProyectoController::class, 'generarPdfPartidaAdicional']);
+// comprobar que haya partidas adicionales
+Route::post('/admin/partida/adicional/comprobar/quehaya', [CuentaProyectoController::class, 'verificarSiHayPartidas']);
 
 
 

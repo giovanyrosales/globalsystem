@@ -12,6 +12,7 @@ use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
 use App\Models\CuentaProy;
+use App\Models\CuentaproyPartidaAdicional;
 use App\Models\CuentaProyRetenido;
 use App\Models\EstadoProyecto;
 use App\Models\FuenteFinanciamiento;
@@ -1575,7 +1576,7 @@ class ProyectoController extends Controller
 
                 $multi = $lista->cantidad * $infomaterial->pu;
 
-                $totalAporteManoObra = $totalAporteManoObra + $multi;
+                $totalAporteManoObra += $multi;
             }
         }
 
@@ -1597,7 +1598,7 @@ class ProyectoController extends Controller
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
 
-                $totalAlquilerMaquinaria = $totalAporteManoObra + $multi;
+                $totalAlquilerMaquinaria += $multi;
             }
         }
 
@@ -1620,7 +1621,7 @@ class ProyectoController extends Controller
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
 
-                $totalTransportePesado = $totalAporteManoObra + $multi;
+                $totalTransportePesado += $multi;
             }
         }
 
@@ -1952,6 +1953,15 @@ class ProyectoController extends Controller
                 $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
             }
 
+            $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $id)->get();
+
+            $sumaPartidaAdicional = 0;
+            foreach ($infoCuentaPartida as $dd){
+                if($pp->idcodigo == $dd->objespeci_id){
+                    $sumaPartidaAdicional += $dd->monto;
+                }
+            }
+
             // información de saldos retenidos
             $arrayRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
@@ -1964,8 +1974,12 @@ class ProyectoController extends Controller
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
+            // sumando partidas adicionales que coincidan con el obj específico + saldo inicial
+            $sumaPartidaAdicional += $pp->saldo_inicial;
+
             // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + $pp->saldo_inicial - $totalRestante;
+            $totalRestanteSaldo = $totalMoviCuenta + $sumaPartidaAdicional - $totalRestante;
+
 
             //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
 
@@ -2444,8 +2458,11 @@ class ProyectoController extends Controller
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
 
                 $multi = $lista->cantidad * $infomaterial->pu;
+                if($lista->duplicado != 0){
+                    $multi = $multi * $lista->duplicado;
+                }
 
-                $totalAporteManoObra = $totalAporteManoObra + $multi;
+                $totalAporteManoObra += $multi;
             }
         }
 
@@ -2466,8 +2483,11 @@ class ProyectoController extends Controller
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
+                if($lista->duplicado != 0){
+                    $multi = $multi * $lista->duplicado;
+                }
 
-                $totalAlquilerMaquinaria = $totalAporteManoObra + $multi;
+                $totalAlquilerMaquinaria += $multi;
             }
         }
 
@@ -2488,8 +2508,11 @@ class ProyectoController extends Controller
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
+                if($lista->duplicado != 0){
+                    $multi = $multi * $lista->duplicado;
+                }
 
-                $totalTransportePesado = $totalAporteManoObra + $multi;
+                $totalTransportePesado += $multi;
             }
         }
 

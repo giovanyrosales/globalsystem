@@ -48,6 +48,12 @@
                                             <i class="fas fa-list-alt" title="Partidas Adicionales"></i>&nbsp; Partidas
                                         </button>
 
+                                        <!-- sacar pdf -->
+                                        <br><br>
+                                        <button type="button" class="btn btn-success btn-xs" onclick="infoPdf({{ $dato->id }})">
+                                            <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
+                                        </button>
+
                                         <!-- botón para aprobar partidas adicionales-->
                                         @if($dato->estado == 1)
                                             <br><br>

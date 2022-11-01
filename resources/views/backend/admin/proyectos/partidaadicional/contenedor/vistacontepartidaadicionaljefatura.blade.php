@@ -606,6 +606,47 @@
                 });
         }
 
+        function infoPdf(id){
+            // id Contenedor
+
+            openLoading();
+
+            axios.post(url+'/partida/adicional/comprobar/quehaya', {
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    // esta en modo revisión
+                    if(response.data.success === 1){
+                        window.open("{{ URL::to('admin/partida/adicional/verpdf') }}/" + id);
+
+                    }else{
+                        // la partida adicional esta aprobada
+
+                        Swal.fire({
+                            title: 'No Encontrada',
+                            text: "No se encontró Partidas Adicionales",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
+
+        }
+
 
     </script>
 
