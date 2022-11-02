@@ -22,6 +22,9 @@
         <div class="row mb-2">
             <div class="col-sm-6">
 
+                    <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
+                        <i title="Atras"></i> Atras </a>
+
             </div>
 
             <div class="col-sm-6">

@@ -6,6 +6,7 @@
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/bootstrap-select.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/jquery-ui.min.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -34,7 +35,8 @@
             </div>
 
             @can('boton.pdf.generar.presupuesto')
-            <button type="button" onclick="modalGenerarPresupuesto()" class="btn btn-success btn-sm">
+            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalGenerarPresupuesto()"
+                    class="button button-3d button-rounded button-pill button-small">
                 <i class="fas fa-file-pdf"></i>
                 Generar Presupuesto
             </button>
@@ -71,8 +73,8 @@
                                 </table>
 
                                 @can('boton.editar.imprevisto.administrador')
-                                <button type="button" style="margin-top: 15px" onclick="modalImprevisto()" class="btn btn-success btn-sm">
-                                    <i class="fas fa-money-bill"></i>
+                                <button type="button" style="margin-top: 15px; font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalImprevisto()" class="button button-3d button-rounded button-pill button-small">
+                                    <i class="fas fa-percent"></i>
                                     Imprevisto
                                 </button>
                                 @endcan
@@ -83,7 +85,7 @@
                                 @if($proyecto->permiso_partida_adic == 1)
                                     @if($proyecto->id_estado == 2)
                                         @can('boton.crear.vista.partida.adicionales')
-                                            <button type="button" style="margin-top: 15px" onclick="vistaPartidaAdicional()" class="btn btn-info btn-sm">
+                                            <button type="button" style="margin-top: 15px; font-weight: bold; background-color: #28a745; color: white !important;" onclick="vistaPartidaAdicional()" class="button button-3d button-rounded button-pill button-small">
                                                 <i class="fas fa-list-alt"></i>
                                                 Partidas Adicionales
                                             </button>
@@ -184,7 +186,7 @@
                             @if($proyecto->presu_aprobado == 0)
                                 <!-- solo se puede agregar partidas si esta priorizado el proyecto -->
                                 @if($proyecto->id_estado == 1)
-                                    <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalPresupuesto()" class="btn btn-secondary btn-sm">
+                                    <button type="button" style="margin-left: 15px; float: right; margin-bottom: 10px ;font-weight: bold; background-color: #6c757d; color: white !important;" onclick="verModalPresupuesto()" class="button button-3d button-rounded button-pill button-small">
                                         Agregar Partida
                                     </button>
                                 @else
@@ -219,7 +221,8 @@
                     <div class="card card-default">
                         <div class="card-header">
                             <h3 class="card-title"><strong>Control de Bitácoras</strong></h3>
-                            <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="modalAgregarBitacora()" class="btn btn-secondary btn-sm">
+                            <button style="font-weight: bold; background-color: #6c757d; color: white !important; margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="modalAgregarBitacora()"
+                                    class="button button-3d button-rounded button-pill button-small">
                                 Agregar Bitacora
                             </button>
                         </div>
@@ -366,7 +369,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarBitacora()">Guardar</button>
+                <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="guardarBitacora()">Guardar</button>
             </div>
         </div>
     </div>
@@ -406,7 +409,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="editarBitacora()">Actualizar</button>
+                <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="editarBitacora()">Actualizar</button>
             </div>
         </div>
     </div>
@@ -441,7 +444,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="editarImprevisto()">Actualizar</button>
+                <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="editarImprevisto()">Actualizar</button>
             </div>
         </div>
     </div>
@@ -520,7 +523,8 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="botonGuardarRequiDetalle" onclick="preguntaGuardarRequisicionEditar()">Guardar</button>
+                <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                        class="button button-rounded button-pill button-small" id="botonGuardarRequiDetalle" onclick="preguntaGuardarRequisicionEditar()">Guardar</button>
             </div>
         </div>
     </div>
@@ -569,7 +573,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Cantidad C/ Unidad:</label>
-                                    <input class="form-control" type="text" maxlength="50" id="cantidad-partida-nuevo">
+                                    <input class="form-control" type="text" autocomplete="off" maxlength="50" id="cantidad-partida-nuevo">
                                 </div>
                             </div>
                         </div>
@@ -585,7 +589,7 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <br>
-                                    <button type="button" onclick="addAgregarFilaPresupuestoNueva()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                    <button type="button" onclick="addAgregarFilaPresupuestoNueva()" style="margin-top:10px; font-weight: bold; background-color: #17a2b8; color: white !important;" class="button button-rounded button-pill button-small float-right">
                                         <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                 </div>
                             </div>
@@ -613,7 +617,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="preguntaGuardarPresupuesto()">Guardar</button>
+                <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="preguntaGuardarPresupuesto()">Guardar</button>
             </div>
         </div>
     </div>
@@ -661,7 +665,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Cantidad C/ Unidad:</label>
-                                    <input class="form-control" type="text" maxlength="50" id="cantidad-partida-editar">
+                                    <input class="form-control" autocomplete="off" type="text" maxlength="50" id="cantidad-partida-editar">
                                 </div>
                             </div>
                         </div>
@@ -708,7 +712,7 @@
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 @if($proyecto->presu_aprobado == 0)
-                    <button type="button" class="btn btn-primary" onclick="preguntaEditarPresupuestoEditar()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="preguntaEditarPresupuestoEditar()">Guardar</button>
                 @endif
             </div>
         </div>
@@ -1802,7 +1806,7 @@
                 "</td>" +
 
                 "<td>" +
-                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaPresupuestoDetalle(this)'>Borrar</button>" +
+                "<button type='button' class='button button-caution button-rounded button-pill button-small' onclick='borrarFilaPresupuestoDetalle(this)'>Borrar</button>" +
                 "</td>" +
 
                 "</tr>";

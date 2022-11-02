@@ -93,9 +93,9 @@
             @endif
 
             <tr>
-                <td colspan="1" width="10%">Item</td>
-                <td colspan="4" width="30%">Partida</td>
-                <td colspan="2" width="20%">Cantidad P.</td>
+                <td colspan="1" width="10%" style="font-weight: bold">Item</td>
+                <td colspan="4" width="30%" style="font-weight: bold">Partida</td>
+                <td colspan="2" width="20%" style="font-weight: bold">Cantidad P.</td>
             </tr>
 
             <tr>
@@ -105,13 +105,13 @@
             </tr>
 
             <tr>
-                <td width="10%">Objeto Específico.</td>
-                <td width="15%">Material</td>
-                <td width="11">U/M</td>
-                <td width="12%">Cantidad</td>
-                <td width="10%">P.U</td>
-                <td width="12%">Sub Total</td>
-                <td width="20%">Total</td>
+                <td width="10%" style="font-weight: bold">Objeto Específico.</td>
+                <td width="15%" style="font-weight: bold">Material</td>
+                <td width="11" style="font-weight: bold">U/M</td>
+                <td width="12%" style="font-weight: bold">Cantidad</td>
+                <td width="10%" style="font-weight: bold">P.U</td>
+                <td width="12%" style="font-weight: bold">Sub Total</td>
+                <td width="20%" style="font-weight: bold">Total</td>
             </tr>
 
             @foreach($dd->bloque1 as $gg)
@@ -163,13 +163,13 @@
         @endif
 
         <tr>
-            <td colspan="7">MANO DE OBRA POR ADMINISTRACIÓN</td>
+            <td colspan="7" style="font-weight: bold">MANO DE OBRA POR ADMINISTRACIÓN</td>
         </tr>
 
         <tr>
-            <td colspan="1" width="10%">Item</td>
-            <td colspan="4" width="30%">Partida</td>
-            <td colspan="2" width="20%">Cantidad P.</td>
+            <td colspan="1" width="10%" style="font-weight: bold">Item</td>
+            <td colspan="4" width="30%" style="font-weight: bold">Partida</td>
+            <td colspan="2" width="20%" style="font-weight: bold">Cantidad P.</td>
         </tr>
 
         <tr>
@@ -179,13 +179,13 @@
         </tr>
 
         <tr>
-            <td width="10%">Objeto Específico.</td>
-            <td width="15%">Material</td>
-            <td width="11">U/M</td>
-            <td width="12%">Cantidad</td>
-            <td width="10%">P.U</td>
-            <td width="12%">Sub Total</td>
-            <td width="20%">Total</td>
+            <td width="10%" style="font-weight: bold">Objeto Específico.</td>
+            <td width="15%" style="font-weight: bold">Material</td>
+            <td width="11" style="font-weight: bold">U/M</td>
+            <td width="12%" style="font-weight: bold">Cantidad</td>
+            <td width="10%" style="font-weight: bold">P.U</td>
+            <td width="12%" style="font-weight: bold">Sub Total</td>
+            <td width="20%" style="font-weight: bold">Total</td>
         </tr>
 
         @foreach($dd->bloque3 as $gg)
@@ -296,7 +296,7 @@
     <tbody>
 
     <tr>
-        <td colspan="2">RESUMEN DE PARTIDA</td>
+        <td colspan="2" style="font-weight: bold">RESUMEN DE PARTIDA</td>
     </tr>
 
     <tr>
@@ -367,7 +367,8 @@
     @can('boton.aprobar.presupuesto')
         @if($preAprobado == 1)
             <!-- sera visible solamente si no esta aprobado aun -->
-            <button type="button" class="btn btn-primary" id="btnAprobarPresupuesto"  onclick="btnAprobarPresupuesto()">Aprobar</button>
+            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                    class="button button-rounded button-pill button-small" id="btnAprobarPresupuesto"  onclick="btnAprobarPresupuesto()">Asignar Bolsón</button>
         @endcan
     @endcan
 

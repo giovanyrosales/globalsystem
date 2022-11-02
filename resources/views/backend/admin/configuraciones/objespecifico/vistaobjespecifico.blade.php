@@ -5,7 +5,7 @@
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -20,7 +20,8 @@
         <div class="container-fluid">
             <div class="row">
                 <h1>Objeto Específico</h1>
-                <button type="button" style="margin-left: 20px" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                <button type="button" style="font-weight: bold; margin-left: 20px; background-color: #28a745; color: white !important;"
+                        onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
                     <i class="fas fa-plus-square"></i>
                     Nuevo Objeto Específico
                 </button>
@@ -63,12 +64,12 @@
 
                                     <div class="form-group">
                                         <label>Código</label>
-                                        <input type="text" class="form-control" id="numero" placeholder="Código">
+                                        <input type="text" class="form-control" autocomplete="off" id="numero" placeholder="Código">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Nombre</label>
-                                        <input type="text" maxlength="800" class="form-control" id="nombre" placeholder="Nombre">
+                                        <input type="text" autocomplete="off" maxlength="800" class="form-control" id="nombre" placeholder="Nombre">
                                     </div>
 
                                     <div class="form-group row" style="margin-top: 30px">
@@ -87,7 +88,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="nuevo()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="nuevo()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -112,12 +113,12 @@
                                     <div class="form-group">
                                         <label>Código</label>
                                         <input type="hidden" id="id-editar">
-                                        <input type="text" class="form-control" id="numero-editar" placeholder="Código">
+                                        <input type="text" autocomplete="off" class="form-control" id="numero-editar" placeholder="Código">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Nombre</label>
-                                        <input type="text" maxlength="800" class="form-control" id="nombre-editar" placeholder="Nombre">
+                                        <input type="text" autocomplete="off" maxlength="800" class="form-control" id="nombre-editar" placeholder="Nombre">
                                     </div>
 
                                     <div class="form-group">
@@ -136,7 +137,8 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                            class="button button-rounded button-pill button-small" onclick="editar()">Guardar</button>
                 </div>
             </div>
         </div>

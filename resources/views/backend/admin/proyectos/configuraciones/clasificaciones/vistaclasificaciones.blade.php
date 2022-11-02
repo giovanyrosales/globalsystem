@@ -71,7 +71,8 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="nuevo()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                             class="button button-rounded button-pill button-small" onclick="nuevo()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -110,7 +111,8 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                            class="button button-rounded button-pill button-small" onclick="editar()">Guardar</button>
                 </div>
             </div>
         </div>

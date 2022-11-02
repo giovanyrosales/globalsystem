@@ -1741,7 +1741,7 @@ class ProyectoController extends Controller
 
                 $partidaAdicionalMonto = PartidaAdicionalContenedor::where('id_proyecto', $request->id)
                     ->where('estado', 2) // partidas aprobadas
-                    ->sum('monto');
+                    ->sum('monto_aprobado');
 
                 //*****************
 
@@ -1758,24 +1758,23 @@ class ProyectoController extends Controller
                 $montoBolsonInicial = Bolson::where('id', $request->idbolson)->sum('monto_inicial');
 
                 // montoPartida: es el monto de las partidas presupuesto de proyecto para aprobar
-                // proyectoMontoBolson: es el monto de las partidas aprobadas de todos los proyectos a bolson
+                // proyectoMontoBolson: es el monto de las partidas aprobadas de todos los proyectos a bolsón
                 // partidaAdicionalMonto: es el monto de las partidas adicionales aprobadas
                 // proyectoFinalizadoMonto: es el monto sobrante de un proyecto cuando se finaliza
 
-                $sumatoria = $montoPartida + $proyectoMontoBolson + $partidaAdicionalMonto + $proyectoFinalizadoMonto;
+                // restar a monto inicial y despues sumarle
+                $restaBolsonInicial = $montoBolsonInicial - ($proyectoMontoBolson + $partidaAdicionalMonto);
 
-                if($this->redondear_dos_decimal($montoBolsonInicial) < $this->redondear_dos_decimal($sumatoria)){
-                    // el bolsón no tiene fondos suficientes
-                    // se necesita
+                // BOLSÓN ACTUAL LO QUE HAY $
+                $restaBolsonInicial += $proyectoFinalizadoMonto;
 
-                    $bolsonActual = $montoBolsonInicial - ($proyectoMontoBolson + $partidaAdicionalMonto + $proyectoFinalizadoMonto);
-                    $montoRequerido = $montoBolsonInicial - $sumatoria;
-                    $montoRequerido = abs($montoRequerido);
+                // me queda x de bolsón, no debe ser menor a lo solicitado
+                if($this->redondear_dos_decimal($restaBolsonInicial) < $this->redondear_dos_decimal($montoPartida)){
 
-                    $bolsonActual = number_format((float)$bolsonActual, 2, '.', ',');
-                    $montoRequerido = number_format((float)$montoRequerido, 2, '.', ',');
+                    $restaBolsonInicial = number_format((float)$restaBolsonInicial, 2, '.', ',');
+                    $montoPartida = number_format((float)$montoPartida, 2, '.', ',');
 
-                    return ['success' => 4, 'actual' => $bolsonActual, 'requerido' => $montoRequerido];
+                    return ['success' => 4, 'actual' => $restaBolsonInicial, 'requerido' => $montoPartida];
                 }else{
 
                     // si hay fondos en bolsón
@@ -1800,25 +1799,6 @@ class ProyectoController extends Controller
 
                     foreach ($partidas as $pp){
                         array_push($pilaDetalle, $pp->id);
-                    }
-
-                    // verificar cada detalle de la partida para ver si tiene objeto especifico
-                    $todoDetalle = DB::table('partida_detalle AS p')
-                        ->join('materiales AS m', 'p.material_id', '=', 'm.id')
-                        ->select('m.id_objespecifico', 'm.nombre')
-                        ->whereIn('p.partida_id', $pilaDetalle)
-                        ->get();
-
-                    $conteo = 0;
-                    foreach ($todoDetalle as $tt){
-                        if($tt->id_objespecifico == null){
-                            $conteo += 1;
-                        }
-                    }
-
-                    if($conteo > 0){
-                        // HAY X MATERIALES QUE NO TIENEN OBJ ESPECÍFICO
-                        return ['success' => 5, 'conteo' => $conteo];
                     }
 
                     $totalManoObra = 0;
@@ -2345,7 +2325,7 @@ class ProyectoController extends Controller
 
                 $partidaAdicionalMonto = PartidaAdicionalContenedor::where('id_proyecto', $request->idproyecto)
                     ->where('estado', 2) // partidas aprobadas
-                    ->sum('monto');
+                    ->sum('monto_aprobado');
 
                 $proyectoFinalizadoMonto = Proyecto::where('id_bolson', $request->idbolson)
                     ->where('id_estado', 4)
@@ -2353,7 +2333,10 @@ class ProyectoController extends Controller
 
                 $montoBolsonInicial = Bolson::where('id', $request->idbolson)->sum('monto_inicial');
 
-                $montoActual = $montoBolsonInicial - ($proyectoMontoBolson + $partidaAdicionalMonto + $proyectoFinalizadoMonto);
+                // vamos a restar
+                $montoActual = $montoBolsonInicial - ($proyectoMontoBolson + $partidaAdicionalMonto);
+                // vamos a sumar los sobrantes
+                $montoActual += $proyectoFinalizadoMonto;
 
                 $montoActual = "$" . number_format((float)$montoActual, 2, '.', ',');
 

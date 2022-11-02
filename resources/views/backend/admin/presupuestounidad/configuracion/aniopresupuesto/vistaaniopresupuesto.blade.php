@@ -5,6 +5,7 @@
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -20,7 +21,7 @@
 
     <section class="content-header">
         <div class="container-fluid">
-            <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
+            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
                 <i class="fas fa-pencil-alt"></i>
                 Nuevo Año
             </button>
@@ -72,7 +73,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="nuevo()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="nuevo()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -118,7 +119,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="editar()">Guardar</button>
                 </div>
             </div>
         </div>

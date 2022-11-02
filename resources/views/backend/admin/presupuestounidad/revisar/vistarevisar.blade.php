@@ -6,7 +6,7 @@
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
-
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 
 @stop
 
@@ -48,7 +48,8 @@
                                             </select>
                                         </div>
 
-                                        <button type="button" onclick="verificar()" class="btn btn-success" style="margin-left: 15px">Buscar</button>
+                                        <button type="button" style="margin-left: 15px;font-weight: bold; background-color: #28a745; color: white !important;"
+                                                onclick="verificar()" class="button button-3d button-rounded button-pill button-small">Buscar</button>
                                     </div>
 
                                 </div>

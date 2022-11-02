@@ -302,9 +302,9 @@ class ControlPdfController extends Controller
             }
 
             $tabla .= "<tr>
-                    <td colspan='1' width='10%'>Item</td>
-                    <td colspan='3' width='30%'>Partida</td>
-                    <td colspan='2' width='20%'>Cantidad P.</td>
+                    <td colspan='1' width='10%' style='font-weight: bold'>Item</td>
+                    <td colspan='3' width='30%' style='font-weight: bold'>Partida</td>
+                    <td colspan='2' width='20%' style='font-weight: bold'>Cantidad P.</td>
                 </tr>
 
                 <tr>
@@ -314,19 +314,19 @@ class ControlPdfController extends Controller
                 </tr>
 
                 <tr>
-                    <td width='15%'>Material</td>
-                    <td width='11'>U/M</td>
-                    <td width='12%'>Cantidad</td>
-                    <td width='10%'>P.U</td>
-                    <td width='12%'>Sub Total</td>
-                    <td width='20%'>Total</td>
+                    <td width='25%' style='font-weight: bold'>Material</td>
+                    <td width='11%' style='font-weight: bold'>U/M</td>
+                    <td width='12%' style='font-weight: bold'>Cantidad</td>
+                    <td width='10%' style='font-weight: bold'>P.U</td>
+                    <td width='12%' style='font-weight: bold'>Sub Total</td>
+                    <td width='20%' style='font-weight: bold'>Total</td>
                 </tr>
                 ";
 
             foreach ($dd->bloque1 as $gg) {
 
                 $tabla .= "<tr>
-                    <td width='15%'>$gg->material</td>
+                    <td width='25%'>$gg->material</td>
                     <td width='10%'>$gg->medida</td>
                     <td width='10%'>$gg->cantidad</td>
                     <td width='10%'>$gg->pu</td>
@@ -337,7 +337,7 @@ class ControlPdfController extends Controller
                 if ($dd->bloque1->last() == $gg) {
                     $tabla .= "
                         <tr>
-                            <td width='15%'></td>
+                            <td width='25%'></td>
                             <td width='10%'></td>
                             <td width='10%'></td>
                             <td width='10%'></td>
@@ -382,7 +382,7 @@ class ControlPdfController extends Controller
             </tr>
 
             <tr>
-                <td width='15%'>Material</td>
+                <td width='25%'>Material</td>
                 <td width='11'>U/M</td>
                 <td width='12%'>Cantidad</td>
                 <td width='10%'>P.U</td>
@@ -395,7 +395,7 @@ class ControlPdfController extends Controller
 
                 $tabla .= "
                 <tr>
-                    <td width='15%'>$gg->material</td>
+                    <td width='25%'>$gg->material</td>
                     <td width='10%'>$gg->medida</td>
                     <td width='10%'>$gg->cantidad</td>
                     <td width='10%'>$gg->pu</td>
@@ -407,7 +407,7 @@ class ControlPdfController extends Controller
                 if ($dd->bloque3->last() == $gg) {
 
                     $tabla .= "<tr>
-                        <td width='15%'></td>
+                        <td width='25%'></td>
                         <td width='10%'></td>
                         <td width='10%'></td>
                         <td width='10%'></td>

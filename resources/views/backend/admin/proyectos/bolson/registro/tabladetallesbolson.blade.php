@@ -7,9 +7,9 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Código</th>
-                                <th>Objeto Específico</th>
-                                <th>Monto</th>
+                                <th style="width: 10%;">Código</th>
+                                <th style="width: 10%;">Objeto Específico</th>
+                                <th style="width: 10%;">Monto</th>
                             </tr>
                             </thead>
                             <tbody>

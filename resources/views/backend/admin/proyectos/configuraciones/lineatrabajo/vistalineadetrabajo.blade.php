@@ -20,7 +20,8 @@
     <section class="content-header">
         <div class="row">
             <h1 style="margin-left: 5px">Línea de Trabajo</h1>
-                <button type="button" style="margin-left: 20px" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+                <button type="button" style="margin-left: 20px;font-weight: bold; background-color: #28a745; color: white !important;"
+                        onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
                     <i class="fas fa-pencil-alt"></i>
                     Nueva Línea de Trabajo
                 </button>
@@ -77,7 +78,8 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="nuevo()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                            class="button button-rounded button-pill button-small" onclick="nuevo()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -117,7 +119,8 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                            class="button button-rounded button-pill button-small" onclick="editar()">Guardar</button>
                 </div>
             </div>
         </div>

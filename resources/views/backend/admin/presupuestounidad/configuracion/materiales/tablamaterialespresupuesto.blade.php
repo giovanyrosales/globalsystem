@@ -24,11 +24,11 @@
                                     <td>{{ $dato->unidadmedida }}</td>
                                     <td>${{ $dato->costo }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
+                                            <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
                                         </button>
                                         <br><br>
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="informacionOcultar({{ $dato->id }})">
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-caution button-rounded button-pill button-small" onclick="informacionOcultar({{ $dato->id }})">
                                             <i class="fas fa-trash-alt" title="Ocultar"></i>&nbsp; Ocultar
                                         </button>
                                     </td>

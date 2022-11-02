@@ -29,6 +29,9 @@ class CreatePartidaAdicionalContenedorTable extends Migration
 
             $table->integer('estado');
 
+            // monto aprobado para descontar al bolsón
+            $table->decimal('monto_aprobado', 10, 2);
+
             // imprevisto
             $table->decimal('imprevisto', 10, 2);
 

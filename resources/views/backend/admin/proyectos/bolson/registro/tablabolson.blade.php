@@ -7,12 +7,11 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th># Cuenta</th>
-                                <th>Monto Inicial</th>
-                                <th>Monto Restante</th>
-                                <th>Monto Retenido</th>
-                                <th>Opciones</th>
+                                <th style="width: 10%;">Nombre</th>
+                                <th style="width: 10%;"># Cuenta</th>
+                                <th style="width: 10%;">Monto Inicial</th>
+                                <th style="width: 10%;">Monto Restante</th>
+                                <th style="width: 10%;">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -21,12 +20,11 @@
                                 <tr>
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->num_cuenta }}</td>
-                                    <td>${{ $dato->montoini }}</td>
-                                    <td>xx</td>
-                                    <td>xx</td>
+                                    <td>{{ $dato->monto_inicial }}</td>
+                                    <td>{{ $dato->montorestante }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Información"></i>&nbsp; Cuentas
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
+                                            <i class="fas fa-edit" title="Información"></i>&nbsp; Cuentas
                                         </button>
                                     </td>
                                 </tr>

@@ -4,7 +4,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -194,7 +194,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="btnGuardarU" onclick="verificar()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" id="btnGuardarU" onclick="verificar()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -223,7 +223,7 @@
                                 <!-- información del proyecto -->
                                 @can('boton.ver.proyecto')
                                     <div class="form-group">
-                                        <button type="button" style="width: 100%" class="btn btn-warning" onclick="vista()">
+                                        <button type="button" style=" width: 100%; font-weight: bold; font-size: 15px; background-color: #ffc107; color: white !important;" class="button button-rounded button-pill" onclick="vista()">
                                             <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver Información
                                         </button>
                                     </div>
@@ -232,7 +232,7 @@
                                 <!-- editar información del proyecto -->
                                 @can('boton.editar.proyecto')
                                     <div class="form-group">
-                                        <button type="button" style="width: 100%" class="btn btn-info" onclick="informacion()">
+                                        <button type="button" style="font-weight: bold; font-size: 15px; width: 100%; background-color: #17a2b8; color: white !important;" class="button button-rounded button-pill" onclick="informacion()">
                                             <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar Proyecto
                                         </button>
                                     </div>
@@ -242,7 +242,7 @@
                                 @can('boton.ver.presupuesto.modal')
 
                                     <div class="form-group" id="divModalPresupuesto">
-                                        <button type="button" style="width: 100%;" class="btn btn-success" onclick="informacionPresupuesto()">
+                                        <button type="button" style="font-weight: bold; font-size: 15px; width: 100%; background-color: #28a745; color: white !important;" class="button button-rounded button-pill" onclick="informacionPresupuesto()">
                                             <i class="fas fa-list-alt" title="Presupuesto"></i>&nbsp; Presupuesto
                                         </button>
                                     </div>
@@ -251,7 +251,7 @@
                                 <!-- ver planilla de proyecto -->
                                 @can('boton.ver.planilla')
                                     <div class="form-group" id="divBtnPlanilla" >
-                                        <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionPlanilla()">
+                                        <button type="button" style="font-weight: bold; font-size: 15px; width: 100%; background-color: #17a2b8; color: white !important;" class="button button-rounded button-pill" onclick="informacionPlanilla()">
                                             <i class="fas fa-eye" title="Planilla"></i>&nbsp; Planilla
                                         </button>
                                     </div>
@@ -260,7 +260,7 @@
                                 <!-- modal con los saldos -->
                                 @can('boton.dinero.presupuesto')
                                         <div class="form-group" id="divContenedorSaldos">
-                                            <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionSaldo()">
+                                            <button type="button" style="font-weight: bold; font-size: 15px; width: 100%; background-color: #17a2b8; color: white !important;" class="button button-rounded button-pill" onclick="informacionSaldo()">
                                                 <i class="fas fa-list-alt" title="Saldos"></i>&nbsp; Saldos
                                             </button>
                                         </div>
@@ -268,7 +268,7 @@
 
                                 @can('boton.movimiento.cuenta.proyecto')
                                     <div class="form-group" id="divContenedorMovimiento" >
-                                        <button type="button" style="width: 100%;" class="btn btn-info" onclick="informacionMovimiento()">
+                                        <button type="button" style="font-weight: bold; font-size: 15px; width: 100%; background-color: #17a2b8; color: white !important;" class="button button-rounded button-pill" onclick="informacionMovimiento()">
                                             <i class="fas fa-list-alt" title="Movimiento Cuenta"></i>&nbsp; Movimiento Cuenta
                                         </button>
                                     </div>
@@ -276,7 +276,7 @@
 
                                 @can('boton.modal.vista.partida.adicionales')
                                     <div class="form-group" id="divContenedorPartidaAdicional" >
-                                        <button type="button" style="width: 100%;" class="btn btn-info" onclick="vistaPartidaAdicional()">
+                                        <button type="button" style="font-weight: bold; font-size: 15px; width: 100%; background-color: #17a2b8; color: white !important;" class="button button-rounded button-pill" onclick="vistaPartidaAdicional()">
                                             <i class="fas fa-list-alt" title="Partida Adicional"></i>&nbsp; Partida Adicional
                                         </button>
                                     </div>
@@ -396,7 +396,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="actualizarEstado()">Actualizar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="actualizarEstado()">Actualizar</button>
                 </div>
             </div>
         </div>
@@ -447,8 +447,8 @@
                 </div>
 
                 <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-success" onclick="preguntaAprobarPresupuesto()">Aprobar</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="preguntaAprobarPresupuesto()">Aprobar</button>
                 </div>
             </div>
         </div>
@@ -802,7 +802,6 @@
                 document.getElementById("divContenedorPartidaAdicional").style.display = "none";
             }
 
-
             // VIENE ID PROYECTO
             $('#id-proyecto').val(dato.id);
 
@@ -1053,32 +1052,11 @@
 
                         var texto = "El Bolsón no cuenta con suficientes Fondos. " + "<br>" +
                             "Monto Actual $" + actual + "<br>" +
-                            "Monto Requerido $" + requerido + "<br>";
+                            "Monto de Proyecto Requiere $" + requerido + "<br>";
 
                         Swal.fire({
                             title: 'Fondo Insuficientes',
                             html: texto,
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-
-                    else if(response.data.success === 5){
-                        let conteo = response.data.conteo;
-
-                        document.getElementById('modalPresupuesto').style.overflowY = 'auto';
-
-                        Swal.fire({
-                            title: 'Materiales Incompleto',
-                            text: "Hay " + conteo + " Materiales que no tiene asignado un Objeto Específico",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,

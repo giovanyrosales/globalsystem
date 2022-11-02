@@ -11,6 +11,7 @@ use App\Models\ObjEspecifico;
 use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
 use App\Models\P_PresupUnidad;
+use App\Models\PartidaAdicionalContenedor;
 use App\Models\Proyecto;
 use App\Models\TipoMovimiento;
 use Illuminate\Http\Request;
@@ -56,7 +57,54 @@ class BolsonController extends Controller
         foreach ($lista as $dd){
 
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
-            $dd->montoini = number_format((float)$dd->monto_inicial, 2, '.', ',');
+
+            //*****************
+
+            // obtener cuanto dinero queda en bolsón, ya que puede haber muchos proyectos asignados a un bolsón
+
+            $proyectoMontoBolson = Proyecto::where('id_bolson', $dd->id)
+                ->sum('monto');
+
+            //*****************
+
+            // obtener dinero descontado cuando una partida adicional está aprobada
+
+
+            $partidaAdicionalMonto = DB::table('proyectos AS p')
+                ->join('partida_adicional_contenedor AS pac', 'pac.id_proyecto', '=', 'p.id')
+                ->select('pac.monto_aprobado')
+                ->where('p.id_bolson', $dd->id)
+                ->where('pac.estado', 2) // partidas adicionales Aprobadas
+                ->sum('pac.monto_aprobado');
+
+
+            //*****************
+
+            // obtener monto de los proyectos que han finalizado
+
+            $proyectoFinalizadoMonto = Proyecto::where('id_bolson', $dd->id)
+                ->where('id_estado', 4)
+                ->sum('monto_finalizado');
+
+            //*****************
+
+            // dinero inicial de bolsón
+
+            // montoPartida: es el monto de las partidas presupuesto de proyecto para aprobar
+            // proyectoMontoBolson: es el monto de las partidas aprobadas de todos los proyectos a bolsón
+            // partidaAdicionalMonto: es el monto de las partidas adicionales aprobadas
+            // proyectoFinalizadoMonto: es el monto sobrante de un proyecto cuando se finaliza
+
+            // restar a monto inicial y despues sumarle
+            $restaBolsonInicial = $dd->monto_inicial - ($proyectoMontoBolson + $partidaAdicionalMonto);
+
+            // BOLSÓN ACTUAL LO QUE HAY $
+            $restaBolsonInicial += $proyectoFinalizadoMonto;
+
+            $restaBolsonInicial = number_format((float)$restaBolsonInicial, 2, '.', ',');
+
+            $dd->montorestante = '$' . $restaBolsonInicial;
+            $dd->monto_inicial = "$" . number_format((float)$dd->monto_inicial, 2, '.', ',');
         }
 
         return view('backend.admin.proyectos.bolson.registro.tablabolson', compact('lista'));
