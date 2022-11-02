@@ -210,7 +210,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -219,7 +219,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -229,7 +229,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -238,7 +238,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });

@@ -21,7 +21,7 @@
                                     <td>{{ $dato->usuario }}</td>
                                     <td>{{ $dato->nombredepa }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
+                                        <button type="button" style="font-weight: bold" class="button button-primary button-pill button-small" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
                                         </button>
                                     </td>

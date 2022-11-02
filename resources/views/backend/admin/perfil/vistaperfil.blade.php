@@ -4,6 +4,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <section class="content-header">
@@ -44,7 +45,7 @@
                         </div>
 
                         <div class="card-footer" style="float: right;">
-                            <button type="button" class="btn btn-success" onclick="actualizar()">Actualizar</button>
+                            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-3d button-rounded button-pill button-small" onclick="actualizar()">Actualizar</button>
                         </div>
                     </form>
                 </div>

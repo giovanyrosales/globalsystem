@@ -79,7 +79,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-success" onclick="agregarRol()">Agregar</button>
+                    <button type="button" style="background-color: #28a745; color: white !important;" class="button button-3d button-rounded button-pill button-small" onclick="agregarRol()">Agregar</button>
                 </div>
             </div>
         </div>
@@ -113,7 +113,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-danger" onclick="borrar()">Borrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #ff4351; color: white !important;" class="button button-3d button-rounded button-pill button-small" onclick="borrar()">Borrar</button>
                 </div>
             </div>
         </div>

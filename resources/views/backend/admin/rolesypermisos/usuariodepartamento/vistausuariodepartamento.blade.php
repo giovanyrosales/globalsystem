@@ -6,6 +6,7 @@
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -21,7 +22,7 @@
     <section class="content-header">
         <div class="row">
 
-            <button type="button" style="margin-left: 20px" onclick="modalAgregar()" class="btn btn-primary btn-sm">
+            <button type="button" style="margin-left: 20px; font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
                 <i class="fas fa-plus-square"></i>
                 Nuevo Registro
             </button>
@@ -90,7 +91,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="verificarGuardar()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-3d button-rounded button-pill button-small" onclick="verificarGuardar()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -132,7 +133,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="verificarEditar()">Actualizar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-3d button-rounded button-pill button-small" onclick="verificarEditar()">Actualizar</button>
                 </div>
             </div>
         </div>
@@ -161,7 +162,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -170,7 +171,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });
@@ -179,7 +180,7 @@
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
-                        return "Busqueda no encontrada";
+                        return "Búsqueda no encontrada";
                     }
                 },
             });

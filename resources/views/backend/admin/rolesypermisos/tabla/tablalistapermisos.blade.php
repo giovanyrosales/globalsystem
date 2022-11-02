@@ -22,7 +22,7 @@
                                     <td>{{ $ll->description }}</td>
 
                                     <td>
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="modalBorrar({{ $ll->id }})">
+                                        <button type="button" style="font-weight: bold" class="button button-caution button-rounded button-pill button-tiny" onclick="modalBorrar({{ $ll->id }})">
                                             <i class="fas fa-trash-alt" title="Eliminar Global"></i>&nbsp; Eliminar Global
                                         </button>
                                     </td>

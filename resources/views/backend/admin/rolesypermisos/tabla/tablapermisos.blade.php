@@ -29,7 +29,7 @@
                                     @endif
 
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="verInformacion({{ $dato->id }})">
+                                        <button type="button" style="font-weight: bold" class="button button-primary button-pill button-small" onclick="verInformacion({{ $dato->id }})">
                                             <i class="fas fa-pencil-alt" title="Editar"></i>&nbsp; Editar
                                         </button>
                                     </td>
