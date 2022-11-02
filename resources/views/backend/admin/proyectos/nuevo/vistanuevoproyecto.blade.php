@@ -4,7 +4,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -34,7 +34,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
+                    <h3 class="card-title">Formulario</h3>
                 </div>
 
                 <form id="formulario-proyecto">
@@ -171,7 +171,7 @@
                 </form>
 
                 <div class="card-footer">
-                    <button type="button" class="btn btn-info float-right" onclick="verificar();">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important; float: right" class="button button-3d button-rounded button-pill button-small" onclick="verificar();">Guardar</button>
                 </div>
 
 

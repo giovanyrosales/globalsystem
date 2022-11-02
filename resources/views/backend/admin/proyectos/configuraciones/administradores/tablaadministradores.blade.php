@@ -7,9 +7,9 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>Teléfono</th>
-                                <th>Opciones</th>
+                                <th style="width: 10%;">Nombre</th>
+                                <th style="width: 10%;">Teléfono</th>
+                                <th style="width: 8%;">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -20,8 +20,8 @@
                                     <td>{{ $dato->telefono }}</td>
 
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
+                                            <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
                                         </button>
                                     </td>
                                 </tr>
