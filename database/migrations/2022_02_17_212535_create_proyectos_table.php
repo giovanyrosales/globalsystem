@@ -45,10 +45,10 @@ class CreateProyectosTable extends Migration
 
 
             // imprevisto que toma al aprobar el presupuesto
-            $table->decimal('imprevisto', 10, 2);
+            $table->decimal('imprevisto_fijo', 10, 2);
 
-            // imprevisto modificable, ya que este no altera cuando este aprobado un presupuesto
-            $table->decimal('imprevisto_modificable', 10, 2);
+            // porcentaje de herramienta
+            $table->decimal('porcentaje_herra_fijo', 10, 2);
 
             // para aprobar las partidas presupuesto
             // 0: default
@@ -63,11 +63,12 @@ class CreateProyectosTable extends Migration
             $table->boolean('permiso');
 
             // utilizado para habilitar botón para agregar partidas adicionales
+            // esto modifica jefatura presupuesto
             $table->boolean('permiso_partida_adic');
 
             // porcentaje de obra adicional, por defecto 20% al crear proyecto
+            // esto no debe superar al aprobar cada partida adicional
             $table->decimal('porcentaje_obra', 10, 2);
-
 
             $table->foreign('id_linea')->references('id')->on('linea');
             $table->foreign('id_fuentef')->references('id')->on('fuentef');

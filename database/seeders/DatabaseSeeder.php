@@ -31,5 +31,6 @@ class DatabaseSeeder extends Seeder
         $this->call(PunidadMedidaSeeder::class);
         $this->call(DepartamentoUnidadSeeder::class);
         $this->call(EstadoUnidadSeeder::class);
+        $this->call(InfoGeneralSeeder::class);
     }
 }

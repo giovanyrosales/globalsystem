@@ -421,7 +421,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Imprevisto de Presupuesto</h4>
+                <h4 class="modal-title">Porcentajes de Presupuesto</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -435,6 +435,11 @@
                                 <div class="form-group">
                                     <label>Imprevisto %</label>
                                     <input type="number" class="form-control" id="imprevisto-editar" placeholder="0%">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Herramientas %</label>
+                                    <input type="number" class="form-control" id="herramienta-editar" placeholder="0%">
                                 </div>
 
                             </div>
@@ -1783,20 +1788,13 @@
 
                 "<td>" +
                 "<p id='fila" + (nFilas) + "' class='form-control' style='max-width: 65px'>" + (nFilas) + "</p>" +
-                "</td>";
+                "</td> " +
 
-                if(tipopartida == '4') {
-                    markup += "<td>" +
-                    "<input name='cantidadPresupuestoArray[]' disabled maxlength='10' class='form-control' type='number'>" +
-                    "</td>";
-                }
-                else{
-                    markup += "<td>" +
-                        "<input name='cantidadPresupuestoArray[]' maxlength='10' class='form-control' type='number'>" +
-                        "</td>";
-                }
+                "<td>" +
+                "<input name='cantidadPresupuestoArray[]' maxlength='10' class='form-control' type='number'>" +
+                "</td> " +
 
-                markup += "<td>" +
+                "<td>" +
                 "<input name='descripcionPresupuestoArray[]' data-infopresupuesto='0' autocomplete='off' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>" +
                 "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
                 "</td>" +
@@ -1965,42 +1963,28 @@
                         return;
                     }
 
-                /*  1- materiales
-                    2- herramientas (2% de materiales)
-                    3- mano de obra (por administracion)
-                    4- aporte mano de obra
-                    5- alquiler de maquinaria
-                    6- trasporte de concreto fresco
-                */
+                    if (datoCantidad === '') {
+                        colorRojoTablaPresupuesto(a);
+                        toastr.error('Fila #' + (a + 1) + ' Cantidad es requerida');
+                        return;
+                    }
 
-                    // unicamente no sera verificado con: APORTE PATRONAL (aporte mano de obra)
+                    if (!datoCantidad.match(reglaNumeroDosDecimal)) {
+                        colorRojoTablaPresupuesto(a);
+                        toastr.error('Fila #' + (a + 1) + ' Cantidad debe ser decimal Positivo. Solo se permite 2 Decimales');
+                        return;
+                    }
 
-                    if(tipopartida != '4') {
+                    if (datoCantidad <= 0) {
+                        colorRojoTablaPresupuesto(a);
+                        toastr.error('Fila #' + (a + 1) + ' Cantidad no debe ser negativo o cero');
+                        return;
+                    }
 
-                        if (datoCantidad === '') {
-                            colorRojoTablaPresupuesto(a);
-                            toastr.error('Fila #' + (a + 1) + ' Cantidad es requerida');
-                            return;
-                        }
-
-                        if (!datoCantidad.match(reglaNumeroDosDecimal)) {
-                            colorRojoTablaPresupuesto(a);
-                            toastr.error('Fila #' + (a + 1) + ' Cantidad debe ser decimal Positivo. Solo se permite 2 Decimales');
-                            return;
-                        }
-
-                        if (datoCantidad <= 0) {
-                            colorRojoTablaPresupuesto(a);
-                            toastr.error('Fila #' + (a + 1) + ' Cantidad no debe ser negativo o cero');
-                            return;
-                        }
-
-                        if (datoCantidad > 99000000) {
-                            colorRojoTablaPresupuesto(a);
-                            toastr.error('Fila #' + (a + 1) + ' Cantidad no puede superar 9 millones');
-                            return;
-                        }
-
+                    if (datoCantidad > 99000000) {
+                        colorRojoTablaPresupuesto(a);
+                        toastr.error('Fila #' + (a + 1) + ' Cantidad no puede superar 9 millones');
+                        return;
                     }
                 }
 
@@ -2041,15 +2025,7 @@
                 // como tienen la misma cantidad de filas, podemos recorrer
                 // todas las filas de una vez
                 for(var p = 0; p < cantidad.length; p++){
-
-                    // SOLO PARA APORTE PATRONAL SIEMPRE SERA 0
-                    // O APORTE MANO DE OBRA
-                    if(tipopartida == '4'){
-                        formData.append('cantidad[]', 0);
-                    }else{
-                        formData.append('cantidad[]', cantidad[p]);
-                    }
-
+                    formData.append('cantidad[]', cantidad[p]);
                     formData.append('datainfo[]', descripcionAtributo[p]);
                     formData.append('duplicado[]', duplicado[p]);
                 }
@@ -2163,25 +2139,15 @@
 
                             var markup = "<tr id='" + infodetalle[i].id + "'>" +
 
+                            "<td>" +
+                            "<p id='fila" + (i + 1) + "' class='form-control' style='max-width: 65px'>" + (i + 1) + "</p>" +
+                            "</td> " +
+
+                            "<td>" +
+                            "<input name='cantidadPresupuestoEditar[]' value='" + infodetalle[i].cantidad + "' maxlength='10' class='form-control' type='number'>" +
+                            "</td> " +
+
                                 "<td>" +
-                                "<p id='fila" + (i + 1) + "' class='form-control' style='max-width: 65px'>" + (i + 1) + "</p>" +
-                                "</td>";
-
-                            // APORTE MANO DE OBRA... NO LLEVA CANTIDAD
-                            if(response.data.info.id_tipopartida === 4){
-                                markup += "<td>" +
-                                "<input name='cantidadPresupuestoEditar[]' disabled maxlength='10' class='form-control' type='number'>" +
-                                "</td>";
-
-                            }else{
-
-                                markup += "<td>" +
-                                "<input name='cantidadPresupuestoEditar[]' value='" + infodetalle[i].cantidad + "' maxlength='10' class='form-control' type='number'>" +
-                                "</td>";
-
-                            }
-
-                            markup += "<td>" +
                             "<input name='descripcionPresupuestoEditar[]' disabled class='form-control' data-infopresupuestoeditar='" + infodetalle[i].material_id + "' value='" + infodetalle[i].descripcion + "' style='width:100%' type='text'>" +
                             "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
                             "</td>" +
@@ -2237,7 +2203,7 @@
         }
 
         function addAgregarFilaPresupuestoEditar(){
-            var tipopartida = document.getElementById('select-partida-nuevo').value;
+
             var nFilas = $('#matriz-presupuesto-editar >tbody >tr').length;
             nFilas += 1;
 
@@ -2246,19 +2212,13 @@
 
                     "<td>"+
                     "<p id='fila"+(nFilas)+"' class='form-control' style='max-width: 65px'>"+(nFilas)+"</p>"+
-                    "</td>";
+                    "</td>" +
+                    "<td>"+
 
-                    if(tipopartida == '4'){ // desactivar cantidad
-                        markup += "<td>"+
-                            "<input name='cantidadPresupuestoEditar[]' disabled maxlength='10' class='form-control' type='number'>"+
-                            "</td>";
-                    }else{
-                        markup += "<td>"+
-                            "<input name='cantidadPresupuestoEditar[]' maxlength='10' class='form-control' type='number'>"+
-                            "</td>";
-                    }
+                    "<input name='cantidadPresupuestoEditar[]' maxlength='10' class='form-control' type='number'>"+
+                    "</td> " +
 
-                    markup += "<td>"+
+                    "<td>"+
                     "<input name='descripcionPresupuestoEditar[]' autocomplete='off' data-infopresupuestoeditar='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuestoEditar(this)' maxlength='400'  type='text'>"+
                     "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
                     "</td>"+
@@ -2811,17 +2771,13 @@
 
             openLoading();
 
-            let id = {{ $id }};
-
-            let formData = new FormData();
-            formData.append('id', id);
-
-            axios.post(url+'/proyecto/buscar/imprevisto', formData, {
+            axios.post(url+'/proyecto/buscar/imprevisto', {
             })
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1) {
-                        $('#imprevisto-editar').val(response.data.numero);
+                        $('#imprevisto-editar').val(response.data.imprevisto);
+                        $('#herramienta-editar').val(response.data.herramienta);
                         $('#modalImprevisto').modal('show');
                     }
                     else{
@@ -2838,6 +2794,7 @@
         function editarImprevisto(){
 
             let imprevisto = document.getElementById('imprevisto-editar').value;
+            let herramienta = document.getElementById('herramienta-editar').value;
 
             var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
@@ -2861,36 +2818,39 @@
                 return;
             }
 
+            //*******
+
+            if(herramienta === ''){
+                toastr.error('Herramienta Porcentaje es requerido');
+                return;
+            }
+
+            if(!herramienta.match(reglaNumeroDosDecimal)) {
+                toastr.error('Herramienta Porcentaje debe ser número Decimal y no Negativo, solo se permite 2 decimales');
+                return;
+            }
+
+            if(herramienta < 0){
+                toastr.error('Herramienta Porcentaje no debe ser negativo');
+                return;
+            }
+
+            if(herramienta > 50){
+                toastr.error('Herramienta Porcentaje no puede ser mayor a 50%');
+                return;
+            }
+
             openLoading();
 
-            let id = {{ $id }};
-
             let formData = new FormData();
-            formData.append('id', id);
             formData.append('imprevisto', imprevisto);
+            formData.append('herramienta', herramienta);
 
             axios.post(url+'/proyecto/editar/imprevisto', formData, {
             })
                 .then((response) => {
                     closeLoading();
-                    if(response.data.success === 1) {
-
-                        Swal.fire({
-                            title: 'No Modificado',
-                            text: "El Presupuesto esta en Revisión",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2){
+                    if(response.data.success === 1){
                         toastr.success('Actualizado correctamente');
                         $('#modalImprevisto').modal('hide');
                     }

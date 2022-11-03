@@ -241,13 +241,13 @@
     <tbody>
 
         <tr>
-            <td colspan="3">APORTE PATRONAL</td>
+            <td colspan="3" style='font-weight: bold'>APORTE PATRONAL</td>
         </tr>
 
         <tr>
-            <td width="20%">Descripción</td>
-            <td width="12%">Sub Total</td>
-            <td width="20%">Total</td>
+            <td width="20%" style='font-weight: bold'>Descripción</td>
+            <td width="12%" style='font-weight: bold'>Sub Total</td>
+            <td width="20%" style='font-weight: bold'>Total</td>
         </tr>
 
         <tr>
@@ -305,7 +305,7 @@
     </tr>
 
     <tr>
-        <td width="20%">HERRAMIENTA (2% DE MAT.)</td>
+        <td width="20%">HERRAMIENTA ({{ $porcientoHerramienta }}% DE MAT.)</td>
         <td width="12%">{{ $herramienta2Porciento }}</td>
     </tr>
 
@@ -336,7 +336,7 @@
     </tr>
 
     <tr>
-        <td width="20%" style="font-weight: bold">IMPREVISTOS ({{$numimprevisto}}% de sub total)</td>
+        <td width="20%" style="font-weight: bold">IMPREVISTOS ({{$imprevistoActual}}% de sub total)</td>
         <td width="12%" style="font-weight: bold">{{ $imprevisto }}</td>
     </tr>
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Configuraciones;
 
 use App\Http\Controllers\Controller;
 use App\Models\Administradores;
+use App\Models\InformacionGeneral;
 use App\Models\Proyecto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -109,19 +110,14 @@ class AdministradoresController extends Controller
     // obtener información de un imprevisto de proyecto
     public function informacionImprevistoProyecto(Request $request){
 
-        $regla = array(
-            'id' => 'required',
-        );
 
-        $validar = Validator::make($request->all(), $regla);
+        if ($info = InformacionGeneral::where('id', 1)->first()) {
 
-        if ($validar->fails()) {
-            return ['success' => 0];
-        }
+            $imprevisto = $info->imprevisto_modificable;
+            $herramienta = $info->porcentaje_herramienta;
 
-        if ($info = Proyecto::where('id', $request->id)->first()) {
-
-            return ['success' => 1, 'numero' => $info->imprevisto_modificable];
+            return ['success' => 1, 'imprevisto' =>$imprevisto,
+                'herramienta' => $herramienta];
         } else {
             return ['success' => 2];
         }
@@ -131,8 +127,8 @@ class AdministradoresController extends Controller
     public function editarImprevistoProyecto(Request $request){
 
         $regla = array(
-            'id' => 'required',
             'imprevisto' => 'required',
+            'herramienta' => 'required',
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -141,21 +137,12 @@ class AdministradoresController extends Controller
             return ['success' => 0];
         }
 
-        if ($info = Proyecto::where('id', $request->id)->first()) {
+        InformacionGeneral::where('id', 1)->update([
+            'imprevisto_modificable' => $request->imprevisto,
+            'porcentaje_herramienta' => $request->herramienta
+        ]);
 
-            if($info->presu_aprobado == 1){
-                // presupuesto esta en desarrollo
-                return ['success' => 1];
-            }
-
-            Proyecto::where('id', $request->id)->update([
-                'imprevisto_modificable' => $request->imprevisto,
-            ]);
-
-            return ['success' => 2];
-        } else {
-            return ['success' => 99];
-        }
+        return ['success' => 1];
     }
 
 }

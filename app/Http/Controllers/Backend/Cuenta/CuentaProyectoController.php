@@ -1123,7 +1123,7 @@ class CuentaProyectoController extends Controller
             $co->fecha = $request->fecha;
             $co->documento = null;
             $co->estado = 0; // 0: en desarrollo, 1: listo para revisión, 2: aprobado
-            $co->monto = 0;
+            $co->monto_aprobado = 0;
             $co->imprevisto = $infoProyecto->imprevisto_modificable;
             $co->fecha_aprobado = null;
             $co->save();
@@ -2269,7 +2269,7 @@ class CuentaProyectoController extends Controller
             $vuelta = true;
 
             $tabla .= "<tr>
-                <td colspan='6'>MANO DE OBRA POR ADMINISTRACIÓN</td>
+                <td colspan='6' style='font-weight: bold'>MANO DE OBRA POR ADMINISTRACIÓN</td>
             </tr>
 
             <tr>
@@ -2330,13 +2330,13 @@ class CuentaProyectoController extends Controller
 
         $tabla .= "
         <tr>
-            <td colspan='3'>APORTE PATRONAL</td>
+            <td colspan='3' style='font-weight: bold'>APORTE PATRONAL</td>
         </tr>
 
         <tr>
-            <td width='20%'>Descripción</td>
-            <td width='12%'>Sub Total</td>
-            <td width='20%'>Total</td>
+            <td width='20%' style='font-weight: bold'>Descripción</td>
+            <td width='12%' style='font-weight: bold'>Sub Total</td>
+            <td width='20%' style='font-weight: bold'>Total</td>
         </tr>
 
         <tr>

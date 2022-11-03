@@ -19,15 +19,7 @@ class TipoPartidaSeeder extends Seeder
         ]);
 
         TipoPartida::create([
-            'nombre' => 'Herramientas (2% de Materiales)',
-        ]);
-
-        TipoPartida::create([
             'nombre' => 'Mano de obra (Por Administración)',
-        ]);
-
-        TipoPartida::create([
-            'nombre' => 'Aporte Mano de Obra',
         ]);
 
         TipoPartida::create([

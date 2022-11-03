@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Pdf;
 use App\Http\Controllers\Controller;
 use App\Models\CatalogoMateriales;
 use App\Models\FuenteRecursos;
+use App\Models\InformacionGeneral;
 use App\Models\Partida;
 use App\Models\PartidaDetalle;
 use App\Models\Proyecto;
@@ -21,16 +22,15 @@ class ControlPdfController extends Controller
     // generar un PDF con el presupuesto de Proyecto
     public function generarPrespuestoPdf($id){
 
-        // obtener todas los presupuesto por id_tipopartida
+        // obtener todos los presupuesto por id_tipopartida
         // 1- Materiales
-        // 2- Herramientas (2% de Materiales)
-        // 3- Mano de obra (Por Administración)
-        // 4- Aporte Mano de Obra
-        // 5- Alquiler de Maquinaria
-        // 6- Transporte de Concreto Fresco
+        // 2- Mano de obra (Por Administración)
+        // 3- Alquiler de Maquinaria
+        // 4- Transporte de Concreto Fresco
+
 
         $partida1 = Partida::where('proyecto_id', $id)
-            ->whereIn('id_tipopartida', [1, 2, 5])
+            ->whereIn('id_tipopartida', [1, 3, 4])
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -61,8 +61,6 @@ class ControlPdfController extends Controller
             $item = $item + 1;
             $secciones->item = $item;
 
-            $secciones->cantidadp = number_format((float)$secciones->cantidadp, 2, '.', ',');
-
             $detalle1 = PartidaDetalle::where('partida_id', $secciones->id)->get();
 
             $total = 0;
@@ -80,17 +78,12 @@ class ControlPdfController extends Controller
 
                 $lista->medida = $medida;
 
-
-                if ($lista->duplicado != 0) {
+                if ($lista->duplicado > 0) {
+                    $multi = ($lista->cantidad * $infomaterial->pu) * $lista->duplicado;
                     $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
                 } else {
-                    $lista->material = $infomaterial->nombre;
-                }
-
-                if($lista->duplicado > 0){
-                    $multi = ($lista->cantidad * $infomaterial->pu) * $lista->duplicado;
-                }else{
                     $multi = $lista->cantidad * $infomaterial->pu;
+                    $lista->material = $infomaterial->nombre;
                 }
 
                 $lista->cantidad = number_format((float)$lista->cantidad, 2, '.', ',');
@@ -111,8 +104,10 @@ class ControlPdfController extends Controller
             $index++;
         }
 
+        // 2- MANO DE OBRA POR ADMINISTRACION
+
         $manoobra = Partida::where('proyecto_id', $id)
-            ->where('id_tipopartida', 3)
+            ->where('id_tipopartida', 2)
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -123,7 +118,6 @@ class ControlPdfController extends Controller
             $item = $item + 1;
             $secciones3->item = $item;
 
-            $secciones3->cantidadp = number_format((float)$secciones3->cantidadp, 2, '.', ',');
 
             $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
 
@@ -165,37 +159,11 @@ class ControlPdfController extends Controller
             $index3++;
         }
 
-        // APORTE DE MANO DE OBRA
 
-        $aporteManoObra = Partida::where('proyecto_id', $id)
-            ->where('id_tipopartida', 4)
-            ->get();
-
-        $totalAporteManoObra = 0;
-
-        foreach ($aporteManoObra as $secciones3) {
-
-            $detalle4 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
-
-            foreach ($detalle4 as $lista) {
-
-                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-                if ($lista->duplicado != 0) {
-                    $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
-                } else {
-                    $lista->material = $infomaterial->nombre;
-                }
-
-                $multi = $lista->cantidad * $infomaterial->pu;
-
-                $totalAporteManoObra += $multi;
-            }
-        }
-
-        // ALQUILER DE MAQUINARIA
+        // 3- ALQUILER DE MAQUINARIA
 
         $alquilerMaquinaria = Partida::where('proyecto_id', $id)
-            ->where('id_tipopartida', 5)
+            ->where('id_tipopartida', 3)
             ->get();
 
         $totalAlquilerMaquinaria = 0;
@@ -214,10 +182,10 @@ class ControlPdfController extends Controller
             }
         }
 
-        // TRANSPORTE CONCRETO FRESCO
+        // 4- TRANSPORTE CONCRETO FRESCO
 
         $trasportePesado = Partida::where('proyecto_id', $id)
-            ->where('id_tipopartida', 6)
+            ->where('id_tipopartida', 4)
             ->get();
 
         $totalTransportePesado = 0;
@@ -240,19 +208,31 @@ class ControlPdfController extends Controller
         $isss = ($totalManoObra * 7.5) / 100;
         $insaforp = ($totalManoObra * 1) / 100;
 
+        $informacionGeneral = InformacionGeneral::where('id', 1)->first();
+
+        // obtener porcentaje actual
+        if($infoPro->presu_aprobado == 2){
+            $porcientoHerramienta = $infoPro->porcentaje_herra_fijo;
+        }else{
+            $porcientoHerramienta = $informacionGeneral->porcentaje_herramienta;
+        }
+
+
         $totalDescuento = ($afp + $isss + $insaforp);
-        $herramienta2Porciento = ($sumaMateriales * 2) / 100;
+        $herramientaXPorciento = ($sumaMateriales * $porcientoHerramienta) / 100;
 
         // subtotal del presupuesto partida
-        $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalDescuento
+        $subtotalPartida = ($sumaMateriales + $herramientaXPorciento + $totalManoObra + $totalDescuento
             + $totalAlquilerMaquinaria + $totalTransportePesado);
+
 
         // obtener el imprevisto actual
         if($infoPro->presu_aprobado == 2){
-            $imprevistoActual = $infoPro->imprevisto;
+            $imprevistoActual = $infoPro->imprevisto_fijo;
         }else{
-            $imprevistoActual = $infoPro->imprevisto_modificable;
+            $imprevistoActual = $informacionGeneral->imprevisto_modificable;
         }
+
 
         // imprevisto obtenido del proyecto
         $imprevisto = ($subtotalPartida * $imprevistoActual) / 100;
@@ -265,7 +245,7 @@ class ControlPdfController extends Controller
         $isss = "$" . number_format((float)$isss, 2, '.', ',');
         $insaforp = "$" . number_format((float)$insaforp, 2, '.', ',');
         $sumaMateriales = "$" . number_format((float)$sumaMateriales, 2, '.', ',');
-        $herramienta2Porciento = "$" . number_format((float)$herramienta2Porciento, 2, '.', ',');
+        $herramientaXPorciento = "$" . number_format((float)$herramientaXPorciento, 2, '.', ',');
         $totalManoObra = "$" . number_format((float)$totalManoObra, 2, '.', ',');
 
         $totalAlquilerMaquinaria = "$" . number_format((float)$totalAlquilerMaquinaria, 2, '.', ',');
@@ -366,7 +346,7 @@ class ControlPdfController extends Controller
             $vuelta = true;
 
             $tabla .= "<tr>
-                <td colspan='6'>MANO DE OBRA POR ADMINISTRACIÓN</td>
+                <td colspan='6' style='font-weight: bold'>MANO DE OBRA POR ADMINISTRACIÓN</td>
             </tr>
 
             <tr>
@@ -427,13 +407,13 @@ class ControlPdfController extends Controller
 
         $tabla .= "
         <tr>
-            <td colspan='3'>APORTE PATRONAL</td>
+            <td colspan='3' style='font-weight: bold'>APORTE PATRONAL</td>
         </tr>
 
         <tr>
-            <td width='20%'>Descripción</td>
-            <td width='12%'>Sub Total</td>
-            <td width='20%'>Total</td>
+            <td width='20%' style='font-weight: bold'>Descripción</td>
+            <td width='12%' style='font-weight: bold'>Sub Total</td>
+            <td width='20%' style='font-weight: bold'>Total</td>
         </tr>
 
         <tr>
@@ -482,8 +462,8 @@ class ControlPdfController extends Controller
     </tr>
 
     <tr>
-        <td width='20%'>HERRAMIENTA (2% DE MAT.)</td>
-        <td width='12%'>$herramienta2Porciento</td>
+        <td width='20%'>HERRAMIENTA ($porcientoHerramienta% DE MAT.)</td>
+        <td width='12%'>$herramientaXPorciento</td>
     </tr>
 
     <tr>
