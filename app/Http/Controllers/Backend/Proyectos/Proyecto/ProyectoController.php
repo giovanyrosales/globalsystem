@@ -1931,12 +1931,12 @@ class ProyectoController extends Controller
                     //-------------------------------------------------------------
 
                     // pasar a modo aprobado
-                    Proyecto::where('id', $request->id)->update([
+                   /* Proyecto::where('id', $request->id)->update([
                         'fecha_aprobado' => Carbon::now('America/El_Salvador'),
                         'presu_aprobado' => 2,
                         'imprevisto_fijo' => $informacionGeneral->imprevisto_modificable,
                         'porcentaje_herra_fijo' => $informacionGeneral->porcentaje_herramienta
-                        ]);
+                        ]);   */
 
                     //*************** OBTENER SALDO DE CADA CÓDIGO */
 
