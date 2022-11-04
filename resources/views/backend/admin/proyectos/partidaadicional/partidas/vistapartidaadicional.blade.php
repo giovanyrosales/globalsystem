@@ -21,30 +21,30 @@
 
     <section class="content-header">
         <div class="row mb-2">
-            <div class="col-sm-6">
-                <label style="font-size: 16px">Fecha: {{ $fecha }}</label> <br>
+            <div class="col-sm-7">
+
+                <p style="font-size: 16px"><strong> Fecha: </strong> {{ $fecha }}</p>
 
                 @if($infoContenedor->estado == 0)
-                    <label style="font-size: 16px">Estado: <strong>Partida en Desarrollo</strong></label>
+                    <p style="font-size: 16px"><strong> Estado: </strong> Partida en Desarrollo</p>
                 @elseif($infoContenedor->estado == 1)
-                    <label style="font-size: 16px">Estado: <strong>Partida en Revisión</strong></label>
+                    <p style="font-size: 16px"><strong> Estado: </strong> Partida en Revisión</p>
                 @else
-                    <label style="font-size: 16px">Estado: <strong>Partidas Aprobadas</strong></label>
+                    <p style="font-size: 16px"><strong> Estado: </strong> Partidas Aprobadas</p>
                 @endif
 
-                <br>
-                <label style="font-size: 16px">Proyecto: <strong>{{ $nombreProyecto }}</strong></label>
+                <p style="font-size: 16px"><strong> Proyecto: </strong> {{ $nombreProyecto }}</p>
 
-                <br>
+
                 <div class="col-md-8">
-                    <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
+                    <a style="margin-top: 15px;font-weight: bold; background-color: #17a2b8; color: white !important;" class="button button-3d button-rounded button-pill button-small float-left" href= "javascript:history.back()" target="frameprincipal">
                         <i title="Cancelar"></i> Atras </a>
                 </div>
 
                 @can('boton.crear.partida.adicional')
                     <!-- solo en modo desarrollo se puede agregar -->
                     @if($infoContenedor->estado == 0)
-                        <button type="button" style="margin-left: 25px; margin-top: 15px" onclick="modalCrearPartida()" class="btn btn-success btn-sm">
+                        <button type="button" style="margin-left: 25px; margin-top: 15px;font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalCrearPartida()" class="button button-3d button-rounded button-pill button-small">
                             <i class="fas fa-plus"></i>
                             Nueva Partida Adicional
                         </button>
@@ -53,7 +53,7 @@
 
             </div>
 
-            <div class="col-sm-6">
+            <div class="col-sm-5">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">Partida Adicional</li>
                     <li class="breadcrumb-item active">Listado</li>
@@ -138,7 +138,7 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <br>
-                                        <button type="button" onclick="addAgregarFilaPresupuestoNueva()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                        <button type="button" onclick="addAgregarFilaPresupuestoNueva()" class="button button-rounded button-pill button-small float-right" style="margin-top:10px;; font-weight: bold; background-color: #28a745; color: white !important;">
                                             <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                     </div>
                                 </div>
@@ -166,7 +166,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="preguntaGuardarPresupuesto()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="preguntaGuardarPresupuesto()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -232,7 +232,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <br>
-                                            <button type="button" onclick="addAgregarFilaPresupuestoEditar()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                            <button type="button" onclick="addAgregarFilaPresupuestoEditar()" class="button button-rounded button-pill button-small float-right" style="margin-top:10px; font-weight: bold; background-color: #28a745; color: white !important;" >
                                                 <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                         </div>
                                     </div>
@@ -262,7 +262,7 @@
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                     @if($infoContenedor->estado == 0)
-                        <button type="button" class="btn btn-primary" onclick="preguntaEditarPresupuestoEditar()">Guardar</button>
+                        <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="preguntaEditarPresupuestoEditar()">Guardar</button>
                     @endif
                 </div>
             </div>
@@ -349,8 +349,6 @@
 
             // ******* DETECCIÓN MANUAL PARA EL TIPO DE PARTIDA *******
 
-            var tipopartida = document.getElementById('select-partida-nuevo').value;
-
             // desactivar select porque ya eligio el tipo de partida
             document.getElementById("select-partida-nuevo").disabled = true;
 
@@ -361,20 +359,13 @@
 
                 "<td>" +
                 "<p id='fila" + (nFilas) + "' class='form-control' style='max-width: 65px'>" + (nFilas) + "</p>" +
-                "</td>";
+                "</td> " +
 
-            if(tipopartida == '4') {
-                markup += "<td>" +
-                    "<input name='cantidadPresupuestoArray[]' disabled maxlength='10' class='form-control' type='number'>" +
-                    "</td>";
-            }
-            else{
-                markup += "<td>" +
+                "<td>" +
                     "<input name='cantidadPresupuestoArray[]' maxlength='10' class='form-control' type='number'>" +
-                    "</td>";
-            }
+                "</td>" +
 
-            markup += "<td>" +
+                "<td>" +
                 "<input name='descripcionPresupuestoArray[]'  autocomplete='off' data-infopresupuesto='0' autocomplete='off' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuesto(this)' maxlength='400'  type='text'>" +
                 "<div class='droplistaPresupuesto' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
                 "</td>" +
@@ -470,7 +461,7 @@
             colorBlancoTablaPresupuesto();
 
             Swal.fire({
-                title: 'Guardar Partida',
+                title: 'Guardar Partida Adicional',
                 text: "",
                 icon: 'info',
                 showCancelButton: true,
@@ -534,42 +525,34 @@
                     return;
                 }
 
-                /*  1- materiales
-                    2- herramientas (2% de materiales)
-                    3- mano de obra (por administracion)
-                    4- aporte mano de obra
-                    5- alquiler de maquinaria
-                    6- trasporte de concreto fresco
-                */
+                // 1- Materiales
+                // 2- Mano de obra (Por Administración)
+                // 3- Alquiler de Maquinaria
+                // 4- Transporte de Concreto Fresco
 
                 // unicamente no sera verificado con: APORTE PATRONAL (aporte mano de obra)
+                if (datoCantidad === '') {
+                    colorRojoTablaPresupuesto(a);
+                    toastr.error('Fila #' + (a + 1) + ' Cantidad es requerida');
+                    return;
+                }
 
-                if(tipopartida != '4') {
+                if (!datoCantidad.match(reglaNumeroDosDecimal)) {
+                    colorRojoTablaPresupuesto(a);
+                    toastr.error('Fila #' + (a + 1) + ' Cantidad debe ser decimal Positivo. Solo se permite 2 Decimales');
+                    return;
+                }
 
-                    if (datoCantidad === '') {
-                        colorRojoTablaPresupuesto(a);
-                        toastr.error('Fila #' + (a + 1) + ' Cantidad es requerida');
-                        return;
-                    }
+                if (datoCantidad <= 0) {
+                    colorRojoTablaPresupuesto(a);
+                    toastr.error('Fila #' + (a + 1) + ' Cantidad no debe ser negativo o cero');
+                    return;
+                }
 
-                    if (!datoCantidad.match(reglaNumeroDosDecimal)) {
-                        colorRojoTablaPresupuesto(a);
-                        toastr.error('Fila #' + (a + 1) + ' Cantidad debe ser decimal Positivo. Solo se permite 2 Decimales');
-                        return;
-                    }
-
-                    if (datoCantidad <= 0) {
-                        colorRojoTablaPresupuesto(a);
-                        toastr.error('Fila #' + (a + 1) + ' Cantidad no debe ser negativo o cero');
-                        return;
-                    }
-
-                    if (datoCantidad > 99000000) {
-                        colorRojoTablaPresupuesto(a);
-                        toastr.error('Fila #' + (a + 1) + ' Cantidad no puede superar 9 millones');
-                        return;
-                    }
-
+                if (datoCantidad > 99000000) {
+                    colorRojoTablaPresupuesto(a);
+                    toastr.error('Fila #' + (a + 1) + ' Cantidad no puede superar 9 millones');
+                    return;
                 }
             }
 
@@ -610,15 +593,7 @@
             // como tienen la misma cantidad de filas, podemos recorrer
             // todas las filas de una vez
             for(var p = 0; p < cantidad.length; p++){
-
-                // SOLO PARA APORTE PATRONAL SIEMPRE SERA 0
-                // O APORTE MANO DE OBRA
-                if(tipopartida == '4'){
-                    formData.append('cantidad[]', 0);
-                }else{
-                    formData.append('cantidad[]', cantidad[p]);
-                }
-
+                formData.append('cantidad[]', cantidad[p]);
                 formData.append('datainfo[]', descripcionAtributo[p]);
                 formData.append('duplicado[]', duplicado[p]);
             }
@@ -819,22 +794,13 @@
 
                                 "<td>" +
                                 "<p id='fila" + (i + 1) + "' class='form-control' style='max-width: 65px'>" + (i + 1) + "</p>" +
-                                "</td>";
+                                "</td>" +
 
-                            // APORTE MANO DE OBRA... NO LLEVA CANTIDAD
-                            if(response.data.info.id_tipopartida === 4){
-                                markup += "<td>" +
-                                    "<input name='cantidadPresupuestoEditar[]' disabled maxlength='10' class='form-control' type='number'>" +
-                                    "</td>";
-
-                            }else{
-
-                                markup += "<td>" +
+                                "<td>" +
                                     "<input name='cantidadPresupuestoEditar[]' value='" + infodetalle[i].cantidad + "' maxlength='10' class='form-control' type='number'>" +
-                                    "</td>";
-                            }
+                                "</td>" +
 
-                            markup += "<td>" +
+                                "<td>" +
                                 "<input name='descripcionPresupuestoEditar[]'  autocomplete='off' disabled class='form-control' data-infopresupuestoeditar='" + infodetalle[i].material_id + "' value='" + infodetalle[i].descripcion + "' style='width:100%' type='text'>" +
                                 "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9; width: 75% !important;'></div>" +
                                 "</td>" +
@@ -901,25 +867,19 @@
 
                 "<td>"+
                 "<p id='fila"+(nFilas)+"' class='form-control' style='max-width: 65px'>"+(nFilas)+"</p>"+
-                "</td>";
+                "</td>" +
 
-            if(tipopartida == '4'){ // desactivar cantidad
-                markup += "<td>"+
-                    "<input name='cantidadPresupuestoEditar[]' disabled maxlength='10' class='form-control' type='number'>"+
-                    "</td>";
-            }else{
-                markup += "<td>"+
+                "<td>"+
                     "<input name='cantidadPresupuestoEditar[]' maxlength='10' class='form-control' type='number'>"+
-                    "</td>";
-            }
+                "</td>" +
 
-            markup += "<td>"+
-                "<input name='descripcionPresupuestoEditar[]'  autocomplete='off' data-infopresupuestoeditar='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuestoEditar(this)' maxlength='400'  type='text'>"+
-                "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
+                "<td>"+
+                    "<input name='descripcionPresupuestoEditar[]'  autocomplete='off' data-infopresupuestoeditar='0' class='form-control' style='width:100%' onkeyup='buscarMaterialPresupuestoEditar(this)' maxlength='400'  type='text'>"+
+                    "<div class='dropListaPresupuestoEditar' style='position: absolute; z-index: 9;'></div>"+
                 "</td>"+
 
                 "<td>"+
-                "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='0' class='form-control' type='number'>"+
+                    "<input name='duplicarPresupuestoEditarArray[]' maxlength='3' value='0' class='form-control' type='number'>"+
                 "</td>"+
 
                 "<td>"+
@@ -1052,31 +1012,28 @@
                     return;
                 }
 
-                if(tipopartida != '4'){
+                if(datoCantidad === ''){
+                    colorRojoTablaPresupuestoEditar(a);
+                    toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
+                    return;
+                }
 
-                    if(datoCantidad === ''){
-                        colorRojoTablaPresupuestoEditar(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad es requerida');
-                        return;
-                    }
+                if(!datoCantidad.match(reglaNumeroDosDecimal)) {
+                    colorRojoTablaPresupuestoEditar(a);
+                    toastr.error('Fila #' + (a+1) + ' Cantidad debe ser Decimal Positivo. Solo se permite 2 Decimales');
+                    return;
+                }
 
-                    if(!datoCantidad.match(reglaNumeroDosDecimal)) {
-                        colorRojoTablaPresupuestoEditar(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad debe ser Decimal Positivo. Solo se permite 2 Decimales');
-                        return;
-                    }
+                if(datoCantidad <= 0){
+                    colorRojoTablaPresupuestoEditar(a);
+                    toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
+                    return;
+                }
 
-                    if(datoCantidad <= 0){
-                        colorRojoTablaPresupuestoEditar(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad no debe ser negativo');
-                        return;
-                    }
-
-                    if(datoCantidad > 99000000){
-                        colorRojoTablaPresupuestoEditar(a);
-                        toastr.error('Fila #' + (a+1) + ' Cantidad máximo 9 millones');
-                        return;
-                    }
+                if(datoCantidad > 99000000){
+                    colorRojoTablaPresupuestoEditar(a);
+                    toastr.error('Fila #' + (a+1) + ' Cantidad máximo 9 millones');
+                    return;
                 }
             }
 
@@ -1132,13 +1089,7 @@
                 var id = $("#matriz-presupuesto-editar tr:eq("+(p+1)+")").attr('id');
                 formData.append('idarray[]', id);
                 formData.append('datainfo[]', descripcionAtributo[p]);
-
-                if(tipopartida == '4'){
-                    formData.append('cantidad[]', 0);
-                }else{
-                    formData.append('cantidad[]', cantidad[p]);
-                }
-
+                formData.append('cantidad[]', cantidad[p]);
                 formData.append('duplicado[]', duplicado[p]);
             }
 
@@ -1199,11 +1150,7 @@
                     toastr.error('Error al actualizar');
                     closeLoading();
                 });
-
         }
-
-
-
 
     </script>
 

@@ -28,12 +28,12 @@
                     <!-- Botón para dar permiso y crear x partidas adicionales. Para jefe presupuesto -->
                     @can('boton.autorizar.denegar.partida.adicional')
                         @if($infoPro->permiso_partida_adic == 1)
-                            <button type="button" style="margin-top: 15px" onclick="modalPermisoDenegar()" class="btn btn-danger btn-sm">
+                            <button type="button" style="margin-top: 15px;font-weight: bold; color: white !important;" onclick="modalPermisoDenegar()" class="button button-caution button-3d button-rounded button-pill button-small">
                                 <i class="fas fa-stop"></i>
                                 Denegar Partidas Adicionales
                             </button>
                         @else
-                            <button type="button" style="margin-top: 15px" onclick="modalPermisoAprobar()" class="btn btn-success btn-sm">
+                            <button type="button"  style="margin-top: 15px;font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalPermisoAprobar()" class="button button-3d button-rounded button-pill button-small">
                                 <i class="fas fa-check"></i>
                                 Autorizar Partidas Adicionales
                             </button>
@@ -42,7 +42,7 @@
 
                     <!-- Botón para modificar porcentaje de obre adicional, por defecto sera 20% -->
                     @can('boton.modal.porcentaje.obra.dicional')
-                        <button type="button" style="margin-top: 15px" onclick="infoPorcentajeObra()" class="btn btn-success btn-sm">
+                        <button type="button" style="margin-top: 15px;font-weight: bold; background-color: #28a745; color: white !important;" onclick="infoPorcentajeObra()" class="button button-3d button-rounded button-pill button-small">
                             <i class="fas fa-plus"></i>
                             Porcentaje Obra Adicional
                         </button>
@@ -58,7 +58,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
+                    <h3 class="card-title">Listado Partidas Adicionales</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -121,7 +121,7 @@
 
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="btnGuardarU" onclick="preguntarAprobar()">Aprobar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" id="btnGuardarU" onclick="preguntarAprobar()">Aprobar</button>
                 </div>
             </div>
         </div>
@@ -154,7 +154,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="actualizarPorcentajeObra()">Actualizar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="actualizarPorcentajeObra()">Actualizar</button>
                 </div>
             </div>
         </div>

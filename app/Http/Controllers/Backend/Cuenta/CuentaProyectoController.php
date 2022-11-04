@@ -9,6 +9,7 @@ use App\Models\Cuenta;
 use App\Models\CuentaProy;
 use App\Models\CuentaproyPartidaAdicional;
 use App\Models\FuenteRecursos;
+use App\Models\InformacionGeneral;
 use App\Models\MoviCuentaProy;
 use App\Models\ObjEspecifico;
 use App\Models\Partida;
@@ -945,29 +946,12 @@ class CuentaProyectoController extends Controller
         foreach ($lista as $dd) {
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
 
-            $montoPartidaActual = 0;
-
-            $arrayPartidaAdicional = PartidaAdicional::where('id_partidaadic_conte', $dd->id)->get();
-
-            foreach ($arrayPartidaAdicional as $datainfo){
-
-                $arrayPartidaDeta = PartidaAdicionalDetalle::where('id_partida_adicional', $datainfo->id)->get();
-
-                foreach ($arrayPartidaDeta as $infoDD){
-
-                    $infoMaterial = CatalogoMateriales::where('id', $infoDD->id_material)->first();
-
-                    if($infoDD->duplicado > 0){
-                        $multi = ($infoDD->cantidad * $infoMaterial->pu) * $infoDD->duplicado;
-                    }else{
-                        $multi = ($infoDD->cantidad * $infoMaterial->pu);
-                    }
-
-                    $montoPartidaActual += $multi;
-                }
+            if($dd->estado == 2){
+                // aprobado
+                $dd->montopartida = '$' . number_format((float)$dd->monto_aprobado, 2, '.', ',');
+            }else{
+                $dd->montopartida = "Pendiente de Aprobación";
             }
-
-            $dd->montopartidas = '$' . number_format((float)$montoPartidaActual, 2, '.', ',');
         }
 
         return view('backend.admin.proyectos.partidaadicional.contenedor.tablacontenedorpartidaadicional', compact('lista'));
@@ -1116,6 +1100,8 @@ class CuentaProyectoController extends Controller
 
         try {
 
+            $infoGeneral = InformacionGeneral::where('id', 1)->first();
+
             $infoProyecto = Proyecto::where('id', $request->idproyecto)->first();
 
             $co = new PartidaAdicionalContenedor();
@@ -1124,7 +1110,7 @@ class CuentaProyectoController extends Controller
             $co->documento = null;
             $co->estado = 0; // 0: en desarrollo, 1: listo para revisión, 2: aprobado
             $co->monto_aprobado = 0;
-            $co->imprevisto = $infoProyecto->imprevisto_modificable;
+            $co->imprevisto = $infoGeneral->imprevisto_modificable;
             $co->fecha_aprobado = null;
             $co->save();
 
@@ -1320,11 +1306,9 @@ class CuentaProyectoController extends Controller
                 $conteoPartida += 1;
             }
 
-            // siempre habra registros
-
+            // siempre habrá registros
             if($request->cantidad != null) {
                 for ($i = 0; $i < count($request->cantidad); $i++) {
-
                     $rDetalle = new PartidaAdicionalDetalle();
                     $rDetalle->id_partida_adicional = $r->id;
                     $rDetalle->id_material = $request->datainfo[$i];

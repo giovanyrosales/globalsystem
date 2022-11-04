@@ -9,6 +9,7 @@
                             <tr>
                                 <th>Fecha</th>
                                 <th>Estado</th>
+                                <th>Monto Aprobado</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -27,36 +28,15 @@
                                         @endif
                                     </td>
 
+                                    <td>{{ $dato->montopartida }}</td>
+
                                     <td>
 
-                                        <!-- ver todas las partidas detalle -->
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="vistaPartidasAdicionales({{ $dato->id }})">
-                                            <i class="fas fa-list-alt" title="Partidas Adicionales"></i>&nbsp; Partidas
+                                        <!-- modal opciones -->
+
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="modalOpciones({{ $dato }})">
+                                            <i class="fas fa-list-alt" title="Opciones"></i>&nbsp; Opciones
                                         </button>
-
-                                         @if($dato->estado != 2)
-                                            <!-- solo aparece el botón sino esta aprobada la partida adicional -->
-                                            <br><br>
-                                            <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
-                                                <i class="fas fa-check" title="Estado"></i>&nbsp; Estado
-                                            </button>
-                                         @endif
-
-                                        <!-- sacar pdf -->
-                                        <br><br>
-                                        <button type="button" class="btn btn-success btn-xs" onclick="infoPdf({{ $dato->id }})">
-                                            <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
-                                        </button>
-
-                                        <!-- solo autorizado podrá borrar contenedor de partidas adicionales -->
-                                        @can('boton.borrar.contenedor.partida.adicional')
-                                            @if($dato->estado == 0)
-                                                <br><br>
-                                                <button type="button" class="btn btn-danger btn-xs" onclick="infoBorrarContenedor({{ $dato->id }})">
-                                                    <i class="fas fa-list-alt" title="Borrar"></i>&nbsp; Borrar
-                                                </button>
-                                            @endif
-                                        @endcan
 
                                     </td>
                                 </tr>

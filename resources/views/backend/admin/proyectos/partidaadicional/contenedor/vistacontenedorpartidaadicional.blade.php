@@ -27,7 +27,7 @@
 
                     <!-- Botón para crear solicitud de partida adicional -->
                     @can('boton.modal.crear.solicitud.partida.adicional')
-                        <button type="button" style="margin-top: 15px" onclick="modalSolicitudPartidaAdicional()" class="btn btn-success btn-sm">
+                        <button type="button" style="margin-top: 15px;font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalSolicitudPartidaAdicional()" class="button button-3d button-rounded button-pill button-small">
                             <i class="fas fa-plus"></i>
                             Crear Solicitud Partida Adicional
                         </button>
@@ -57,7 +57,7 @@
         </div>
     </section>
 
-
+    <!-- MODAL PARA AGREGAR NUEVO CONTENEDOR -->
     <div class="modal fade" id="modalAgregar">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -87,13 +87,14 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="crearSolicitudPartida()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="crearSolicitudPartida()">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
 
+    <!-- MODAL PARA EDITAR ESTADO DE CONTENEDOR -->
     <div class="modal fade" id="modalEstado">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -111,7 +112,7 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <input id="id-contenedor" type="hidden">
+                                        <input id="id-estado" type="hidden">
 
                                         <select class="form-control" id="select-estado">
                                             <option value="0">En Desarrollo</option>
@@ -127,11 +128,71 @@
 
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="btnGuardarU" onclick="actualizarEstado()">Actualizar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" id="btnGuardarU" onclick="actualizarEstado()">Actualizar</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- MODAL PARA DIFERENTES OPCIONES -->
+    <div class="modal fade" id="modalOpcion">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Opciones</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <!-- ID del contenedor -->
+                                <input type="hidden" id="id-contenedor">
+
+                                <!-- ver partidas adicionales -->
+                                <div class="form-group">
+                                    <button type="button" style=" width: 100%; font-weight: bold; font-size: 15px; background-color: #28a745; color: white !important;" class="button button-rounded button-pill" onclick="vistaPartidasAdicionales()">
+                                        <i class="fas fa-list-alt" title="Partidas Adicionales"></i>&nbsp; Partidas Adicionales
+                                    </button>
+                                </div>
+
+                                <!-- solo aparece el botón si no está aprobada la partida adicional -->
+                                <div class="form-group" id="divModalEstadoContenedor">
+                                    <button type="button" style=" width: 100%; font-weight: bold; font-size: 15px; background-color: #17a2b8; color: white !important;" class="button button-rounded button-pill" onclick="vistaInformacionEstado()">
+                                        <i class="fas fa-check" title="Estado"></i>&nbsp; Estado
+                                    </button>
+                                </div>
+
+                                <!-- sacar pdf -->
+                                <div class="form-group" id="divModalPdfContenedor">
+                                    <button type="button" style=" width: 100%; font-weight: bold; font-size: 15px; background-color: #17a2b8; color: white !important;" class="button button-rounded button-pill" onclick="infoPdf()">
+                                        <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
+                                    </button>
+                                </div>
+
+                                @can('boton.borrar.contenedor.partida.adicional')
+                                    <!-- solo autorizado podrá borrar contenedor de partidas adicionales -->
+                                    <div class="form-group" id="divModalBorrarContenedor">
+                                        <button type="button" style=" width: 100%; font-weight: bold; font-size: 15px; color: white !important;" class="button button-caution button-rounded button-pill" onclick="infoBorrarContenedor()">
+                                            <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar
+                                        </button>
+                                    </div>
+                                @endcan
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
 </div>
 
@@ -180,10 +241,11 @@
                 return;
             }
 
-            let idpro = {{ $id }};
+            // id proyecto
+            let idproyecto = {{ $id }};
 
             let formData = new FormData();
-            formData.append('idproyecto', idpro);
+            formData.append('idproyecto', idproyecto);
             formData.append('fecha', fecha);
 
             axios.post(url+'/partida/adicional/crear/solicitud', formData, {
@@ -221,7 +283,9 @@
                 });
         }
 
-        function infoBorrarContenedor(id){
+        function infoBorrarContenedor(){
+
+            $('#modalOpcion').modal('hide');
 
             Swal.fire({
                 title: 'Borrar Solicitud',
@@ -235,14 +299,15 @@
                 confirmButtonText: 'Borrar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    peticionBorrarContenedor(id);
+                    peticionBorrarContenedor();
                 }
             });
         }
 
-        function peticionBorrarContenedor(id){
+        function peticionBorrarContenedor(){
 
             openLoading();
+            let id = document.getElementById('id-contenedor').value;
 
             axios.post(url+'/partida/adicional/borrar/contenedor', {
                 'id' : id
@@ -303,13 +368,18 @@
         }
 
 
-        function vistaPartidasAdicionales(id){
+        // vista de partidas adicionales
+        function vistaPartidasAdicionales(){
+
+            $('#modalOpcion').modal('hide');
             // id Contenedor
+            var id = document.getElementById('id-contenedor').value;
             window.location.href="{{ url('/admin/partida/adicional/creacion/index') }}/" + id;
         }
 
-        function infoPdf(id){
+        function infoPdf(){
             // id Contenedor
+            var id = document.getElementById('id-contenedor').value;
 
             openLoading();
 
@@ -348,7 +418,10 @@
                 });
         }
 
-        function vistaInformacionEstado(id){
+        function vistaInformacionEstado(){
+            $('#modalOpcion').modal('hide');
+
+            var id = document.getElementById('id-contenedor').value;
 
             openLoading();
 
@@ -361,7 +434,7 @@
                     // esta en modo revisión
                     if(response.data.success === 1){
 
-                        $('#id-contenedor').val(id);
+                        $('#id-estado').val(id);
 
                         let estado = response.data.info.estado;
 
@@ -405,7 +478,7 @@
 
             openLoading();
             var estado = document.getElementById('select-estado').value;
-            var id = document.getElementById('id-contenedor').value;
+            var id = document.getElementById('id-estado').value;
 
             let formData = new FormData();
             formData.append('estado', estado);
@@ -466,6 +539,74 @@
                     closeLoading();
                 });
         }
+
+        // ** MODAL DE OPCIONES **
+        function modalOpciones(dato){
+
+            // id contenedor
+            $('#id-contenedor').val(dato.id);
+
+            if (document.getElementById('divModalEstadoContenedor') !== null) {
+                document.getElementById("divModalEstadoContenedor").style.display = "none";
+            }
+
+            if (document.getElementById('divModalPdfContenedor') !== null) {
+                document.getElementById("divModalPdfContenedor").style.display = "none";
+            }
+
+            if (document.getElementById('divModalBorrarContenedor') !== null) {
+                document.getElementById("divModalBorrarContenedor").style.display = "none";
+            }
+
+            // OBTENER INFORMACIÓN DEL CONTENEDOR
+
+            openLoading();
+            axios.post(url+'/partida/adicio/contenedor/estado/informacion', {
+                'id' : dato.id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        // estado de contenedor
+                        let estado = response.data.info.estado;
+
+                        if(estado !== 2){
+                            // puede modificarse estado
+                            if (document.getElementById('divModalEstadoContenedor') !== null) {
+                                document.getElementById("divModalEstadoContenedor").style.display = "block";
+                            }
+                        }
+
+                        if(response.data.info.documento != null){
+                            if (document.getElementById('divModalPdfContenedor') !== null) {
+                                document.getElementById("divModalPdfContenedor").style.display = "block";
+                            }
+                        }
+
+                        // solo en modo desarrollo se puede borrar
+                        if(estado === 0){
+                            if (document.getElementById('divModalBorrarContenedor') !== null) {
+                                document.getElementById("divModalBorrarContenedor").style.display = "block";
+                            }
+                        }
+
+                        $('#modalOpcion').modal('show');
+                    }
+                    else {
+                        toastr.error('Error al buscar información');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar información');
+                    closeLoading();
+                });
+        }
+
+
+
 
     </script>
 

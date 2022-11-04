@@ -1296,7 +1296,6 @@
             let idbolson = $(e).val();
             var idproyecto = document.getElementById('id-proyecto').value;
 
-
             if(idbolson == '0'){
                 document.getElementById("texto-bolson-pendiente").innerHTML = '';
                 return;

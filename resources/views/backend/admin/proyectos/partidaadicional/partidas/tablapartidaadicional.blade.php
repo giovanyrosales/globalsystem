@@ -26,15 +26,15 @@
                                 <td style="width: 10%">{{ $dato->cantidadp }}</td>
                                 <td style="width: 10%">
                                     @if($infoContenedor->estado == 0)
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto({{ $dato }})">
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacionPresupuesto({{ $dato }})">
                                             <i class="fas fa-pen" title="Editar"></i>&nbsp; Editar
                                         </button>
                                         <br> <br>
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="infoBorrar({{ $dato->id }})">
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-caution button-rounded button-pill button-small" onclick="infoBorrar({{ $dato->id }})">
                                             <i class="fas fa-trash-alt" title="Borrar"></i>&nbsp; Borrar
                                         </button>
                                     @else
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto({{ $dato }})">
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacionPresupuesto({{ $dato }})">
                                             <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
                                         </button>
                                     @endif

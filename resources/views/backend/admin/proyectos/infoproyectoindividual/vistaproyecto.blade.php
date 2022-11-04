@@ -91,8 +91,8 @@
                                             </button>
                                         @endcan
                                     @else
-                                        <br>
-                                        <label style="float: left">Proyecto No esta Iniciado</label>
+                                        <br><br>
+                                        <label style="float: left">Proyecto No esta Iniciado para Agregar Partida Adicional</label>
                                     @endif
                                 @endif
 
@@ -129,7 +129,9 @@
                                               Agregar Requisición
                                           </button>
                                       @else
-                                              <label style="float: right">Proyecto No esta Iniciado</label>
+                                      <br>
+                                      <br>
+                                              <label style="float: right">Proyecto No esta Iniciado para Agregar Requisición</label>
                                       @endif
                                   @endcan
                           @endif
