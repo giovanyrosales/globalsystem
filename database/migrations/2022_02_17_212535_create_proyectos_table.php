@@ -38,7 +38,8 @@ class CreateProyectosTable extends Migration
             $table->string('codcontable', 150)->nullable();
             $table->string('acuerdoapertura', 100)->nullable(); // file
             $table->string('acuerdocierre', 100)->nullable(); // file
-            $table->decimal('monto', 12, 2); // defecto sera 0
+
+            $table->decimal('monto', 10, 2); // cuando presu es aprobado, esto es el monto de partida
 
             // cuando se finaliza un proyecto se calcula los montos restantes
             $table->decimal('monto_finalizado', 10, 2);

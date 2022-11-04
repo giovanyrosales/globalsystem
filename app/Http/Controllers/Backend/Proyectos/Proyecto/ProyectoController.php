@@ -92,14 +92,14 @@ class ProyectoController extends Controller
         $p->codcontable = $request->codcontable;
         $p->acuerdoapertura = null;
         $p->acuerdocierre = null;
-        $p->monto = 0;
         $p->imprevisto_fijo = 0; // este sera usado cuando sea aprobado presupuesto
         $p->porcentaje_herra_fijo = 0; // sera seteado al aprobar partida
         $p->presu_aprobado = 0;
         $p->fecha_aprobado = null;
         $p->permiso = 0;
         $p->permiso_partida_adic = 0;
-        $p->monto_finalizado = 0;
+        $p->monto = 0; // cuando presu es aprobado, esto es el monto de partida
+        $p->monto_finalizado = 0; // es lo que sobra cuando proyecto es finalizado
         $p->porcentaje_obra = 20; // porcentaje obra adicional por defecto
 
         if($p->save()){
@@ -1158,6 +1158,25 @@ class ProyectoController extends Controller
         foreach ($partida as $pp){
             $conteo = $conteo + 1;
             $pp->item = $conteo;
+
+            $sumamonto = 0;
+
+            $arrayPartidaDeta = PartidaDetalle::where('partida_id', $pp->id)->get();
+
+            foreach ($arrayPartidaDeta as $dd){
+
+                $infoMaterial = CatalogoMateriales::where('id', $dd->material_id)->first();
+
+                if($dd->duplicado > 0){
+                    $multi = ($dd->cantidad * $infoMaterial->pu) * $dd->duplicado;
+                }else{
+                    $multi = $dd->cantidad * $infoMaterial->pu;
+                }
+
+                $sumamonto += $multi;
+            }
+
+            $pp->montopartida = number_format((float)$sumamonto, 2, '.', ',');
         }
 
         $presuaprobado = 0;
@@ -1769,48 +1788,37 @@ class ProyectoController extends Controller
                     // 4- Transporte de Concreto Fresco
 
                     $partida1 = Partida::where('proyecto_id', $infoProyecto->id)
-                        ->whereIn('id_tipopartida', [1, 3, 4])
                         ->orderBy('id', 'ASC')
-                        ->get();
-
-                    $arrayPartidas = Partida::where('proyecto_id', $request->id)
-                        ->whereIn('id_tipopartida', [1])
-                        ->orderBy('id')
                         ->get();
 
                     $pilaIdPartidas = array();
 
-                    foreach ($arrayPartidas as $pp){
+                    foreach ($partida1 as $pp){
                         array_push($pilaIdPartidas, $pp->id);
                     }
 
-
                     $sumaMateriales = 0;
 
+                    // UNICAMENTE PARTIDA MATERIALES
                     foreach ($partida1 as $secciones) {
-
                         $detalle1 = PartidaDetalle::where('partida_id', $secciones->id)->get();
-
-                        $total = 0;
 
                         foreach ($detalle1 as $lista) {
 
-                            $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
-
-                            if ($lista->duplicado > 0) {
-                                $multi = ($lista->cantidad * $infomaterial->pu) * $lista->duplicado;
-                                $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
-                            } else {
-                                $multi = $lista->cantidad * $infomaterial->pu;
-                                $lista->material = $infomaterial->nombre;
-                            }
-
-                            // se sumara solo materiales
                             if($secciones->id_tipopartida == 1){
-                                $sumaMateriales = $sumaMateriales + $multi;
-                            }
 
-                            $total = $total + $multi;
+                                $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
+
+                                if ($lista->duplicado > 0) {
+                                    $multi = ($lista->cantidad * $infomaterial->pu) * $lista->duplicado;
+                                } else {
+                                    $multi = $lista->cantidad * $infomaterial->pu;
+                                }
+
+                                // se sumara solo materiales
+
+                                $sumaMateriales = $sumaMateriales + $multi; // 17,237.52
+                            }
                         }
                     }
 
@@ -1826,8 +1834,6 @@ class ProyectoController extends Controller
                     foreach ($manoobra as $secciones3) {
 
                         $detalle3 = PartidaDetalle::where('partida_id', $secciones3->id)->get();
-
-                        $total3 = 0;
 
                         foreach ($detalle3 as $lista) {
 
@@ -1845,7 +1851,6 @@ class ProyectoController extends Controller
                             }
 
                             $totalManoObra = $totalManoObra + $multi;
-                            $total3 = $total3 + $multi;
                         }
                     }
 
@@ -1900,10 +1905,7 @@ class ProyectoController extends Controller
 
                     $informacionGeneral = InformacionGeneral::where('id', 1)->first();
 
-
                     $totalDescuento = ($afp + $isss + $insaforp);
-
-
 
                     $herramientaXPorciento = ($sumaMateriales * $informacionGeneral->porcentaje_herramienta) / 100;
 
@@ -1914,31 +1916,23 @@ class ProyectoController extends Controller
                     // obtener el imprevisto actual
                     $imprevistoActual = $informacionGeneral->imprevisto_modificable;
 
-
                     // imprevisto obtenido del proyecto
                     $imprevisto = ($subtotalPartida * $imprevistoActual) / 100;
-
-                    // total de la partida final
-                    $totalPartidaFinal = $subtotalPartida + $imprevisto;
-
-
-
-                    Log::info('herr x porciento ' . $herramientaXPorciento);
-                    Log::info('imprevisto ' . $imprevisto);
-                    Log::info('total partida $' . $totalPartidaFinal);
 
 
                     //-------------------------------------------------------------
 
                     // pasar a modo aprobado
-                   /* Proyecto::where('id', $request->id)->update([
+                    Proyecto::where('id', $request->id)->update([
                         'fecha_aprobado' => Carbon::now('America/El_Salvador'),
                         'presu_aprobado' => 2,
                         'imprevisto_fijo' => $informacionGeneral->imprevisto_modificable,
                         'porcentaje_herra_fijo' => $informacionGeneral->porcentaje_herramienta
-                        ]);   */
+                        ]);
 
-                    //*************** OBTENER SALDO DE CADA CÓDIGO */
+                    //*************** OBTENER SALDO DE CADA CÓDIGO **********************/
+
+                    // ** MATERIALES UNICAMENTE
 
                     // agrupando para obtener solo los ID de objetos específicos.
                     $detalles = DB::table('partida_detalle AS pd')
@@ -1963,20 +1957,6 @@ class ProyectoController extends Controller
 
                         // obtener sumatoria de los materiales
                         foreach ($info as $dato) {
-
-                            // SUMA DE ISSS Y AFP
-                            // LOS CÓDIGOS FIJOS
-                            //51402: POR REMUNERACIONES EVENTUALES
-                            if($dato->codigo == 51402){
-                                $suma = $isss + $insaforp;
-                                break;
-                            }
-                            // 51502: POR REMUNERACIONES EVENTUALES (igual al de arriba)
-                            else if($dato->codigo == 51502){
-                                $suma = $afp;
-                                break;
-                            }
-
                             if ($dato->duplicado > 0) {
                                 $suma = $suma + (($dato->cantidad * $dato->duplicado) * $dato->pu);
                             } else {
@@ -2013,8 +1993,6 @@ class ProyectoController extends Controller
                         $presu->save();
                     }
 
-
-
                     // IMPREVISTO DEL X PORCIENTO
 
                     if($cuentapr = CuentaProy::where('proyecto_id', $request->id)
@@ -2031,6 +2009,43 @@ class ProyectoController extends Controller
                         $presu->proyecto_id = $request->id;
                         $presu->objespeci_id = 97; // HERRAMIENTAS, REPUESTOS Y ACCESORIOS
                         $presu->saldo_inicial = $imprevisto;
+                        $presu->partida_adicional = 0; // no es partida adicional
+                        $presu->save();
+                    }
+
+                    // APORTE PATRONAL DEL ISSS AFP INSAFORP
+
+                    if($cuentapr = CuentaProy::where('proyecto_id', $request->id)
+                        ->where('objespeci_id', 10)->first()){
+
+                        $sumaher = $cuentapr->saldo_inicial + $imprevisto;
+
+                        CuentaProy::where('id', $cuentapr->id)->update([
+                            'saldo_inicial' => $sumaher
+                        ]);
+                    }else{
+                        $presu = new CuentaProy();
+                        $presu->proyecto_id = $request->id;
+                        $presu->objespeci_id = 10; // código: 51402
+                        $presu->saldo_inicial = ($isss + $insaforp);
+                        $presu->partida_adicional = 0; // no es partida adicional
+                        $presu->save();
+                    }
+
+                    if($cuentapr = CuentaProy::where('proyecto_id', $request->id)
+                        ->where('objespeci_id', 13)->first()){
+
+                        $sumaher = $cuentapr->saldo_inicial + $imprevisto;
+
+                        CuentaProy::where('id', $cuentapr->id)->update([
+                            'saldo_inicial' => $sumaher
+                        ]);
+
+                    }else{
+                        $presu = new CuentaProy();
+                        $presu->proyecto_id = $request->id;
+                        $presu->objespeci_id = 13; // código: 51502
+                        $presu->saldo_inicial = ($afp);
                         $presu->partida_adicional = 0; // no es partida adicional
                         $presu->save();
                     }

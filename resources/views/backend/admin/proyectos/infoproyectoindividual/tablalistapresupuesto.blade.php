@@ -9,6 +9,7 @@
                             <tr>
                                 <th style="width: 10%">Item</th>
                                 <th style="width: 30%">Nombre</th>
+                                <th style="width: 8%">Monto</th>
                                 <th style="width: 12%">Opciones</th>
                             </tr>
                             </thead>
@@ -18,7 +19,7 @@
                                 <tr>
                                     <td>{{ $dato->item }}</td>
                                     <td>{{ $dato->nombre }}</td>
-
+                                    <td>${{ $dato->montopartida }}</td>
                                     <td>
                                         @if($presuaprobado == 0)
                                             <button type="button" class="btn btn-primary btn-xs" onclick="informacionPresupuesto({{ $dato }})">
