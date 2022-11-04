@@ -2654,7 +2654,6 @@ class ProyectoController extends Controller
         $subtotalPartida = ($sumaMateriales + $herramientaXPorciento + $totalManoObra + $totalDescuento
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
-
         // imprevisto obtenido del proyecto
         $imprevisto = ($subtotalPartida * $informacionGeneral->imprevisto_modificable) / 100;
 

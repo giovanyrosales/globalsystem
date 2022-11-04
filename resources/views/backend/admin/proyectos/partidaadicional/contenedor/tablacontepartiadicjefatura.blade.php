@@ -42,21 +42,21 @@
                                     <td>
 
                                         <!-- ver todas las partidas detalle -->
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="vistaPartidasAdicionales({{ $dato->id }})">
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="vistaPartidasAdicionales({{ $dato->id }})">
                                             <i class="fas fa-list-alt" title="Partidas Adicionales"></i>&nbsp; Partidas
                                         </button>
 
                                         <!-- sacar pdf -->
-                                        <br><br>
-                                        <button type="button" class="btn btn-success btn-xs" onclick="infoPdf({{ $dato->id }})">
+
+                                        <button type="button" style="margin-top: 5px;font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="infoPdf({{ $dato->id }})">
                                             <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
                                         </button>
 
                                         <!-- botón para aprobar partidas adicionales-->
                                         @if($dato->estado == 1)
-                                            <br><br>
+
                                             <!-- abrir modal para verificar a que bolsón asignar -->
-                                            <button type="button" class="btn btn-success btn-xs" onclick="vistaInformacionEstado({{ $dato->id }})">
+                                            <button type="button" style="margin-top: 5px;font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="vistaInformacionEstado({{ $dato->id }})">
                                                 <i class="fas fa-check" title="Revisar"></i>&nbsp; Revisar
                                             </button>
                                         @endif

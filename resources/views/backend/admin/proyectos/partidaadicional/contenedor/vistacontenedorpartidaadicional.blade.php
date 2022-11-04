@@ -168,7 +168,7 @@
                                 </div>
 
                                 <!-- sacar pdf -->
-                                <div class="form-group" id="divModalPdfContenedor">
+                                <div class="form-group" >
                                     <button type="button" style=" width: 100%; font-weight: bold; font-size: 15px; background-color: #17a2b8; color: white !important;" class="button button-rounded button-pill" onclick="infoPdf()">
                                         <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
                                     </button>
@@ -392,7 +392,6 @@
                     // esta en modo revisión
                     if(response.data.success === 1){
                         window.open("{{ URL::to('admin/partida/adicional/verpdf') }}/" + id);
-
                     }else{
                         // la partida adicional esta aprobada
 
@@ -550,10 +549,6 @@
                 document.getElementById("divModalEstadoContenedor").style.display = "none";
             }
 
-            if (document.getElementById('divModalPdfContenedor') !== null) {
-                document.getElementById("divModalPdfContenedor").style.display = "none";
-            }
-
             if (document.getElementById('divModalBorrarContenedor') !== null) {
                 document.getElementById("divModalBorrarContenedor").style.display = "none";
             }
@@ -576,12 +571,6 @@
                             // puede modificarse estado
                             if (document.getElementById('divModalEstadoContenedor') !== null) {
                                 document.getElementById("divModalEstadoContenedor").style.display = "block";
-                            }
-                        }
-
-                        if(response.data.info.documento != null){
-                            if (document.getElementById('divModalPdfContenedor') !== null) {
-                                document.getElementById("divModalPdfContenedor").style.display = "block";
                             }
                         }
 

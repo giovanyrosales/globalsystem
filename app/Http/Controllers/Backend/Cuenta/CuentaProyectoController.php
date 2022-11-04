@@ -1110,7 +1110,8 @@ class CuentaProyectoController extends Controller
             $co->documento = null;
             $co->estado = 0; // 0: en desarrollo, 1: listo para revisión, 2: aprobado
             $co->monto_aprobado = 0;
-            $co->imprevisto = $infoGeneral->imprevisto_modificable;
+            $co->imprevisto = 0; // se modifica hasta que sea aprobado
+            $co->imprevisto_herramienta = 0; // se modifica hasta que sea aprobado
             $co->fecha_aprobado = null;
             $co->save();
 
@@ -1904,22 +1905,19 @@ class CuentaProyectoController extends Controller
         }
     }
 
-    // generar un documento PDF
+    // generar un documento PDF para partida adicional
     public function generarPdfPartidaAdicional($id){
         // id contenedor
 
-        // obtener todas los presupuesto por id_tipopartida
         // 1- Materiales
-        // 2- Herramientas (2% de Materiales)
-        // 3- Mano de obra (Por Administración)
-        // 4- Aporte Mano de Obra
-        // 5- Alquiler de Maquinaria
-        // 6- Transporte de Concreto Fresco
+        // 2- Mano de obra (Por Administración)
+        // 3- Alquiler de Maquinaria
+        // 4- Transporte de Concreto Fresco
 
         $infoContenedor = PartidaAdicionalContenedor::where('id', $id)->first();
 
         $partida1 = PartidaAdicional::where('id_partidaadic_conte', $id)
-            ->whereIn('id_tipopartida', [1, 2, 5])
+            ->whereIn('id_tipopartida', [1, 3, 4])
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -1950,8 +1948,6 @@ class CuentaProyectoController extends Controller
             $item = $item + 1;
             $secciones->item = $item;
 
-            $secciones->cantidadp = number_format((float)$secciones->cantidadp, 2, '.', ',');
-
             $detalle1 = PartidaAdicionalDetalle::where('id_partida_adicional', $secciones->id)->get();
 
             $total = 0;
@@ -1962,20 +1958,19 @@ class CuentaProyectoController extends Controller
 
                 $lista->objespecifico = $infomaterial->id_objespecifico;
 
-                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
-                $lista->medida = $infomedida->medida;
-
-
-                if ($lista->duplicado > 0) {
-                    $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
-                } else {
-                    $lista->material = $infomaterial->nombre;
+                $medida = '';
+                if($infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first()){
+                    $medida = $infomedida->medida;
                 }
 
-                if($lista->duplicado > 0){
+                $lista->medida = $medida;
+
+                if ($lista->duplicado > 0) {
                     $multi = ($lista->cantidad * $infomaterial->pu) * $lista->duplicado;
-                }else{
+                    $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
+                } else {
                     $multi = $lista->cantidad * $infomaterial->pu;
+                    $lista->material = $infomaterial->nombre;
                 }
 
                 $lista->cantidad = number_format((float)$lista->cantidad, 2, '.', ',');
@@ -1996,8 +1991,10 @@ class CuentaProyectoController extends Controller
             $index++;
         }
 
-        $manoobra = PartidaAdicional::where('id_partidaadic_conte', $infoContenedor->id)
-            ->where('id_tipopartida', 3)
+        // 2- MANO DE OBRA POR ADMINISTRACION
+
+        $manoobra = PartidaAdicional::where('id_partidaadic_conte', $id)
+            ->where('id_tipopartida', 2)
             ->orderBy('id', 'ASC')
             ->get();
 
@@ -2005,10 +2002,8 @@ class CuentaProyectoController extends Controller
 
         foreach ($manoobra as $secciones3) {
             array_push($resultsBloque3, $secciones3);
-            $item += 1;
+            $item = $item + 1;
             $secciones3->item = $item;
-
-            $secciones3->cantidadp = number_format((float)$secciones3->cantidadp, 2, '.', ',');
 
             $detalle3 = PartidaAdicionalDetalle::where('id_partida_adicional', $secciones3->id)->get();
 
@@ -2018,17 +2013,21 @@ class CuentaProyectoController extends Controller
 
                 $infomaterial = CatalogoMateriales::where('id', $lista->id_material)->first();
 
-                $infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first();
-                $lista->medida = $infomedida->medida;
+                $medida = '';
+                if($infomedida = UnidadMedida::where('id', $infomaterial->id_unidadmedida)->first()){
+                    $medida = $infomedida->medida;
+                }
 
-                if ($lista->duplicado > 0) {
+                $lista->medida = $medida;
+
+                if ($lista->duplicado != 0) {
                     $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
                 } else {
                     $lista->material = $infomaterial->nombre;
                 }
 
                 $multi = $lista->cantidad * $infomaterial->pu;
-                if ($lista->duplicado > 0) {
+                if ($lista->duplicado != 0) {
                     $multi = $multi * $lista->duplicado;
                 }
 
@@ -2046,40 +2045,10 @@ class CuentaProyectoController extends Controller
             $index3++;
         }
 
-        // APORTE DE MANO DE OBRA
+        // 3- ALQUILER DE MAQUINARIA
 
-        $aporteManoObra = PartidaAdicional::where('id_partidaadic_conte', $infoContenedor->id)
-            ->where('id_tipopartida', 4)
-            ->get();
-
-        $totalAporteManoObra = 0;
-
-        foreach ($aporteManoObra as $secciones3) {
-
-            $detalle4 = PartidaAdicionalDetalle::where('id_partida_adicional', $secciones3->id)->get();
-
-            foreach ($detalle4 as $lista) {
-
-                $infomaterial = CatalogoMateriales::where('id', $lista->id_material)->first();
-                if ($lista->duplicado > 0) {
-                    $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
-                } else {
-                    $lista->material = $infomaterial->nombre;
-                }
-
-                $multi = $lista->cantidad * $infomaterial->pu;
-                if ($lista->duplicado > 0) {
-                    $multi = $multi * $lista->duplicado;
-                }
-
-                $totalAporteManoObra += $multi;
-            }
-        }
-
-        // ALQUILER DE MAQUINARIA
-
-        $alquilerMaquinaria = PartidaAdicional::where('id_partidaadic_conte', $infoContenedor->id)
-            ->where('id_tipopartida', 5)
+        $alquilerMaquinaria = PartidaAdicional::where('id_partidaadic_conte', $id)
+            ->where('id_tipopartida', 3)
             ->get();
 
         $totalAlquilerMaquinaria = 0;
@@ -2092,21 +2061,16 @@ class CuentaProyectoController extends Controller
 
                 $infomaterial = CatalogoMateriales::where('id', $lista->id_material)->first();
                 $lista->material = $infomaterial->nombre;
-
                 $multi = $lista->cantidad * $infomaterial->pu;
-
-                if ($lista->duplicado > 0) {
-                    $multi = $multi * $lista->duplicado;
-                }
 
                 $totalAlquilerMaquinaria += $multi;
             }
         }
 
-        // TRANSPORTE CONCRETO FRESCO
+        // 4- TRANSPORTE CONCRETO FRESCO
 
-        $trasportePesado = PartidaAdicional::where('id_partidaadic_conte', $infoContenedor->id)
-            ->where('id_tipopartida', 6)
+        $trasportePesado = PartidaAdicional::where('id_partidaadic_conte', $id)
+            ->where('id_tipopartida', 4)
             ->get();
 
         $totalTransportePesado = 0;
@@ -2119,11 +2083,7 @@ class CuentaProyectoController extends Controller
 
                 $infomaterial = CatalogoMateriales::where('id', $lista->id_material)->first();
                 $lista->material = $infomaterial->nombre;
-
                 $multi = $lista->cantidad * $infomaterial->pu;
-                if ($lista->duplicado > 0) {
-                    $multi = $multi * $lista->duplicado;
-                }
 
                 $totalTransportePesado += $multi;
             }
@@ -2133,15 +2093,32 @@ class CuentaProyectoController extends Controller
         $isss = ($totalManoObra * 7.5) / 100;
         $insaforp = ($totalManoObra * 1) / 100;
 
+        $informacionGeneral = InformacionGeneral::where('id', 1)->first();
+
+        // obtener porcentaje actual
+        if($infoContenedor->estado == 2){
+            $porcientoHerramienta = $infoContenedor->imprevisto_herramienta;
+        }else{
+            $porcientoHerramienta = $informacionGeneral->porcentaje_herramienta;
+        }
+
         $totalDescuento = ($afp + $isss + $insaforp);
-        $herramienta2Porciento = ($sumaMateriales * 2) / 100;
+        $herramientaXPorciento = ($sumaMateriales * $porcientoHerramienta) / 100;
 
         // subtotal del presupuesto partida
-        $subtotalPartida = ($sumaMateriales + $herramienta2Porciento + $totalManoObra + $totalDescuento
+        $subtotalPartida = ($sumaMateriales + $herramientaXPorciento + $totalManoObra + $totalDescuento
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
+        // obtener el imprevisto actual
+        if($infoContenedor->estado == 2){
+            $imprevistoActual = $infoContenedor->imprevisto;
+        }else{
+            $imprevistoActual = $informacionGeneral->imprevisto_modificable;
+        }
+
+
         // imprevisto obtenido del proyecto
-        $imprevisto = ($subtotalPartida * $infoPro->imprevisto) / 100;
+        $imprevisto = ($subtotalPartida * $imprevistoActual) / 100;
 
         // total de la partida final
         $totalPartidaFinal = $subtotalPartida + $imprevisto;
@@ -2151,7 +2128,7 @@ class CuentaProyectoController extends Controller
         $isss = "$" . number_format((float)$isss, 2, '.', ',');
         $insaforp = "$" . number_format((float)$insaforp, 2, '.', ',');
         $sumaMateriales = "$" . number_format((float)$sumaMateriales, 2, '.', ',');
-        $herramienta2Porciento = "$" . number_format((float)$herramienta2Porciento, 2, '.', ',');
+        $herramientaXPorciento = "$" . number_format((float)$herramientaXPorciento, 2, '.', ',');
         $totalManoObra = "$" . number_format((float)$totalManoObra, 2, '.', ',');
 
         $totalAlquilerMaquinaria = "$" . number_format((float)$totalAlquilerMaquinaria, 2, '.', ',');
@@ -2160,7 +2137,6 @@ class CuentaProyectoController extends Controller
         $imprevisto = "$" . number_format((float)$imprevisto, 2, '.', ',');
         $totalPartidaFinal = "$" . number_format((float)$totalPartidaFinal, 2, '.', ',');
 
-        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
         $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
         $mpdf->SetTitle('Presupuesto -' . $mes);
 
@@ -2173,7 +2149,7 @@ class CuentaProyectoController extends Controller
             <img id='logo' src='$logoalcaldia'>
             <p id='titulo'>ALCALDÍA MUNICIPAL DE METAPÁN <br>
             Fondo: $fuenter <br>
-            Hoja de presupuesto de Partida Adicional<br>
+            Hoja de presupuesto Partida Adicional<br>
             Fecha: $mes <br></p>
             </div>";
 
@@ -2189,9 +2165,9 @@ class CuentaProyectoController extends Controller
             }
 
             $tabla .= "<tr>
-                    <td colspan='1' width='10%'>Item</td>
-                    <td colspan='3' width='30%'>Partida</td>
-                    <td colspan='2' width='20%'>Cantidad P.</td>
+                    <td colspan='1' width='10%' style='font-weight: bold'>Item</td>
+                    <td colspan='3' width='30%' style='font-weight: bold'>Partida</td>
+                    <td colspan='2' width='20%' style='font-weight: bold'>Cantidad P.</td>
                 </tr>
 
                 <tr>
@@ -2201,19 +2177,19 @@ class CuentaProyectoController extends Controller
                 </tr>
 
                 <tr>
-                    <td width='15%'>Material</td>
-                    <td width='11'>U/M</td>
-                    <td width='12%'>Cantidad</td>
-                    <td width='10%'>P.U</td>
-                    <td width='12%'>Sub Total</td>
-                    <td width='20%'>Total</td>
+                    <td width='25%' style='font-weight: bold'>Material</td>
+                    <td width='11%' style='font-weight: bold'>U/M</td>
+                    <td width='12%' style='font-weight: bold'>Cantidad</td>
+                    <td width='10%' style='font-weight: bold'>P.U</td>
+                    <td width='12%' style='font-weight: bold'>Sub Total</td>
+                    <td width='20%' style='font-weight: bold'>Total</td>
                 </tr>
                 ";
 
             foreach ($dd->bloque1 as $gg) {
 
                 $tabla .= "<tr>
-                    <td width='15%'>$gg->material</td>
+                    <td width='25%'>$gg->material</td>
                     <td width='10%'>$gg->medida</td>
                     <td width='10%'>$gg->cantidad</td>
                     <td width='10%'>$gg->pu</td>
@@ -2224,7 +2200,7 @@ class CuentaProyectoController extends Controller
                 if ($dd->bloque1->last() == $gg) {
                     $tabla .= "
                         <tr>
-                            <td width='15%'></td>
+                            <td width='25%'></td>
                             <td width='10%'></td>
                             <td width='10%'></td>
                             <td width='10%'></td>
@@ -2269,7 +2245,7 @@ class CuentaProyectoController extends Controller
             </tr>
 
             <tr>
-                <td width='15%'>Material</td>
+                <td width='25%'>Material</td>
                 <td width='11'>U/M</td>
                 <td width='12%'>Cantidad</td>
                 <td width='10%'>P.U</td>
@@ -2282,7 +2258,7 @@ class CuentaProyectoController extends Controller
 
                 $tabla .= "
                 <tr>
-                    <td width='15%'>$gg->material</td>
+                    <td width='25%'>$gg->material</td>
                     <td width='10%'>$gg->medida</td>
                     <td width='10%'>$gg->cantidad</td>
                     <td width='10%'>$gg->pu</td>
@@ -2294,7 +2270,7 @@ class CuentaProyectoController extends Controller
                 if ($dd->bloque3->last() == $gg) {
 
                     $tabla .= "<tr>
-                        <td width='15%'></td>
+                        <td width='25%'></td>
                         <td width='10%'></td>
                         <td width='10%'></td>
                         <td width='10%'></td>
@@ -2352,7 +2328,7 @@ class CuentaProyectoController extends Controller
             <img id='logo' src='$logoalcaldia'>
             <p id='titulo'>ALCALDÍA MUNICIPAL DE METAPÁN <br>
             Fondo: " . $fuenter . " <br>
-            Hoja de presupuesto <br>
+            Hoja de presupuesto Partida Adicional<br>
             Fecha: " . $mes . " <br></p>
             </div>";
 
@@ -2369,8 +2345,8 @@ class CuentaProyectoController extends Controller
     </tr>
 
     <tr>
-        <td width='20%'>HERRAMIENTA (2% DE MAT.)</td>
-        <td width='12%'>$herramienta2Porciento</td>
+        <td width='20%'>HERRAMIENTA ($porcientoHerramienta% DE MAT.)</td>
+        <td width='12%'>$herramientaXPorciento</td>
     </tr>
 
     <tr>
@@ -2399,7 +2375,7 @@ class CuentaProyectoController extends Controller
     </tr>
 
     <tr>
-        <td width='20%' style='font-weight: bold'>IMPREVISTOS ($infoPro->imprevisto% de sub total)</td>
+        <td width='20%' style='font-weight: bold'>IMPREVISTOS ($imprevistoActual% de sub total)</td>
         <td width='12%' style='font-weight: bold'>$imprevisto</td>
     </tr>
 
@@ -2420,6 +2396,7 @@ class CuentaProyectoController extends Controller
         $mpdf->WriteHTML($tabla2,2);
 
         $mpdf->Output();
+
     }
 
 

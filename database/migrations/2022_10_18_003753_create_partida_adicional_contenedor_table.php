@@ -35,6 +35,9 @@ class CreatePartidaAdicionalContenedorTable extends Migration
             // imprevisto
             $table->decimal('imprevisto', 10, 2);
 
+            // imprevisto para herramienta
+            $table->decimal('imprevisto_herramienta', 10, 2);
+
             $table->date('fecha_aprobado')->nullable();
 
             $table->foreign('id_proyecto')->references('id')->on('proyectos');
