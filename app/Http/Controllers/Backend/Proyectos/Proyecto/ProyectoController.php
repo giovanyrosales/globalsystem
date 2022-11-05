@@ -1545,7 +1545,7 @@ class ProyectoController extends Controller
 
                 $lista->medida = $medida;
 
-                if($lista->duplicado != 0){
+                if($lista->duplicado > 0){
                     $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
                 }else{
                     $lista->material = $infomaterial->nombre;
@@ -1588,6 +1588,9 @@ class ProyectoController extends Controller
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
+                if ($lista->duplicado > 0) {
+                    $multi = $multi * $lista->duplicado;
+                }
 
                 $totalAlquilerMaquinaria += $multi;
             }
@@ -1611,6 +1614,9 @@ class ProyectoController extends Controller
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
+                if ($lista->duplicado > 0) {
+                    $multi = $multi * $lista->duplicado;
+                }
 
                 $totalTransportePesado += $multi;
             }
@@ -1779,7 +1785,7 @@ class ProyectoController extends Controller
                         }
 
                         $multi = $lista->cantidad * $infomaterial->pu;
-                        if ($lista->duplicado != 0) {
+                        if ($lista->duplicado > 0) {
                             $multi = $multi * $lista->duplicado;
                         }
 
@@ -1804,6 +1810,9 @@ class ProyectoController extends Controller
                         $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                         $lista->material = $infomaterial->nombre;
                         $multi = $lista->cantidad * $infomaterial->pu;
+                        if ($lista->duplicado > 0) {
+                            $multi = $multi * $lista->duplicado;
+                        }
 
                         $totalAlquilerMaquinaria += $multi;
                     }
@@ -1826,6 +1835,9 @@ class ProyectoController extends Controller
                         $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                         $lista->material = $infomaterial->nombre;
                         $multi = $lista->cantidad * $infomaterial->pu;
+                        if ($lista->duplicado > 0) {
+                            $multi = $multi * $lista->duplicado;
+                        }
 
                         $totalTransportePesado += $multi;
                     }
@@ -2522,13 +2534,10 @@ class ProyectoController extends Controller
         // 3- Alquiler de Maquinaria
         // 4- Transporte de Concreto Fresco
 
-
         $partida1 = Partida::where('proyecto_id', $id)
             ->whereIn('id_tipopartida', [1, 3, 4])
             ->orderBy('id', 'ASC')
             ->get();
-
-        $infoPro = Proyecto::where('id', $id)->first();
 
         $sumaMateriales = 0;
 
@@ -2585,7 +2594,7 @@ class ProyectoController extends Controller
                 }
 
                 $multi = $lista->cantidad * $infomaterial->pu;
-                if ($lista->duplicado != 0) {
+                if ($lista->duplicado > 0) {
                     $multi = $multi * $lista->duplicado;
                 }
 
@@ -2612,6 +2621,9 @@ class ProyectoController extends Controller
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
+                if ($lista->duplicado > 0) {
+                    $multi = $multi * $lista->duplicado;
+                }
 
                 $totalAlquilerMaquinaria += $multi;
             }
@@ -2634,6 +2646,9 @@ class ProyectoController extends Controller
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
+                if ($lista->duplicado > 0) {
+                    $multi = $multi * $lista->duplicado;
+                }
 
                 $totalTransportePesado += $multi;
             }
@@ -2664,6 +2679,7 @@ class ProyectoController extends Controller
         return ($this->redondear_dos_decimal($totalPartidaFinal));
     }
 
+
     // obtener información del proyecto
     public function informacionProyectoIndividual(Request $request){
         $regla = array(
@@ -2681,5 +2697,10 @@ class ProyectoController extends Controller
             return ['success' => 2];
         }
     }
+
+
+
+
+
 
 }

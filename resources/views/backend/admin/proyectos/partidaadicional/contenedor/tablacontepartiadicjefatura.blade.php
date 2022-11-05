@@ -42,7 +42,7 @@
                                     <td>
 
                                         <!-- ver todas las partidas detalle -->
-                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="vistaPartidasAdicionales({{ $dato->id }})">
+                                        <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="vistaPartidasAdicionales({{ $dato->id }})">
                                             <i class="fas fa-list-alt" title="Partidas Adicionales"></i>&nbsp; Partidas
                                         </button>
 

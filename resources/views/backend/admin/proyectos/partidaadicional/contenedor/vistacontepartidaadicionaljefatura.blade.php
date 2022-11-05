@@ -407,7 +407,7 @@
                         // asignar ID contenedor
                         $('#id-contenedor').val(id);
 
-                        document.getElementById("txt-monto-partida").innerHTML = response.data.montopartida;
+                        document.getElementById("txt-monto-partida").innerHTML = "$" + response.data.montopartida;
                         document.getElementById("txt-nombre-bolson").innerHTML = response.data.nombolson;
                         document.getElementById("txt-restante-bolson").innerHTML = response.data.bolsonrestante;
 
@@ -546,14 +546,13 @@
                 .then((response) => {
                     closeLoading();
 
+                    $('#modalEstado').modal('hide');
 
                     if(response.data.success === 1) {
 
-                        let conteo = response.data.conteo;
-
                         Swal.fire({
-                            title: 'Materiales Incompleto',
-                            text: "Hay " + conteo + " Materiales que no tiene asignado un Objeto Específico",
+                            title: 'Proyecto Finalizado',
+                            text: "El Proyecto fue finalizado",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -565,14 +564,37 @@
 
                             }
                         })
-
                     }
                     else if(response.data.success === 2){
-                        $('#modalEstado').modal('hide');
-                        toastr.success('Partida Adicional Aprobada');
-                        recargar();
+                        // no hay dinero en bolsón
+
+                        let queda = response.data.quedabolson;
+                        let solicito = response.data.solicita;
+
+                        Swal.fire({
+                            title: 'Bolsón sin Fondos',
+                            html: "La Partida Adicional Solicita $."+ solicito + "<br>"
+                                + "Y el Bolsón Tiene Fondos $"+ queda +"<br>"
+                            ,
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
                     }
+
                     else if(response.data.success === 3){
+                        // guardado
+
+                         toastr.success('guardado');
+                    }
+                    else if(response.data.success === 4){
 
                         let porcentaje = response.data.porcentaje + "%";
                         let montomaximo = response.data.montomaximo;

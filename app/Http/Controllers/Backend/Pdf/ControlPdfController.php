@@ -134,7 +134,7 @@ class ControlPdfController extends Controller
 
                 $lista->medida = $medida;
 
-                if ($lista->duplicado != 0) {
+                if ($lista->duplicado > 0) {
                     $lista->material = $infomaterial->nombre . " (" . $lista->duplicado . ")";
                 } else {
                     $lista->material = $infomaterial->nombre;
@@ -177,6 +177,9 @@ class ControlPdfController extends Controller
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
+                if ($lista->duplicado > 0) {
+                    $multi = $multi * $lista->duplicado;
+                }
 
                 $totalAlquilerMaquinaria += $multi;
             }
@@ -199,6 +202,9 @@ class ControlPdfController extends Controller
                 $infomaterial = CatalogoMateriales::where('id', $lista->material_id)->first();
                 $lista->material = $infomaterial->nombre;
                 $multi = $lista->cantidad * $infomaterial->pu;
+                if ($lista->duplicado > 0) {
+                    $multi = $multi * $lista->duplicado;
+                }
 
                 $totalTransportePesado += $multi;
             }
@@ -217,7 +223,6 @@ class ControlPdfController extends Controller
             $porcientoHerramienta = $informacionGeneral->porcentaje_herramienta;
         }
 
-
         $totalDescuento = ($afp + $isss + $insaforp);
         $herramientaXPorciento = ($sumaMateriales * $porcientoHerramienta) / 100;
 
@@ -225,14 +230,12 @@ class ControlPdfController extends Controller
         $subtotalPartida = ($sumaMateriales + $herramientaXPorciento + $totalManoObra + $totalDescuento
             + $totalAlquilerMaquinaria + $totalTransportePesado);
 
-
         // obtener el imprevisto actual
         if($infoPro->presu_aprobado == 2){
             $imprevistoActual = $infoPro->imprevisto_fijo;
         }else{
             $imprevistoActual = $informacionGeneral->imprevisto_modificable;
         }
-
 
         // imprevisto obtenido del proyecto
         $imprevisto = ($subtotalPartida * $imprevistoActual) / 100;
