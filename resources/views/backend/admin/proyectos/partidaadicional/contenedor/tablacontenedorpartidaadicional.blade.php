@@ -7,10 +7,10 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Estado</th>
-                                <th>Monto Aprobado</th>
-                                <th>Opciones</th>
+                                <th style="width: 10%">Fecha</th>
+                                <th style="width: 10%">Estado</th>
+                                <th style="width: 10%">Monto Aprobado</th>
+                                <th style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>

@@ -17,12 +17,9 @@ class CreateCuentaproyTable extends Migration
             $table->id();
             $table->bigInteger('proyecto_id')->unsigned();
             $table->bigInteger('objespeci_id')->unsigned(); // objeto específico
+            $table->bigInteger('cuentaproy_part_adicional')->unsigned()->nullable();
 
             $table->decimal('saldo_inicial', 10,2); // no cambia nunca
-
-            // 0: no es partida adicional
-            // 1: si es partida adicional
-            $table->boolean('partida_adicional');
 
             $table->foreign('proyecto_id')->references('id')->on('proyectos');
             $table->foreign('objespeci_id')->references('id')->on('obj_especifico');

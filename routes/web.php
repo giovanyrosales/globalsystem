@@ -314,7 +314,8 @@ Route::post('/admin/partida/adicional/aprobar', [CuentaProyectoController::class
 Route::get('/admin/partida/adicional/verpdf/{id}', [CuentaProyectoController::class, 'generarPdfPartidaAdicional']);
 // comprobar que haya partidas adicionales
 Route::post('/admin/partida/adicional/comprobar/quehaya', [CuentaProyectoController::class, 'verificarSiHayPartidas']);
-
+// guardar documento de contenedor para partida adicional
+Route::post('/admin/partida/adicional/documento/guardar', [CuentaProyectoController::class, 'guardarDocumentoPartidaAdic']);
 
 
 // buscador de material para crear una partida

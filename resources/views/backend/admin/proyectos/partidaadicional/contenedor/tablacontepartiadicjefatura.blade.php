@@ -10,10 +10,11 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Estado</th>
-                                <th>Documento</th>
-                                <th>Opciones</th>
+                                <th style="width: 10%">Fecha</th>
+                                <th style="width: 10%">Estado</th>
+                                <th style="width: 10%">Monto Aprobado</th>
+                                <th style="width: 10%">Documento</th>
+                                <th style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -31,11 +32,17 @@
                                         @endif
                                     </td>
 
+                                    <td>{{ $dato->montopartida }}</td>
+
                                     <td>
                                         @if($dato->documento != null)
                                             <a href="{{ url('/admin/partida/adicional/obraadicional/doc/'.$dato->id) }}">
-                                                <button class="btn btn-success btn-xs"><i class="fa fa-download"></i> Descargar</button>
+                                                <button style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small"><i class="fa fa-download"></i> Descargar</button>
                                             </a>
+                                        @else
+                                            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="infoSubirDoc({{ $dato->id }})">
+                                                <i class="fas fa-upload" title="Cargar Documento"></i>&nbsp; Cargar Documento
+                                            </button>
                                         @endif
                                     </td>
 

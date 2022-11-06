@@ -1923,14 +1923,6 @@ class ProyectoController extends Controller
 
                     //-------------------------------------------------------------
 
-                    // pasar a modo aprobado
-                    Proyecto::where('id', $request->id)->update([
-                        'fecha_aprobado' => Carbon::now('America/El_Salvador'),
-                        'presu_aprobado' => 2,
-                        'imprevisto_fijo' => $informacionGeneral->imprevisto_modificable,
-                        'porcentaje_herra_fijo' => $informacionGeneral->porcentaje_herramienta
-                        ]);
-
                     //*************** OBTENER SALDO DE CADA CÓDIGO **********************/
 
                     // ** MATERIALES UNICAMENTE
@@ -1970,7 +1962,7 @@ class ProyectoController extends Controller
                         $presu->proyecto_id = $request->id;
                         $presu->objespeci_id = $det->id_objespecifico;
                         $presu->saldo_inicial = $suma;
-                        $presu->partida_adicional = 0; // no es partida adicional
+                        $presu->cuentaproy_part_adicional = null;
                         $presu->save();
                     }
 
@@ -1993,7 +1985,7 @@ class ProyectoController extends Controller
                         $presu->proyecto_id = $request->id;
                         $presu->objespeci_id = 37; // HERRAMIENTAS, REPUESTOS Y ACCESORIOS
                         $presu->saldo_inicial = $herramientaXPorciento;
-                        $presu->partida_adicional = 0; // no es partida adicional
+                        $presu->cuentaproy_part_adicional = null;
                         $presu->save();
                     }
 
@@ -2013,7 +2005,7 @@ class ProyectoController extends Controller
                         $presu->proyecto_id = $request->id;
                         $presu->objespeci_id = 97; // HERRAMIENTAS, REPUESTOS Y ACCESORIOS
                         $presu->saldo_inicial = $imprevisto;
-                        $presu->partida_adicional = 0; // no es partida adicional
+                        $presu->cuentaproy_part_adicional = null;
                         $presu->save();
                     }
 
@@ -2032,7 +2024,7 @@ class ProyectoController extends Controller
                         $presu->proyecto_id = $request->id;
                         $presu->objespeci_id = 10; // código: 51402
                         $presu->saldo_inicial = ($isss + $insaforp);
-                        $presu->partida_adicional = 0; // no es partida adicional
+                        $presu->cuentaproy_part_adicional = null;
                         $presu->save();
                     }
 
@@ -2051,13 +2043,18 @@ class ProyectoController extends Controller
                         $presu->proyecto_id = $request->id;
                         $presu->objespeci_id = 13; // código: 51502
                         $presu->saldo_inicial = ($afp);
-                        $presu->partida_adicional = 0; // no es partida adicional
+                        $presu->cuentaproy_part_adicional = null;
                         $presu->save();
                     }
 
+                    // pasar a modo aprobado
                     Proyecto::where('id', $request->id)->update([
+                        'fecha_aprobado' => Carbon::now('America/El_Salvador'),
+                        'presu_aprobado' => 2,
                         'monto' => $montoPartidaFinal,
                         'id_bolson' => $request->idbolson,
+                        'imprevisto_fijo' => $informacionGeneral->imprevisto_modificable,
+                        'porcentaje_herra_fijo' => $informacionGeneral->porcentaje_herramienta
                     ]);
 
                     DB::commit();
@@ -2083,6 +2080,12 @@ class ProyectoController extends Controller
             ->select('obj.nombre', 'obj.id AS idcodigo', 'obj.codigo', 'p.id', 'p.saldo_inicial')
             ->where('p.proyecto_id', $id)
             ->get();
+
+        $pilaIdCuentaProy = array();
+
+        foreach ($presupuesto as $ll) {
+            array_push($pilaIdCuentaProy, $ll->id); // id cuentaproy
+        }
 
         foreach ($presupuesto as $pp){
 

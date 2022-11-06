@@ -83,7 +83,7 @@
                 </div>
 
                 <div class="modal-body">
-                    <form id="formulario">
+                    <form id="formulario-montos">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12">
@@ -160,6 +160,38 @@
         </div>
     </div>
 
+    <!-- DOCUEMENTO PARA PARTIDA ADICIONAL -->
+    <div class="modal fade" id="modalDocumento" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Agregar Documento</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form id="formulario-documento">
+                        <div class="card-body">
+
+                            <div class="form-group">
+                                <label>Documento</label>
+                                <input id="id-conte-documento" type="hidden">
+                                <input type="file" id="documento-contenedor" class="form-control" accept="image/jpeg, image/jpg, image/png, .pdf"/>
+                            </div>
+
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="guardarDocumento()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
@@ -189,7 +221,7 @@
 
         function recargar(){
             let id = {{ $id }}; // id PROYECTO
-            var ruta = "{{ URL::to('/admin/partida/adicional/contenedor/tabla') }}/" + id;
+            var ruta = "{{ URL::to('/admin/partida/adici/conte/jefatura/tabla') }}/" + id;
             $('#tablaDatatable').load(ruta);
         }
 
@@ -402,6 +434,8 @@
                     else if(response.data.success === 5){
                             // viene la información
 
+                        document.getElementById("formulario-montos").reset();
+
                         $('#modalEstado').modal('show');
 
                         // asignar ID contenedor
@@ -591,8 +625,14 @@
 
                     else if(response.data.success === 3){
                         // guardado
-
-                         toastr.success('guardado');
+                        recargar();
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: 'Partida Adicional Aprobada',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
                     }
                     else if(response.data.success === 4){
 
@@ -667,7 +707,51 @@
                     toastr.error('Error al buscar');
                     closeLoading();
                 });
+        }
 
+        function infoSubirDoc(id){
+            document.getElementById("formulario-documento").reset();
+            $('#id-conte-documento').val(id);
+            $('#modalDocumento').modal('show');
+        }
+
+
+        function guardarDocumento(){
+            var documento = document.getElementById('documento-contenedor');
+            var idcontenedor = document.getElementById('id-conte-documento').value;
+
+            if(documento.files && documento.files[0]){ // si trae doc
+                if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png|.pdf')){
+                    toastr.error('formato permitidos: .png .jpg .jpeg .pdf');
+                    return;
+                }
+            }else{
+                toastr.error('Documento es requerido');
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('idcontenedor', idcontenedor);
+            formData.append('documento', documento.files[0]);
+
+            axios.post(url+'/partida/adicional/documento/guardar', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalDocumento').modal('hide');
+                        toastr.success('Documento guardado');
+                        recargar();
+                    }
+                    else{
+                        toastr.error('error al guardar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al guardar');
+                    closeLoading();
+                });
         }
 
 
