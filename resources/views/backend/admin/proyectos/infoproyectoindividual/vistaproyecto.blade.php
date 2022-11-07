@@ -319,7 +319,8 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <br>
-                                    <button type="button" onclick="addAgregarFilaNuevaRequisicion()" class="btn btn-primary btn-sm float-right" style="margin-top:10px;">
+                                    <button type="button" onclick="addAgregarFilaNuevaRequisicion()" class="button button-3d button-rounded button-pill button-small"
+                                            style="margin-top:10px; font-weight: bold; background-color: #17a2b8; color: white !important;">
                                         <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                 </div>
                             </div>
@@ -345,7 +346,8 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="preguntaGuardarRequisicion()">Guardar</button>
+                <button type="button" class="button button-3d button-rounded button-pill button-small" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                        onclick="preguntaGuardarRequisicion()">Guardar</button>
             </div>
         </div>
     </div>
@@ -970,7 +972,7 @@
 
             Swal.fire({
                 title: 'Guardar Requisición',
-                text: "",
+                text: "se Reservara Monto en Saldo Retenido",
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -1076,6 +1078,7 @@
                 }
             }
 
+            // SOLO TIENE QUE IR UNA LETRA, ESTO NO SE ENVÍA A SERVER
             for(var b = 0; b < descripcion.length; b++){
 
                 var datoDescripcion = descripcion[b];

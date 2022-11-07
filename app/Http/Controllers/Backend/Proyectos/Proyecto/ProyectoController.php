@@ -662,7 +662,7 @@ class ProyectoController extends Controller
 
                 // como siempre busco material que estaban en el presupuesto, siempre encontrara
                 // el proyecto ID y el ID de objeto específico
-                $infoPresupuesto = CuentaProy::where('proyecto_id', $request->id)
+                $infoCuentaProy = CuentaProy::where('proyecto_id', $request->id)
                     ->where('objespeci_id', $infoCatalogo->id_objespecifico)
                     ->first();
 
@@ -672,11 +672,11 @@ class ProyectoController extends Controller
                 $totalRetenido = 0;
 
                 // movimiento de cuentas (sube y baja)
-                $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $infoPresupuesto->id)
+                $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $infoCuentaProy->id)
                     ->where('autorizado', 1) // autorizado por presupuesto
                     ->sum('dinero');
 
-                $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $infoPresupuesto->id)
+                $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $infoCuentaProy->id)
                     ->where('autorizado', 1) // autorizado por presupuesto
                     ->sum('dinero');
 
@@ -686,7 +686,7 @@ class ProyectoController extends Controller
                 $arrayRestante = DB::table('cuentaproy_restante AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.id_cuentaproy', $infoPresupuesto->id)
+                    ->where('pd.id_cuentaproy', $infoCuentaProy->id)
                     ->where('rd.cancelado', 0)
                     ->get();
 
@@ -694,11 +694,20 @@ class ProyectoController extends Controller
                     $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
                 }
 
+                $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $infoCuentaProy->proyecto_id)->get();
+
+                $sumaPartidaAdicional = 0;
+                foreach ($infoCuentaPartida as $dd){
+                    if($infoCuentaProy->objespeci_id == $dd->objespeci_id){
+                        $sumaPartidaAdicional += $dd->monto;
+                    }
+                }
+
                 // información de saldos retenidos
                 $arrayRetenido = DB::table('cuentaproy_retenido AS psr')
                     ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                    ->where('psr.id_cuentaproy', $infoPresupuesto->id)
+                    ->where('psr.id_cuentaproy', $infoCuentaProy->id)
                     ->where('rd.cancelado', 0)
                     ->get();
 
@@ -706,16 +715,19 @@ class ProyectoController extends Controller
                     $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
                 }
 
-                // aquí se obtiene el Saldo Restante del código
-                $totalRestanteSaldo = $totalMoviCuenta + $infoPresupuesto->saldo_inicial - $totalRestante;
+                //
+                $sumaPartidaAdicional += $infoCuentaProy->saldo_inicial;
 
+                // aquí se obtiene el Saldo Restante del código
+                $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
+
+                // Esto es lo que hay SALDO RESTANTE quitando el retenido
                 $totalCalculado = $totalRestanteSaldo - $totalRetenido;
 
-                // verificar cantidad * dinero del material nuevo.
-                // este dinero se esta solicitando para la fila.
-                $saldoMaterial = $request->cantidad[$i] * $infoCatalogo->pu;
 
-                Log::info('ss ' . $saldoMaterial);
+                // Verificar cantidad * dinero del material nuevo.
+                // Este dinero se está solicitando para la fila.
+                $saldoMaterial = $request->cantidad[$i] * $infoCatalogo->pu;
 
                 if($this->redondear_dos_decimal($totalCalculado) < $this->redondear_dos_decimal($saldoMaterial)){
 
@@ -752,7 +764,7 @@ class ProyectoController extends Controller
                     // guardar el SALDO RETENIDO
                     $rRetenido = new CuentaProyRetenido();
                     $rRetenido->id_requi_detalle = $rDetalle->id;
-                    $rRetenido->id_cuentaproy = $infoPresupuesto->id;
+                    $rRetenido->id_cuentaproy = $infoCuentaProy->id;
 
                     $rRetenido->save();
                 }
@@ -761,7 +773,7 @@ class ProyectoController extends Controller
             $contador = RequisicionDetalle::where('requisicion_id', $r->id)->count();
             $contador = $contador + 1;
 
-            DB::commit();
+            //DB::commit();
             return ['success' => 2, 'contador' => $contador];
 
         }catch(\Throwable $e){
@@ -2210,20 +2222,57 @@ class ProyectoController extends Controller
         return ['success' => 3];
     }
 
+    // buscar materiales de un determinado presupuesto de proyecto + partida adicional
     public function buscadorMaterialRequisicion(Request $request){
 
         if($request->get('query')){
             $query = $request->get('query');
 
-            $listado = Partida::where('proyecto_id', $request->idpro)->get();
 
+            // OBTENER TODOS LOS ID MATERIALES DE PRESUPUESTO Y PARTIDA ADICIONAL
+
+
+
+
+
+
+            $pilaIdContenedor = array();
+            $infoContenedor = PartidaAdicionalContenedor::where('id_proyecto', $request->idpro)
+                ->where('estado', 2) // solo aprobados
+                ->get();
+
+            foreach ($infoContenedor as $dd){
+                array_push($pilaIdContenedor, $dd->id);
+            }
+
+            $arrayPartidaAdicional = PartidaAdicional::whereIn('id_partidaadic_conte', $pilaIdContenedor)->get();
+
+            $pilaIdAdicional = array();
+            foreach ($arrayPartidaAdicional as $dd){
+                array_push($pilaIdAdicional, $dd->id);
+            }
+
+            // array de materiales materiales adicionales
+            $arrayIdMatePartidaAdic = DB::table('partida_adicional_detalle AS pd')
+                ->join('materiales AS m', 'pd.id_material', '=', 'm.id')
+                ->select('m.id')
+                ->whereIn('pd.id_partida_adicional', $pilaIdAdicional->id)
+                ->where('m.nombre', 'LIKE', "%{$query}%")
+                ->groupBy('m.id')
+                ->get();
+
+
+
+
+            //---------- PARTIDA PRESUPUESTO ----------
+            $listado = Partida::where('proyecto_id', $request->idpro)->get();
             $pila = array();
 
             foreach ($listado as $dd){
                 array_push($pila, $dd->id);
             }
 
-            $data = DB::table('partida_detalle AS pd')
+            $arrayIdMateriales = DB::table('partida_detalle AS pd')
                 ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
                 ->select('m.id')
                 ->whereIn('pd.partida_id', $pila)
@@ -2231,28 +2280,23 @@ class ProyectoController extends Controller
                 ->groupBy('m.id')
                 ->get();
 
-            foreach ($data as $dd){
+
+
+
+            foreach ($arrayIdMateriales as $dd){
 
                 $infoMaterial = CatalogoMateriales::where('id', $dd->id)->first();
 
-                $medida = '';
-                if($infoUnidad = UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
-                    $medida = $infoUnidad->medida;
-                }
-
-                if($medida === ''){
-                    $dd->unido = $infoMaterial->nombre;
-                }else{
-                    $dd->unido = $infoMaterial->nombre . ' - ' . $medida;
-                }
+                $infoUnidad = UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+                $dd->unido = $infoMaterial->nombre . ' - ' . $infoUnidad->medida;
             }
 
             $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
             $tiene = true;
-            foreach($data as $row){
+            foreach($arrayIdMateriales as $row){
 
                 // si solo hay 1 fila, No mostrara el hr, salto de linea
-                if(count($data) == 1){
+                if(count($arrayIdMateriales) == 1){
                     if(!empty($row)){
                         $tiene = false;
                         $output .= '
