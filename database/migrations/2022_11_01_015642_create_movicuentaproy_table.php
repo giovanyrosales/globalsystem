@@ -19,7 +19,7 @@ class CreateMovicuentaproyTable extends Migration
             $table->bigInteger('id_cuentaproy_baja')->unsigned();
 
             $table->decimal('dinero', 10, 2);
-            $table->dateTime('fecha');
+            $table->date('fecha');
 
             // si deniega el jefe presupuesto, se borrara la fila
 

@@ -784,6 +784,7 @@ class CuentaProyectoController extends Controller
             // aquí se obtiene el Saldo Restante del código
             $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
 
+            $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
 
             return ['success' => 1, 'info' => $infoMovi, 'cuentaaumenta' => $cuentaaumenta,
                 'cuentabaja' => $cuentabaja, 'objetosube' => $objetoaumenta, 'objetobaja' => $objetobaja,
