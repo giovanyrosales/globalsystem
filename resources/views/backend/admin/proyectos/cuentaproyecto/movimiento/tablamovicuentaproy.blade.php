@@ -22,14 +22,14 @@
                                     <td>{{ $dato->codigo }}</td>
                                     <td>{{ $dato->nombre }}</td>
                                     <td>${{ $dato->saldo_inicial }}</td>
-                                    <td>${{ $dato->saldo_restante }}</td>
+                                    <td style="font-weight: bold">${{ $dato->saldo_restante }}</td>
                                     <td>${{ $dato->total_retenido }}</td>
 
                                     <td>
                                         <!-- solo administrador puede hacer un movimiento, si esta autorizado -->
                                         @can('boton.agregar.movimiento.cuenta')
                                             @if($dato->permiso == 1)
-                                                <button type="button" class="btn btn-primary btn-xs" onclick="informacionAgregar({{ $dato->id }})">
+                                                <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacionAgregar({{ $dato->id }})">
                                                     <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aumentar
                                                 </button>
                                             @endif

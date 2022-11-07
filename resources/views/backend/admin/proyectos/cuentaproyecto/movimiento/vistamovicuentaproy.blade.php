@@ -6,6 +6,7 @@
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -23,7 +24,8 @@
             <div class="row mb-6">
                 <div class="col-sm-5">
                     <h1>Movimiento Cuenta de Proyecto</h1>
-                    <button type="button" style="margin-top: 15px" onclick="verHistorico()" class="btn btn-primary btn-sm">
+                    <button type="button" style="margin-top: 15px;font-weight: bold; background-color: #17a2b8; color: white !important;"
+                            onclick="verHistorico()" class="button button-3d button-rounded button-pill button-small">
                         <i class="fas fa-list-alt"></i>
                         Histórico
                     </button>
@@ -31,12 +33,12 @@
                     <!-- botón para dar permiso para hacer un movimiento de cuenta. para jefe presupuesto -->
                     @can('boton.autorizar.denegar.movimiento.cuenta')
                         @if($permiso == 1)
-                            <button type="button" style="margin-top: 15px" onclick="modalPermisoDenegar()" class="btn btn-danger btn-sm">
+                            <button type="button" style="margin-top: 15px;font-weight: bold; color: white !important;" onclick="modalPermisoDenegar()" class="button button-caution button-3d button-rounded button-pill button-small">
                                 <i class="fas fa-stop"></i>
                                 Denegar Movimiento
                             </button>
                         @else
-                            <button type="button" style="margin-top: 15px" onclick="modalPermisoAprobar()" class="btn btn-success btn-sm">
+                            <button type="button" style="margin-top: 15px;font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalPermisoAprobar()" class="button button-3d button-rounded button-pill button-small">
                                 <i class="fas fa-check"></i>
                                 Autorizar Movimiento
                             </button>
@@ -114,7 +116,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Aumento de Saldo</label>
-                                            <input type="text" class="form-control" placeholder="0.00" id="saldo-modificar">
+                                            <input type="text" autocomplete="off" class="form-control" placeholder="0.00" id="saldo-modificar">
                                         </div>
                                     </div>
 
@@ -127,14 +129,17 @@
                                     </div>
 
                                     <div class="col-md-12 row">
+
+
                                         <div class="form-group col-md-6">
-                                            <label>Fecha:</label>
-                                            <input type="date" class="form-control" id="fecha-nuevo">
+                                            <label style="font-weight: bold">Saldo Restante:</label>
+                                            <p style="color: red">Se resta también el Saldo Retenido</p>
+                                            <input type="text" disabled class="form-control" id="restante">
                                         </div>
 
                                         <div class="form-group col-md-6">
-                                            <label style="font-weight: bold">Saldo Actual:</label>
-                                            <input type="text" disabled class="form-control" id="restante">
+                                            <label>Fecha</label>
+                                            <input type="date" class="form-control" id="fecha-nuevo">
                                         </div>
                                     </div>
 
@@ -145,7 +150,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="verificar()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="verificar()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -265,7 +270,7 @@
         function verificar(){
             Swal.fire({
                 title: 'Guardar Movimiento',
-                text: "",
+                text: "Se debe esperar la Aprobación",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -366,7 +371,7 @@
                                 + "Saldo Restante $"+ restante +"<br>"
                                 + "Saldo Retenido $"+ retenido +"<br>"
                                 + "Saldo a Restar $"+ arestar +"<br>"
-                                + "La cuenta quedara cón $"+ calculado+"<br>"
+                                + "La cuenta quedara cón "+ calculado+"<br>"
                             ,
                             icon: 'info',
                             showCancelButton: false,

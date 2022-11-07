@@ -26,6 +26,7 @@ use App\Models\Orden;
 use App\Models\P_Materiales;
 use App\Models\P_PresupUnidadDetalle;
 use App\Models\Partida;
+use App\Models\PartidaAdicional;
 use App\Models\PartidaAdicionalContenedor;
 use App\Models\PartidaDetalle;
 use App\Models\Proveedores;
@@ -123,6 +124,20 @@ class ProyectoController extends Controller
             if($ll->fechaini != null) {
                 $ll->fechaini = date("d-m-Y", strtotime($ll->fechaini));
             }
+
+            if($ll->presu_aprobado == 2){
+                $ll->montopartida = '$' . number_format((float)$ll->monto, 2, '.', ',');
+            }else{
+                $ll->montopartida = "Pendiente";
+            }
+
+            // proyecto finalizado
+            if($ll->id_estado == 4){
+                $ll->montosobrante = '$' . number_format((float)$ll->monto_finalizado, 2, '.', ',');
+            }else{
+                $ll->montosobrante = "Pendiente";
+            }
+
         }
 
         return view('backend.admin.proyectos.listaproyectos.tablalistaproyecto', compact('lista'));
@@ -311,8 +326,18 @@ class ProyectoController extends Controller
 
         $tipospartida = TipoPartida::orderBy('id', 'ASC')->get();
 
+        $boolPartidaAdicional = false;
+        // para mostrar boton "materiales partida adicional" para que administradora de proyecto vea los materiales
+        // que fueron aprobados en una partida adicional
+        if(PartidaAdicionalContenedor::where('id_proyecto', $id)
+            ->where('estado', 2) // contenedor aprobado
+            ->first()){
+            // con solo 1 que encuentre es suficiente
+            $boolPartidaAdicional = true;
+        }
+
         return view('backend.admin.proyectos.infoproyectoindividual.vistaproyecto', compact('proyecto', 'id',
-            'conteo', 'conteoPartida', 'estado', 'preaprobacion', 'tipospartida'));
+            'conteo', 'conteoPartida', 'estado', 'preaprobacion', 'tipospartida', 'boolPartidaAdicional'));
     }
 
     // retorna vista de tabla de las bitácoras de un proyecto por ID
@@ -2094,11 +2119,12 @@ class ProyectoController extends Controller
             $totalRestante = 0;
             $totalRetenido = 0;
 
-            // movimiento de cuentas (sube y baja)
+            // movimiento de cuentas SUBE
             $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $pp->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
 
+            // movimiento de cuentas BAJA
             $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $pp->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
@@ -2142,8 +2168,7 @@ class ProyectoController extends Controller
             $sumaPartidaAdicional += $pp->saldo_inicial;
 
             // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + $sumaPartidaAdicional - $totalRestante;
-
+            $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
 
             //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
 
@@ -2259,28 +2284,72 @@ class ProyectoController extends Controller
     // busca materiales para crear una requisición, solo muestra materiales asignado a presupuesto de proyecto
     public function verCatalogoMaterialRequisicion($id){
 
-        $lista = Partida::where('proyecto_id', $id)->get();
-        $pila = array();
+        $listaPartidas = Partida::where('proyecto_id', $id)->get();
+        $pilaIdPartidas = array();
 
-        foreach ($lista as $dd){
-            array_push($pila, $dd->id);
+        foreach ($listaPartidas as $dd){
+            array_push($pilaIdPartidas, $dd->id);
         }
 
         // presupuesto
         $presupuesto = DB::table('partida_detalle AS p')
             ->join('materiales AS m', 'p.material_id', '=', 'm.id')
-            ->select('m.nombre', 'm.id', 'p.cantidad', 'm.id_objespecifico', 'm.id_unidadmedida')
-            ->whereIn('p.partida_id', $pila)
-            ->orderBy('m.nombre', 'ASC')
+            ->select('m.nombre', 'm.id', 'm.id_objespecifico', 'm.id_unidadmedida')
+            ->whereIn('p.partida_id', $pilaIdPartidas)
+            ->groupBy('m.id')
             ->get();
 
         foreach ($presupuesto as $pp){
 
-            $medida = '';
-            if($info = UnidadMedida::where('id', $pp->id_unidadmedida)->first()){
-                $medida = $info->medida;
-            }
-            $pp->medida = $medida;
+            $infoMedida = UnidadMedida::where('id', $pp->id_unidadmedida)->first();
+            $pp->medida = $infoMedida->medida;
+
+            $infoObjeto = ObjEspecifico::where('id', $pp->id_objespecifico)->first();
+
+            $pp->objcodigo = $infoObjeto->codigo;
+            $pp->objnombre = $infoObjeto->nombre;
+
+            $infoCatalogo = CatalogoMateriales::where('id', $pp->id)->first();
+            $pp->actual = '$' . number_format((float)$infoCatalogo->pu, 2, '.', ',');
+        }
+
+        $titulo = "Materiales del Presupuesto";
+
+        return view('backend.admin.proyectos.modal.modalcatalogomaterial', compact('presupuesto', 'titulo'));
+    }
+
+    // mostrar modal de todos los materiales de partidas adicionales
+    public function verCatalogoMaterialPartidaAdicional($id){
+
+        $infoContenedor = PartidaAdicionalContenedor::where('id_proyecto', $id)
+            ->where('estado', 2) // solo aprobados
+            ->get();
+
+        $pilaIdContenedor = array();
+
+        foreach ($infoContenedor as $dd){
+            array_push($pilaIdContenedor, $dd->id);
+        }
+
+        $listaPartidas = PartidaAdicional::whereIn('id_partidaadic_conte', $pilaIdContenedor)->get();
+        $pilaIdPartida = array();
+
+        foreach ($listaPartidas as $dd){
+            array_push($pilaIdPartida, $dd->id);
+        }
+
+        // presupuesto
+        $presupuesto = DB::table('partida_adicional_detalle AS p')
+            ->join('materiales AS m', 'p.id_material', '=', 'm.id')
+            ->select('m.nombre', 'm.id', 'm.id_objespecifico', 'm.id_unidadmedida')
+            ->whereIn('p.id_partida_adicional', $pilaIdPartida)
+            ->groupBy('m.id')
+            ->get();
+
+        foreach ($presupuesto as $pp){
+
+            $infoMedida = UnidadMedida::where('id', $pp->id_unidadmedida)->first();
+            $pp->medida = $infoMedida->medida;
 
             $infoObjeto = ObjEspecifico::where('id', $pp->id_objespecifico)->first();
 
@@ -2291,8 +2360,11 @@ class ProyectoController extends Controller
             $pp->actual = number_format((float)$infoCatalogo->pu, 2, '.', ',');
         }
 
-        return view('backend.admin.proyectos.modal.modalcatalogomaterial', compact('presupuesto'));
+        $titulo = "Materiales del Presupuesto Partida Adicionalx";
+
+        return view('backend.admin.proyectos.modal.modalcatalogomaterial', compact('presupuesto', 'titulo'));
     }
+
 
     // información de un estado de proyecto
     public function informacionEstadoProyecto(Request $request){

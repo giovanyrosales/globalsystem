@@ -83,8 +83,7 @@ class CuentaProyectoController extends Controller
     }
 
     // retorna tabla con los movimientos de cuenta para un proyecto ID
-    public function indexTablaMoviCuentaProy($id)
-    {
+    public function indexTablaMoviCuentaProy($id){
 
         // ID PROYECTO
 
@@ -102,11 +101,12 @@ class CuentaProyectoController extends Controller
             $totalRestante = 0;
             $totalRetenido = 0;
 
-            // movimiento de cuentas (sube y baja)
+            // movimiento de cuentas SUBE
             $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $pp->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
 
+            // movimiento de cuentas BAJA
             $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $pp->id)
                 ->where('autorizado', 1) // autorizado por presupuesto
                 ->sum('dinero');
@@ -125,6 +125,15 @@ class CuentaProyectoController extends Controller
                 $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
             }
 
+            $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $id)->get();
+
+            $sumaPartidaAdicional = 0;
+            foreach ($infoCuentaPartida as $dd){
+                if($pp->idcodigo == $dd->objespeci_id){
+                    $sumaPartidaAdicional += $dd->monto;
+                }
+            }
+
             // información de saldos retenidos
             $arrayRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
@@ -137,8 +146,11 @@ class CuentaProyectoController extends Controller
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
+            // sumando partidas adicionales que coincidan con el obj específico + saldo inicial
+            $sumaPartidaAdicional += $pp->saldo_inicial;
+
             // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + $pp->saldo_inicial - $totalRestante;
+            $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
 
             //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
 
@@ -176,6 +188,8 @@ class CuentaProyectoController extends Controller
             $infoObjetoEspe = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
             $txtObjetoEspec = $infoObjetoEspe->codigo . " - " . $infoObjetoEspe->nombre;
 
+
+
             // PROCESO DE CÁLCULOS
 
             $totalRestante = 0;
@@ -205,6 +219,15 @@ class CuentaProyectoController extends Controller
                 $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
             }
 
+            $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $infoCuentaProy->proyecto_id)->get();
+
+            $sumaPartidaAdicional = 0;
+            foreach ($infoCuentaPartida as $dd){
+                if($infoCuentaProy->objespeci_id == $dd->objespeci_id){
+                    $sumaPartidaAdicional += $dd->monto;
+                }
+            }
+
             // obtener saldos retenidos
             $arrayRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
@@ -217,19 +240,23 @@ class CuentaProyectoController extends Controller
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
-            // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + $infoCuentaProy->saldo_inicial - $totalRestante;
+            // sumando partidas adicionales que coincidan con el obj específico + saldo inicial
+            $sumaPartidaAdicional += $infoCuentaProy->saldo_inicial;
 
-            // al saldo restante le vamos a restar el dinero que se quitara al código
-            // al otro código que se sumara, no sé verífica ya que no afecta que suba su dinero
-            // hoy se obtendrá lo restante - retenido, ya
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
+
             $totalCalculado = ($totalRestanteSaldo - $request->saldomodificar) - $totalRetenido;
 
+
             // al final no debe quedar menor a 0, para poder guardar el movimiento de cuenta.
-            if ($totalCalculado < 0) {
+            if ($this->redondear_dos_decimal($totalCalculado) < 0) {
                 // saldo insuficiente para hacer este movimiento, ya que queda NEGATIVO
 
-                $totalCalculado = number_format((float)$totalCalculado, 2, '.', ',');
+                // pasar a positivo
+                $totalCalculado = abs($totalCalculado);
+                $totalCalculado = "-$" . number_format((float)$totalCalculado, 2, '.', ',');
+
                 $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
                 $totalRetenido = number_format((float)$totalRetenido, 2, '.', ',');
                 $dinero = number_format((float)$request->saldomodificar, 2, '.', ',');
@@ -337,6 +364,8 @@ class CuentaProyectoController extends Controller
         }
     }
 
+    // MDOFISDFGNISD GFGR
+
     // información de un movimiento de cuenta
     public function informacionMoviCuentaProy(Request $request)
     {
@@ -366,8 +395,7 @@ class CuentaProyectoController extends Controller
 
             // CÁLCULOS
 
-            $totalSalida = 0;
-            $totalEntrada = 0;
+            $totalRestante = 0;
             $totalRetenido = 0;
 
             // movimiento de cuentas (sube y baja)
@@ -382,47 +410,44 @@ class CuentaProyectoController extends Controller
             $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
             // obtener todas las salidas de material
-            $infoSalidaDetalle = DB::table('cuentaproy_retenido AS pd')
+            $arrayRestante = DB::table('cuentaproy_restante AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $lista->id)
                 ->where('rd.cancelado', 0)
                 ->get();
 
-            foreach ($infoSalidaDetalle as $dd) {
-                $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
+            foreach ($arrayRestante as $dd){
+                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
             }
 
-            $infoEntradaDetalle = DB::table('cuentaproy_retenido AS pd')
+            $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $lista->proyecto_id)->get();
+
+            $sumaPartidaAdicional = 0;
+            foreach ($infoCuentaPartida as $dd){
+                if($lista->objespeci_id == $dd->objespeci_id){
+                    $sumaPartidaAdicional += $dd->monto;
+                }
+            }
+
+            // obtener todas las salidas de material
+            $arrayRetenido = DB::table('cuentaproy_retenido AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuentaproy', $lista->id)
                 ->where('rd.cancelado', 0)
                 ->get();
 
-            foreach ($infoEntradaDetalle as $dd) {
-                $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
-            }
-
-            // información de saldos retenidos
-            $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
-                ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('psr.id_cuentaproy', $lista->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($infoSaldoRetenido as $dd) {
+            foreach ($arrayRetenido as $dd) {
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
-            // total de los cambios de detalle que se han hecho.
-            $totalCuentaDetalle = $totalEntrada - $totalSalida;
+
+            // sumando partidas adicionales que coincidan con el obj específico + saldo inicial
+            $sumaPartidaAdicional += $lista->saldo_inicial;
 
             // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + $lista->saldo_inicial - $totalCuentaDetalle;
-
-            //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
+            $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
 
             $totalRestanteSaldo = "$" . number_format((float)$totalRestanteSaldo, 2, '.', ',');
 
@@ -435,8 +460,7 @@ class CuentaProyectoController extends Controller
     }
 
     // al mover el select de movimiento cuenta a modificar, quiero ver el saldo restante
-    public function infoSaldoRestanteCuenta(Request $request)
-    {
+    public function infoSaldoRestanteCuenta(Request $request){
 
         $regla = array(
             'id' => 'required', // ID CUENTA PROY
@@ -479,6 +503,15 @@ class CuentaProyectoController extends Controller
                 $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
             }
 
+            $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $lista->proyecto_id)->get();
+
+            $sumaPartidaAdicional = 0;
+            foreach ($infoCuentaPartida as $dd){
+                if($lista->objespeci_id == $dd->objespeci_id){
+                    $sumaPartidaAdicional += $dd->monto;
+                }
+            }
+
             // información de saldos retenidos
             $arrayRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
@@ -491,14 +524,18 @@ class CuentaProyectoController extends Controller
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
+            // sumando partidas adicionales que coincidan con el obj específico + saldo inicial
+            $sumaPartidaAdicional += $lista->saldo_inicial;
+
             // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + $lista->saldo_inicial - $totalRestante;
+            $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
 
-            //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
+            // se debe quitar el retenido
+            $totalCalculado = $totalRestanteSaldo - $totalRetenido;
 
-            $totalRestanteSaldo = "$" . number_format((float)$totalRestanteSaldo, 2, '.', ',');
+            $totalCalculado = "$" . number_format((float)$totalCalculado, 2, '.', ',');
 
-            return ['success' => 1, 'restante' => $totalRestanteSaldo];
+            return ['success' => 1, 'restante' => $totalCalculado];
         } else {
             return ['success' => 2];
         }
@@ -669,6 +706,8 @@ class CuentaProyectoController extends Controller
 
         if ($infoMovi = MoviCuentaProy::where('id', $request->id)->first()) {
 
+            // PUEDO TOMAR YA SEA EL SUBE O BAJA, YA QUE TODOS PERTENECEN AL MISMO PROYECTO
+
             $infoCuentaProySube = CuentaProy::where('id', $infoMovi->id_cuentaproy_sube)->first();
             $infoCuentaProyBaja = CuentaProy::where('id', $infoMovi->id_cuentaproy_baja)->first();
 
@@ -686,13 +725,13 @@ class CuentaProyectoController extends Controller
 
             $fecha = date("d-m-Y", strtotime($infoMovi->fecha));
 
-
             // OBTENER SALDO RESTANTE, PARA EL OBJETO ESPECÍFICO QUE SE QUITARA DINERO
 
             // CÁLCULOS
 
-            $totalSalida = 0;
-            $totalEntrada = 0;
+            $infoCuentaProy = CuentaProy::where('id', $infoMovi->id_cuentaproy_baja)->first();
+
+            $totalRestante = 0;
             $totalRetenido = 0;
 
             // movimiento de cuentas (sube y baja)
@@ -707,49 +746,44 @@ class CuentaProyectoController extends Controller
             $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
 
             // obtener todas las salidas de material
-            $infoSalidaDetalle = DB::table('cuentaproy_retenido AS pd')
+            $arrayRestante = DB::table('cuentaproy_restante AS pd')
                 ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
-                ->where('pd.id_cuentaproy', $infoCuentaProyBaja->id)
+                ->where('pd.id_cuentaproy', $infoCuentaProy->id)
                 ->where('rd.cancelado', 0)
                 ->get();
 
-            foreach ($infoSalidaDetalle as $dd) {
-                $totalSalida = $totalSalida + ($dd->cantidad * $dd->dinero);
+            foreach ($arrayRestante as $dd){
+                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
             }
 
-            $infoEntradaDetalle = DB::table('cuentaproy_retenido AS pd')
-                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('pd.id_cuentaproy', $infoCuentaProyBaja->id)
-                ->where('rd.cancelado', 0)
-                ->get();
+            $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $infoCuentaProy->proyecto_id)->get();
 
-            foreach ($infoEntradaDetalle as $dd) {
-                $totalEntrada = $totalEntrada + ($dd->cantidad * $dd->dinero);
+            $sumaPartidaAdicional = 0;
+            foreach ($infoCuentaPartida as $dd){
+                if($infoCuentaProy->objespeci_id == $dd->objespeci_id){
+                    $sumaPartidaAdicional += $dd->monto;
+                }
             }
 
             // información de saldos retenidos
-            $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
+            $arrayRetenido = DB::table('cuentaproy_retenido AS psr')
                 ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('psr.id_cuentaproy', $infoCuentaProyBaja->id)
+                ->where('psr.id_cuentaproy', $infoCuentaProy->id)
                 ->where('rd.cancelado', 0)
                 ->get();
 
-            foreach ($infoSaldoRetenido as $dd) {
+            foreach ($arrayRetenido as $dd){
                 $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
             }
 
-            // total de los cambios de detalle que se han hecho.
-            $totalCuentaDetalle = $totalEntrada - $totalSalida;
+            // sumando partidas adicionales que coincidan con el obj específico + saldo inicial
+            $sumaPartidaAdicional += $infoCuentaProy->saldo_inicial;
 
             // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + $infoCuentaProyBaja->saldo_inicial - $totalCuentaDetalle;
+            $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
 
-            //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
-
-            $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
 
             return ['success' => 1, 'info' => $infoMovi, 'cuentaaumenta' => $cuentaaumenta,
                 'cuentabaja' => $cuentabaja, 'objetosube' => $objetoaumenta, 'objetobaja' => $objetobaja,
@@ -789,8 +823,7 @@ class CuentaProyectoController extends Controller
     }
 
 
-    public function autorizarMovimientoCuenta(Request $request)
-    {
+    public function autorizarMovimientoCuenta(Request $request){
 
         // ID movicuentaproy
 
@@ -805,6 +838,7 @@ class CuentaProyectoController extends Controller
                     return ['success' => 1];
                 }
 
+                // INFO DE LA CUENTA QUE VA A BAJAR
                 $infoCuentaProy = CuentaProy::where('id', $infoMovimiento->id_cuentaproy_baja)->first(); // y este va a disminuir
 
                 $infoObjetoEspe = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
@@ -841,6 +875,16 @@ class CuentaProyectoController extends Controller
                     $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
                 }
 
+                $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $infoCuentaProy->proyecto_id)->get();
+
+                $sumaPartidaAdicional = 0;
+                foreach ($infoCuentaPartida as $dd){
+                    // DE LA CUENTA QUE VA A BAJAR
+                    if($infoCuentaProy->objespeci_id == $dd->objespeci_id){
+                        $sumaPartidaAdicional += $dd->monto;
+                    }
+                }
+
                 // obtener saldos retenidos
                 $arrayRetenido = DB::table('cuentaproy_retenido AS psr')
                     ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
@@ -853,18 +897,22 @@ class CuentaProyectoController extends Controller
                     $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
                 }
 
-                // aquí se obtiene el Saldo Restante del código
-                $totalRestanteSaldo = $totalMoviCuenta + $infoCuentaProy->saldo_inicial - $totalRestante;
 
-                // al saldo restante le vamos a restar el dinero que se quitara al código
-                // al otro código que se sumara, no sé verífica ya que no afecta que suba su dinero
-                // hoy se obtendrá lo restante - retenido, ya
+                // sumando partidas adicionales que coincidan con el obj específico + saldo inicial
+                $sumaPartidaAdicional += $infoCuentaProy->saldo_inicial;
+
+                // aquí se obtiene el Saldo Restante del código
+                $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
+
+                // HOY RESTAR LO QUE SE QUIERE QUITAR AL OBJETO ESPECÍFICO Y TAMBIEN QUE NO HAYA SALDO RETENIDO
                 $totalCalculado = ($totalRestanteSaldo - $infoMovimiento->dinero) - $totalRetenido;
 
                 if ($this->redondear_dos_decimal($totalCalculado) < 0) {
                     // saldo insuficiente para hacer este movimiento, ya que queda NEGATIVO
 
-                    $totalCalculado = number_format((float)$totalCalculado, 2, '.', ',');
+                    // pasar a positivo
+                    $totalCalculado = abs($totalCalculado);
+                    $totalCalculado = '-$' . number_format((float)$totalCalculado, 2, '.', ',');
                     $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
                     $totalRetenido = number_format((float)$totalRetenido, 2, '.', ',');
                     $dinero = number_format((float)$infoMovimiento->dinero, 2, '.', ',');
@@ -2623,9 +2671,11 @@ class CuentaProyectoController extends Controller
         $tabla .= "<table width='100%' id='tablaFor'>
             <tbody>";
 
+        $conteo = 0;
         foreach ($partida1 as $dd) {
 
-            if ($partida1->last() == $dd) {
+            $conteo += 1;
+            if ($conteo > 1) {
                 $tabla .= "<tr>
                     <td width='100%' colspan='6'></td>
                     </tr>>";

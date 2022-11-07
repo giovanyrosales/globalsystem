@@ -8,9 +8,11 @@
                             <thead>
                             <tr>
                                 <th style="width: 10%">Código</th>
-                                <th style="width: 35%">Nombre</th>
+                                <th style="width: 30%">Nombre</th>
                                 <th style="width: 10%">Fecha Inicio</th>
-                                <th style="width: 17%">Encargado</th>
+                                <th style="width: 15%">Encargado</th>
+                                <th style="width: 14%">Presupuesto</th>
+                                <th style="width: 14%">Monto Sobrante</th>
                                 <th style="width: 12%">Opciones</th>
                             </tr>
                             </thead>
@@ -22,6 +24,10 @@
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->fechaini }}</td>
                                     <td>{{ $dato->encargado }}</td>
+                                    <td style="font-weight: bold">{{ $dato->montopartida }}</td>
+                                    <td style="font-weight: bold">{{ $dato->montosobrante }}</td>
+
+
                                     <td>
                                         <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="modalOpciones({{ $dato }})">
                                             <i class="fas fa-edit" title="Opciones"></i>&nbsp; Opciones

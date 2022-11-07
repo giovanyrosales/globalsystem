@@ -322,8 +322,10 @@ Route::post('/admin/partida/adicional/documento/guardar', [CuentaProyectoControl
 Route::post('/admin/proyecto/buscar/material-presupuesto',  [ProyectoController::class,'buscadorMaterialPresupuesto']);
 // buscador de material para editar una partida
 Route::post('/admin/proyecto/buscar/material-presupuesto-editar',  [ProyectoController::class,'buscadorMaterialPresupuestoEditar']);
-// busca materiales para crear una requisición, solo muestra materiales asignado a presupuesto de proyecto
+// mostrar modal de materiales para crear una requisición, solo muestra materiales asignado a presupuesto de proyecto
 Route::get('/admin/ver/materiales/admin/requisicion/{id}', [ProyectoController::class,'verCatalogoMaterialRequisicion']);
+// mostrar modal de todos los materiales de partidas adicionales
+Route::get('/admin/ver/materiales/partida/adicional/{id}', [ProyectoController::class,'verCatalogoMaterialPartidaAdicional']);
 
 
 // * COTIZACIONES PENDIENTES PARA PROYECTOS

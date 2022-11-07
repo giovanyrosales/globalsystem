@@ -276,9 +276,10 @@ class ControlPdfController extends Controller
         $tabla .= "<table width='100%' id='tablaFor'>
             <tbody>";
 
+        $conteo = 0;
         foreach ($partida1 as $dd) {
-
-            if ($partida1->last() == $dd) {
+            $conteo += 1;
+            if ($conteo > 1) {
                 $tabla .= "<tr>
                     <td width='100%' colspan='6'></td>
                     </tr>>";

@@ -80,13 +80,15 @@ class RolesSeeder extends Seeder
             Permission::create(['name' => 'boton.descargar.reforma.movimiento.cuenta', 'description' => 'utilizado para descargar la reforma de movimiento de cuenta'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'boton.revision.movimiento.cuenta', 'description' => 'utilizado para autorizar o denegar un movimiento de cuenta'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'boton.modal.estados.proyectos', 'description' => 'Ver modal con estado de proyecto'])->syncRoles($roleUaci);
-            Permission::create(['name' => 'boton.modal.vista.partida.adicionales', 'description' => 'para opciones de proyecto, visible para presupuesto'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'boton.modal.vista.partida.adicionales', 'description' => 'para opciones de proyecto, visible para presupuesto'])->syncRoles($rolePresupuesto, $roleUaci, $roleAdministrador);
             Permission::create(['name' => 'boton.autorizar.denegar.partida.adicional', 'description' => 'botón para autorizar crear x partidas adicionales'])->syncRoles($rolePresupuesto);
             Permission::create(['name' => 'boton.crear.vista.partida.adicionales', 'description' => 'redirecciona a vista contenedor de partida adicional'])->syncRoles($roleIng);
             Permission::create(['name' => 'boton.modal.crear.solicitud.partida.adicional', 'description' => 'abrir modal para crear solicitud partida adicional'])->syncRoles($roleIng);
             Permission::create(['name' => 'boton.borrar.contenedor.partida.adicional', 'description' => 'borra el contenedor con todas las partidas adicionales'])->syncRoles($roleIng);
             Permission::create(['name' => 'boton.crear.partida.adicional', 'description' => 'boton para abrir modal y crear una partida adicional'])->syncRoles($roleIng);
             Permission::create(['name' => 'boton.modal.porcentaje.obra.dicional', 'description' => 'boton para abrir modal y ver porcentaje de obra adicional'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'boton.agregar.documento.partida.dicional', 'description' => 'boton para abrir modal y subir documento a partida adicional'])->syncRoles($rolePresupuesto);
+            Permission::create(['name' => 'boton.revisar.documento.partida.dicional', 'description' => 'boton para abrir modal y subir documento a partida adicional'])->syncRoles($rolePresupuesto);
 
 
 
@@ -165,7 +167,7 @@ class RolesSeeder extends Seeder
 
 
         Permission::create(['name' => 'boton.aprobar.presupuesto', 'description' => 'boton para aprobar presupuesto, mostrado en modal'])->syncRoles($rolePresupuesto);
-        Permission::create(['name' => 'boton.dinero.presupuesto', 'description' => 'boton para mostrar MODAL cuanto dinero le queda a un proyecto del presupuesto'])->syncRoles($roleAdministrador, $roleUaci, $rolePresupuesto);
+        Permission::create(['name' => 'boton.dinero.presupuesto', 'description' => 'boton para mostrar MODAL cuanto dinero le queda a un proyecto del presupuesto'])->syncRoles($roleAdministrador, $roleUaci, $roleIng, $rolePresupuesto);
         Permission::create(['name' => 'boton.movimiento.cuenta.proyecto', 'description' => 'botón para redirigir a movimiento cuenta proyecto'])->syncRoles($roleAdministrador, $roleUaci, $rolePresupuesto);
 
 

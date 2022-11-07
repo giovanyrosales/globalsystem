@@ -66,7 +66,7 @@
 <div id="header">
     <div class="content">
         <p id="titulo">ALCALDÍA MUNICIPAL DE METAPÁN <br>
-            Materiales del Presupuesto<br>
+            {{ $titulo }}<br>
     </div>
 </div>
 
@@ -75,12 +75,11 @@
 
     <tbody>
     <tr>
-        <td width="15%">Código</td>
-        <td width="15%">Obj. Espec.</td>
-        <td width="30%">Material</td>
-        <td width="15%">Medida</td>
-        <td width="10%">Cantidad</td>
-        <td width="15%">Precio Actual</td>
+        <td width="15%" style="font-weight: bold">Código</td>
+        <td width="15%" style="font-weight: bold">Obj. Espec.</td>
+        <td width="30%" style="font-weight: bold">Material</td>
+        <td width="15%" style="font-weight: bold">Medida</td>
+        <td width="15%" style="font-weight: bold">Precio Actual</td>
     </tr>
 
     @foreach($presupuesto as $dd)
@@ -88,10 +87,9 @@
         <tr>
             <td width="15%">{{ $dd->objcodigo }}</td>
             <td width="15%">{{ $dd->objnombre }}</td>
-            <td width="30%">{{ $dd->nombre }}</td>
+            <td width="30%" style="font-weight: bold">{{ $dd->nombre }}</td>
             <td width="15%">{{ $dd->medida }}</td>
-            <td width="10%">{{ $dd->cantidad }}</td>
-            <td width="15%">${{ $dd->actual }}</td>
+            <td width="15%" style="font-weight: bold">{{ $dd->actual }}</td>
         </tr>
 
     @endforeach

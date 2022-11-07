@@ -4,6 +4,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -148,6 +149,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Saldo Restante Actualmente</label>
+                                            <p style="color: red">Se resta también Saldo Retenido</p>
                                             <input type="text" disabled placeholder="0.00" class="form-control" id="saldo-restante-actual">
                                         </div>
                                     </div>
@@ -435,7 +437,7 @@
                                 + "Saldo Restante $"+ restante +"<br>"
                                 + "Saldo Retenido $"+ retenido +"<br>"
                                 + "Saldo a Restar $"+ arestar +"<br>"
-                                + "La cuenta quedara cón $"+ calculado+"<br>"
+                                + "La cuenta quedara cón "+ calculado+"<br>"
                             ,
                             icon: 'info',
                             showCancelButton: false,

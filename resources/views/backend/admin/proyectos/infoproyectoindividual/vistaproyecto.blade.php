@@ -116,23 +116,48 @@
                               <span class="badge bg-warning">Esperando aprobación de Presupuesto</span>
                           @else
                               <br>
+                          <div class="row">
+
                               <div class="form-group">
-                                  <button type="button" class="btn btn-secondary" onclick="vistaCatalogoMaterial()">
-                                      <i class="fas fa-list-alt" title="Catálogo"></i>&nbsp; Catálogo
+                                  <button type="button" style="font-weight: bold; background-color: #6c757d; color: white !important;"
+                                          class="button button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterial()">
+                                      <i class="fas fa-list-alt" title="Catálogo"></i>&nbsp; Material Presupuesto
                                   </button>
                               </div>
 
+                            @if($boolPartidaAdicional)
+                              <div class="form-group">
+                                  <button type="button" style="font-weight: bold; margin-left: 15px; background-color: #6c757d; color: white !important;"
+                                          class="button button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterialPartidaAdic()">
+                                      <i class="fas fa-list-alt" title="Catálogo"></i>&nbsp; Material Partida Adicional
+                                  </button>
+                              </div>
+                            @endif
+
+
+                          </div>
+
+
                             <!-- unicamente puede agregar requisición si proyecto esta iniciado -->
                                   @can('boton.agregar.requisicion')
-                                      @if($proyecto->id_estado == 2)
-                                          <button style="margin-left: 15px; float: right; margin-bottom: 10px" type="button" onclick="verModalRequisicion()" class="btn btn-success btn-sm">
-                                              Agregar Requisición
-                                          </button>
-                                      @else
-                                      <br>
-                                      <br>
+                                    @if($proyecto->id_estado == 4)
+
+                                          <br>
+                                          <br>
+                                          <label style="float: right">Proyecto esta Finalizado</label>
+                                        @else
+                                          @if($proyecto->id_estado == 2)
+                                              <button style="margin-left: 15px; float: right; margin-bottom: 10px; font-weight: bold; background-color: #28a745; color: white !important;"
+                                                      type="button" onclick="verModalRequisicion()" class="button button-3d button-rounded button-pill button-small">
+                                                  Agregar Requisición
+                                              </button>
+                                          @else
+                                              <br>
+                                              <br>
                                               <label style="float: right">Proyecto No esta Iniciado para Agregar Requisición</label>
-                                      @endif
+                                          @endif
+
+                                    @endif
                                   @endcan
                           @endif
 
@@ -2701,8 +2726,16 @@
         // ver catalogo de materiales por parte de quien hace requisiciones
         function vistaCatalogoMaterial(){
 
-            let id = {{ $id }};
+            let id = {{ $id }}; // id proyecto
             var ruta = "{{ URL::to('/admin/ver/materiales/admin/requisicion') }}/" + id;
+            $('#tablaCatalogoMaterial').load(ruta);
+            $('#modalCatalogoMaterial').modal('show');
+        }
+
+        // materiales de todas las partidas adicionales aprobadas
+        function vistaCatalogoMaterialPartidaAdic(){
+            let id = {{ $id }}; // id proyecto
+            var ruta = "{{ URL::to('/admin/ver/materiales/partida/adicional') }}/" + id;
             $('#tablaCatalogoMaterial').load(ruta);
             $('#modalCatalogoMaterial').modal('show');
         }

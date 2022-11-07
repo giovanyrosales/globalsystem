@@ -121,7 +121,7 @@
     function infoSaldoRetenido(){
         Swal.fire({
             title: 'Saldo Retenido',
-            text: "Se retiene el Saldo al hacer una requisición. Se libera el Saldo al borrar el requerimiento completo o un material",
+            text: "Se retiene el Saldo al hacer una requisición. Se libera el Saldo al borrar el requerimiento completo, un material o al completarse la orden de compra",
             icon: 'question',
             showCancelButton: false,
             confirmButtonColor: '#28a745',
