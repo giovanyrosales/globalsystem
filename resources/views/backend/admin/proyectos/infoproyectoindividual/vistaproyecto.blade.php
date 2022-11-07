@@ -972,7 +972,7 @@
 
             Swal.fire({
                 title: 'Guardar Requisición',
-                text: "se Reservara Monto en Saldo Retenido",
+                text: "Se Reservara Monto en Saldo Retenido",
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',

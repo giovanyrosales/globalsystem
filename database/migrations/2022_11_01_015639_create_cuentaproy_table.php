@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateCuentaproyTable extends Migration
 {
     /**
-     * GUARDA LOS CODIGOS CON EL SALDO INICIAL, Y SALDO RESTANTE ES CALCULADO
+     * GUARDA LOS CÓDIGOS CON EL SALDO INICIAL, Y SALDO RESTANTE ES CALCULADO
      *
      * @return void
      */

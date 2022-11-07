@@ -8,6 +8,7 @@ use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
 use App\Models\CuentaProy;
+use App\Models\CuentaproyPartidaAdicional;
 use App\Models\MoviCuentaProy;
 use App\Models\ObjEspecifico;
 use App\Models\Orden;
@@ -363,6 +364,11 @@ class CotizacionController extends Controller
             $infoUnidad = UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
             $infoCodigo = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
 
+            // ACTUALIZAR PRECIO
+            RequisicionDetalle::where('id', $dd->id)->update([
+                'dinero' => $infoCatalogo->pu
+            ]);
+
             $dd->nombre = $infoCatalogo->nombre;
             $dd->pu = $infoCatalogo->pu;
             $dd->medida = $infoUnidad->medida;
@@ -429,45 +435,42 @@ class CotizacionController extends Controller
 
                 if(CotizacionDetalle::where('id_requidetalle', $datainfo->id)->first()){
 
-                    $arrayCotiDetalle = CotizacionDetalle::where('id_requidetalle', $datainfo->id)->get();
-
                     // como ese material puede estar en multiples cotizaciones
-                    $pilaArrayIDCoti = array();
-
-                    foreach ($arrayCotiDetalle as $dd){
-                        array_push($pilaArrayIDCoti, $dd->cotizacion_id);
-                    }
+                    $arrayCotiDetalle = CotizacionDetalle::where('id_requidetalle', $datainfo->id)
+                        ->select('cotizacion_id')
+                        ->get();
 
                     // Por cada ID material de reui detalle, ya obtuve todos los ID
                     // de cotización. Para comprobar si está denegada o aprobada
 
                     // solo estado default
-                    $arrayCotiConteo = Cotizacion::whereIn('id', $pilaArrayIDCoti)
+                    $arrayCotiConteo = Cotizacion::whereIn('id', $arrayCotiDetalle)
                         ->whereIn('estado', [0]) // estado default
                         ->count();
 
+                    // ESTE MATERIAL QUE VIENE YA ESTA EN MODO ESPERA, ES DECIR,
+                    // YA FUE COTIZADO Y ESTA ESPERANDO UNA RESPUESTA DE APROBADA O DENEGADA
                     if($arrayCotiConteo > 0){
-                        // el material está esperando una respuesta de denegada o aprobada la cotización
                         return ['success' => 2];
                     }
 
                     // solo estado default
-                    $arrayCotiConteoAprobada = Cotizacion::whereIn('id', $pilaArrayIDCoti)
+                    $arrayCotiConteoAprobada = Cotizacion::whereIn('id', $arrayCotiDetalle)
                         ->whereIn('estado', [1]) // estado aprobadas
                         ->get();
 
                     foreach ($arrayCotiConteoAprobada as $dd){
+                        // Toda contenedor de la cotización
                         // conocer si la orden no está denegada para retornar
-
                         if(!Orden::where('cotizacion_id', $dd->id)
                         ->where('estado', 1)->first()){
                             return ['success' => 2];
                         }
-
                     }
                 }
 
-                // VERIFICACIÓN DE SALDOS
+                // **** VERIFICACIÓN DE SALDOS PORQUE LA COTIZACIÓN PUEDE CAMBIAR EL COSTO DEL MATERIAL
+                // SE RESERVO X DINERO PERO AQUÍ PUEDE VALER MAS QUE LO RESERVADO
 
                 $infoCatalogo = CatalogoMateriales::where('id', $datainfo->material_id)->first();
 
@@ -478,7 +481,7 @@ class CotizacionController extends Controller
 
                 // como siempre busco material que estaban en el presupuesto, siempre encontrara
                 // el proyecto ID y el ID de objeto específico
-                $infoPresupuesto = CuentaProy::where('proyecto_id', $infoRequisicion->id_proyecto)
+                $infoCuentaProy = CuentaProy::where('proyecto_id', $infoRequisicion->id_proyecto)
                     ->where('objespeci_id', $infoCatalogo->id_objespecifico)
                     ->first();
 
@@ -489,11 +492,11 @@ class CotizacionController extends Controller
                 $totalRetenido = 0;
 
                 // movimiento de cuentas (sube y baja)
-                $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $infoPresupuesto->id)
+                $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $infoCuentaProy->id)
                     ->where('autorizado', 1) // autorizado por presupuesto
                     ->sum('dinero');
 
-                $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $infoPresupuesto->id)
+                $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $infoCuentaProy->id)
                     ->where('autorizado', 1) // autorizado por presupuesto
                     ->sum('dinero');
 
@@ -503,7 +506,7 @@ class CotizacionController extends Controller
                 $arrayRestante = DB::table('cuentaproy_restante AS pd')
                     ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.id_cuentaproy', $infoPresupuesto->id)
+                    ->where('pd.id_cuentaproy', $infoCuentaProy->id)
                     ->where('rd.cancelado', 0)
                     ->get();
 
@@ -511,11 +514,20 @@ class CotizacionController extends Controller
                     $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
                 }
 
+                $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $infoRequisicion->id_proyecto)->get();
+
+                $sumaPartidaAdicional = 0;
+                foreach ($infoCuentaPartida as $dd){
+                    if($infoCuentaProy->objespeci_id == $dd->objespeci_id){
+                        $sumaPartidaAdicional += $dd->monto;
+                    }
+                }
+
                 // información de saldos retenidos
                 $infoSaldoRetenido = DB::table('cuentaproy_retenido AS psr')
                     ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                    ->where('psr.id_cuentaproy', $infoPresupuesto->id)
+                    ->where('psr.id_cuentaproy', $infoCuentaProy->id)
                     ->where('rd.cancelado', 0)
                     ->get();
 
@@ -523,15 +535,17 @@ class CotizacionController extends Controller
                     $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
                 }
 
-                // aquí se obtiene el Saldo Restante del código
-                $totalRestanteSaldo = $totalMoviCuenta + $infoPresupuesto->saldo_inicial - $totalRestante;
 
-                //$totalCalculado = $totalRestanteSaldo - $totalRetenido;
+                $sumaPartidaAdicional += $infoCuentaProy->saldo_inicial;
+
+                // aquí se obtiene el Saldo Restante del código
+                $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
+
 
                 // verificar cantidad * dinero del material nuevo
                 $saldoMaterial = $datainfo->cantidad * $infoCatalogo->pu;
 
-                // ************* NO SE SUMA EL SALDO RETENIDO. SOLO SE VERIFICA QUE HAYA SALDO RESTANTE.
+                // ************* NO SE RESTA EL SALDO RETENIDO. SOLO SE VERIFICA QUE HAYA SALDO RESTANTE.
 
                 // verificar si alcanza el saldo para guardar la cotización
                 if($this->redondear_dos_decimal($totalRestanteSaldo) < $this->redondear_dos_decimal($saldoMaterial)){

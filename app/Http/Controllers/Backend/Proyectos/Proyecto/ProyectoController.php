@@ -773,7 +773,7 @@ class ProyectoController extends Controller
             $contador = RequisicionDetalle::where('requisicion_id', $r->id)->count();
             $contador = $contador + 1;
 
-            //DB::commit();
+            DB::commit();
             return ['success' => 2, 'contador' => $contador];
 
         }catch(\Throwable $e){
@@ -2229,71 +2229,65 @@ class ProyectoController extends Controller
             $query = $request->get('query');
 
 
-            // OBTENER TODOS LOS ID MATERIALES DE PRESUPUESTO Y PARTIDA ADICIONAL
+            // ************* OBTENER TODOS LOS ID MATERIALES DE PRESUPUESTO *************
 
+            //---------- PARTIDA PRESUPUESTO ----------
+            $arrayPartidas = Partida::where('proyecto_id', $request->idpro)
+                ->select('id')
+                ->get();
 
+            $arrayIdMateriales = DB::table('partida_detalle AS pd')
+                ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
+                ->select('m.id')
+                ->whereIn('pd.partida_id', $arrayPartidas)
+                ->where('m.nombre', 'LIKE', "%{$query}%")
+                ->groupBy('m.id')
+                ->get();
 
+            // ************* OBTENER TODOS LOS ID MATERIALES DE PARTIDA ADICIONAL *************
 
-
-
-            $pilaIdContenedor = array();
             $infoContenedor = PartidaAdicionalContenedor::where('id_proyecto', $request->idpro)
+                ->select('id')
                 ->where('estado', 2) // solo aprobados
                 ->get();
 
-            foreach ($infoContenedor as $dd){
-                array_push($pilaIdContenedor, $dd->id);
-            }
-
-            $arrayPartidaAdicional = PartidaAdicional::whereIn('id_partidaadic_conte', $pilaIdContenedor)->get();
-
-            $pilaIdAdicional = array();
-            foreach ($arrayPartidaAdicional as $dd){
-                array_push($pilaIdAdicional, $dd->id);
-            }
+            $arrayPartidaAdicional = PartidaAdicional::whereIn('id_partidaadic_conte', $infoContenedor)
+                ->select('id')
+                ->get();
 
             // array de materiales materiales adicionales
             $arrayIdMatePartidaAdic = DB::table('partida_adicional_detalle AS pd')
                 ->join('materiales AS m', 'pd.id_material', '=', 'm.id')
                 ->select('m.id')
-                ->whereIn('pd.id_partida_adicional', $pilaIdAdicional->id)
+                ->whereIn('pd.id_partida_adicional', $arrayPartidaAdicional)
                 ->where('m.nombre', 'LIKE', "%{$query}%")
                 ->groupBy('m.id')
                 ->get();
 
+            $arrayUnido = $arrayIdMateriales->merge($arrayIdMatePartidaAdic);
 
+            $pilaIdMateriales = array();
 
-
-            //---------- PARTIDA PRESUPUESTO ----------
-            $listado = Partida::where('proyecto_id', $request->idpro)->get();
-            $pila = array();
-
-            foreach ($listado as $dd){
-                array_push($pila, $dd->id);
+            foreach ($arrayUnido as $dd){
+                array_push($pilaIdMateriales, $dd->id);
             }
 
-            $arrayIdMateriales = DB::table('partida_detalle AS pd')
-                ->join('materiales AS m', 'pd.material_id', '=', 'm.id')
-                ->select('m.id')
-                ->whereIn('pd.partida_id', $pila)
-                ->where('m.nombre', 'LIKE', "%{$query}%")
-                ->groupBy('m.id')
+            // BÚSQUEDA DE INFORMACIÓN DE MATERIALES
+            $listaMateriales = CatalogoMateriales::whereIn('id', $pilaIdMateriales)
+                ->select('id')
+                ->groupBy('id')
                 ->get();
 
-
-
-
-            foreach ($arrayIdMateriales as $dd){
-
-                $infoMaterial = CatalogoMateriales::where('id', $dd->id)->first();
-
-                $infoUnidad = UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
-                $dd->unido = $infoMaterial->nombre . ' - ' . $infoUnidad->medida;
-            }
+            // BÚSQUEDA
 
             $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
             $tiene = true;
-            foreach($arrayIdMateriales as $row){
+            foreach($listaMateriales as $row){
+
+                $infoMaterial = CatalogoMateriales::where('id', $row->id)->first();
+
+                $infoUnidad = UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+                $row->unido = $infoMaterial->nombre . ' - ' . $infoUnidad->medida;
 
                 // si solo hay 1 fila, No mostrara el hr, salto de linea
                 if(count($arrayIdMateriales) == 1){

@@ -29,12 +29,12 @@
 
 
                                     <td>
-                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="modalOpciones({{ $dato }})">
+                                        <button type="button"  class="btn btn-primary btn-xs" onclick="modalOpciones({{ $dato }})">
                                             <i class="fas fa-edit" title="Opciones"></i>&nbsp; Opciones
                                         </button>
 
                                         @can('boton.modal.estados.proyectos')
-                                        <button type="button" style=" margin-top: 5px; background-color: #28a745; font-weight: bold; color: white !important;" class="button button-rounded button-pill button-small" onclick="modalEstados({{ $dato->id }})">
+                                        <button type="button" style="margin-top: 5px;" class="btn btn-success btn-xs" onclick="modalEstados({{ $dato->id }})">
                                             <i class="fas fa-list-alt" title="Estados"></i>&nbsp; Estados
                                         </button>
                                         @endcan

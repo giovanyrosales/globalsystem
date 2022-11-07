@@ -21,7 +21,7 @@
                                     <td>{{ $dato->destino }}</td>
                                     <td>{{ $dato->necesidad }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-warning btn-xs" onclick="modalCotizar({{ $dato->id }})">
+                                        <button type="button" style="font-weight: bold; background-color: #efa706; color: white !important;" class="button button-rounded button-pill button-small" onclick="modalCotizar({{ $dato->id }})">
                                             <i class="fas fa-list-alt" title="Cotizar"></i>&nbsp; Cotizar
                                         </button>
                                     </td>

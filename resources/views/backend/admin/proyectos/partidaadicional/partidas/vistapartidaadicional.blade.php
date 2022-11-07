@@ -38,7 +38,7 @@
 
                 <div class="col-md-8">
                     <a style="margin-top: 15px;font-weight: bold; background-color: #17a2b8; color: white !important;" class="button button-3d button-rounded button-pill button-small float-left" href= "javascript:history.back()" target="frameprincipal">
-                        <i title="Cancelar"></i> Atras </a>
+                        <i title="Atrás"></i> Atrás </a>
                 </div>
 
                 @can('boton.crear.partida.adicional')

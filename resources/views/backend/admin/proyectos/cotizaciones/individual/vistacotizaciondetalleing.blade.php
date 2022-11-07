@@ -20,6 +20,11 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1>Cotización - Detalle</h1>
+
+                <div class="col-md-8" style="margin-top: 8px;">
+                    <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
+                        <i title="Atrás"></i> Atrás </a>
+                </div>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -107,10 +112,7 @@
                 <div class="card-body">
                     <div class="row">
 
-                        <div class="col-md-8">
-                            <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
-                                <i title="Cancelar"></i> Atras </a>
-                        </div>
+
                     </div>
                 </div>
 

@@ -6,6 +6,7 @@
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -130,7 +131,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="detalleCotizacion()">Detalle</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="detalleCotizacion()">Detalle</button>
                 </div>
             </div>
         </div>
@@ -483,6 +484,9 @@
                         })
                     }
                     else if(response.data.success === 2){
+                        // ESTE MATERIAL QUE VIENE YA ESTA EN MODO ESPERA, ES DECIR,
+                        // YA FUE COTIZADO Y ESTA ESPERANDO UNA RESPUESTA DE APROBADA O DENEGADA
+
                         Swal.fire({
                             title: 'Material Con Cotización',
                             text: "Un Material ya tiene una Cotización en Espera o ya fue Aprobada. Recargar para visualizar.",
@@ -515,7 +519,8 @@
                             html: "El material " + nombre + " - " + unidad + ", Solicita $" + costo + ". Pero el Código " + codigo + "<br>"
                             + "El Saldo actual actual. " + "<br>"
                                 + "Saldo Restante $" + disponible + "<br>"
-                                + "Saldo Faltante para Cotizar $" + totalactual + "<br>"
+                                + "Saldo Restante para Compras $" + totalactual + "<br>"
+                                + "Recomendación: Realizar Movimiento de Cuenta"+ "<br>"
                             ,
                             icon: 'info',
                             showCancelButton: false,
@@ -530,7 +535,7 @@
                     }
 
                     else if(response.data.success === 4){
-
+                        // MATERIAL A COTIZAR ESTA CANCELADO
                         Swal.fire({
                             title: 'Material Cancelado',
                             text: "El Administrador cancelo un material.",

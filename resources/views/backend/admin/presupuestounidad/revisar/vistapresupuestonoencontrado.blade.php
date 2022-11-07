@@ -18,7 +18,7 @@
                 </div>
                 <div class="col-md-8">
                     <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
-                        <i title="Atras"></i> Atras </a>
+                        <i title="Atrás"></i> Atrás </a>
                 </div>
             </div>
         </div>

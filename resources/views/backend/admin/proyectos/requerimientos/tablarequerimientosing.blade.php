@@ -23,7 +23,7 @@
                                     <td>{{ $dato->ubicacion }}</td>
                                     <td>
 
-                                        <button type="button" class="btn btn-info btn-xs" onclick="informacion({{ $dato->id }})">
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
                                             <i class="fa fa-eye" title="Ver"></i>&nbsp; Ver
                                         </button>
 

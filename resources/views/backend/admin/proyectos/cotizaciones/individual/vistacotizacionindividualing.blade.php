@@ -4,7 +4,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -20,6 +20,11 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1>Cotización - Detalle</h1>
+
+                <div class="col-md-8">
+                    <a style="font-weight: bold; margin-top: 15px; color: white !important;" class="button button-primary button-rounded button-pill button-small" href= "javascript:history.back()" target="frameprincipal">
+                        <i title="Atrás"></i> Atrás </a>
+                </div>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -107,10 +112,7 @@
                 <div class="card-body">
                     <div class="row">
 
-                        <div class="col-md-8">
-                            <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
-                                <i title="Atras"></i> Atras </a>
-                        </div>
+
 
                         <!-- JEFA DE UACI PUEDE DENEGAR O AUTORIZAR COTIZACION -->
 
@@ -129,8 +131,8 @@
 
                         @can('texto.esperando.aprobacion.cotizacion')
                             @if($cotizacion->estado == 0)
-                            <div class="col-md-4" style="float: right">
-                                <span class="badge bg-info" style="font-size: 18px">Esperando Aprobación por Jefatura</span>
+                            <div class="col-md-4 float-right">
+                                <span class="badge bg-secondary" style="font-size: 18px">Esperando Aprobación por Jefatura</span>
                             </div>
                             @endcan
                         @endcan

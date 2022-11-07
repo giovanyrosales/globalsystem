@@ -2168,7 +2168,6 @@ class CuentaProyectoController extends Controller
                         $presudeta->monto = $afp;
                         $presudeta->save();
 
-
                         PartidaAdicionalContenedor::where('id', $request->idcontenedor)->update([
                             'fecha_aprobado' => Carbon::now('America/El_Salvador'),
                             'estado' => 2, // aprobado

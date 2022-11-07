@@ -23,7 +23,7 @@
             <div class="col-sm-6">
 
                     <a class="btn btn-info mt-3 float-left" href= "javascript:history.back()" target="frameprincipal">
-                        <i title="Atras"></i> Atras </a>
+                        <i title="Atrás"></i> Atrás </a>
 
             </div>
 
