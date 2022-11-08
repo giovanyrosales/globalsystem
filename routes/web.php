@@ -365,10 +365,10 @@ Route::post('/admin/ordenes/proyecto/generar/nuevo',  [OrdenController::class,'g
 // generar PDF de orden de compra y variable {cantidad} es # de material por hoja
 Route::get('/admin/ordenes/proyecto/pdf/{id}/{cantidad}', [OrdenController::class,'vistaPdfOrden']);
 
-// * ORDENES DE COMPRAS
+// * ORDENES DE COMPRAS PROCESADAS
 
 // retorna vista con las ordenes de compras
-Route::get('/admin/ordenes/compras/index', [OrdenController::class,'indexOrdenesCompras'])->name('ordenes.compras.index');
+Route::get('/admin/ordenes/compras/index', [OrdenController::class,'indexOrdenesCompras'])->name('admin.ordenes.compra.procesadas');
 // retorna tabla con las ordenes de compras
 Route::get('/admin/ordenes/compras/tabla-index', [OrdenController::class,'tablaOrdenesCompras']);
 // anular una orden de compra
@@ -377,6 +377,13 @@ Route::post('/admin/ordenes/proyecto/anular/compra',  [OrdenController::class,'a
 Route::post('/admin/ordenes/proyecto/generar/acta',  [OrdenController::class,'generarActa']);
 // generar PDF de la acta de compra
 Route::get('/admin/ordenes/acta/reporte/{id}', [OrdenController::class,'reporteActaGenerada']);
+
+// * ORDENES DE COMPRA DENEGADAS
+// retorna vista con las ordenes de compras denegadas
+Route::get('/admin/ordenes/compras/denegadas/index', [OrdenController::class,'indexOrdenesComprasDenegadas'])->name('admin.ordenes.compra.denegadas');
+// retorna tabla con las ordenes de compras denegadas
+Route::get('/admin/ordenes/compras/denegadas/tabla', [OrdenController::class,'tablaOrdenesComprasDenegadas']);
+
 
 
 // * CONFIGURACIÓN DEL SISTEMA

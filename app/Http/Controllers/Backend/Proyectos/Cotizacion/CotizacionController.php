@@ -116,6 +116,25 @@ class CotizacionController extends Controller
         DB::beginTransaction();
         try {
 
+            $infoCotizacion = Cotizacion::where('id', $request->id)->first();
+            $infoRequisicion = Requisicion::where('id', $infoCotizacion->requisicion_id)->first();
+            $infoProyecto = Proyecto::where('id', $infoRequisicion->id_proyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+
             if(Cotizacion::where('id', $request->id)
             ->where('estado', 0)->first()){
                 Cotizacion::where('id', $request->id)->update([
@@ -125,7 +144,7 @@ class CotizacionController extends Controller
             }
 
             DB::commit();
-            return ['success' => 1];
+            return ['success' => 2];
         }catch(\Throwable $e){
             DB::rollback();
             return ['success' => 99];
@@ -140,6 +159,25 @@ class CotizacionController extends Controller
         try {
 
             // COTIZACIÓN DENEGADA
+
+            $infoCotizacion = Cotizacion::where('id', $request->id)->first();
+            $infoRequisicion = Requisicion::where('id', $infoCotizacion->requisicion_id)->first();
+            $infoProyecto = Proyecto::where('id', $infoRequisicion->id_proyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
 
             Cotizacion::where('id', $request->id)->update([
                 'estado' => 2,
@@ -158,7 +196,7 @@ class CotizacionController extends Controller
             }
 
             DB::commit();
-            return ['success' => 1];
+            return ['success' => 2];
 
         }catch(\Throwable $e){
             //Log::info('ee' . $e);
@@ -400,6 +438,23 @@ class CotizacionController extends Controller
 
         try {
 
+            $infoRequisicion = Requisicion::where('id', $request->idrequisicion)->first();
+            $infoProyecto = Proyecto::where('id', $infoRequisicion->id_proyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 6, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 6, 'mensaje' => $texto];
+            }
+
             // VERIFICAR QUE EXISTAN TODOS LOS MATERIALES A COTIZAR EN REQUISICIÓN DETALLE
             for ($i = 0; $i < count($request->lista); $i++) {
 
@@ -417,9 +472,6 @@ class CotizacionController extends Controller
             $coti->fecha_estado = null;
             $coti->estado = 0;
             $coti->save();
-
-
-            $infoRequisicion = Requisicion::where('id', $request->idrequisicion)->first();
 
             // obtener todos los materiales de id requisiciín detalle
             $arrayRequiDetalle = RequisicionDetalle::whereIn('id', $request->lista)

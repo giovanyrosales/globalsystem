@@ -164,14 +164,44 @@
                 @endcan
 
                 @can('sidebar.seccion.ordenescompra')
-                <li class="nav-item has-treeview">
-                    <a href="{{ route('ordenes.compras.index') }}" target="frameprincipal" class="nav-link">
-                        <i class="nav-icon fas fa-list"></i>
-                        <p>
-                            Ordenes de Compra
-                        </p>
-                    </a>
-                </li>
+
+                        <li class="nav-item">
+
+                            <a href="#" class="nav-link nav-">
+                                <i class="far fa-edit"></i>
+                                <p>
+                                    Ordenes de Compra
+                                    <i class="fas fa-angle-left right"></i>
+                                </p>
+                            </a>
+
+                            <ul class="nav nav-treeview">
+
+                                @can('ordenes.compras.procesadas.index')
+                                    <li class="nav-item has-treeview">
+                                        <a href="{{ route('admin.ordenes.compra.procesadas') }}" target="frameprincipal" class="nav-link">
+                                            <i class="nav-icon fas fa-list"></i>
+                                            <p>
+                                                Ordenes Procesadas
+                                            </p>
+                                        </a>
+                                    </li>
+                                @endcan
+
+                                @can('ordenes.compras.denegadas.index')
+                                    <li class="nav-item has-treeview">
+                                        <a href="{{ route('admin.ordenes.compra.denegadas') }}" target="frameprincipal" class="nav-link">
+                                            <i class="nav-icon fas fa-list"></i>
+                                            <p>
+                                                Ordenes Denegadas
+                                            </p>
+                                        </a>
+                                    </li>
+                                @endcan
+
+                            </ul>
+                        </li>
+
                 @endcan
 
                 @can('sidebar.seccion.requerimientosunidad')

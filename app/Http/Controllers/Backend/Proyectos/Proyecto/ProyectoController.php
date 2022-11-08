@@ -220,6 +220,24 @@ class ProyectoController extends Controller
 
             $infoProyecto = Proyecto::where('id', $request->id)->first();
 
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 3, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 3, 'mensaje' => $texto];
+            }
+
+
+
+
             if ($request->hasFile('documento')) {
 
                 $cadena = Str::random(15);
@@ -371,6 +389,24 @@ class ProyectoController extends Controller
 
         try {
 
+            $infoProyecto = Proyecto::where('id', $request->id)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+
+
             if ($request->hasFile('documento')) {
 
                 $cadena = Str::random(15);
@@ -398,9 +434,9 @@ class ProyectoController extends Controller
                     $d->save();
 
                     DB::commit();
-                    return ['success' => 1];
-                }else{
                     return ['success' => 2];
+                }else{
+                    return ['success' => 99];
                 }
             }
             else{
@@ -411,12 +447,12 @@ class ProyectoController extends Controller
                 $b->save();
 
                 DB::commit();
-                return ['success' => 1];
+                return ['success' => 2];
             }
 
         }catch(\Throwable $e){
             DB::rollback();
-            return ['success' => 2];
+            return ['success' => 99];
         }
     }
 
@@ -430,7 +466,23 @@ class ProyectoController extends Controller
 
         if ($validar->fails()){return ['success' => 0];}
 
-        if(Bitacora::where('id', $request->id)->first()){
+        if($infoBitacora = Bitacora::where('id', $request->id)->first()){
+
+            $infoProyecto = Proyecto::where('id', $infoBitacora->id_proyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
 
             // obtener listado
             $lista = BitacoraDetalle::where('id_bitacora', $request->id)->get();
@@ -446,10 +498,10 @@ class ProyectoController extends Controller
             BitacoraDetalle::where('id_bitacora', $request->id)->delete();
             Bitacora::where('id', $request->id)->delete();
 
-            return ['success' => 1];
+            return ['success' => 2];
         }else{
-            // siempre regresar 1
-            return ['success' => 1];
+
+            return ['success' => 99];
         }
     }
 
@@ -484,16 +536,32 @@ class ProyectoController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
-        if(Bitacora::where('id', $request->id)->first()){
+        if($infoBitacora = Bitacora::where('id', $request->id)->first()){
+
+            $infoProyecto = Proyecto::where('id', $infoBitacora->id_proyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
 
             Bitacora::where('id', $request->id)->update([
                 'fecha' => $request->fecha,
                 'observaciones' => $request->observaciones
             ]);
 
-            return ['success' => 1];
-        }else{
             return ['success' => 2];
+        }else{
+            return ['success' => 99];
         }
     }
 
@@ -532,9 +600,26 @@ class ProyectoController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
-        if($info = BitacoraDetalle::where('id', $request->id)->first()){
+        if($infoDetalle = BitacoraDetalle::where('id', $request->id)->first()){
 
-            $doc = $info->documento;
+            $infoBitacora = Bitacora::where('id', $infoDetalle->id_bitacora)->first();
+            $infoProyecto = Proyecto::where('id', $infoBitacora->id_proyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            $doc = $infoDetalle->documento;
 
             BitacoraDetalle::where('id', $request->id)->delete();
 
@@ -542,26 +627,40 @@ class ProyectoController extends Controller
                 Storage::disk('archivos')->delete($doc);
             }
 
-            return ['success' => 1];
-        }else{
             return ['success' => 2];
+        }else{
+            return ['success' => 99];
         }
     }
 
     // registrar nuevo detalle a una bitácora por ID
     public function nuevoBitacoraDetalle(Request $request){
         $regla = array(
-            'id' => 'required', // id de proyecto
+            'id' => 'required', // id bitacora
         );
 
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()){return ['success' => 0];}
 
-        $numero = Bitacora::where('id_proyecto', $request->id)->count();
-        if($numero == null){
-            $numero = 0;
+
+        $infoBitacora = Bitacora::where('id', $request->id)->first();
+        $infoProyecto = Proyecto::where('id', $infoBitacora->id_proyecto)->first();
+
+        if($infoProyecto->id_estado == 3){
+            // pausado
+
+            $texto = "El estado del proyecto es Pausado";
+            return ['success' => 1, 'mensaje' => $texto];
         }
+
+        if($infoProyecto->id_estado == 4){
+            // finalizado
+
+            $texto = "El estado del proyecto es Finalizado";
+            return ['success' => 1, 'mensaje' => $texto];
+        }
+
 
         $cadena = Str::random(15);
         $tiempo = microtime();
@@ -581,9 +680,9 @@ class ProyectoController extends Controller
             $d->save();
 
             DB::commit();
-            return ['success' => 1];
-        }else{
             return ['success' => 2];
+        }else{
+            return ['success' => 99];
         }
     }
 

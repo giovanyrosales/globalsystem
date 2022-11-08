@@ -56,7 +56,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nueva Área de Gestión</h4>
+                    <h4 class="modal-title">Nueva Imagen</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -68,12 +68,12 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Documento</label>
+                                        <label>Imagen</label>
                                         <input type="file" id="documento-bitacora" class="form-control" accept="image/jpeg, image/jpg, image/png"/>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Nombre para Documento</label>
+                                        <label>Nombre para Imagen</label>
                                         <input type="text" maxlength="300" class="form-control" id="nombre-bitacora-doc-nuevo">
                                     </div>
 
@@ -118,14 +118,14 @@
     <script>
 
         function recargar(){
-            var id = {{ $id }};
+            var id = {{ $id }}; // id bitacora
             var ruta = "{{ url('/admin/proyecto/vista/tabla/bitacora-detalle') }}/"+id;
             $('#tablaDatatable').load(ruta);
         }
 
         function modalBorrar(id){
             Swal.fire({
-                title: 'Borrar Documento',
+                title: 'Borrar Imagen',
                 text: "",
                 icon: 'info',
                 showCancelButton: true,
@@ -149,6 +149,24 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else  if(response.data.success === 2) {
                         toastr.success('Borrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
@@ -162,8 +180,6 @@
                     closeLoading();
                 });
         }
-
-
 
         function modalAgregar(){
             document.getElementById("formulario-nuevo").reset();
@@ -189,8 +205,7 @@
                 return;
             }
 
-            // id del proyecto
-            var id = {{ $id }};
+            var id = {{ $id }}; // id bitacora
 
             openLoading();
             var formData = new FormData();
@@ -202,7 +217,25 @@
             })
                 .then((response) => {
                     closeLoading();
+
                     if(response.data.success === 1){
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2) {
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();

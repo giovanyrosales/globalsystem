@@ -218,6 +218,24 @@
                         toastr.success('Orden Anulada!');
                         recargar();
                     }
+                    else if(response.data.success === 3) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
                     else{
                         toastr.error('Error al Anular Orden');
                     }
@@ -259,11 +277,30 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2) {
                         toastr.success('Acta creada correctamente');
                         recargar();
                         $('#modalGenerarActa').modal('hide');
                         window.open("{{ URL::to('admin/ordenes/acta/reporte') }}/" + response.data.actaid);
-                    }else{
+                    }
+                    else{
                         toastr.error('Error al guardar Acta');
                     }
                 })

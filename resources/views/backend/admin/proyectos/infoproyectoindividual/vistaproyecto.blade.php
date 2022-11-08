@@ -1692,10 +1692,30 @@
                     closeLoading();
 
                     if (response.data.success === 1) {
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if (response.data.success === 2) {
+
                         $('#modalAgregarBitacora').modal('hide');
                         recargarBitacora();
                         toastr.success('Agregado correctamente');
-                    } else {
+
+                    }
+                    else {
                         toastr.error('Error al registrar');
                     }
 
@@ -1735,9 +1755,31 @@
                     closeLoading();
 
                     if (response.data.success === 1) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
+                    else if (response.data.success === 2) {
+
                         recargarBitacora();
                         toastr.success('Borrado correctamente');
-                    } else {
+
+                    }
+                    else {
                         toastr.error('Error al borrar');
                     }
 
@@ -1797,15 +1839,36 @@
             formData.append('fecha', fecha);
             formData.append('observaciones', observaciones);
 
-            axios.post(url + '/proyecto/vista/bitacora/editar', formData, )
+            axios.post(url + '/proyecto/vista/bitacora/editar', formData,)
                 .then((response) => {
                     closeLoading();
 
                     if (response.data.success === 1) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if (response.data.success === 2) {
+
                         $('#modalEditarBitacora').modal('hide');
                         recargarBitacora();
                         toastr.success('Actualizado correctamente');
-                    } else {
+
+                    }
+                    else {
                         toastr.error('Error al actualizar');
                     }
 
@@ -1819,6 +1882,7 @@
 
         // vista para bitacora detalle
         function vistaBitacora(id) {
+            // id tabla bitacoras
             window.location.href = "{{ url('/admin/proyecto/vista/bitacora-detalle') }}/" + id;
         }
 

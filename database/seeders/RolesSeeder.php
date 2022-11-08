@@ -118,9 +118,14 @@ class RolesSeeder extends Seeder
 
 
         // ORDENES DE COMPRAS
-        Permission::create(['name' => 'sidebar.seccion.ordenescompra', 'description' => 'sidebar seccion ordenes de compra'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleJefeUaci);
+        Permission::create(['name' => 'sidebar.seccion.ordenescompra', 'description' => 'sidebar seccion ordenes de compra'])->syncRoles($roleUaci, $roleJefeUaci);
 
-            Permission::create(['name' => 'boton.anular.orden.compra', 'description' => 'boton para solo Anular una orden de compra'])->syncRoles($roleJefeUaci);
+        Permission::create(['name' => 'ordenes.compras.procesadas.index', 'description' => 'ver ordenes de compras procesadas'])->syncRoles($roleUaci, $roleJefeUaci);
+        Permission::create(['name' => 'ordenes.compras.denegadas.index', 'description' => 'ver ordenes de compras denegadas'])->syncRoles($roleUaci, $roleJefeUaci);
+
+
+
+        Permission::create(['name' => 'boton.anular.orden.compra', 'description' => 'boton para solo Anular una orden de compra'])->syncRoles($roleJefeUaci);
 
 
         // CONFIGURACIONES
