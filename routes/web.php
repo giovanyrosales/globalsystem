@@ -743,10 +743,19 @@ Route::get('/admin/p/generador/excel/totales/{anio}', [ReportesPresupuestoUnidad
 Route::get('/admin/p/generador/consolidado/pdf/presupuesto/{anio}', [ReportesPresupuestoUnidadController::class,'generarConsolidadoPdfPresupuesto']);
 // retorna Excel con el consolidado, todos los presupuestos ya están aprobados
 Route::get('/admin/p/generador/excel/consolidado/{anio}', [ReportesPresupuestoUnidadController::class,'generarConsolidadoExcelPresupuesto']);
+
 // retorna PDF con los totales por unidad que se seleccionó
 Route::get('/admin/p/generador/pdf/porunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalPdfPorUnidades']);
+// reporte PDF solo para 1 unidad, ya que lleva columna precio unitario
+Route::get('/admin/p/generador/pdf/unaunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarPdfSoloUnaUnidad']);
+
+
+
 // retorna Excel con los totales por unidad que se seleccionó
 Route::get('/admin/p/generador/excel/porunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalExcelPorUnidades']);
+// retorna Excel con los totales por solo una unidad
+Route::get('/admin/generador/excel/unaunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalExcelSoloUnidad']);
+
 
 
 // * REQUERIMIENTOS DE UNA UNIDAD
