@@ -241,6 +241,8 @@
                 return;
             }
 
+            openLoading();
+
             // id proyecto
             let idproyecto = {{ $id }};
 
@@ -254,6 +256,25 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
+                    else if(response.data.success === 2) {
                         $('#modalAgregar').modal('hide');
 
                         recargar();
@@ -356,6 +377,24 @@
                     else if(response.data.success === 3){
                         toastr.success('Solicitud Eliminada');
                         recargar();
+                    }
+                    else if(response.data.success === 4) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
                     }
                     else {
                         toastr.error('Error al borrar');
@@ -489,6 +528,25 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
+
                         $('#modalEstado').modal('hide');
                         recargar();
 
@@ -507,7 +565,9 @@
                             }
                         })
                     }
-                    else if(response.data.success === 2){
+
+                    else if(response.data.success === 3){
+
                         Swal.fire({
                             title: 'No Actualizado',
                             text: "No se encuentras Partidas Adicionales",
@@ -523,11 +583,12 @@
                             }
                         })
                     }
+                    else if(response.data.success === 4){
 
-                    else if(response.data.success === 3){
                         toastr.success('Estado Actualizado');
                         $('#modalEstado').modal('hide');
                         recargar();
+
                     }
                     else {
                         toastr.error('Error al actualizar');

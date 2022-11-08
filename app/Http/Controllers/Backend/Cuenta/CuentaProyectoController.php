@@ -168,8 +168,7 @@ class CuentaProyectoController extends Controller
     }
 
     // registra una nuevo movimiento de cuenta
-    public function nuevaMoviCuentaProy(Request $request)
-    {
+    public function nuevaMoviCuentaProy(Request $request){
 
         DB::beginTransaction();
 
@@ -184,6 +183,23 @@ class CuentaProyectoController extends Controller
             if ($infoProyecto->permiso == 0) {
                 return ['success' => 1];
             }
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 4, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 4, 'mensaje' => $texto];
+            }
+
+
+
 
             $infoObjetoEspe = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
             $txtObjetoEspec = $infoObjetoEspe->codigo . " - " . $infoObjetoEspe->nombre;
@@ -324,6 +340,26 @@ class CuentaProyectoController extends Controller
         DB::beginTransaction();
 
         try {
+            $infoMovimiento = MoviCuentaProy::where('id', $request->id)->first();
+            // obtener ya sea el SUBE O EL BAJA, ya que solo quiero el proyecto id
+            $infoCuentaProy = CuentaProy::where('id', $infoMovimiento->id_cuentaproy_sube)->first();
+            $infoProyecto = Proyecto::where('id', $infoCuentaProy->proyecto_id)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+
 
             if ($request->hasFile('documento')) {
 
@@ -339,10 +375,8 @@ class CuentaProyectoController extends Controller
 
                 if ($archivo) {
 
-                    $info = MoviCuentaProy::where('id', $request->id)->first();
-
-                    if (Storage::disk('archivos')->exists($info->reforma)) {
-                        Storage::disk('archivos')->delete($info->reforma);
+                    if (Storage::disk('archivos')->exists($infoMovimiento->reforma)) {
+                        Storage::disk('archivos')->delete($infoMovimiento->reforma);
                     }
 
                     MoviCuentaProy::where('id', $request->id)->update([
@@ -350,17 +384,17 @@ class CuentaProyectoController extends Controller
                     ]);
 
                     DB::commit();
-                    return ['success' => 1];
-                } else {
                     return ['success' => 2];
+                } else {
+                    return ['success' => 99];
                 }
             } else {
-                return ['success' => 2];
+                return ['success' => 99];
             }
         } catch (\Throwable $e) {
 
             DB::rollback();
-            return ['success' => 2];
+            return ['success' => 99];
         }
     }
 
@@ -542,8 +576,7 @@ class CuentaProyectoController extends Controller
     }
 
     // retorna vista para agregar planilla a proyecto
-    public function indexPlanilla($id)
-    {
+    public function indexPlanilla($id){
 
         $info = Proyecto::where('id', $id)->first();
         if ($info->codigo != null) {
@@ -585,6 +618,24 @@ class CuentaProyectoController extends Controller
         DB::beginTransaction();
 
         try {
+
+            if($infoProyecto = Proyecto::where('id', $request->id)->first()){
+
+                if($infoProyecto->id_estado == 3){
+                    // pausado
+
+                    $texto = "El estado del proyecto es Pausado";
+                    return ['success' => 1, 'mensaje' => $texto];
+                }
+
+                if($infoProyecto->id_estado == 4){
+                    // finalizado
+
+                    $texto = "El estado del proyecto es Finalizado";
+                    return ['success' => 1, 'mensaje' => $texto];
+                }
+            }
+
             $dato = new Planilla();
             $dato->proyecto_id = $request->id;
             $dato->fecha_de = $request->fechade;
@@ -601,11 +652,11 @@ class CuentaProyectoController extends Controller
             $dato->save();
 
             DB::commit();
-            return ['success' => 1];
+            return ['success' => 2];
         } catch (\Throwable $e) {
             Log::info('ee ' . $e);
             DB::rollback();
-            return ['success' => 2];
+            return ['success' => 99];
         }
     }
 
@@ -634,7 +685,28 @@ class CuentaProyectoController extends Controller
     public function editarPlanilla(Request $request)
     {
 
+        DB::beginTransaction();
+
+        try {
+
         if (Planilla::where('id', $request->id)->first()) {
+
+            if($infoProyecto = Proyecto::where('id', $request->idproyecto)->first()){
+
+                if($infoProyecto->id_estado == 3){
+                    // pausado
+
+                    $texto = "El estado del proyecto es Pausado";
+                    return ['success' => 1, 'mensaje' => $texto];
+                }
+
+                if($infoProyecto->id_estado == 4){
+                    // finalizado
+
+                    $texto = "El estado del proyecto es Finalizado";
+                    return ['success' => 1, 'mensaje' => $texto];
+                }
+            }
 
             Planilla::where('id', $request->id)->update([
                 'fecha_de' => $request->fechade,
@@ -650,10 +722,17 @@ class CuentaProyectoController extends Controller
                 'insaforp' => $request->insaforp,
             ]);
 
-            return ['success' => 1];
-        } else {
+            DB::commit();
             return ['success' => 2];
+        } else {
+            return ['success' => 99];
         }
+
+    } catch (\Throwable $e) {
+        DB::rollback();
+        return ['success' => 99];
+        }
+
     }
 
 
@@ -661,15 +740,29 @@ class CuentaProyectoController extends Controller
     public function autorizarMovimientoDeCuenta(Request $request)
     {
 
-        if (Proyecto::where('id', $request->id)->first()) {
+        if ($infoProyecto = Proyecto::where('id', $request->id)->first()) {
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
 
             Proyecto::where('id', $request->id)->update([
                 'permiso' => 1
             ]);
 
-            return ['success' => 1];
-        } else {
             return ['success' => 2];
+        } else {
+            return ['success' => 99];
         }
 
     }
@@ -678,15 +771,29 @@ class CuentaProyectoController extends Controller
     public function denegarMovimientoDeCuenta(Request $request)
     {
 
-        if (Proyecto::where('id', $request->id)->first()) {
+        if ($infoProyecto = Proyecto::where('id', $request->id)->first()) {
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
 
             Proyecto::where('id', $request->id)->update([
                 'permiso' => 0
             ]);
 
-            return ['success' => 1];
-        } else {
             return ['success' => 2];
+        } else {
+            return ['success' => 99];
         }
     }
 
@@ -809,17 +916,34 @@ class CuentaProyectoController extends Controller
 
         if ($infoMovi = MoviCuentaProy::where('id', $request->id)->first()) {
 
+            $infoCuentaProy = CuentaProy::where('id', $infoMovi->id_cuentaproy_sube)->first();
+            $infoProyecto = Proyecto::where('id', $infoCuentaProy->proyecto_id)->first();
+
+              if($infoProyecto->id_estado == 3){
+                  // pausado
+
+                  $texto = "El estado del proyecto es Pausado";
+                  return ['success' => 1, 'mensaje' => $texto];
+              }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
             // no borrar porque ya esta autorizado
             if ($infoMovi->autorizado == 1) {
-                return ['success' => 1];
+                return ['success' => 2];
             }
 
             // borrar fila
             MoviCuentaProy::where('id', $request->id)->delete();
 
-            return ['success' => 2];
-        } else {
             return ['success' => 3];
+        } else {
+            return ['success' => 99];
         }
     }
 
@@ -841,6 +965,24 @@ class CuentaProyectoController extends Controller
 
                 // INFO DE LA CUENTA QUE VA A BAJAR
                 $infoCuentaProy = CuentaProy::where('id', $infoMovimiento->id_cuentaproy_baja)->first(); // y este va a disminuir
+
+                $infoProyecto = Proyecto::where('id', $infoCuentaProy->proyecto_id)->first();
+
+                if($infoProyecto->id_estado == 3){
+                    // pausado
+
+                    $texto = "El estado del proyecto es Pausado";
+                    return ['success' => 4, 'mensaje' => $texto];
+                }
+
+                if($infoProyecto->id_estado == 4){
+                    // finalizado
+
+                    $texto = "El estado del proyecto es Finalizado";
+                    return ['success' => 4, 'mensaje' => $texto];
+                }
+
+
 
                 $infoObjetoEspe = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
                 $txtObjetoEspec = $infoObjetoEspe->codigo . " - " . $infoObjetoEspe->nombre;
@@ -1086,30 +1228,61 @@ class CuentaProyectoController extends Controller
 
     // autorizar que se pueda crear partidas adicionales
     public function autorizarPartidaAdicionalPermiso(Request $request){
-        if (Proyecto::where('id', $request->id)->first()) {
+        if ($infoProyecto = Proyecto::where('id', $request->id)->first()) {
+
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
 
             Proyecto::where('id', $request->id)->update([
                 'permiso_partida_adic' => 1
             ]);
 
-            return ['success' => 1];
-        } else {
             return ['success' => 2];
+        } else {
+            return ['success' => 99];
         }
     }
 
     // denegar que se pueda crear partidas adicionales
     public function denegarPartidaAdicionalPermiso(Request $request)
     {
-        if (Proyecto::where('id', $request->id)->first()) {
+        if ($infoProyecto = Proyecto::where('id', $request->id)->first()) {
+
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
 
             Proyecto::where('id', $request->id)->update([
                 'permiso_partida_adic' => 0
             ]);
 
-            return ['success' => 1];
-        } else {
             return ['success' => 2];
+        } else {
+            return ['success' => 99];
         }
     }
 
@@ -1131,9 +1304,21 @@ class CuentaProyectoController extends Controller
 
         try {
 
-            $infoGeneral = InformacionGeneral::where('id', 1)->first();
-
             $infoProyecto = Proyecto::where('id', $request->idproyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
 
             $co = new PartidaAdicionalContenedor();
             $co->id_proyecto = $request->idproyecto;
@@ -1147,7 +1332,7 @@ class CuentaProyectoController extends Controller
             $co->save();
 
             DB::commit();
-            return ['success' => 1];
+            return ['success' => 2];
 
         } catch (\Throwable $e) {
             DB::rollback();
@@ -1241,6 +1426,7 @@ class CuentaProyectoController extends Controller
         try {
 
             $infoContenedor = PartidaAdicionalContenedor::where('id', $request->id)->first();
+            $infoProyecto = Proyecto::where('id', $infoContenedor->id_proyecto)->first();
 
             // ya esta en modo revisión
             if($infoContenedor->estado == 1){
@@ -1251,6 +1437,23 @@ class CuentaProyectoController extends Controller
             if($infoContenedor->estado == 2){
                 return ['success' => 2];
             }
+
+
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 4, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 4, 'mensaje' => $texto];
+            }
+
 
             // obtener dependencias
             $arrayPartida = PartidaAdicional::where('id_partidaadic_conte', $request->id)->get();
@@ -1306,19 +1509,36 @@ class CuentaProyectoController extends Controller
             return ['success' => 0];
         }
 
-        if($infop = PartidaAdicionalContenedor::where('id', $request->idcontenedor)->first()){
+        $infoContenedor = PartidaAdicionalContenedor::where('id', $request->idcontenedor)->first();
+        $infoProyecto = Proyecto::where('id', $infoContenedor->id_proyecto)->first();
+
             //0: presupuesto en desarrollo
             //1: listo para revision
             //2: aprobado
 
-            if ($infop->estado == 1){
+            if ($infoContenedor->estado == 1){
                 return ['success' => 1];
             }
 
-            if ($infop->estado == 2){
+            if ($infoContenedor->estado == 2){
                 return ['success' => 2];
             }
+
+        if($infoProyecto->id_estado == 3){
+            // pausado
+
+            $texto = "El estado del proyecto es Pausado";
+            return ['success' => 4, 'mensaje' => $texto];
         }
+
+        if($infoProyecto->id_estado == 4){
+            // finalizado
+
+            $texto = "El estado del proyecto es Finalizado";
+            return ['success' => 4, 'mensaje' => $texto];
+        }
+
+
 
         DB::beginTransaction();
 
@@ -1377,6 +1597,8 @@ class CuentaProyectoController extends Controller
         if($infoPartida = PartidaAdicional::where('id', $request->id)->first()){
 
             $infoContenedor = PartidaAdicionalContenedor::where('id', $infoPartida->id_partidaadic_conte)->first();
+            $infoProyecto = Proyecto::where('id', $infoContenedor->id_proyecto)->first();
+
 
             // modo revision
             if($infoContenedor->estado == 1){
@@ -1387,6 +1609,21 @@ class CuentaProyectoController extends Controller
             if($infoContenedor->estado == 2){
                 return ['success' => 2];
             }
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 4, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 4, 'mensaje' => $texto];
+            }
+
 
             PartidaAdicionalDetalle::where('id_partida_adicional', $infoPartida->id)->delete();
             PartidaAdicional::where('id', $request->id)->delete();
@@ -1446,20 +1683,36 @@ class CuentaProyectoController extends Controller
             // idpartida   ID PARTIDA ADICIONAL
 
 
-            if($infoPartida = PartidaAdicional::where('id', $request->idpartida)->first()) {
+            $infoPartida = PartidaAdicional::where('id', $request->idpartida)->first();
 
-                $infoContenedor = PartidaAdicionalContenedor::where('id', $infoPartida->id_partidaadic_conte)->first();
+            $infoContenedor = PartidaAdicionalContenedor::where('id', $infoPartida->id_partidaadic_conte)->first();
+            $infoProyecto = Proyecto::where('id', $infoContenedor->id_proyecto)->first();
 
-                // Modo revision
-                if ($infoContenedor->estado == 1) {
-                    return ['success' => 1];
-                }
 
-                // presupuesto aprobado
-                if ($infoContenedor->estado == 2) {
-                    return ['success' => 2];
-                }
+            // Modo revision
+            if ($infoContenedor->estado == 1) {
+                return ['success' => 1];
             }
+
+            // presupuesto aprobado
+            if ($infoContenedor->estado == 2) {
+                return ['success' => 2];
+            }
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 4, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 4, 'mensaje' => $texto];
+            }
+
 
             // actualizar registros requisicion
             PartidaAdicional::where('id', $request->idpartida)->update([
@@ -1554,23 +1807,39 @@ class CuentaProyectoController extends Controller
 
         if($infoPartida = PartidaAdicionalContenedor::where('id', $request->id)->first()){
 
+            $infoProyecto = Proyecto::where('id', $infoPartida->id_proyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
             // ya esta aprobada
             if($infoPartida->estado == 2){
-                return ['success' => 1];
+                return ['success' => 2];
             }
 
             $conteo = PartidaAdicional::where('id_partidaadic_conte', $infoPartida->id)->count();
 
             if($conteo <= 0){
                 // es decir, no tiene partidas el contenedor, así que no se puede actualizar
-                return ['success' => 2];
+                return ['success' => 3];
             }
 
             PartidaAdicionalContenedor::where('id', $infoPartida->id)->update([
                 'estado' => $request->estado,
             ]);
 
-            return ['success' => 3];
+            return ['success' => 4];
         }else{
             return ['success' => 99];
         }
@@ -2371,6 +2640,24 @@ class CuentaProyectoController extends Controller
 
         try {
 
+            $infoContenedor = PartidaAdicionalContenedor::where('id', $request->idcontenedor)->first();
+            $infoProyecto = Proyecto::where('id', $infoContenedor->id_proyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 1, 'mensaje' => $texto];
+            }
+
+
             if ($request->hasFile('documento')) {
 
                 $cadena = Str::random(15);
@@ -2385,10 +2672,8 @@ class CuentaProyectoController extends Controller
 
                 if($archivo){
 
-                    $info = PartidaAdicionalContenedor::where('id', $request->idcontenedor)->first();
-
-                    if(Storage::disk('archivos')->exists($info->documento)){
-                        Storage::disk('archivos')->delete($info->documento);
+                    if(Storage::disk('archivos')->exists($infoContenedor->documento)){
+                        Storage::disk('archivos')->delete($infoContenedor->documento);
                     }
 
                     PartidaAdicionalContenedor::where('id', $request->idcontenedor)->update([
@@ -2396,7 +2681,7 @@ class CuentaProyectoController extends Controller
                     ]);
 
                     DB::commit();
-                    return ['success' => 1];
+                    return ['success' => 2];
                 }else{
                     return ['success' => 99];
                 }

@@ -248,9 +248,30 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
+                    else if(response.data.success === 2){
+
                         $('#modalReforma').modal('hide');
                         toastr.success('Documento guardado');
                         recargar();
+
                     }
                     else{
                         toastr.error('error al guardar');
@@ -329,6 +350,23 @@
 
                     // el movimiento ya fue autorizado
                     if(response.data.success === 1){
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
                         recargar();
 
                         Swal.fire({
@@ -345,7 +383,7 @@
                             }
                         })
                     }
-                    else if(response.data.success === 2){
+                    else if(response.data.success === 3) {
                         toastr.success('Movimiento Denegado');
                         recargar();
                     }
@@ -453,6 +491,25 @@
                     else if(response.data.success === 3){
                         toastr.success('Movimiento Autorizado');
                         recargar();
+                    }
+
+                    else if(response.data.success === 4) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
                     }
                     else{
                         toastr.error('Error al registrar');

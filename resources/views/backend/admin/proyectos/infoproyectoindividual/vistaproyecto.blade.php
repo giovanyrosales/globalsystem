@@ -82,19 +82,26 @@
 
                                 <!-- permiso para habilitar botón y agregar partidas adicionales -->
                                 <!-- debe estar proyecto en estado INICIADO -->
-                                @if($proyecto->permiso_partida_adic == 1)
-                                    @if($proyecto->id_estado == 2)
-                                        @can('boton.crear.vista.partida.adicionales')
+
+                                @can('boton.crear.vista.partida.adicionales')
+
+                                    @if($proyecto->permiso_partida_adic == 1)
+                                        @if($proyecto->id_estado == 2)
+
                                             <button type="button" style="margin-top: 15px; font-weight: bold; background-color: #28a745; color: white !important;" onclick="vistaPartidaAdicional()" class="button button-3d button-rounded button-pill button-small">
                                                 <i class="fas fa-list-alt"></i>
                                                 Partidas Adicionales
                                             </button>
-                                        @endcan
-                                    @else
-                                        <br><br>
-                                        <label style="float: left">Proyecto No esta Iniciado para Agregar Partida Adicional</label>
+                                        @elseif($proyecto->id_estado == 3)
+
+                                            <label style="float: right; color: red; font-size: 16px">Proyecto Esta Pausado</label>
+
+                                        @elseif($proyecto->id_estado == 4)
+                                            <label style="float: right; color: red; font-size: 16px">Proyecto esta Finalizado</label>
+                                        @endif
                                     @endif
-                                @endif
+
+                                @endcan
 
                             </div>
                         </div>
@@ -116,49 +123,46 @@
                               <span class="badge bg-warning">Esperando aprobación de Presupuesto</span>
                           @else
                               <br>
-                          <div class="row">
+                              <div class="row">
 
-                              <div class="form-group">
-                                  <button type="button" style="font-weight: bold; background-color: #6c757d; color: white !important;"
-                                          class="button button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterial()">
-                                      <i class="fas fa-list-alt" title="Catálogo"></i>&nbsp; Material Presupuesto
-                                  </button>
-                              </div>
+                                  <div class="form-group">
+                                      <button type="button" style="font-weight: bold; background-color: #6c757d; color: white !important;"
+                                              class="button button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterial()">
+                                          <i class="fas fa-list-alt" title="Material Presupuesto"></i>&nbsp; Material Presupuesto
+                                      </button>
+                                  </div>
 
-                            @if($boolPartidaAdicional)
-                              <div class="form-group">
-                                  <button type="button" style="font-weight: bold; margin-left: 15px; background-color: #6c757d; color: white !important;"
-                                          class="button button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterialPartidaAdic()">
-                                      <i class="fas fa-list-alt" title="Catálogo"></i>&nbsp; Material Partida Adicional
-                                  </button>
-                              </div>
-                            @endif
-
+                                @if($boolPartidaAdicional)
+                                  <div class="form-group">
+                                      <button type="button" style="font-weight: bold; margin-left: 15px; background-color: #6c757d; color: white !important;"
+                                              class="button button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterialPartidaAdic()">
+                                          <i class="fas fa-list-alt" title="Material Partida Adicional"></i>&nbsp; Material Partida Adicional
+                                      </button>
+                                  </div>
+                                @endif
 
                           </div>
 
-
                             <!-- unicamente puede agregar requisición si proyecto esta iniciado -->
-                                  @can('boton.agregar.requisicion')
-                                    @if($proyecto->id_estado == 4)
+                              @can('boton.agregar.requisicion')
+                                @if($proyecto->id_estado == 2)
 
-                                          <br>
-                                          <br>
-                                          <label style="float: right">Proyecto esta Finalizado</label>
-                                        @else
-                                          @if($proyecto->id_estado == 2)
-                                              <button style="margin-left: 15px; float: right; margin-bottom: 10px; font-weight: bold; background-color: #28a745; color: white !important;"
-                                                      type="button" onclick="verModalRequisicion()" class="button button-3d button-rounded button-pill button-small">
-                                                  Agregar Requisición
-                                              </button>
-                                          @else
-                                              <br>
-                                              <br>
-                                              <label style="float: right">Proyecto No esta Iniciado para Agregar Requisición</label>
-                                          @endif
 
-                                    @endif
-                                  @endcan
+                                      <button style="margin-left: 15px; float: right; margin-bottom: 10px; font-weight: bold; background-color: #28a745; color: white !important;"
+                                              type="button" onclick="verModalRequisicion()" class="button button-3d button-rounded button-pill button-small">
+                                          Agregar Requisición
+                                      </button>
+                                @elseif($proyecto->id_estado == 3)
+
+                                      <label style="float: right; color: red; font-size: 16px">Proyecto Esta Pausado</label>
+
+                                @elseif($proyecto->id_estado == 4)
+                                      <label style="float: right; color: red; font-size: 16px">Proyecto esta Finalizado</label>
+                                @else
+                                      <label style="float: right">Esperando Presupuesto</label>
+                                @endif
+
+                              @endcan
                           @endif
 
                       </div>
@@ -1156,6 +1160,24 @@
                         recargarRequisicion();
                         limpiarRequisicion(response.data.contador);
                     }
+                    else if(response.data.success === 3) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
                     else{
                         toastr.error('Error al crear requisición');
                     }
@@ -1558,6 +1580,26 @@
                         recargarRequisicion();
                         $('#modalEditarRequisicion').modal('hide');
                     }
+                    else if(response.data.success === 3){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
+
                     else{
                         toastr.error('error al actualizar');
                     }
@@ -2793,6 +2835,24 @@
                      // cotización borrada
                         toastr.success('Cotización Borrada');
                         recargarRequisicion();
+                    }
+                    else if(response.data.success === 3) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
                     }
                     else{
                         toastr.error('error al borrar');

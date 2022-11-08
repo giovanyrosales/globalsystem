@@ -659,6 +659,25 @@
                         recargar(); // recarga la tabla
                         $("#matriz-presupuesto tbody tr").remove(); // limpia la tabla
                     }
+
+                    else if(response.data.success === 4){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
                     else{
                         toastr.error('Error al crear presupuesto');
                     }
@@ -747,6 +766,25 @@
                     else if(response.data.success === 3){
                         toastr.success('Partida Borrada');
                         recargar();
+                    }
+                    else if(response.data.success === 4) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
                     }
                     else{
                         toastr.error('Error al borrar');
@@ -858,11 +896,10 @@
 
 
         function addAgregarFilaPresupuestoEditar(){
-            var tipopartida = document.getElementById('select-partida-nuevo').value;
+            //var tipopartida = document.getElementById('select-partida-nuevo').value;
             var nFilas = $('#matriz-presupuesto-editar >tbody >tr').length;
             nFilas += 1;
 
-            // APORTE MANO DE OBRA no lleva cantidad
             var markup = "<tr>"+
 
                 "<td>"+
@@ -1141,7 +1178,25 @@
                         recargar();
                         $('#modalEditarPresupuesto').modal('hide');
                     }
+                    else if(response.data.success === 4){
 
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
                     else{
                         toastr.error('Error al actualizar');
                     }

@@ -255,7 +255,28 @@
                 .then((response) => {
                     closeLoading();
 
+
                     if(response.data.success === 1){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
+
+                    else if(response.data.success === 2){
 
                         Swal.fire({
                             title: 'Autorizado',
@@ -312,7 +333,26 @@
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1){
+                    if(response.data.success === 1) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
+                    else if(response.data.success === 2){
 
                         Swal.fire({
                             title: 'Autorizar Partidas',
@@ -740,9 +780,30 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
+                    else if(response.data.success === 2) {
+
                         $('#modalDocumento').modal('hide');
                         toastr.success('Documento guardado');
                         recargar();
+
                     }
                     else{
                         toastr.error('error al guardar');

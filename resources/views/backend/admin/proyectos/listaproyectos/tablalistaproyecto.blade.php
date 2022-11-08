@@ -34,7 +34,7 @@
                                         </button>
 
                                         @can('boton.modal.estados.proyectos')
-                                        <button type="button" style="margin-top: 5px;" class="btn btn-success btn-xs" onclick="modalEstados({{ $dato->id }})">
+                                        <button type="button" style="margin-top: 2px;" class="btn btn-success btn-xs" onclick="modalEstados({{ $dato->id }})">
                                             <i class="fas fa-list-alt" title="Estados"></i>&nbsp; Estados
                                         </button>
                                         @endcan

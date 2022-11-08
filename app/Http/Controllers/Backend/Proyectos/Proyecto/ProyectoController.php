@@ -641,6 +641,25 @@ class ProyectoController extends Controller
 
         try {
 
+            // VERIFICAR ESTADOS DE PROYECTO
+            if($infoPr = Proyecto::where('id', $request->id)->first()){
+
+                if($infoPr->id_estado == 3){
+                    // pausado
+
+                    $texto = "El estado del proyecto es Pausado";
+                    return ['success' => 3, 'mensaje' => $texto];
+                }
+
+                if($infoPr->id_estado == 4){
+                    // finalizado
+
+                    $texto = "El estado del proyecto es Finalizado";
+                    return ['success' => 3, 'mensaje' => $texto];
+                }
+            }
+
+
             // primero se crea, y después verificamos
             $r = new Requisicion();
             $r->id_proyecto = $request->id;
@@ -891,6 +910,26 @@ class ProyectoController extends Controller
 
         try {
 
+            $infoRequisicion = Requisicion::where('id', $request->idrequisicion)->first();
+
+            if($infoProyecto = Proyecto::where('id', $infoRequisicion->id_proyecto)->first()){
+
+                if($infoProyecto->id_estado == 3){
+                    // pausado
+
+                    $texto = "El estado del proyecto es Pausado";
+                    return ['success' => 3, 'mensaje' => $texto];
+                }
+
+                if($infoProyecto->id_estado == 4){
+                    // finalizado
+
+                    $texto = "El estado del proyecto es Finalizado";
+                    return ['success' => 3, 'mensaje' => $texto];
+                }
+            }
+
+
             // ACTUALIZAR SOLAMENTE SI NO TIENE COTIZACIÓN
             if(!Cotizacion::where('requisicion_id', $request->idrequisicion)->first()){
                 Requisicion::where('id', $request->idrequisicion)->update([
@@ -911,14 +950,14 @@ class ProyectoController extends Controller
 
             // OBTENER LOS ID REQUISICION DETALLE QUE SE VAN A BORRAR,
             // Y SOLO VERIFICAR QUE NO ESTE COTIZADO
-            $infoRequi = RequisicionDetalle::where('requisicion_id', $request->idrequisicion)
+            $infoRequiDetalle = RequisicionDetalle::where('requisicion_id', $request->idrequisicion)
                 ->whereNotIn('id', $pila)
                 ->get();
 
             $pilaBorrar = array();
 
             // ya con los id a borrar. verificar que no esten cotizados
-            foreach ($infoRequi as $dd){
+            foreach ($infoRequiDetalle as $dd){
                 array_push($pilaBorrar, $dd->id);
                 if($dd->estado == 1){
                     // MATERIAL COTIZADO, RETORNAR
@@ -1046,7 +1085,23 @@ class ProyectoController extends Controller
 
         if ($validar->fails()){return ['success' => 0];}
 
-        if(Requisicion::where('id', $request->id)->first()){
+        if($infoRequisicion = Requisicion::where('id', $request->id)->first()){
+
+            $infoProyecto = Proyecto::where('id', $infoRequisicion->id_proyecto)->first();
+
+            if($infoProyecto->id_estado == 3){
+                // pausado
+
+                $texto = "El estado del proyecto es Pausado";
+                return ['success' => 3, 'mensaje' => $texto];
+            }
+
+            if($infoProyecto->id_estado == 4){
+                // finalizado
+
+                $texto = "El estado del proyecto es Finalizado";
+                return ['success' => 3, 'mensaje' => $texto];
+            }
 
             // buscar si no hay ningún material ya cotizado
             if(Cotizacion::where('requisicion_id', $request->id)->first()){

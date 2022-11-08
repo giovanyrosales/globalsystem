@@ -4,7 +4,7 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -21,7 +21,8 @@
             <h4>Proyecto: {{ $datos }}</h4>
         </div>
         <br>
-        <button type="button" style="margin-left: 10px" onclick="modalAgregar()" class="btn btn-success btn-sm">
+        <button type="button" style="margin-left: 10px;font-weight: bold; background-color: #28a745; color: white !important;"
+                onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
             <i class="fas fa-plus-square"></i>
             Agregar Planilla
         </button>
@@ -161,7 +162,8 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="nuevo()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                            class="button button-rounded button-pill button-small" onclick="nuevo()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -280,7 +282,8 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small"
+                            onclick="editar()">Guardar</button>
                 </div>
             </div>
         </div>
@@ -559,7 +562,25 @@
             })
                 .then((response) => {
                     closeLoading();
-                    if(response.data.success === 1){
+                   if(response.data.success === 1) {
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
@@ -626,6 +647,8 @@
 
             var crecerlaboral = document.getElementById('crecerlaboral-editar').value;
             var crecerpatronal = document.getElementById('crecerpatronal-editar').value;
+
+            var idproyecto = {{ $id }};
 
             if(fechade === ''){
                 toastr.error('Fecha De es requerido');
@@ -818,7 +841,8 @@
 
             openLoading();
             var formData = new FormData();
-            formData.append('id', id);
+            formData.append('id', id); // id editar planilla
+            formData.append('idproyecto', idproyecto);
             formData.append('fechade', fechade);
             formData.append('fechahasta', fechahasta);
             formData.append('salariototal', salariototal);
@@ -837,6 +861,24 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
                         recargar();

@@ -403,6 +403,25 @@
 
                             }
                         })
+                    }
+
+                    else if(response.data.success === 4){
+
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
 
                     }
                     else {
@@ -449,6 +468,25 @@
 
                     if(response.data.success === 1){
 
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
+                    else if(response.data.success === 2) {
+
                         Swal.fire({
                             title: 'Autorizado',
                             text: "Solo se podrá hacer un movimiento de cuenta",
@@ -464,6 +502,7 @@
                             }
                         });
                     }
+
                     else {
                         toastr.error('Error al registrar');
                     }
@@ -507,6 +546,25 @@
 
                     if(response.data.success === 1){
 
+                        let mensaje = response.data.mensaje;
+
+                        Swal.fire({
+                            title: 'Estado Proyecto',
+                            html: mensaje,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
+                    else if(response.data.success === 2){
+
                         Swal.fire({
                             title: 'Movimiento Denegado',
                             text: "Se ha cancelado un movimiento de cuenta",
@@ -522,6 +580,7 @@
                             }
                         });
                     }
+
                     else {
                         toastr.error('Error al registrar');
                     }
