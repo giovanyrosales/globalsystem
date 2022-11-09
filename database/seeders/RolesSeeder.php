@@ -203,6 +203,9 @@ class RolesSeeder extends Seeder
 
 
 
+        Permission::create(['name' => 'p.cuentas.unidades', 'description' => 'para ver todas las cuentas unidades y aquí se crean por año'])->syncRoles($rolePresupuesto);
+
+
 
 
 

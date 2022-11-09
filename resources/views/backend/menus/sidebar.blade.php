@@ -511,6 +511,16 @@
                             </li>
                             @endcan
 
+
+                            @can('p.cuentas.unidades')
+                                <li class="nav-item">
+                                    <a href="{{ route('p.admin.cuentas.unidades.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Cuentas Unidades</p>
+                                    </a>
+                                </li>
+                            @endcan
+
                         </ul>
                     </li>
                 @endcan

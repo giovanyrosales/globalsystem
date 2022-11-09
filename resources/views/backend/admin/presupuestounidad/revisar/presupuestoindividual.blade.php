@@ -121,7 +121,25 @@
             axios.post(url+'/p/presupuesto/unidad/cambiar/estado', formData, {
             })
                 .then((response) => {
-                    if(response.data.success === 1){
+
+                    if(response.data.success === 1) {
+
+                        Swal.fire({
+                            title: 'Presupuesto Vacío',
+                            text: "El Presupuesto esta creado, pero no tiene ningún Material Registrado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Recargar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+                    else if(response.data.success === 2){
                         Swal.fire({
                             position: 'center',
                             icon: 'success',

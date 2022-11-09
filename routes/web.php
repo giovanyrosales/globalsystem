@@ -36,6 +36,7 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\Materiales\MaterialesPresupue
 use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ConfiguracionPresupuestoUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ReportesPresupuestoUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos\RequerimientosUnidadController;
+use App\Http\Controllers\Backend\PresupuestoUnidad\CuentasUnidad\CuentaUnidadController;
 
 // --- LOGIN ---
 
@@ -483,12 +484,6 @@ Route::get('/admin/bolson/detalle/index/{id}', [BolsonController::class,'indexDe
 Route::get('/admin/bolson/detalle/tabla/{id}', [BolsonController::class,'tablaDetalleBolson']);
 
 
-
-
-
-
-
-
 // * CLASIFICACIONES
 
 // retorna vista con las clasificaciones de material
@@ -769,10 +764,19 @@ Route::get('/admin/p/anio/presupuesto/requerimiento/index', [RequerimientosUnida
 // verifica si puede hacer requerimientos segun año de presupuesto
 Route::post('/admin/p/anio/permiso/requerimiento', [RequerimientosUnidadController::class,'verificarEstadoPresupuesto']);
 
+// * CUENTAS UNIDADES
+
+//
 
 
-
-
+// retorna vista con las cuentas de unidades
+Route::get('/admin/p/cuentas/unidades/index', [CuentaUnidadController::class,'indexCuentasUnidades'])->name('p.admin.cuentas.unidades.index');
+// retorna tabla con las cuentas de unidades
+Route::get('/admin/p/cuentas/unidades/tabla', [CuentaUnidadController::class,'tablaCuentasUnidades']);
+// crear las cuentas unidades para todos los presupuesto aprobado
+Route::post('/admin/p/registrar/cuentas/unidades', [CuentaUnidadController::class,'registrarCuentasUnidades']);
+// cuando hace falta un departamento nuevo y ya se creó cuenta unidad anteriormente se hara manual
+Route::post('/admin/p/registrar/cuentas/unidad/manual', [CuentaUnidadController::class,'registrarCuentasUnidadManual']);
 
 
 
