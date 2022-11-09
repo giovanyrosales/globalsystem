@@ -127,6 +127,7 @@
         </div>
     </div>
 
+    <!-- MATERIALES SOLICITUD -->
     <div class="modal fade" id="modalNuevoMaterial">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -195,6 +196,49 @@
     </div>
 
 
+
+    <!-- PROYECTOS SOLICITUD -->
+    <div class="modal fade" id="modalNuevoProyecto">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Solicitud de Proyecto</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-nuevo-proyecto">
+                        <div class="card-body">
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Descripción</label>
+                                            <input type="text" class="form-control" autocomplete="off" maxlength="300" id="proyecto-descripcion-nuevo" placeholder="Nombre">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Monto ($)</label>
+                                            <input type="text" class="form-control" autocomplete="off" id="proyecto-costo-nuevo" placeholder="0.00">
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="verificarNuevoProyecto()">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
@@ -816,6 +860,82 @@
             $('#modalNuevoMaterial').modal('hide');
         }
 
+
+
+        //*** PROYECTOS ****
+
+        function modalNuevaSolicitudProyecto(){
+            document.getElementById("formulario-nuevo-proyecto").reset();
+            $('#modalNuevoProyecto').modal('show');
+        }
+
+
+        function verificarNuevoProyecto(){
+
+            var descripcion = document.getElementById('proyecto-descripcion-nuevo').value;
+            var costo = document.getElementById('proyecto-costo-nuevo').value;
+
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
+
+            // ****
+
+            if(descripcion === ''){
+                toastr.error('Descripción es requerido');
+                return;
+            }
+
+            if(descripcion.length > 300){
+                toastr.error('Descripción máximo 300 caracteres');
+                return;
+            }
+
+            // ****
+
+            if(costo === ''){
+                toastr.error('Costo es requerido');
+                return;
+            }
+
+            if(!costo.match(reglaNumeroDosDecimal)) {
+                toastr.error('Costo debe ser número Decimal Positivo. Solo se permite 2 Decimales');
+                return;
+            }
+
+            if(costo < 0){
+                toastr.error('Costo no permite números negativos');
+                return;
+            }
+
+            if(costo > 99000000){
+                toastr.error('Costo máximo 99 millones de límite');
+                return;
+            }
+
+            var markup = "<tr>"+
+
+                "<td>"+
+                "<input name='proyectodescripcionfila[]' maxlength='300' value='"+ descripcion +"' disabled class='form-control' type='text'>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='proyectocostoextrafila[]' value='"+costo+"' disabled class='form-control' type='text'/>"+
+                "</td>"+
+
+                "<td>"+
+                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaProyecto(this)'>Borrar</button>"+
+                "</td>"+
+
+                "</tr>";
+
+            $("#matrizProyectos tbody").append(markup);
+
+            $('#modalNuevoProyecto').modal('hide');
+        }
+
+        function borrarFilaProyecto(elemento){
+            var tabla = elemento.parentNode.parentNode;
+            tabla.parentNode.removeChild(tabla);
+        }
 
 
     </script>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Configuraciones;
 use App\Http\Controllers\Controller;
 use App\Models\FuenteFinanciamiento;
 use App\Models\FuenteRecursos;
+use App\Models\P_AnioPresupuesto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -25,7 +26,9 @@ class FuenteRecursosController extends Controller
             }
         }
 
-        return view('backend.admin.proyectos.configuraciones.fuenterecursos.vistafuenterecursos', compact('fuentef'));
+        $anios = P_AnioPresupuesto::orderBy('nombre')->get();
+
+        return view('backend.admin.proyectos.configuraciones.fuenterecursos.vistafuenterecursos', compact('fuentef', 'anios'));
     }
 
     // retorna tabla con las fuentes de recursos
@@ -38,6 +41,9 @@ class FuenteRecursosController extends Controller
 
             $recurso = $info->codigo . " " . $info->nombre;
             $ll->recurso = $recurso;
+
+            $infoAnio = P_AnioPresupuesto::where('id', $ll->id_p_anio)->first();
+            $ll->fecha = $infoAnio->nombre;
         }
 
         return view('backend.admin.proyectos.configuraciones.fuenterecursos.tablafuenterecursos', compact('lista'));
@@ -46,7 +52,8 @@ class FuenteRecursosController extends Controller
     public function nuevaFuenteRecursos(Request $request){
 
         $regla = array(
-            'codigo' => 'required'
+            'codigo' => 'required',
+            'idanio' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -57,6 +64,7 @@ class FuenteRecursosController extends Controller
         $dato->codigo = $request->codigo;
         $dato->nombre = $request->nombre;
         $dato->id_fuentef = $request->fuente;
+        $dato->id_p_anio = $request->idanio;
 
         if($dato->save()){
             return ['success' => 1];
@@ -85,7 +93,10 @@ class FuenteRecursosController extends Controller
                 }
             }
 
-            return ['success' => 1, 'fuente' => $lista, 'idfuente' => $lista->id_fuentef, 'arrayfuente' => $arrayFuente];
+            $arrayAnios = P_AnioPresupuesto::orderBy('nombre')->get();
+
+            return ['success' => 1, 'fuente' => $lista, 'idfuente' =>
+                $lista->id_fuentef, 'arrayfuente' => $arrayFuente, 'arrayanios' => $arrayAnios];
         }else{
             return ['success' => 2];
         }
@@ -97,6 +108,7 @@ class FuenteRecursosController extends Controller
         $regla = array(
             'id' => 'required',
             'codigo' => 'required',
+            'idanio' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -108,7 +120,8 @@ class FuenteRecursosController extends Controller
             FuenteRecursos::where('id', $request->id)->update([
                 'codigo' => $request->codigo,
                 'nombre' => $request->nombre,
-                'id_fuentef' => $request->fuente
+                'id_fuentef' => $request->fuente,
+                'id_p_anio' => $request->idanio
             ]);
 
             return ['success' => 1];

@@ -9,6 +9,7 @@
                             <tr>
                                 <th>Código</th>
                                 <th>Nombre</th>
+                                <th>Año</th>
                                 <th>Fuente F.</th>
                                 <th>Opciones</th>
                             </tr>
@@ -19,6 +20,7 @@
                                 <tr>
                                     <td>{{ $dato->codigo }}</td>
                                     <td>{{ $dato->nombre }}</td>
+                                    <td>{{ $dato->fecha }}</td>
                                     <td>{{ $dato->recurso }}</td>
                                     <td>
                                         <button type="button" style="font-weight: bold; color: white !important;"

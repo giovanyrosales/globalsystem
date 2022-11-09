@@ -11,16 +11,17 @@ class CreateFuenterTable extends Migration
      *
      * @return void
      */
-    public function up()
-    {
+    public function up(){
         Schema::create('fuenter', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_fuentef')->unsigned();
+            $table->bigInteger('id_p_anio')->unsigned();
 
             $table->string('codigo', 100);
             $table->string('nombre', 300)->nullable();
 
             $table->foreign('id_fuentef')->references('id')->on('fuentef');
+            $table->foreign('id_p_anio')->references('id')->on('p_anio_presupuesto');
         });
     }
 

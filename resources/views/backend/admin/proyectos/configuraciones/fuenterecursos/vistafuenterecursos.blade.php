@@ -61,6 +61,15 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
+                                        <label>Año</label>
+                                        <select class="form-control" id="select-anios">
+                                            @foreach( $anios as $dd)
+                                                <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
                                         <label>Código</label>
                                         <input type="text" maxlength="100" class="form-control" id="codigo-nuevo" autocomplete="off">
                                     </div>
@@ -108,6 +117,12 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <label>Año</label>
+                                        <select class="form-control" id="select-anios-editar">
+                                        </select>
+                                    </div>
 
                                     <div class="form-group">
                                         <label>Código</label>
@@ -159,7 +174,6 @@
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
-
         });
     </script>
 
@@ -179,6 +193,12 @@
             var codigo = document.getElementById('codigo-nuevo').value;
             var nombre = document.getElementById('nombre-nuevo').value;
             var fuente = document.getElementById('select-fuente-f-nuevo').value;
+            var anio = document.getElementById('select-anios').value;
+
+            if(anio === ''){
+                toastr.error('Año es requerido');
+                return;
+            }
 
             if(codigo === ''){
                 toastr.error('Código es requerido');
@@ -202,6 +222,7 @@
 
             openLoading();
             var formData = new FormData();
+            formData.append('idanio', anio);
             formData.append('codigo', codigo);
             formData.append('nombre', nombre);
             formData.append('fuente', fuente);
@@ -241,12 +262,21 @@
                         $('#nombre-editar').val(response.data.fuente.nombre);
 
                         document.getElementById("select-fuente-f-editar").options.length = 0;
+                        document.getElementById("select-anios-editar").options.length = 0;
 
                         $.each(response.data.arrayfuente, function( key, val ){
                             if(response.data.idfuente == val.id){
                                 $('#select-fuente-f-editar').append('<option value="' +val.id +'" selected="selected">'+val.codigo + ' ' + val.nombre +'</option>');
                             }else{
                                 $('#select-fuente-f-editar').append('<option value="' +val.id +'">'+val.codigo + ' ' + val.nombre +'</option>');
+                            }
+                        });
+
+                        $.each(response.data.arrayanios, function( key, val ){
+                            if(response.data.fuente.id_p_anio == val.id){
+                                $('#select-anios-editar').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
+                            }else{
+                                $('#select-anios-editar').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
                             }
                         });
 
@@ -265,6 +295,12 @@
             var nombre = document.getElementById('nombre-editar').value;
             var codigo = document.getElementById('codigo-editar').value;
             var fuente = document.getElementById('select-fuente-f-editar').value;
+            var anio = document.getElementById('select-anios-editar').value;
+
+            if(anio === ''){
+                toastr.error('Año es requerido');
+                return;
+            }
 
             if(codigo === ''){
                 toastr.error('Código es requerido');
@@ -287,6 +323,7 @@
             formData.append('codigo', codigo);
             formData.append('nombre', nombre);
             formData.append('fuente', fuente);
+            formData.append('idanio', anio);
 
             axios.post(url+'/fuenter/editar', formData, {
             })

@@ -15,6 +15,7 @@
             <ul class="nav nav-pills ml-auto p-2">
                 <li class="nav-item"><a class="nav-link active" href="#tab_1" onclick="mostrarBloque()" data-toggle="tab">Base Presupuesto</a></li>
                 <li class="nav-item"><a class="nav-link" href="#tab_2" onclick="ocultarBloque()" data-toggle="tab">Nuevos Materiales</a></li>
+                <li class="nav-item"><a class="nav-link" href="#tab_3" onclick="ocultarBloque()" data-toggle="tab">Proyectos</a></li>
             </ul>
         </div>
         <div class="card-body">
@@ -155,6 +156,39 @@
 
                 </div>
 
+                <!-- LISTA DE PROYECTOS - TABS 3 -->
+
+                <div class="tab-pane" id="tab_3">
+
+                    <form>
+                        <div class="card-body">
+
+                            <table class="table" id="matrizProyectos" style="border: 80px" data-toggle="table">
+                                <thead>
+                                <tr>
+                                    <th style="width: 30%; text-align: center">Descripción</th>
+                                    <th style="width: 10%; text-align: center">Monto ($)</th>
+                                    <th style="width: 10%; text-align: center">Opciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+
+                            </table>
+
+                            <br>
+                            <button type="button" class="btn btn-block btn-success" onclick="modalNuevaSolicitudProyecto()">Agregar Solicitud de Proyecto</button>
+                            <br>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <!-- fin - Tabs -->
             </div>
         </div>
     </div>
