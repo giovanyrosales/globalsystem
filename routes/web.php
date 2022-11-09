@@ -750,11 +750,15 @@ Route::get('/admin/p/generador/pdf/porunidad/{anio}/{unidad}', [ReportesPresupue
 Route::get('/admin/p/generador/pdf/unaunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarPdfSoloUnaUnidad']);
 
 
+// ver si existe el presupuesto departamento y su año
+Route::post('/admin/p/ver/unidad/tiene/presupuesto/anio', [ConfiguracionPresupuestoUnidadController::class,'verificarSiExistePresupuesto']);
+// ver si existe el presupuesto departamento y su año para x unidades que se envía
+Route::post('/admin/p/ver/unidades/tiene/presupuesto/anio', [ConfiguracionPresupuestoUnidadController::class,'verificarSiExistePresupuestoTodoDepa']);
 
 // retorna Excel con los totales por unidad que se seleccionó
 Route::get('/admin/p/generador/excel/porunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalExcelPorUnidades']);
 // retorna Excel con los totales por solo una unidad
-Route::get('/admin/generador/excel/unaunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalExcelSoloUnidad']);
+Route::get('/admin/p/generador/excel/unaunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalExcelSoloUnidad']);
 
 
 

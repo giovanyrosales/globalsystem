@@ -798,7 +798,85 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         return ['success' => 2, 'lista' => $lista];
     }
 
+    // ver si existe el presupuesto departamento y su año
+    public function verificarSiExistePresupuesto(Request $request){
+
+        $rules = array(
+            'idanio' => 'required',
+            'iddepartamento' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        if(P_PresupUnidad::where('id_anio', $request->idanio)
+            ->where('id_departamento', $request->iddepartamento)
+            ->first()){
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    // ver si existe el presupuesto departamento y su año
+    public function verificarSiExistePresupuestoTodoDepa(Request $request){
+
+        $rules = array(
+            'idanio' => 'required',
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        $porciones = explode("-", $request->unidades);
 
 
+        // conteo
+
+        $conteo = P_PresupUnidad::where('id_anio', $request->idanio)
+            ->whereIn('id_departamento', $porciones)
+            ->where('id_estado', 3) // solo aprobados
+            ->orderBy('id', 'ASC')
+            ->count();
+
+        if($conteo == 0){
+            // ninguno encontrado
+            return ['success' => 3];
+        }
+
+        // filtrado por x departamento y x año
+        $arrayPresupUnidad = P_PresupUnidad::where('id_anio', $request->idanio)
+            ->whereIn('id_departamento', $porciones)
+            ->where('id_estado', 3) // solo aprobados
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        // verificar que existan todos los departamentos
+        foreach ($porciones as $dd){
+
+            $boolEsta = true;
+            foreach ($arrayPresupUnidad as $pp){
+                if($dd == $pp->id_departamento){
+                    $boolEsta = false;
+                }
+            }
+
+            // es true, este departamento no se encontro
+            if($boolEsta){
+                $infoDepartamento = P_Departamento::where('id', $dd)->first();
+                return ['success' => 1, 'departamento' => $infoDepartamento->nombre];
+            }
+        }
+
+        // todos estan
+
+        return ['success' => 2];
+    }
 
 }

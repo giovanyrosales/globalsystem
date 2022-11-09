@@ -332,9 +332,108 @@
             let reemplazo = listado.replace(/,/g, "-");
 
             if(selected.length > 1){
-                window.open("{{ URL::to('admin/p/generador/pdf/porunidad') }}/" + idanio + "/" + reemplazo);
+
+                let formData = new FormData();
+                formData.append('idanio', idanio);
+                formData.append('unidades', reemplazo);
+
+                openLoading();
+
+                axios.post(url+'/p/ver/unidades/tiene/presupuesto/anio', formData, {
+                })
+                    .then((response) => {
+
+                        closeLoading();
+                        if(response.data.success === 1){
+                            let nombre = response.data.departamento;
+
+                            Swal.fire({
+                                title: 'Presupuesto No Encontrado',
+                                html: "El Departamento " + nombre + ". Con su Año de Presupuesto no se encontró",
+                                icon: 'info',
+                                showCancelButton: false,
+                                confirmButtonColor: '#28a745',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Aceptar',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+
+                                }
+                            })
+                        }
+
+                        else if(response.data.success === 2){
+                            // si hay presupuesto
+                            window.open("{{ URL::to('admin/p/generador/pdf/porunidad') }}/" + idanio + "/" + reemplazo);
+                        }
+                        else if(response.data.success === 3){
+                            Swal.fire({
+                                title: 'Presupuesto No Encontrado',
+                                html: "Ningún Departamento cuenta con Presupuesto Creado o Aprobado",
+                                icon: 'info',
+                                showCancelButton: false,
+                                confirmButtonColor: '#28a745',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Aceptar',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+
+                                }
+                            })
+                        }
+                        else{
+                            toastr.error('Error al buscar');
+                        }
+                    })
+                    .catch((error) => {
+                        toastr.error('Error al buscar');
+                        closeLoading();
+                    });
+
+
+
+
             }else{
-                window.open("{{ URL::to('admin/p/generador/pdf/unaunidad') }}/" + idanio + "/" + departamento);
+
+                let formData = new FormData();
+                formData.append('idanio', idanio);
+                formData.append('iddepartamento', departamento);
+
+                openLoading();
+
+                axios.post(url+'/p/ver/unidad/tiene/presupuesto/anio', formData, {
+                })
+                    .then((response) => {
+
+                        closeLoading();
+                        if(response.data.success === 1){
+                            // si hay presupuesto
+                            window.open("{{ URL::to('admin/p/generador/pdf/unaunidad') }}/" + idanio + "/" + departamento);
+                        }
+
+                        else if(response.data.success === 2){
+                            Swal.fire({
+                                title: 'Presupuesto No Encontrado',
+                                html: "El Departamento con su Año de Presupuesto no se encontró",
+                                icon: 'info',
+                                showCancelButton: false,
+                                confirmButtonColor: '#28a745',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Aceptar',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+
+                                }
+                            })
+                        }
+                        else{
+                            toastr.error('Error al buscar');
+                        }
+                    })
+                    .catch((error) => {
+                        toastr.error('Error al buscar');
+                        closeLoading();
+                    });
             }
         }
 
@@ -360,9 +459,112 @@
             let reemplazo = listado.replace(/,/g, "-");
 
             if(selected.length > 1){
-                window.open("{{ URL::to('admin/generador/excel/porunidad') }}/" + idanio + "/" + reemplazo);
+
+                // ARRAY DE DEPARTAMENTOS
+
+                let formData = new FormData();
+                formData.append('idanio', idanio);
+                formData.append('unidades', reemplazo);
+
+                openLoading();
+
+                axios.post(url+'/p/ver/unidades/tiene/presupuesto/anio', formData, {
+                })
+                    .then((response) => {
+
+                        closeLoading();
+                        if(response.data.success === 1){
+                            let nombre = response.data.departamento;
+
+                            Swal.fire({
+                                title: 'Presupuesto No Encontrado',
+                                html: "El Departamento " + nombre + ". Con su Año de Presupuesto no se encontró",
+                                icon: 'info',
+                                showCancelButton: false,
+                                confirmButtonColor: '#28a745',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Aceptar',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+
+                                }
+                            })
+                        }
+
+                        else if(response.data.success === 2){
+                            // si hay presupuesto
+                            window.open("{{ URL::to('admin/p/generador/excel/porunidad') }}/" + idanio + "/" + reemplazo);
+                        }
+                        else if(response.data.success === 3){
+                            Swal.fire({
+                                title: 'Presupuesto No Encontrado',
+                                html: "Ningún Departamento cuenta con Presupuesto Creado o Aprobado",
+                                icon: 'info',
+                                showCancelButton: false,
+                                confirmButtonColor: '#28a745',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Aceptar',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+
+                                }
+                            })
+                        }
+                        else{
+                            toastr.error('Error al buscar');
+                        }
+                    })
+                    .catch((error) => {
+                        toastr.error('Error al buscar');
+                        closeLoading();
+                    });
+
+
             }else{
-                window.open("{{ URL::to('admin/generador/excel/unaunidad') }}/" + idanio + "/" + departamento);
+
+                // SOLO 1 DEPARTAMENTO
+
+                // se debe verificar que haya presupuesto de esta unidad
+
+                let formData = new FormData();
+                formData.append('idanio', idanio);
+                formData.append('iddepartamento', departamento);
+
+                openLoading();
+
+                axios.post(url+'/p/ver/unidad/tiene/presupuesto/anio', formData, {
+                })
+                    .then((response) => {
+
+                        closeLoading();
+                        if(response.data.success === 1){
+                           // si hay presupuesto
+                            window.open("{{ URL::to('admin/p/generador/excel/unaunidad') }}/" + idanio + "/" + departamento);
+                        }
+
+                        else if(response.data.success === 2){
+                            Swal.fire({
+                                title: 'Presupuesto No Encontrado',
+                                html: "El Departamento con su Año de Presupuesto no se encontró",
+                                icon: 'info',
+                                showCancelButton: false,
+                                confirmButtonColor: '#28a745',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Aceptar',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+
+                                }
+                            })
+                        }
+                        else{
+                            toastr.error('Error al buscar');
+                        }
+                    })
+                    .catch((error) => {
+                        toastr.error('Error al buscar');
+                        closeLoading();
+                    });
             }
         }
 
