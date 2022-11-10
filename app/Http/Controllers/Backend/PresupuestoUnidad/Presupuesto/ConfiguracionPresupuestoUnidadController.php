@@ -12,6 +12,7 @@ use App\Models\P_Materiales;
 use App\Models\P_MaterialesDetalle;
 use App\Models\P_PresupUnidad;
 use App\Models\P_PresupUnidadDetalle;
+use App\Models\P_ProyectosPendientes;
 use App\Models\P_UnidadMedida;
 use App\Models\P_UsuarioDepartamento;
 use App\Models\Rubro;
@@ -225,7 +226,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                 }
             }
 
-            // ingreso de materiales extra
+            // INGRESO DE MATERIALES EXTRA
             if($request->descripcionfila != null) {
                 for ($j = 0; $j < count($request->descripcionfila); $j++) {
 
@@ -237,6 +238,18 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                     $mtrDetalle->cantidad = $request->cantidadextrafila[$j];
                     $mtrDetalle->periodo = $request->periodoextrafila[$j];
                     $mtrDetalle->save();
+                }
+            }
+
+            // INGRESO DE PROYECTOS EXTRA
+            if($request->descripcionfilaproyecto != null) {
+                for ($jp = 0; $jp < count($request->descripcionfilaproyecto); $jp++) {
+
+                    $prdDetalle = new P_ProyectosPendientes();
+                    $prdDetalle->id_presup_unidad = $pr->id;
+                    $prdDetalle->descripcion = $request->descripcionfilaproyecto[$jp];
+                    $prdDetalle->costo = $request->costoextrafilaproyecto[$jp];
+                    $prdDetalle->save();
                 }
             }
 
@@ -416,15 +429,24 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         $totalvalor = number_format((float)$totalvalor, 2, '.', ',');
 
-        // obtener listado de materiales extra
-        $listado = P_MaterialesDetalle::where('id_presup_unidad', $infoPresupUnidad->id)->get();
+        // LISTADOR DE MATERIALES
+        $listado = P_MaterialesDetalle::where('id_presup_unidad', $infoPresupUnidad->id)
+            ->orderBy('descripcion', 'ASC')
+            ->get();
 
         foreach ($listado as $dd){
             $infoMedida = P_UnidadMedida::where('id', $dd->id_unidadmedida)->first();
             $dd->unidadmedida = $infoMedida->nombre;
         }
 
-        return view('backend.admin.presupuestounidad.editar.contenedoreditarpresupuesto', compact( 'estado', 'totalvalor', 'listado', 'idAnio', 'idpresupuesto', 'preanio', 'unidad', 'rubro'));
+        // LISTADO DE PROYECTO
+        $listadoProyecto = P_ProyectosPendientes::where('id_presup_unidad', $infoPresupUnidad->id)
+            ->orderBy('descripcion', 'ASC')
+            ->get();
+
+
+        return view('backend.admin.presupuestounidad.editar.contenedoreditarpresupuesto', compact( 'estado', 'totalvalor',
+            'listado', 'idAnio', 'idpresupuesto', 'preanio', 'unidad', 'rubro', 'listadoProyecto'));
     }
 
     // petición para editar un presupuesto si no esta en revisión o aprobado
@@ -462,6 +484,10 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             // borrar materiales extra
             P_MaterialesDetalle::where('id_presup_unidad', $request->idpresupuesto)->delete();
 
+            // borrar solicitud de proyectos
+            P_ProyectosPendientes::where('id_presup_unidad', $request->idpresupuesto)->delete();
+
+
             if($request->unidades != null) {
                 // crear de nuevo presupuesto base
                 for ($i = 0; $i < count($request->unidades); $i++) {
@@ -478,7 +504,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                 }
             }
 
-            // ingresar materiales extra
+            // INGRESO DE MATERIALES EXTRA
 
             if($request->descripcionfila != null) {
                 for ($j = 0; $j < count($request->descripcionfila); $j++) {
@@ -491,6 +517,18 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                     $mtrDetalle->cantidad = $request->cantidadextrafila[$j];
                     $mtrDetalle->periodo = $request->periodoextrafila[$j];
                     $mtrDetalle->save();
+                }
+            }
+
+            // INGRESO DE SOLICITUD DE PROYECTOS
+            if($request->descripcionfilaproyecto != null) {
+                for ($jp = 0; $jp < count($request->descripcionfilaproyecto); $jp++) {
+
+                    $prdDetalle = new P_ProyectosPendientes();
+                    $prdDetalle->id_presup_unidad = $request->idpresupuesto;
+                    $prdDetalle->descripcion = $request->descripcionfilaproyecto[$jp];
+                    $prdDetalle->costo = $request->costoextrafilaproyecto[$jp];
+                    $prdDetalle->save();
                 }
             }
 

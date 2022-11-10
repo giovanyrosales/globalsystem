@@ -42,9 +42,9 @@
                                     </button>
 
                                     <ul class="nav nav-pills ml-auto p-2">
-                                        <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Base Presupuesto</a></li>
-                                        <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Nuevos Materiales</a></li>
-
+                                        <li class="nav-item"><a class="nav-link active" href="#tab_1" onclick="mostrarBloque()" data-toggle="tab">Base Presupuesto</a></li>
+                                        <li class="nav-item"><a class="nav-link" href="#tab_2" onclick="ocultarBloque()" data-toggle="tab">Nuevos Materiales</a></li>
+                                        <li class="nav-item"><a class="nav-link" href="#tab_3" onclick="ocultarBloque()" data-toggle="tab">Proyectos</a></li>
                                     </ul>
                                 </div><!-- /.card-header -->
                                 <div class="card-body">
@@ -208,6 +208,58 @@
                                             </form>
 
                                         </div>
+
+
+
+
+                                        <!-- LISTA DE NUEVOS PROYECTOS - TABS 3 -->
+                                        <div class="tab-pane" id="tab_3">
+
+                                            <form>
+                                                <div class="card-body">
+
+                                                    <table class="table" id="matrizProyectos" style="border: 80px" data-toggle="table">
+                                                        <thead>
+                                                        <tr>
+                                                            <th style="width: 30%; text-align: center">Descripción</th>
+                                                            <th style="width: 15%; text-align: center">Costo</th>
+
+                                                            <th style="width: 10%; text-align: center">Opciones</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                        @foreach($listadoProyecto as $lp)
+
+                                                            <tr>
+                                                                <td style="width: 30%"><input name="proyectodescripcionfila[]" disabled value="{{ $lp->descripcion }}" maxlength="300" class="form-control" type="text"></td>
+                                                                <td style="width: 15%;"><input name="proyectocostoextrafila[]" disabled value="{{ $lp->costo }}" class="form-control" type="number"></td>
+                                                                <td>
+                                                                    @if($estado == 1)
+                                                                        <button type="button" class="btn btn-block btn-danger" id="btnBorrarProyecto" onclick="borrarFilaProyecto(this)">Borrar</button>
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+
+                                                        @endforeach
+
+                                                        </tbody>
+                                                    </table>
+
+                                                    @if($estado == 1)
+                                                        <br>
+                                                        <button type="button" class="btn btn-block btn-success" onclick="modalNuevaSolicitud()">Agregar Solicitud de Material</button>
+                                                        <br>
+                                                    @endif
+
+                                                </div>
+
+                                            </form>
+
+                                        </div>
+
+
+
 
                                     </div>
                                 </div>
@@ -583,6 +635,64 @@
                 }
             }
 
+
+
+            // VERIFICAR LOS PROYECTOS QUE SE VAN A SOLICITAR
+
+            var nRegistroProyecto = $('#matrizProyectos >tbody >tr').length;
+            if (nRegistroProyecto > 0){
+
+                var descripcionProyecto = $("input[name='proyectodescripcionfila[]']").map(function(){return $(this).val();}).get();
+                var costoProyecto = $("input[name='proyectocostoextrafila[]']").map(function(){return $(this).val();}).get();
+
+                for(var pp = 0; pp < descripcionProyecto.length; pp++){
+
+                    var datoDescripcionPro = descripcionProyecto[pp];
+
+                    if(datoDescripcionPro === ''){
+                        modalMensaje('Nuevo Proyecto', 'Fila: #' + (pp+1) + ', falta su descripción. Borrar fila y agregar de nuevo');
+                        return;
+                    }
+
+                    if(datoDescripcionPro.length > 300){
+                        modalMensaje('Nuevo Proyecto', 'Fila: #' + (pp+1) + ', su descripción supera los 300 caracteres. Borrar fila y agregar de nuevo');
+                        return;
+                    }
+                }
+
+                for(var pc = 0; pc < costoProyecto.length; pc++){
+
+                    var datoCostoExtraPro = costoProyecto[pc];
+
+                    if(datoCostoExtraPro === ''){
+                        modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo es requerido. Borrar fila y agregar de nuevo');
+                        return;
+                    }
+
+                    if(!datoCostoExtraPro.match(reglaNumeroDosDecimal)) {
+                        modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo debe ser Número Decimal Positivo y 2 Decimales Máximo. Borrar fila y agregar de nuevo');
+                        return;
+                    }
+
+                    if(datoCostoExtraPro <= 0){
+                        modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo no debe ser Negativo o Cero. Borrar fila y agregar de nuevo');
+                        return;
+                    }
+
+                    if(datoCostoExtraPro > 9000000){
+                        modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo no debe superar 9 millones. Borrar fila y agregar de nuevo');
+                        return;
+                    }
+                }
+
+                // AGREGAR SOLICITUD DE PROYECTOS
+                for(var pro = 0; pro < descripcionProyecto.length; pro++){
+                    formData.append('descripcionfilaproyecto[]', descripcionProyecto[pro]);
+                    formData.append('costoextrafilaproyecto[]', costoProyecto[pro]);
+                }
+            }
+
+
             // AGREGAR SOLICITUD DE NUEVOS MATERIALES
             for(var p = 0; p < descripcion.length; p++){
                 formData.append('descripcionfila[]', descripcion[p]);
@@ -593,7 +703,7 @@
             }
 
         }
-        // fin validacion
+        // fin validación
 
         // llenar array para enviar
         for(var z = 0; z < unidades.length; z++){
