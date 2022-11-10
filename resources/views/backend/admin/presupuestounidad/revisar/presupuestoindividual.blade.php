@@ -77,7 +77,6 @@
     </section>
 
 
-
     <!-- PROYECTOS SOLICITUD -->
     <div class="modal fade" id="modalNuevoProyecto">
         <div class="modal-dialog modal-lg">
@@ -155,6 +154,76 @@
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                     <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="verificarNuevoProyecto()">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MATERIALES SOLICITUD -->
+    <div class="modal fade" id="modalNuevoMaterial">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Solicitud de Materiales</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-nuevo-material">
+                        <div class="card-body">
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+
+                                        <div class="form-group">
+                                            <label>Objeto Específico</label>
+                                            <select class="form-control" id="select-obj-material">
+                                                @foreach( $arrayObjeto as $dd)
+                                                    <option value="{{ $dd->id }}">{{ $dd->codigo }} - {{ $dd->nombre }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Descripción</label>
+                                            <input type="hidden" id="material-id-aborrar">
+                                            <input type="text" class="form-control" disabled id="material-descripcion-nuevo">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Costo ($)</label>
+                                            <input type="number" class="form-control" disabled id="material-costo-nuevo">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Cantidad</label>
+                                            <input type="number" class="form-control" disabled id="material-cantidad-nuevo">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Periodo</label>
+                                            <input type="number" class="form-control" disabled id="material-periodo-nuevo">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Unidad de Medida</label>
+                                            <select class="form-control" id="select-material-unidadmedida">
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="verificarNuevoMaterial()">Agregar</button>
                 </div>
             </div>
         </div>
@@ -394,8 +463,6 @@
                     toastr.error('Error al registrar');
                     closeLoading();
                 });
-
-
         }
 
     </script>

@@ -63,7 +63,7 @@
                                                                                                 <tr>
                                                                                                     <th style="width: 30%; text-align: center">Descripción</th>
                                                                                                     <th style="width: 20%; text-align: center">U/M</th>
-                                                                                                    <th style="width: 15%; text-align: center">Costo</th>
+                                                                                                    <th style="width: 15%; text-align: center">Costo ($)</th>
                                                                                                     <th style="width: 10%; text-align: center">Unidades</th>
                                                                                                     <th style="width: 10%; text-align: center">Periodo</th>
                                                                                                     <th style="width: 10%; text-align: center">Total</th>
@@ -89,6 +89,27 @@
                                                                                                     </tr>
 
                                                                                                     <!-- fin foreach material -->
+                                                                                                @endforeach
+
+                                                                                                <!-- AGREGAR EL PROYECTO -->
+
+                                                                                                @foreach($listadoProyectoAprobados as $lpa)
+
+                                                                                                    @if($obj->codigo == $lpa->codigoobj)
+
+                                                                                                        <tr>
+                                                                                                            <td>
+                                                                                                                <input value="{{ $lpa->descripcion }}" disabled class="form-control" type="text">
+                                                                                                            </td>
+                                                                                                            <td><input value="" disabled class="form-control" type="text"></td>
+                                                                                                            <td><input value="{{ $lpa->costoFormat }}" disabled class="form-control" style="max-width: 170px" ></td>
+                                                                                                            <td><input value="" disabled class="form-control" style="max-width: 180px" ></td>
+                                                                                                            <td><input value="" disabled class="form-control" style="max-width: 180px" ></td>
+                                                                                                            <td><input value="{{ $lpa->costoFormat }}" disabled class="form-control" type="text" style="max-width: 180px"></td>
+                                                                                                        </tr>
+
+                                                                                                    @endif
+
                                                                                                 @endforeach
 
                                                                                                 </tbody>
@@ -137,38 +158,27 @@
                                                     <table class="table" id="matrizMateriales" data-toggle="table">
                                                         <thead>
                                                         <tr>
-                                                            <th style="width: 15%; text-align: center">Cod</th>
                                                             <th style="width: 30%; text-align: center">Descripción</th>
                                                             <th style="width: 12%; text-align: center">U/M</th>
-                                                            <th style="width: 14%; text-align: center">Costo</th>
+                                                            <th style="width: 14%; text-align: center">Costo ($)</th>
                                                             <th style="width: 14%; text-align: center">Cantidad</th>
                                                             <th style="width: 9%; text-align: center">Periodo</th>
 
                                                             <th style="width: 10%; text-align: center">Opciones</th>
                                                         </tr>
                                                         </thead>
-                                                        <tbody id="myTbodyMateriales">
+                                                        <tbody>
 
                                                         @foreach($listado as $ll)
 
-                                                            <tr>
-                                                                <td><select class="form-control seleccion" style="max-width: 180px">
-                                                                        @foreach($objeto as $item)
-                                                                            <option value="{{$item->id}}">{{$item->codigo}} - {{ $item->nombre }}</option>
-                                                                        @endforeach
-                                                                    </select></td>
-                                                                <td>
-                                                                    <input name="idfila[]" value="{{ $ll->id }}" type="hidden">
-                                                                    <input disabled value="{{ $ll->descripcion }}" class="form-control" type="text">
-                                                                </td>
-                                                                <td>
-                                                                    <input disabled value="{{ $ll->simbolo }}" class="form-control" type="text">
-                                                                </td>
-                                                                <td><input disabled value="{{ $ll->costo }}" class="form-control" min="1" type="number" style="max-width: 120px"></td>
-                                                                <td><input disabled value="{{ $ll->cantidad }}" class="form-control" min="1" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" type="number" style="max-width: 120px"></td>
-                                                                <td><input disabled value="{{ $ll->periodo }}" class="form-control" min="1" onkeypress="if ( isNaN( String.fromCharCode(event.keyCode) )) return false;" type="number" style="max-width: 180px"></td>
+                                                            <tr id="{{ $ll->id }}">
+                                                                <td><input disabled value="{{ $ll->descripcion }}" class="form-control" ></td>
+                                                                <td><input disabled value="{{ $ll->simbolo }}" data-unidadmedia="{{ $ll->id_unidadmedida }}"  class="form-control" ></td>
+                                                                <td><input disabled value="{{ $ll->costo }}" class="form-control" ></td>
+                                                                <td><input disabled value="{{ $ll->cantidad }}" class="form-control" ></td>
+                                                                <td><input disabled value="{{ $ll->periodo }}" class="form-control" ></td>
 
-                                                                <td><button type="button" class="btn btn-block btn-success" id="btnTransferir" onclick="verificarTransferir(this)">Transferir</button></td>
+                                                                <td><button type="button" class="btn btn-block btn-success" onclick="verificarTransferirMaterial(this)">Transferir</button></td>
                                                             </tr>
 
                                                         @endforeach
@@ -189,8 +199,8 @@
 
                                             <form>
                                                 <div class="card-body">
-
-                                                    <table class="table" id="matrizProyectos" style="border: 80px" data-toggle="table">
+                                                    <h3>Proyectos Pendientes</h3>
+                                                    <table class="table" id="matrizProyectosPendientes" style="border: 80px" data-toggle="table">
                                                         <thead>
                                                         <tr>
                                                             <th style="width: 30%; text-align: center">Descripción</th>
@@ -205,9 +215,9 @@
 
                                                             <tr id="{{ $lp->id }}">
                                                                 <td style="width: 30%">
-                                                                    <input name="proyectodescripcionfila[]" disabled value="{{ $lp->descripcion }}" class="form-control" type="text">
+                                                                    <input  disabled value="{{ $lp->descripcion }}" class="form-control" type="text">
                                                                 </td>
-                                                                <td style="width: 15%;"><input name="proyectocostoextrafila[]" disabled value="{{ $lp->costo }}" class="form-control" type="number"></td>
+                                                                <td style="width: 15%;"><input disabled value="{{ $lp->costo }}" class="form-control" type="number"></td>
                                                                 <td>
                                                                     <input value="{{ $lp->id }}" type="hidden">
                                                                     <button type="button" class="btn btn-block btn-success" onclick="transferirProyecto(this)">Transferir</button>
@@ -223,6 +233,48 @@
                                                 </div>
 
                                             </form>
+
+                                            <!-- MOSTRAR PROYECTOS APROBADOS - TABS 3 -->
+
+                                            <br>
+                                            <hr>
+                                            <form>
+                                                <div class="card-body">
+                                                    <h3>Proyectos Aprobados</h3>
+                                                    <table class="table" id="matrizProyectosAprobados" style="border: 80px" data-toggle="table">
+                                                        <thead>
+                                                        <tr>
+                                                            <th style="width: 15%; text-align: center">Descripción</th>
+                                                            <th style="width: 10%; text-align: center">Costo</th>
+                                                            <th style="width: 12%; text-align: center">Obj. Específico</th>
+                                                            <th style="width: 12%; text-align: center">Fuente Recursos</th>
+                                                            <th style="width: 12%; text-align: center">Línea Trabajo</th>
+                                                            <th style="width: 12%; text-align: center">Área Gestión</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                        @foreach($listadoProyectoAprobados as $lp)
+
+                                                            <tr>
+                                                                <td><input disabled value="{{ $lp->descripcion }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->costoFormat }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->objeto }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->fuenterecurso }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->lineatrabajo }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->areagestion }}" class="form-control"></td>
+                                                            </tr>
+
+                                                        @endforeach
+
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+
+                                            </form>
+
 
                                         </div>
 
@@ -277,89 +329,29 @@
         location.reload();
     }
 
-    function verificarTransferir(e){
-        Swal.fire({
-            title: 'Transferir?',
-            text: "Se agregara a Presupuesto Base y Presupuesto de la Unidad",
-            icon: 'success',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#d33',
-            cancelButtonText: 'Cancelar',
-            confirmButtonText: 'Si'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                transferir(e);
-            }
-        })
-    }
-
-    function transferir(e){
-
+    function verificarTransferirMaterial(e){
         var table = e.parentNode.parentNode;
-        var objeto = table.cells[0].childNodes[0].value;
-        var idpresupuesto = {{ $idpresupuesto }};
-        var idfila = table.cells[1].children[0].value;
 
-        // guardar en base de materiales de la unidad
-        // guardar en base de materiales
+        var descripcion = table.cells[0].childNodes[0].value;
+        var idunidadmedida = table.cells[1].childNodes[0].getAttribute("data-unidadmedia");
+        var costo = table.cells[2].childNodes[0].value;
+        var cantidad = table.cells[3].childNodes[0].value;
+        var periodo = table.cells[4].childNodes[0].value;
 
-        let formData = new FormData();
-        formData.append('objeto', objeto);
-        formData.append('idpresupuesto', idpresupuesto);
-        formData.append('idfila', idfila);
+        // id fila material para borrarla
+        var idproborrar = $(e).closest('tr').attr('id');
 
-        axios.post(url+'/p/presupuesto/nuevo/material/transferir', formData, {
-        })
-            .then((response) => {
+        document.getElementById("formulario-nuevo-material").reset();
+        $('#modalNuevoMaterial').modal('show');
 
-                if(response.data.success === 1){
+        $('#material-descripcion-nuevo').val(descripcion);
+        $('#material-costo-nuevo').val(costo);
+        $('#material-cantidad-nuevo').val(cantidad);
+        $('#material-periodo-nuevo').val(periodo);
 
-                    Swal.fire({
-                        title: 'No Agregado',
-                        text: "Para agregar el Presupuesto no debe estar Aprobado",
-                        icon: 'info',
-                        showCancelButton: false,
-                        confirmButtonColor: '#28a745',
-                        closeOnClickOutside: false,
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-                        }
-                    });
-                }
-
-                else if(response.data.success === 2) {
-                    table.parentNode.removeChild(table);
-
-                    let nombre = response.data.unidad;
-
-                    Swal.fire({
-                        title: 'Actualizado',
-                        text: "El Material ha sido agregado al Base Presupuesto y el Presupuesto de la Unidad: " + nombre,
-                        icon: 'info',
-                        showCancelButton: false,
-                        confirmButtonColor: '#28a745',
-                        closeOnClickOutside: false,
-                        allowOutsideClick: false,
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload();
-                        }
-                    });
-
-                }
-                else{
-                    toastr.error('error al actualizar');
-                }
-            })
-            .catch((error) => {
-                toastr.error('error al actualizar');
-                closeLoading();
-            });
+        $('#material-id-aborrar').val(idproborrar);
     }
+
 
     function transferirProyecto(e){
         var table = e.parentNode.parentNode;

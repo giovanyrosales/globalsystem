@@ -433,7 +433,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         $totalvalor = number_format((float)$totalvalor, 2, '.', ',');
 
-        // LISTADOR DE MATERIALES
+        // LISTADO DE MATERIALES
         $listado = P_MaterialesDetalle::where('id_presup_unidad', $infoPresupUnidad->id)
             ->orderBy('descripcion', 'ASC')
             ->get();
@@ -618,6 +618,31 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             array_push($pilaArrayMaterialUnicos, $p->id_material);
         }
 
+        $idpresupuesto = $presupuesto->id;
+
+        // LISTADO DE PROYECTO APROBADOS
+        $listadoProyectoAprobados = P_ProyectosAprobados::where('id_presup_unidad', $idpresupuesto)
+            ->orderBy('descripcion', 'ASC')
+            ->get();
+
+        foreach ($listadoProyectoAprobados as $dd){
+
+            $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
+            $infoFuenteR = ObjEspecifico::where('id', $dd->id_fuenter)->first();
+            $infoLinea = ObjEspecifico::where('id', $dd->id_lineatrabajo)->first();
+            $infoArea = ObjEspecifico::where('id', $dd->id_areagestion)->first();
+
+            $dd->codigoobj = $infoObjeto->codigo;
+            $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+            $dd->fuenterecurso = $infoFuenteR->codigo . " - " . $infoFuenteR->nombre;
+            $dd->lineatrabajo = $infoLinea->codigo . " - " . $infoLinea->nombre;
+            $dd->areagestion = $infoArea->codigo . " - " . $infoArea->nombre;
+
+            $dd->costoFormat = '$' . number_format((float)$dd->costo, 2, '.', ',');
+        }
+
+
+
         // agregar cuentas
         foreach($rubro as $secciones){
             array_push($resultsBloque,$secciones);
@@ -644,6 +669,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
                     array_push($resultsBloque3, $ll);
 
+
                     if($ll->codigo == 61109){
                         $ll->nombre = $ll->nombre . " ( ACTIVOS FIJOS MENORES A $600.00 )";
                     }
@@ -666,17 +692,24 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
                             $subLista->cantidad = $data->cantidad;
                             $subLista->periodo = $data->periodo;
+
+                            // periodo siempre sera mínimo 1
                             $total = ($data->precio * $data->cantidad) * $data->periodo;
                             $subLista->total = number_format((float)$total, 2, '.', ',');
 
                             $subLista->precio = $data->precio;
                             $sumaObjeto = $sumaObjeto + $total;
-
                         }else{
                             $subLista->cantidad = '';
                             $subLista->periodo = '';
                             $subLista->total = '';
                             $subLista->precio = $subLista->costo;
+                        }
+                    }
+
+                    foreach ($listadoProyectoAprobados as $lpa){
+                        if($ll->codigo == $lpa->codigoobj){
+                            $sumaObjeto += $lpa->costo;
                         }
                     }
 
@@ -708,19 +741,19 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             $lista->simbolo = $uni->nombre;
         }
 
-        $idpresupuesto = $presupuesto->id;
 
         $totalvalor = number_format((float)$totalvalor, 2, '.', ',');
 
 
-        // LISTADO DE PROYECTO
+        // LISTADO DE PROYECTO PENDIENTE
         $listadoProyecto = P_ProyectosPendientes::where('id_presup_unidad', $idpresupuesto)
             ->orderBy('descripcion', 'ASC')
             ->get();
 
+
         return view('backend.admin.presupuestounidad.revisar.contenedorpresupuestoindividual', compact( 'estado',
             'idpresupuesto', 'idestado', 'totalvalor',
-            'objeto', 'listado', 'preanio', 'rubro', 'listadoProyecto'));
+            'objeto', 'listado', 'preanio', 'rubro', 'listadoProyecto', 'listadoProyectoAprobados'));
     }
 
     // petición para transferir material solicitado por una unidad y agregar a base de materiales
