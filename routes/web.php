@@ -718,6 +718,10 @@ Route::get('/admin/p/editar/presupuesto/anio/{id}', [ConfiguracionPresupuestoUni
 Route::get('/admin/p/editar/presupuesto/anio/contenedor/{id}', [ConfiguracionPresupuestoUnidadController::class,'contenedorEditarPresupuestoUnidad']);
 // petición para editar un presupuesto si no esta en revisión o aprobado
 Route::post('/admin/p/editar/presupuesto/editar', [ConfiguracionPresupuestoUnidadController::class,'editarPresupuestoUnidad']);
+// registrar un nuevo proyecto para presupuesto de la unidad
+Route::post('/admin/p/registrar/proyecto/presupuesto/unidad', [ConfiguracionPresupuestoUnidadController::class,'registrarProyectoPresupuestoUnidad']);
+
+
 
 // retorna vista revisar presupuesto y ver si se aprueba, se envía ID departamento y ID unidad
 Route::get('/admin/p/departamento/presupuesto/unidad/{depa}/{anio}', [ConfiguracionPresupuestoUnidadController::class,'indexPresupuestoParaAprobar']);
@@ -727,7 +731,7 @@ Route::get('/admin/p/departamento/presupuesto/contenedor/{depa}/{anio}', [Config
 Route::post('/admin/p/presupuesto/nuevo/material/transferir', [ConfiguracionPresupuestoUnidadController::class,'transferirNuevoMaterial']);
 // actualizar estado de un presupuesto
 Route::post('/admin/p/presupuesto/unidad/cambiar/estado', [ConfiguracionPresupuestoUnidadController::class,'editarEstadoPresupuesto']);
-// verifica si todos los presupuestos esten aprobados para generar consolidado PDF
+// verifica si todos los presupuestos estén aprobados para generar consolidado PDF
 Route::post('/admin/p/generador/verificar/consolidado/presupuesto', [ConfiguracionPresupuestoUnidadController::class,'verificarConsolidadoPresupuesto']);
 
 // retornar PDF con los totales, se envía el ID año

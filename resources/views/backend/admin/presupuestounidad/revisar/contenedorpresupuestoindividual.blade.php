@@ -21,7 +21,7 @@
                                         <button type="button" onclick="recargar()" class="btn btn-success"  style="margin-right: 25px"><i class="fa fa-redo-alt"></i> Recargar</button>
                                         <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Base Presupuesto</a></li>
                                         <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Nuevos Materiales</a></li>
-
+                                        <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">Proyectos</a></li>
                                     </ul>
                                 </div><!-- /.card-header -->
                                 <div class="card-body">
@@ -183,6 +183,51 @@
 
                                         </div>
 
+
+                                        <!-- LISTA DE NUEVOS PROYECTOS - TABS 3 -->
+                                        <div class="tab-pane" id="tab_3">
+
+                                            <form>
+                                                <div class="card-body">
+
+                                                    <table class="table" id="matrizProyectos" style="border: 80px" data-toggle="table">
+                                                        <thead>
+                                                        <tr>
+                                                            <th style="width: 30%; text-align: center">Descripción</th>
+                                                            <th style="width: 15%; text-align: center">Costo</th>
+
+                                                            <th style="width: 10%; text-align: center">Opciones</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                        @foreach($listadoProyecto as $lp)
+
+                                                            <tr id="{{ $lp->id }}">
+                                                                <td style="width: 30%">
+                                                                    <input name="proyectodescripcionfila[]" disabled value="{{ $lp->descripcion }}" class="form-control" type="text">
+                                                                </td>
+                                                                <td style="width: 15%;"><input name="proyectocostoextrafila[]" disabled value="{{ $lp->costo }}" class="form-control" type="number"></td>
+                                                                <td>
+                                                                    <input value="{{ $lp->id }}" type="hidden">
+                                                                    <button type="button" class="btn btn-block btn-success" onclick="transferirProyecto(this)">Transferir</button>
+                                                                </td>
+                                                            </tr>
+
+                                                        @endforeach
+
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+
+                                            </form>
+
+                                        </div>
+
+
+
                                     </div>
                                 </div>
                             </div>
@@ -315,5 +360,22 @@
                 closeLoading();
             });
     }
+
+    function transferirProyecto(e){
+        var table = e.parentNode.parentNode;
+        var descripcion = table.cells[0].children[0].value;
+        var costo = table.cells[1].children[0].value;
+
+        // id de proyecto para borrarlo
+        var idproborrar = $(e).closest('tr').attr('id');
+
+        document.getElementById("formulario-nuevo-proyecto").reset();
+        $('#modalNuevoProyecto').modal('show');
+
+        $('#proyecto-descripcion-nuevo').val(descripcion);
+        $('#proyecto-costo-nuevo').val(costo);
+        $('#proyecto-id-aborrar').val(idproborrar);
+    }
+
 
 </script>

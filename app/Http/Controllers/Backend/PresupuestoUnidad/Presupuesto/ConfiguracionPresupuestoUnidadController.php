@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto;
 
 use App\Http\Controllers\Controller;
+use App\Models\AreaGestion;
 use App\Models\Cuenta;
+use App\Models\FuenteRecursos;
+use App\Models\LineaTrabajo;
 use App\Models\ObjEspecifico;
 use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
@@ -12,6 +15,7 @@ use App\Models\P_Materiales;
 use App\Models\P_MaterialesDetalle;
 use App\Models\P_PresupUnidad;
 use App\Models\P_PresupUnidadDetalle;
+use App\Models\P_ProyectosAprobados;
 use App\Models\P_ProyectosPendientes;
 use App\Models\P_UnidadMedida;
 use App\Models\P_UsuarioDepartamento;
@@ -341,7 +345,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         $totalvalor = 0;
 
-        // agregar cuentas
+
         foreach($rubro as $secciones){
             array_push($resultsBloque,$secciones);
 
@@ -373,8 +377,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
                     $subSecciones3 = P_Materiales::where('id_objespecifico', $ll->id)
                         ->where('visible', 1)
-                        ->whereIn('id', $pilaArrayMaterialVisib) // si material fue ocultado, aun puede verse
-                                                            // si lo tengo a mi presu uni detalle
                         ->orderBy('descripcion', 'ASC')
                         ->get();
 
@@ -383,7 +385,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                     foreach ($subSecciones3 as $subLista){
 
                         $uni = P_UnidadMedida::where('id', $subLista->id_unidadmedida)->first();
-                        $unimedida = $uni->nombre;
+                        $unimedida = $uni->simbolo;
 
                         $subLista->unimedida = $unimedida;
 
@@ -391,11 +393,12 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                         if($data = P_PresupUnidadDetalle::where('id_presup_unidad', $infoPresupUnidad->id)
                             ->where('id_material', $subLista->id)->first()){
 
+                            $subLista->precio = $data->precio;
+
                             $subLista->cantidad = $data->cantidad;
                             $subLista->periodo = $data->periodo;
                             $total = ($data->precio * $data->cantidad) * $data->periodo;
                             $subLista->total = '$' . number_format((float)$total, 2, '.', ',');
-                            $subLista->precio = $data->precio;
 
                             $sumaObjeto = $sumaObjeto + $total;
                         }else{
@@ -427,6 +430,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             $index++;
         }
 
+
         $totalvalor = number_format((float)$totalvalor, 2, '.', ',');
 
         // LISTADOR DE MATERIALES
@@ -443,7 +447,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         $listadoProyecto = P_ProyectosPendientes::where('id_presup_unidad', $infoPresupUnidad->id)
             ->orderBy('descripcion', 'ASC')
             ->get();
-
 
         return view('backend.admin.presupuestounidad.editar.contenedoreditarpresupuesto', compact( 'estado', 'totalvalor',
             'listado', 'idAnio', 'idpresupuesto', 'preanio', 'unidad', 'rubro', 'listadoProyecto'));
@@ -558,7 +561,14 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
             $idpre = $infoPresupuesto->id;
 
-            return view('backend.admin.presupuestounidad.revisar.presupuestoindividual', compact( 'iddepa', 'idpre','arrayestado', 'idanio', 'infoAnio', 'estado'));
+            $arrayObjeto = ObjEspecifico::orderBy('nombre', 'ASC')->get();
+            $arrayFuente = FuenteRecursos::where('id_p_anio', $idanio)
+            ->orderBy('nombre', 'ASC')->get();
+            $arrayLinea = LineaTrabajo::orderBy('nombre', 'ASC')->get();
+            $arrayGestion = AreaGestion::orderBy('nombre', 'ASC')->get();
+
+            return view('backend.admin.presupuestounidad.revisar.presupuestoindividual', compact( 'iddepa', 'idpre','arrayestado',
+                'idanio', 'infoAnio', 'estado', 'arrayObjeto', 'arrayFuente', 'arrayLinea', 'arrayGestion'));
         }else{
             // presupuesto no encontrado
             return view('backend.admin.presupuestounidad.revisar.vistapresupuestonoencontrado');
@@ -607,8 +617,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         foreach ($arrayPresUniDetalle as $p){
             array_push($pilaArrayMaterialUnicos, $p->id_material);
         }
-
-
 
         // agregar cuentas
         foreach($rubro as $secciones){
@@ -704,7 +712,15 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         $totalvalor = number_format((float)$totalvalor, 2, '.', ',');
 
-        return view('backend.admin.presupuestounidad.revisar.contenedorpresupuestoindividual', compact( 'estado', 'idpresupuesto', 'idestado', 'totalvalor', 'objeto', 'listado', 'preanio', 'rubro'));
+
+        // LISTADO DE PROYECTO
+        $listadoProyecto = P_ProyectosPendientes::where('id_presup_unidad', $idpresupuesto)
+            ->orderBy('descripcion', 'ASC')
+            ->get();
+
+        return view('backend.admin.presupuestounidad.revisar.contenedorpresupuestoindividual', compact( 'estado',
+            'idpresupuesto', 'idestado', 'totalvalor',
+            'objeto', 'listado', 'preanio', 'rubro', 'listadoProyecto'));
     }
 
     // petición para transferir material solicitado por una unidad y agregar a base de materiales
@@ -928,6 +944,55 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         // todos estan
 
         return ['success' => 2];
+    }
+
+    // registrar un nuevo proyecto para presupuesto de la unidad
+    public function registrarProyectoPresupuestoUnidad(Request $request){
+
+        $rules = array(
+            'id' => 'required',
+            'proidborrar' => 'required'
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            if(P_PresupUnidad::where('id', $request->id)->first()){
+
+                // REGISTRAR
+
+                $deta = new P_ProyectosAprobados();
+                $deta->id_presup_unidad = $request->id;
+                $deta->id_objespeci = $request->objeto;
+                $deta->id_fuenter = $request->fuenter;
+                $deta->id_lineatrabajo = $request->linea;
+                $deta->id_areagestion = $request->areagestion;
+                $deta->descripcion = $request->descripcion;
+                $deta->costo = $request->costo;
+                $deta->save();
+
+                // borrar proyectos pendiente
+
+                P_ProyectosPendientes::where('id', $request->proidborrar)->delete();
+
+                DB::commit();
+                return ['success' => 1];
+            }else{
+                return ['success' => 99];
+            }
+
+        }catch(\Throwable $e){
+            DB::rollback();
+            Log::info('ee' . $e);
+            return ['success' => 99];
+        }
     }
 
 }

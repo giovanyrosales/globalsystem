@@ -231,12 +231,12 @@
 
                                                         @foreach($listadoProyecto as $lp)
 
-                                                            <tr>
+                                                            <tr >
                                                                 <td style="width: 30%"><input name="proyectodescripcionfila[]" disabled value="{{ $lp->descripcion }}" maxlength="300" class="form-control" type="text"></td>
                                                                 <td style="width: 15%;"><input name="proyectocostoextrafila[]" disabled value="{{ $lp->costo }}" class="form-control" type="number"></td>
                                                                 <td>
                                                                     @if($estado == 1)
-                                                                        <button type="button" class="btn btn-block btn-danger" id="btnBorrarProyecto" onclick="borrarFilaProyecto(this)">Borrar</button>
+                                                                        <button type="button" class="btn btn-block btn-danger" onclick="borrarFilaProyecto(this)">Borrar</button>
                                                                     @endif
                                                                 </td>
                                                             </tr>
@@ -248,7 +248,7 @@
 
                                                     @if($estado == 1)
                                                         <br>
-                                                        <button type="button" class="btn btn-block btn-success" onclick="modalNuevaSolicitud()">Agregar Solicitud de Material</button>
+                                                        <button type="button" class="btn btn-block btn-success" onclick="modalNuevaSolicitudProyecto()">Agregar Solicitud de Proyecto</button>
                                                         <br>
                                                     @endif
 
@@ -635,85 +635,85 @@
                 }
             }
 
-
-
-            // VERIFICAR LOS PROYECTOS QUE SE VAN A SOLICITAR
-
-            var nRegistroProyecto = $('#matrizProyectos >tbody >tr').length;
-            if (nRegistroProyecto > 0){
-
-                var descripcionProyecto = $("input[name='proyectodescripcionfila[]']").map(function(){return $(this).val();}).get();
-                var costoProyecto = $("input[name='proyectocostoextrafila[]']").map(function(){return $(this).val();}).get();
-
-                for(var pp = 0; pp < descripcionProyecto.length; pp++){
-
-                    var datoDescripcionPro = descripcionProyecto[pp];
-
-                    if(datoDescripcionPro === ''){
-                        modalMensaje('Nuevo Proyecto', 'Fila: #' + (pp+1) + ', falta su descripción. Borrar fila y agregar de nuevo');
-                        return;
-                    }
-
-                    if(datoDescripcionPro.length > 300){
-                        modalMensaje('Nuevo Proyecto', 'Fila: #' + (pp+1) + ', su descripción supera los 300 caracteres. Borrar fila y agregar de nuevo');
-                        return;
-                    }
-                }
-
-                for(var pc = 0; pc < costoProyecto.length; pc++){
-
-                    var datoCostoExtraPro = costoProyecto[pc];
-
-                    if(datoCostoExtraPro === ''){
-                        modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo es requerido. Borrar fila y agregar de nuevo');
-                        return;
-                    }
-
-                    if(!datoCostoExtraPro.match(reglaNumeroDosDecimal)) {
-                        modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo debe ser Número Decimal Positivo y 2 Decimales Máximo. Borrar fila y agregar de nuevo');
-                        return;
-                    }
-
-                    if(datoCostoExtraPro <= 0){
-                        modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo no debe ser Negativo o Cero. Borrar fila y agregar de nuevo');
-                        return;
-                    }
-
-                    if(datoCostoExtraPro > 9000000){
-                        modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo no debe superar 9 millones. Borrar fila y agregar de nuevo');
-                        return;
-                    }
-                }
-
-                // AGREGAR SOLICITUD DE PROYECTOS
-                for(var pro = 0; pro < descripcionProyecto.length; pro++){
-                    formData.append('descripcionfilaproyecto[]', descripcionProyecto[pro]);
-                    formData.append('costoextrafilaproyecto[]', costoProyecto[pro]);
-                }
-            }
-
-
             // AGREGAR SOLICITUD DE NUEVOS MATERIALES
-            for(var p = 0; p < descripcion.length; p++){
-                formData.append('descripcionfila[]', descripcion[p]);
-                formData.append('costoextrafila[]', costoextra[p]);
-                formData.append('cantidadextrafila[]', cantidadextra[p]);
-                formData.append('periodoextrafila[]', periodoextra[p]);
-                formData.append('unidadmedida[]', unidadmedidafila[p]);
+            for(var mate = 0; mate < descripcion.length; mate++){
+                formData.append('descripcionfila[]', descripcion[mate]);
+                formData.append('costoextrafila[]', costoextra[mate]);
+                formData.append('cantidadextrafila[]', cantidadextra[mate]);
+                formData.append('periodoextrafila[]', periodoextra[mate]);
+                formData.append('unidadmedida[]', unidadmedidafila[mate]);
             }
 
-        }
-        // fin validación
+            // fin validación
 
-        // llenar array para enviar
-        for(var z = 0; z < unidades.length; z++){
+            // llenar array para enviar
+            for(var z = 0; z < unidades.length; z++){
 
-            if(unidades[z].length > 0 && periodo[z].length > 0){
-                formData.append('idmaterial[]', idmaterial[z]);
-                formData.append('unidades[]', unidades[z]);
-                formData.append('periodo[]', periodo[z]);
+                if(unidades[z].length > 0 && periodo[z].length > 0){
+                    formData.append('idmaterial[]', idmaterial[z]);
+                    formData.append('unidades[]', unidades[z]);
+                    formData.append('periodo[]', periodo[z]);
+                }
             }
         }
+
+
+
+        // VERIFICAR LOS PROYECTOS QUE SE VAN A SOLICITAR
+        var nRegistroProyecto = $('#matrizProyectos >tbody >tr').length;
+        if (nRegistroProyecto > 0){
+
+
+            var descripcionProyecto = $("input[name='proyectodescripcionfila[]']").map(function(){return $(this).val();}).get();
+            var costoProyecto = $("input[name='proyectocostoextrafila[]']").map(function(){return $(this).val();}).get();
+
+            for(var pp = 0; pp < descripcionProyecto.length; pp++){
+
+                var datoDescripcionPro = descripcionProyecto[pp];
+
+                if(datoDescripcionPro === ''){
+                    modalMensaje('Nuevo Proyecto', 'Fila: #' + (pp+1) + ', falta su descripción. Borrar fila y agregar de nuevo');
+                    return;
+                }
+
+                if(datoDescripcionPro.length > 300){
+                    modalMensaje('Nuevo Proyecto', 'Fila: #' + (pp+1) + ', su descripción supera los 300 caracteres. Borrar fila y agregar de nuevo');
+                    return;
+                }
+            }
+
+            for(var pc = 0; pc < costoProyecto.length; pc++){
+
+                var datoCostoExtraPro = costoProyecto[pc];
+
+                if(datoCostoExtraPro === ''){
+                    modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo es requerido. Borrar fila y agregar de nuevo');
+                    return;
+                }
+
+                if(!datoCostoExtraPro.match(reglaNumeroDosDecimal)) {
+                    modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo debe ser Número Decimal Positivo y 2 Decimales Máximo. Borrar fila y agregar de nuevo');
+                    return;
+                }
+
+                if(datoCostoExtraPro <= 0){
+                    modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo no debe ser Negativo o Cero. Borrar fila y agregar de nuevo');
+                    return;
+                }
+
+                if(datoCostoExtraPro > 9000000){
+                    modalMensaje('Nuevos Proyecto', 'Fila: #' + (pc+1) + ', el Costo no debe superar 9 millones. Borrar fila y agregar de nuevo');
+                    return;
+                }
+            }
+
+            // AGREGAR SOLICITUD DE PROYECTOS
+            for(var pro = 0; pro < descripcionProyecto.length; pro++){
+                formData.append('descripcionfilaproyecto[]', descripcionProyecto[pro]);
+                formData.append('costoextrafilaproyecto[]', costoProyecto[pro]);
+            }
+        }
+
 
         var idpresupuesto = {{ $idpresupuesto }};
 
