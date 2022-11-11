@@ -320,10 +320,9 @@
                             text: "El Presupuesto esta creado, pero no tiene ningún Material Registrado",
                             icon: 'info',
                             showCancelButton: false,
-                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
-                            confirmButtonText: 'Recargar'
+                            confirmButtonText: 'Aceptar'
                         }).then((result) => {
                             if (result.isConfirmed) {
 

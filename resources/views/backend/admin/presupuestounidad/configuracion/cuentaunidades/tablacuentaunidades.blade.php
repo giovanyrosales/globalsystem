@@ -7,13 +7,22 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 15%">Nombre</th>
-                                <th style="width: 7%">Opciones</th>
+                                <th style="width: 8%">Año</th>
+                                <th style="width: 15%">Departamento</th>
+                                <th style="width: 15%">Objeto Específico</th>
+                                <th style="width: 10%">Saldo Inicial</th>
                             </tr>
                             </thead>
                             <tbody>
 
-
+                            @foreach($listado as $dato)
+                                <tr>
+                                    <td>{{ $dato->anio }}</td>
+                                    <td>{{ $dato->departamento }}</td>
+                                    <td>{{ $dato->objeto }}</td>
+                                    <td>{{ $dato->monto }}</td>
+                                </tr>
+                            @endforeach
 
                             </tbody>
                         </table>

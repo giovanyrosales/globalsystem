@@ -710,28 +710,19 @@
                 formData.append('periodoextrafila[]', periodoextra[mate]);
                 formData.append('unidadmedida[]', unidadmedidafila[mate]);
             }
-
-            // fin validación
-
-            // llenar array para enviar
-            for(var z = 0; z < unidades.length; z++){
-
-                if(unidades[z].length > 0 && periodo[z].length > 0){
-
-                    console.log('periodo ' + periodo[z]);
-
-                    formData.append('idmaterial[]', idmaterial[z]);
-                    formData.append('unidades[]', unidades[z]);
-                    formData.append('periodo[]', periodo[z]);
-                }
-            }
         }
 
-        console.log('fin')
 
+        // llenar array para enviar
+        for(var z = 0; z < unidades.length; z++){
 
+            if(unidades[z].length > 0 && periodo[z].length > 0){
 
-
+                formData.append('idmaterial[]', idmaterial[z]);
+                formData.append('unidades[]', unidades[z]);
+                formData.append('periodo[]', periodo[z]);
+            }
+        }
 
 
         // VERIFICAR LOS PROYECTOS QUE SE VAN A SOLICITAR

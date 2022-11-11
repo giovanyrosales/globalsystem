@@ -9,6 +9,7 @@ use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
 use App\Models\P_PresupUnidad;
 use App\Models\P_PresupUnidadDetalle;
+use App\Models\P_ProyectosAprobados;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -35,9 +36,22 @@ class CuentaUnidadController extends Controller
     // retorna tabla con las cuentas de unidades
     public function tablaCuentasUnidades(){
 
+        $listado = CuentaUnidad::orderBy('id_departamento', 'ASC')->get();
 
+        foreach ($listado as $dd){
 
-        return view('backend.admin.presupuestounidad.configuracion.cuentaunidades.tablacuentaunidades');
+            $infoDepartamento = P_Departamento::where('id', $dd->id_departamento)->first();
+            $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
+            $infoAnio = P_AnioPresupuesto::where('id', $dd->id_anio)->first();
+
+            $dd->departamento = $infoDepartamento->nombre;
+            $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+            $dd->anio = $infoAnio->nombre;
+
+            $dd->monto = "$" . number_format((float)$dd->saldo_inicial, 2, '.', ',');
+        }
+
+        return view('backend.admin.presupuestounidad.configuracion.cuentaunidades.tablacuentaunidades', compact('listado'));
     }
 
     // crear las cuentas unidades para todos los presupuesto aprobado
@@ -123,6 +137,15 @@ class CuentaUnidadController extends Controller
                         // PERIODO SIEMPRE MÍNIMO 1
                         // dinero para el objeto específico
                         $dineroObjeto += ($apud->cantidad  * $apud->periodo) * $apud->precio;
+                    }
+
+                    // AUMENTAR DINERO PARA PROYECTOS APROBADOS
+                    $arrayProyectosAprobados = P_ProyectosAprobados::where('id_presup_unidad', $dd->id)->get();
+
+                    foreach ($arrayProyectosAprobados as $apaa){
+                      if($apaa->id_objespeci == $obj->id){
+                          $dineroObjeto += $apaa->costo;
+                      }
                     }
 
                     if($dineroObjeto > 0){

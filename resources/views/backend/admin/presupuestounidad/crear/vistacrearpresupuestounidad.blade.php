@@ -222,7 +222,7 @@
 
                                         <div class="form-group">
                                             <label>Monto ($)</label>
-                                            <input type="number" class="form-control" autocomplete="off" id="proyecto-costo-nuevo" placeholder="0.00">
+                                            <input type="number" class="form-control" autocomplete="off" id="proyecto-costo-nuevo">
                                         </div>
 
                                     </div>
