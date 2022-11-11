@@ -25,7 +25,12 @@ class CuentaUnidadController extends Controller
     public function indexCuentasUnidades(){
 
         // solo mostrar años que no tienen cuenta unidad creados
-        $listado = CuentaUnidad::select('id_anio')->groupBy('id_anio')->get();
+        $listado = DB::table('cuenta_unidad AS cu')
+            ->join('p_presup_unidad AS pu', 'cu.id_presup_unidad', '=', 'pu.id')
+            ->select('pu.id_anio')
+            ->groupBy('pu.id_anio')
+            ->get();
+
         $anios = P_AnioPresupuesto::whereNotIn('id', $listado)->orderBy('nombre')->get();
         $aniostodos = P_AnioPresupuesto::orderBy('nombre')->get();
         $departamentos = P_Departamento::orderBy('nombre')->get();
@@ -36,13 +41,15 @@ class CuentaUnidadController extends Controller
     // retorna tabla con las cuentas de unidades
     public function tablaCuentasUnidades(){
 
-        $listado = CuentaUnidad::orderBy('id_departamento', 'ASC')->get();
+        $listado = CuentaUnidad::all();
 
         foreach ($listado as $dd){
 
-            $infoDepartamento = P_Departamento::where('id', $dd->id_departamento)->first();
+            $infoPresup = P_PresupUnidad::where('id', $dd->id_presup_unidad)->first();
+
+            $infoDepartamento = P_Departamento::where('id', $infoPresup->id_departamento)->first();
+            $infoAnio = P_AnioPresupuesto::where('id', $infoPresup->id_anio)->first();
             $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
-            $infoAnio = P_AnioPresupuesto::where('id', $dd->id_anio)->first();
 
             $dd->departamento = $infoDepartamento->nombre;
             $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
@@ -72,7 +79,11 @@ class CuentaUnidadController extends Controller
         try {
 
             // verificar si existe al menos 1 una vez el mismo año
-            if(CuentaUnidad::where('id_anio', $request->idanio)->first()){
+            if(DB::table('cuenta_unidad AS cu')
+                ->join('p_presup_unidad AS pu', 'cu.id_presup_unidad', '=', 'pu.id')
+                ->select('pu.id_anio')
+                ->where('pu.id_anio',  $request->idanio)
+                ->first()){
                 return ['success' => 1];
             }
 
@@ -151,8 +162,7 @@ class CuentaUnidadController extends Controller
                     if($dineroObjeto > 0){
                         // GUARDAR CUENTA UNIDAD
                         $dato = new CuentaUnidad();
-                        $dato->id_anio = $dd->id_anio;
-                        $dato->id_departamento = $dd->id_departamento;
+                        $dato->id_presup_unidad = $dd->id;
                         $dato->id_objespeci = $obj->id;
                         $dato->saldo_inicial = $dineroObjeto;
                         $dato->save();
@@ -187,7 +197,12 @@ class CuentaUnidadController extends Controller
 
         try {
 
-            $conteo = CuentaUnidad::where('id_anio', $request->idanio)->count();
+            $conteo = DB::table('cuenta_unidad AS cu')
+                ->join('p_presup_unidad AS pu', 'cu.id_presup_unidad', '=', 'pu.id')
+                ->select('pu.id_anio')
+                ->where('pu.id_anio',  $request->idanio)
+                ->count();
+
             if($conteo == 0){
                 // no hay ninguno con este año, por lo tanto primero pasar por registro automático
                 return ['success' => 1];
@@ -204,10 +219,12 @@ class CuentaUnidadController extends Controller
                     return ['success' => 2];
                 }
 
-
                 // YA ESTABA REGISTRADO EN CUENTA UNIDAD EL ANIO Y DEPARTAMENTO
-                if(CuentaUnidad::where('id_anio', $request->idanio)
-                    ->where('id_departamento', $request->iddepartamento)
+                if(DB::table('cuenta_unidad AS cu')
+                    ->join('p_presup_unidad AS pu', 'cu.id_presup_unidad', '=', 'pu.id')
+                    ->select('pu.id_anio', 'pu.id_departamento')
+                    ->where('pu.id_anio',  $request->idanio)
+                    ->where('pu.id_departamento', $request->iddepartamento)
                     ->first()){
                     return ['success' => 3];
                 }
@@ -244,8 +261,7 @@ class CuentaUnidadController extends Controller
                         if($dineroObjeto > 0){
                             // GUARDAR CUENTA UNIDAD
                             $dato = new CuentaUnidad();
-                            $dato->id_anio = $dd->id_anio;
-                            $dato->id_departamento = $dd->id_departamento;
+                            $dato->id_presup_unidad = $dd->id;
                             $dato->id_objespeci = $obj->id;
                             $dato->saldo_inicial = $dineroObjeto;
                             $dato->save();
@@ -253,10 +269,8 @@ class CuentaUnidadController extends Controller
                     }
                 }
 
-                //DB::commit();
+                DB::commit();
                 return ['success' => 4];
-
-
             }else{
                 // No creado aun
                 return ['success' => 5];

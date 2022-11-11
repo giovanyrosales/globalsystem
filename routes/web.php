@@ -764,18 +764,7 @@ Route::get('/admin/p/generador/excel/porunidad/{anio}/{unidad}', [ReportesPresup
 Route::get('/admin/p/generador/excel/unaunidad/{anio}/{unidad}', [ReportesPresupuestoUnidadController::class, 'generarTotalExcelSoloUnidad']);
 
 
-
-// * REQUERIMIENTOS DE UNA UNIDAD
-
-// retornar vista para poder elegir año de presupuesto para solicitar requerimiento
-Route::get('/admin/p/anio/presupuesto/requerimiento/index', [RequerimientosUnidadController::class,'indexBuscarAñoPresupuesto'])->name('admin.p.unidad.requerimientos.index');
-// verifica si puede hacer requerimientos segun año de presupuesto
-Route::post('/admin/p/anio/permiso/requerimiento', [RequerimientosUnidadController::class,'verificarEstadoPresupuesto']);
-
 // * CUENTAS UNIDADES
-
-//
-
 
 // retorna vista con las cuentas de unidades
 Route::get('/admin/p/cuentas/unidades/index', [CuentaUnidadController::class,'indexCuentasUnidades'])->name('p.admin.cuentas.unidades.index');
@@ -787,5 +776,19 @@ Route::post('/admin/p/registrar/cuentas/unidades', [CuentaUnidadController::clas
 Route::post('/admin/p/registrar/cuentas/unidad/manual', [CuentaUnidadController::class,'registrarCuentasUnidadManual']);
 
 
+
+
+
+// * REQUERIMIENTOS DE UNA UNIDAD
+
+// retornar vista para poder elegir año de presupuesto para solicitar requerimiento
+Route::get('/admin/p/anio/presupuesto/requerimiento/index', [RequerimientosUnidadController::class,'indexBuscarAñoPresupuesto'])->name('admin.p.unidad.requerimientos.index');
+
+// verifica si puede hacer requerimientos según año de presupuesto
+Route::post('/admin/p/anio/permiso/requerimiento', [RequerimientosUnidadController::class,'verificarEstadoPresupuesto']);
+// retorna vista donde están los requerimientos por año
+Route::get('/admin/p/requerimientos/vista/{idanio}', [RequerimientosUnidadController::class, 'indexRequerimientosUnidades']);
+// retorna tabla donde están los requerimientos por año
+Route::get('/admin/p/requerimientos/tabla/{idanio}', [RequerimientosUnidadController::class, 'tablaRequerimientosUnidades']);
 
 

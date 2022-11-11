@@ -201,14 +201,16 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'p.crear.presupuesto.unidad', 'description' => 'para crear presupuesto de unidades'])->syncRoles($roleUnidad);
         Permission::create(['name' => 'p.editar.presupuesto.unidad', 'description' => 'para editar presupuesto de unidades'])->syncRoles($roleUnidad);
 
-
-
         Permission::create(['name' => 'p.cuentas.unidades', 'description' => 'para ver todas las cuentas unidades y aquí se crean por año'])->syncRoles($rolePresupuesto);
 
+        Permission::create(['name' => 'sidebar.p.requerimientos.unidades', 'description' => 'para ver los años que puede pedir requerimientos'])->syncRoles($roleUnidad);
 
 
 
 
+        Permission::create(['name' => 'boton.cotizar.requisicion.unidad', 'description' => 'boton cotizar requisicion para unidad'])->syncRoles($roleUnidad);
+        Permission::create(['name' => 'boton.editar.requisicion.unidad', 'description' => 'boton editar requisicion para unidad'])->syncRoles($roleUnidad);
+        Permission::create(['name' => 'boton.borrar.requisicion.unidad', 'description' => 'boton borrar requisicion para unidad'])->syncRoles($roleUnidad);
 
 
 

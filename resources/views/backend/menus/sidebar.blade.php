@@ -596,7 +596,7 @@
                 @endcan
 
 
-
+                @can('sidebar.p.requerimientos.unidades')
                 <li class="nav-item has-treeview">
                     <a href="{{ route('admin.p.unidad.requerimientos.index') }}" target="frameprincipal" class="nav-link">
                         <i class="nav-icon fas fa-list-alt"></i>
@@ -605,7 +605,7 @@
                         </p>
                     </a>
                 </li>
-
+                @endcan
 
 
 

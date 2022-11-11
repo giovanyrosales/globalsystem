@@ -4,24 +4,24 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCuentaUnidadTable extends Migration
+class CreateRequisicionUnidadTable extends Migration
 {
     /**
-     * Run the migrations.
+     *  Petición que hace el encargado de la unidad
      *
      * @return void
      */
     public function up()
     {
-        Schema::create('cuenta_unidad', function (Blueprint $table) {
+        Schema::create('requisicion_unidad', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_presup_unidad')->unsigned();
-            $table->bigInteger('id_objespeci')->unsigned(); // objeto específico
 
-            $table->decimal('saldo_inicial', 10,2); // no cambia nunca
+            $table->string('destino', 300);
+            $table->date('fecha');
+            $table->text('necesidad')->nullable();
 
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
-            $table->foreign('id_objespeci')->references('id')->on('obj_especifico');
         });
     }
 
@@ -32,6 +32,6 @@ class CreateCuentaUnidadTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('cuenta_unidad');
+        Schema::dropIfExists('requisicion_unidad');
     }
 }

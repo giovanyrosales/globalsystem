@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Controles;
 
 use App\Http\Controllers\Controller;
+use App\Models\P_Departamento;
+use App\Models\P_UsuarioDepartamento;
 use Illuminate\Support\Facades\Auth;
 
 class ControlController extends Controller
@@ -62,7 +64,13 @@ class ControlController extends Controller
             $ruta = 'no.permisos.index';
         }
 
-        return view('backend.index', compact( 'ruta', 'user'));
+        $titulo = "Alcaldía de Metapán";
+        if($infoUsuario = P_UsuarioDepartamento::where('id_usuario', $user->id)->first()){
+            $infoDepartamento = P_Departamento::where('id', $infoUsuario->id_departamento)->first();
+            $titulo = $titulo . " - " . $infoDepartamento->nombre;
+        }
+
+        return view('backend.index', compact( 'ruta', 'user', 'titulo'));
     }
 
     // redirecciona a vista sin permisos
