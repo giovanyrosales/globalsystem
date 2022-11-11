@@ -200,7 +200,8 @@
             <button type="button" class="btn btn-info" style="background: #b0f2c2; color: black !important; font-weight: bold">OBJETO ESPECÍFICO</button>
         </div>
 
-        <button type="button" onclick="verificar()" class="btn btn-success float-right">Guardar</button>
+        <button type="button" onclick="verificar()" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                class="button button-rounded button-pill button-small float-right">Guardar</button>
     </div>
 
 </div>

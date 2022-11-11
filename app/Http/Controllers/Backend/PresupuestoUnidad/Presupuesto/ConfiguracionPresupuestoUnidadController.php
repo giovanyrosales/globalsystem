@@ -159,6 +159,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
     public function buscarMaterialPresupuestoUnidad(Request $request){
 
         $data = P_Materiales::where('descripcion', 'LIKE', "%{$request->texto}%")
+            ->where('visible', 0) // solo buscar materiales visibles
             ->take(25)
             ->get();
 
@@ -345,6 +346,27 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         $totalvalor = 0;
 
+        // LISTADO DE PROYECTO APROBADOS
+        $listadoProyectoAprobados = P_ProyectosAprobados::where('id_presup_unidad', $idpresupuesto)
+            ->orderBy('descripcion', 'ASC')
+            ->get();
+
+        foreach ($listadoProyectoAprobados as $dd){
+
+            $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
+            $infoFuenteR = ObjEspecifico::where('id', $dd->id_fuenter)->first();
+            $infoLinea = ObjEspecifico::where('id', $dd->id_lineatrabajo)->first();
+            $infoArea = ObjEspecifico::where('id', $dd->id_areagestion)->first();
+
+            $dd->codigoobj = $infoObjeto->codigo;
+            $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+            $dd->fuenterecurso = $infoFuenteR->codigo . " - " . $infoFuenteR->nombre;
+            $dd->lineatrabajo = $infoLinea->codigo . " - " . $infoLinea->nombre;
+            $dd->areagestion = $infoArea->codigo . " - " . $infoArea->nombre;
+
+            $dd->costoFormat = '$' . number_format((float)$dd->costo, 2, '.', ',');
+        }
+
 
         foreach($rubro as $secciones){
             array_push($resultsBloque,$secciones);
@@ -376,7 +398,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                     }
 
                     $subSecciones3 = P_Materiales::where('id_objespecifico', $ll->id)
-                        ->where('visible', 1)
+                        ->where('visible', 1) // solo materiales visibles
                         ->orderBy('descripcion', 'ASC')
                         ->get();
 
@@ -407,7 +429,15 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                             $subLista->total = '';
                             $subLista->precio = $subLista->costo;
                         }
+
                     }
+
+                    foreach ($listadoProyectoAprobados as $lpa){
+                        if($ll->codigo == $lpa->codigoobj){
+                            $sumaObjeto += $lpa->costo;
+                        }
+                    }
+
 
                     $sumaObjetoTotal = $sumaObjetoTotal + $sumaObjeto;
                     $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', ',');
@@ -448,8 +478,9 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             ->orderBy('descripcion', 'ASC')
             ->get();
 
+
         return view('backend.admin.presupuestounidad.editar.contenedoreditarpresupuesto', compact( 'estado', 'totalvalor',
-            'listado', 'idAnio', 'idpresupuesto', 'preanio', 'unidad', 'rubro', 'listadoProyecto'));
+            'listado', 'idAnio', 'idpresupuesto', 'preanio', 'unidad', 'rubro', 'listadoProyecto', 'listadoProyectoAprobados'));
     }
 
     // petición para editar un presupuesto si no esta en revisión o aprobado
@@ -561,7 +592,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
             $idpre = $infoPresupuesto->id;
 
-            $arrayObjeto = ObjEspecifico::orderBy('nombre', 'ASC')->get();
+            $arrayObjeto = ObjEspecifico::orderBy('codigo', 'ASC')->get();
             $arrayFuente = FuenteRecursos::where('id_p_anio', $idanio)
             ->orderBy('nombre', 'ASC')->get();
             $arrayLinea = LineaTrabajo::orderBy('nombre', 'ASC')->get();
@@ -760,9 +791,9 @@ class ConfiguracionPresupuestoUnidadController extends Controller
     public function transferirNuevoMaterial(Request $request){
 
         $regla = array(
-            'objeto' => 'required',
             'idpresupuesto' => 'required',
-            'idfila' => 'required'
+            'idobj' => 'required',
+            'idborrarmaterial' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -780,34 +811,30 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                 return ['success' => 1];
             }
 
-            $infoDepa = P_Departamento::where('id', $infoPresupuesto->id_departamento)->first();
-
-            // obtener informacion del material extra detalle
-            $info = P_MaterialesDetalle::where('id', $request->idfila)->first();
-
             // agregar a materiales base
             $base = new P_Materiales();
-            $base->descripcion = strtoupper($info->descripcion);
-            $base->id_unidadmedida = $info->id_unidadmedida;
-            $base->id_objespecifico = $request->objeto;
-            $base->costo = $info->costo;
-            $base->visible = 1;
+            $base->descripcion = $request->descripcion;
+            $base->id_unidadmedida = $request->idunidadmedida;
+            $base->id_objespecifico = $request->idobj;
+            $base->costo = $request->costo;
+            $base->visible = 1; // material visible
             $base->save();
 
             // agregar material a la unidad detalle
             $prDetalle = new P_PresupUnidadDetalle();
             $prDetalle->id_presup_unidad = $request->idpresupuesto;
             $prDetalle->id_material = $base->id;
-            $prDetalle->cantidad = $info->cantidad;
-            $prDetalle->precio = $info->costo;
-            $prDetalle->periodo = $info->periodo;
+            $prDetalle->cantidad = $request->cantidad;
+            $prDetalle->precio = $request->costo;
+            $prDetalle->periodo = $request->periodo;
             $prDetalle->save();
 
             // borrar el material extra
-            P_MaterialesDetalle::where('id', $request->idfila)->delete();
+            P_MaterialesDetalle::where('id', $request->idborrarmaterial)->delete();
 
              DB::commit();
-            return ['success' => 2, 'unidad' => $infoDepa->nombre];
+            return ['success' => 2];
+
         }catch(\Throwable $e){
             Log::info('ee' . $e);
             DB::rollback();
@@ -1027,5 +1054,15 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             return ['success' => 99];
         }
     }
+
+    // solo obtener las unidades de medida para registrar material solicitado por unidad
+    public function informacionUnidadMedidaPresupuesto(Request $request){
+
+        $arrayUnidad = P_UnidadMedida::orderBy('nombre', 'ASC')->get();
+
+        return ['success' => 1, 'arrayunidad' => $arrayUnidad];
+    }
+
+
 
 }

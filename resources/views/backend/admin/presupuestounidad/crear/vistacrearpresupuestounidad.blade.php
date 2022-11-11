@@ -7,7 +7,7 @@
     <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
-
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 <style>
@@ -158,17 +158,17 @@
 
                                         <div class="form-group">
                                             <label>Costo Estimado:</label>
-                                            <input type="text" class="form-control" autocomplete="off" id="costo-nuevo" placeholder="0.00">
+                                            <input type="number" class="form-control" autocomplete="off" id="costo-nuevo" placeholder="0.00">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Cantidad:</label>
-                                            <input type="text" class="form-control" autocomplete="off" id="cantidad-nuevo" placeholder="0">
+                                            <input type="number" class="form-control" autocomplete="off" id="cantidad-nuevo" placeholder="0">
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Periodo:</label>
-                                            <input type="text" class="form-control" autocomplete="off" id="periodo-nuevo" placeholder="0">
+                                            <label>Periodo (Mínimo 1):</label>
+                                            <input type="number" class="form-control" autocomplete="off" value="1" id="periodo-nuevo" placeholder="0">
                                         </div>
 
                                         <div class="form-group">
@@ -822,8 +822,8 @@
                 return;
             }
 
-            if(costo < 0){
-                toastr.error('Costo no permite números negativos');
+            if(costo <= 0){
+                toastr.error('Costo no permite Ceros o negativos');
                 return;
             }
 
@@ -866,13 +866,13 @@
                 return;
             }
 
-            if(periodo < 0){
-                toastr.error('Periodo no permite números negativos');
+            if(periodo <= 0){
+                toastr.error('Periodo no debe ser Cero o Negativos');
                 return;
             }
 
-            if(periodo > 3){
-                toastr.error('Periodo máximo Número 999 de límite');
+            if(periodo > 999){
+                toastr.error('Periodo máximo 999 veces de límite');
                 return;
             }
 

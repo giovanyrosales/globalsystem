@@ -358,13 +358,13 @@
                 return;
             }
 
-            if(periodo < 0){
-                toastr.error('Periodo no permite números negativos');
+            if(periodo <= 0){
+                toastr.error('Periodo no permite Cero o negativos');
                 return;
             }
 
             if(periodo > 999){
-                toastr.error('Periodo máximo Número 999 de límite');
+                toastr.error('Periodo máximo 999 veces de límite');
                 return;
             }
 

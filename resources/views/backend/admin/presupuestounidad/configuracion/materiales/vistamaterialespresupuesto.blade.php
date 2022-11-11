@@ -516,7 +516,6 @@
                     closeLoading();
                     if(response.data.success === 1){
                         $('#modalEditar').modal('hide');
-                        recargar();
 
                         Swal.fire({
                             title: 'Material Repetido',
@@ -528,14 +527,27 @@
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                location.reload();
                             }
                         })
                     }
                     else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
-                        recargar();
+
+                        Swal.fire({
+                            title: 'Material Actualizado',
+                            text: "",
+                            icon: 'success',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
                     }
                     else {
                         toastr.error('Error al editar');
@@ -592,8 +604,19 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        toastr.success('Ocultado correctamente');
-                        recargar();
+                        Swal.fire({
+                            title: 'Material Ocultado',
+                            text: "",
+                            icon: 'success',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
                     }
                     else {
                         toastr.error('Error al ocultar');

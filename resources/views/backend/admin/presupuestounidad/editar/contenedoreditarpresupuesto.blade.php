@@ -118,6 +118,28 @@
                                                                                                     <!-- fin foreach material -->
                                                                                                 @endforeach
 
+
+                                                                                                <!-- AGREGAR EL PROYECTO APROBADO -->
+
+                                                                                                @foreach($listadoProyectoAprobados as $lpa)
+
+                                                                                                    @if($obj->codigo == $lpa->codigoobj)
+
+                                                                                                        <tr style="background-color: #FAD7A0;">
+                                                                                                            <td style="background-color: #FAD7A0;">
+                                                                                                                <input value="{{ $lpa->descripcion }}" style="background-color: #FAD7A0; color: black; font-weight: bold" type="text" disabled class="form-control">
+                                                                                                            </td>
+                                                                                                            <td><input value="" disabled class="form-control" style="background-color: #FAD7A0; color: black; font-weight: bold" type="text"></td>
+                                                                                                            <td style="background-color: #FAD7A0;"><input value="{{ $lpa->costoFormat }}" disabled style="background-color: #FAD7A0; color: black; font-weight: bold; max-width: 170px" type="text" class="form-control"></td>
+                                                                                                            <td style="background-color: #FAD7A0;"><input value="" disabled style="background-color: #FAD7A0; color: black; font-weight: bold; max-width: 180px" type="text" class="form-control"></td>
+                                                                                                            <td style="background-color: #FAD7A0;"><input value="" disabled style="background-color: #FAD7A0; color: black; font-weight: bold; max-width: 180px" type="text" class="form-control"></td>
+                                                                                                            <td style="background-color: #FAD7A0;"><input value="{{ $lpa->costoFormat }}" style="background-color: #FAD7A0; color: black; font-weight: bold; max-width: 180px" type="text" disabled class="form-control"></td>
+                                                                                                        </tr>
+
+                                                                                                    @endif
+
+                                                                                                @endforeach
+
                                                                                                 </tbody>
 
                                                                                             </table>
@@ -167,7 +189,7 @@
                                                         <tr>
                                                             <th style="width: 30%; text-align: center">Descripción</th>
                                                             <th style="width: 20%; text-align: left">Unidad de Medida</th>
-                                                            <th style="width: 15%; text-align: center">Costo</th>
+                                                            <th style="width: 15%; text-align: center">Costo ($)</th>
                                                             <th style="width: 15%; text-align: center">Cantidad</th>
                                                             <th style="width: 10%; text-align: center">Periodo</th>
 
@@ -217,7 +239,7 @@
 
                                             <form>
                                                 <div class="card-body">
-
+                                                    <h3>Proyectos Pendientes</h3>
                                                     <table class="table" id="matrizProyectos" style="border: 80px" data-toggle="table">
                                                         <thead>
                                                         <tr>
@@ -255,6 +277,51 @@
                                                 </div>
 
                                             </form>
+
+
+                                            <!-- MOSTRAR PROYECTOS APROBADOS - TABS 3 -->
+
+                                            <br>
+                                            <hr>
+                                            <form>
+                                                <div class="card-body">
+                                                    <h3>Proyectos Aprobados</h3>
+                                                    <table class="table" id="matrizProyectosAprobados" style="border: 80px" data-toggle="table">
+                                                        <thead>
+                                                        <tr>
+                                                            <th style="width: 15%; text-align: center">Descripción</th>
+                                                            <th style="width: 10%; text-align: center">Costo</th>
+                                                            <th style="width: 12%; text-align: center">Obj. Específico</th>
+                                                            <th style="width: 12%; text-align: center">Fuente Recursos</th>
+                                                            <th style="width: 12%; text-align: center">Línea Trabajo</th>
+                                                            <th style="width: 12%; text-align: center">Área Gestión</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                        @foreach($listadoProyectoAprobados as $lp)
+
+                                                            <tr>
+                                                                <td><input disabled value="{{ $lp->descripcion }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->costoFormat }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->objeto }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->fuenterecurso }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->lineatrabajo }}" class="form-control"></td>
+                                                                <td><input disabled value="{{ $lp->areagestion }}" class="form-control"></td>
+                                                            </tr>
+
+                                                        @endforeach
+
+                                                        </tbody>
+                                                    </table>
+
+
+                                                </div>
+
+                                            </form>
+
+
+
 
                                         </div>
 
@@ -320,17 +387,17 @@
 
                                     <div class="form-group">
                                         <label>Costo Estimado:</label>
-                                        <input type="text" class="form-control" autocomplete="off" id="costo-nuevo" placeholder="0.00">
+                                        <input type="number" class="form-control" autocomplete="off" id="costo-nuevo" placeholder="0.00">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Cantidad:</label>
-                                        <input type="text" class="form-control" autocomplete="off" id="cantidad-nuevo" placeholder="0">
+                                        <input type="number" class="form-control" autocomplete="off" id="cantidad-nuevo" placeholder="0">
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Periodo:</label>
-                                        <input type="text" class="form-control" autocomplete="off" id="periodo-nuevo" placeholder="0">
+                                        <label>Periodo (Mínimo 1):</label>
+                                        <input type="number" class="form-control" autocomplete="off" id="periodo-nuevo">
                                     </div>
 
                                     <div class="form-group">
@@ -650,12 +717,20 @@
             for(var z = 0; z < unidades.length; z++){
 
                 if(unidades[z].length > 0 && periodo[z].length > 0){
+
+                    console.log('periodo ' + periodo[z]);
+
                     formData.append('idmaterial[]', idmaterial[z]);
                     formData.append('unidades[]', unidades[z]);
                     formData.append('periodo[]', periodo[z]);
                 }
             }
         }
+
+        console.log('fin')
+
+
+
 
 
 
@@ -713,6 +788,8 @@
                 formData.append('costoextrafilaproyecto[]', costoProyecto[pro]);
             }
         }
+
+
 
 
         var idpresupuesto = {{ $idpresupuesto }};

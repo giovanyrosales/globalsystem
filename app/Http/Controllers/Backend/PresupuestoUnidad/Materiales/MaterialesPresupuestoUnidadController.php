@@ -79,7 +79,7 @@ class MaterialesPresupuestoUnidadController extends Controller
         $dato->id_objespecifico = $request->objespecifico;
         $dato->descripcion = $request->nombre;
         $dato->costo = $request->precio;
-        $dato->visible = 0;
+        $dato->visible = 1; // material visible
 
         if($dato->save()){
             return ['success' => 2];

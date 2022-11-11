@@ -91,21 +91,21 @@
                                                                                                     <!-- fin foreach material -->
                                                                                                 @endforeach
 
-                                                                                                <!-- AGREGAR EL PROYECTO -->
+                                                                                                <!-- AGREGAR EL PROYECTO APROBADO -->
 
                                                                                                 @foreach($listadoProyectoAprobados as $lpa)
 
                                                                                                     @if($obj->codigo == $lpa->codigoobj)
 
-                                                                                                        <tr>
+                                                                                                        <tr style="background-color: #FAD7A0;">
                                                                                                             <td>
-                                                                                                                <input value="{{ $lpa->descripcion }}" disabled class="form-control" type="text">
+                                                                                                                <input style="background-color: #FAD7A0; color: black; font-weight: bold" value="{{ $lpa->descripcion }}" disabled class="form-control" type="text">
                                                                                                             </td>
-                                                                                                            <td><input value="" disabled class="form-control" type="text"></td>
-                                                                                                            <td><input value="{{ $lpa->costoFormat }}" disabled class="form-control" style="max-width: 170px" ></td>
-                                                                                                            <td><input value="" disabled class="form-control" style="max-width: 180px" ></td>
-                                                                                                            <td><input value="" disabled class="form-control" style="max-width: 180px" ></td>
-                                                                                                            <td><input value="{{ $lpa->costoFormat }}" disabled class="form-control" type="text" style="max-width: 180px"></td>
+                                                                                                            <td><input style="background-color: #FAD7A0; color: black; font-weight: bold" value="" disabled class="form-control" type="text"></td>
+                                                                                                            <td><input style="background-color: #FAD7A0; color: black; font-weight: bold; max-width: 170px" type="text" value="{{ $lpa->costoFormat }}" disabled class="form-control"></td>
+                                                                                                            <td><input style="background-color: #FAD7A0; color: black; font-weight: bold; max-width: 180px" type="text" value="" disabled class="form-control"></td>
+                                                                                                            <td><input style="background-color: #FAD7A0; color: black; font-weight: bold; max-width: 180px" type="text" value="" disabled class="form-control"></td>
+                                                                                                            <td><input style="background-color: #FAD7A0; color: black; font-weight: bold; max-width: 180px" type="text" value="{{ $lpa->costoFormat }}" disabled class="form-control"></td>
                                                                                                         </tr>
 
                                                                                                     @endif
@@ -342,14 +342,48 @@
         var idproborrar = $(e).closest('tr').attr('id');
 
         document.getElementById("formulario-nuevo-material").reset();
-        $('#modalNuevoMaterial').modal('show');
 
-        $('#material-descripcion-nuevo').val(descripcion);
-        $('#material-costo-nuevo').val(costo);
-        $('#material-cantidad-nuevo').val(cantidad);
-        $('#material-periodo-nuevo').val(periodo);
+        openLoading();
 
-        $('#material-id-aborrar').val(idproborrar);
+        // buscar información de unidad de medida y registrar material
+        // solo obtener las unidades de medida
+        axios.post(url+'/p/presupuesto/obtener/unidad/medida', {
+        })
+            .then((response) => {
+
+                closeLoading();
+
+                if(response.data.success === 1) {
+
+                    document.getElementById("select-material-unidadmedida").options.length = 0;
+
+                    // objeto especifico
+                    $.each(response.data.arrayunidad, function( key, val ){
+                        if(idunidadmedida == val.id){
+                            $('#select-material-unidadmedida').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
+                        }else{
+                            $('#select-material-unidadmedida').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
+                        }
+                    });
+
+
+                    $('#material-descripcion-nuevo').val(descripcion);
+                    $('#material-costo-nuevo').val(costo);
+                    $('#material-cantidad-nuevo').val(cantidad);
+                    $('#material-periodo-nuevo').val(periodo);
+
+                    $('#material-id-aborrar').val(idproborrar);
+
+                    $('#modalNuevoMaterial').modal('show');
+
+                }else{
+                    toastr.error('Error al buscar');
+                }
+            })
+            .catch((error) => {
+                toastr.error('Error al buscar');
+                closeLoading();
+            });
     }
 
 

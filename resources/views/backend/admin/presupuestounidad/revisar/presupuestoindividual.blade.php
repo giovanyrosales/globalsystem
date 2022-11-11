@@ -190,22 +190,22 @@
                                         <div class="form-group" style="margin-top: 15px">
                                             <label>Descripción</label>
                                             <input type="hidden" id="material-id-aborrar">
-                                            <input type="text" class="form-control" disabled id="material-descripcion-nuevo">
+                                            <input type="text" class="form-control" id="material-descripcion-nuevo">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
                                             <label>Costo ($)</label>
-                                            <input type="number" class="form-control" disabled id="material-costo-nuevo">
+                                            <input type="number" class="form-control" id="material-costo-nuevo">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
                                             <label>Cantidad</label>
-                                            <input type="number" class="form-control" disabled id="material-cantidad-nuevo">
+                                            <input type="number" class="form-control" id="material-cantidad-nuevo">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
                                             <label>Periodo</label>
-                                            <input type="number" class="form-control" disabled id="material-periodo-nuevo">
+                                            <input type="number" class="form-control" id="material-periodo-nuevo">
                                         </div>
 
                                         <div class="form-group">
@@ -463,6 +463,164 @@
                     toastr.error('Error al registrar');
                     closeLoading();
                 });
+        }
+
+        function verificarNuevoMaterial(){
+
+            var idpresupuesto = {{ $idpre }};
+
+            var idobj = document.getElementById('select-obj-material').value;
+            var idborrarmaterial = document.getElementById('material-id-aborrar').value;
+            var descripcion = document.getElementById('material-descripcion-nuevo').value;
+            var costo = document.getElementById('material-costo-nuevo').value;
+            var cantidad = document.getElementById('material-cantidad-nuevo').value;
+            var periodo = document.getElementById('material-periodo-nuevo').value;
+            var idunidadmedida = document.getElementById('select-material-unidadmedida').value;
+
+
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
+            // ****
+
+            if(descripcion === ''){
+                toastr.error('Descripción es requerido');
+                return;
+            }
+
+            if(descripcion.length > 300){
+                toastr.error('Descripción máximo 300 caracteres');
+                return;
+            }
+
+            // ****
+
+            if(costo === ''){
+                toastr.error('Costo es requerido');
+                return;
+            }
+
+            if(!costo.match(reglaNumeroDosDecimal)) {
+                toastr.error('Costo debe ser número Decimal Positivo. Solo se permite 2 Decimales');
+                return;
+            }
+
+            if(costo <= 0){
+                toastr.error('Costo no permite Ceros o negativos');
+                return;
+            }
+
+            if(costo > 99000000){
+                toastr.error('Costo máximo 99 millones de límite');
+                return;
+            }
+
+            // ****
+
+            if(cantidad === ''){
+                toastr.error('Cantidad es requerido');
+                return;
+            }
+
+            if(!cantidad.match(reglaNumeroDosDecimal)) {
+                toastr.error('Cantidad debe ser número Decimal Positivo. Solo se permite 2 Decimales');
+                return;
+            }
+
+            if(cantidad <= 0){
+                toastr.error('Cantidad no permite Ceros o negativos');
+                return;
+            }
+
+            if(cantidad > 99000000){
+                toastr.error('Cantidad máximo 99 millones de límite');
+                return;
+            }
+
+            // ****
+
+            if(periodo === ''){
+                toastr.error('Periodo es requerido');
+                return;
+            }
+
+            if(!periodo.match(reglaNumeroEntero)) {
+                toastr.error('Periodo debe ser número Entero y No Negativos');
+                return;
+            }
+
+            if(periodo <= 0){
+                toastr.error('Periodo no debe ser Cero o Negativos');
+                return;
+            }
+
+            if(periodo > 999){
+                toastr.error('Periodo máximo 999 veces de límite');
+                return;
+            }
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('idpresupuesto', idpresupuesto);
+            formData.append('idobj', idobj);
+            formData.append('idborrarmaterial', idborrarmaterial);
+            formData.append('descripcion', descripcion);
+            formData.append('costo', costo);
+            formData.append('cantidad', cantidad);
+            formData.append('periodo', periodo);
+            formData.append('idunidadmedida', idunidadmedida);
+
+            axios.post(url+'/p/presupuesto/nuevo/material/transferir', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalNuevoProyecto').modal('hide');
+
+                        Swal.fire({
+                            title: 'No Registrado',
+                            text: "El Presupuesto ya esta Aprobado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+                    else  if(response.data.success === 2){
+
+                        Swal.fire({
+                            title: 'Material Registrado',
+                            text: "Se Agrego a Base de Presupuesto y al Presupuesto de la Unidad",
+                            icon: 'success',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+
+                    }
+                    else {
+                        toastr.error('Error al registrar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al registrar');
+                    closeLoading();
+                });
+
         }
 
     </script>

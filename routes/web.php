@@ -720,6 +720,10 @@ Route::get('/admin/p/editar/presupuesto/anio/contenedor/{id}', [ConfiguracionPre
 Route::post('/admin/p/editar/presupuesto/editar', [ConfiguracionPresupuestoUnidadController::class,'editarPresupuestoUnidad']);
 // registrar un nuevo proyecto para presupuesto de la unidad
 Route::post('/admin/p/registrar/proyecto/presupuesto/unidad', [ConfiguracionPresupuestoUnidadController::class,'registrarProyectoPresupuestoUnidad']);
+// solo obtener las unidades de medida para registrar material solicitado por unidad
+Route::post('/admin/p/presupuesto/obtener/unidad/medida', [ConfiguracionPresupuestoUnidadController::class,'informacionUnidadMedidaPresupuesto']);
+
+
 
 
 
