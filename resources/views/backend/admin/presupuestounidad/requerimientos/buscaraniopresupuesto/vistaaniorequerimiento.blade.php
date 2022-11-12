@@ -181,11 +181,11 @@
                     }
 
                     else{
-                        toastr.error('error al registrar');
+                        toastr.error('error al buscar');
                     }
                 })
                 .catch((error) => {
-                    toastr.error('error al registrar');
+                    toastr.error('error al buscar');
                     closeLoading();
                 });
         }

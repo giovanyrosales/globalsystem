@@ -149,6 +149,9 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
+
+            openLoading();
+
             var ruta = "{{ URL::to('/admin/ordenes/compras/tabla-index') }}";
             $('#tablaDatatable').load(ruta);
 

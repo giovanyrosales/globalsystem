@@ -36,12 +36,12 @@
                             <label>Saldo Aprobado: {{ $monto }}</label><br>
 
                             <button type="button" style="margin-top: 15px; font-weight: bold; color: white !important;"
-                                    class="button button-primary button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterial()">
+                                    class="button button-primary button-3d button-rounded button-pill button-small" onclick="infoModalSaldo()">
                                 <i class="fas fa-list-alt" title="Saldos"></i>&nbsp; Saldos
                             </button>
                             <br>
                             <button type="button" style="margin-top: 15px; font-weight: bold; color: white !important;"
-                                    class="button button-primary button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterial()">
+                                    class="button button-primary button-3d button-rounded button-pill button-small" onclick="infoMovimientoCuenta()">
                                 <i class="fas fa-list-alt" title="Movimiento de Cuenta"></i>&nbsp; Movimiento de Cuenta
                             </button>
 
@@ -62,10 +62,16 @@
                     </div>
 
                     <form>
-                        <button type="button" style="margin: 20px; font-weight: bold; background-color: #28a745; color: white !important;"
-                                class="button button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterial()">
-                            <i class="fas fa-plus-square" title="Agregar Requisición"></i>&nbsp; Agregar Requisición
-                        </button>
+
+                        @if($bloqueo == 1)
+                            <label>Sin permiso para Crear Requisición</label>
+                        @else
+                            <button type="button" style="margin: 20px; font-weight: bold; background-color: #28a745; color: white !important;"
+                                    class="button button-3d button-rounded button-pill button-small" onclick="infoModalSaldo()">
+                                <i class="fas fa-plus-square" title="Agregar Requisición"></i>&nbsp; Agregar Requisición
+                            </button>
+                        @endif
+
 
                         <div class="card-body">
 
@@ -177,7 +183,32 @@
         </div>
     </div>
 
+    <!-- modal para ver saldo del proyecto -->
+    <div class="modal fade" id="modalSaldo">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Saldo Disponible</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
 
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="tablaSaldo">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
 
@@ -218,105 +249,20 @@
             $('#modalAgregar').modal('show');
         }
 
-        function nuevo(){
-            var nombre = document.getElementById('nombre').value;
-
-            if(nombre === ''){
-                toastr.error('Nombre es requerido');
-                return;
-            }
-
-            if(nombre.length > 300){
-                toastr.error('Nombre máximo 300 caracteres');
-                return;
-            }
-
-            openLoading();
-            var formData = new FormData();
-            formData.append('nombre', nombre);
-
-            axios.post(url+'/p/departamentos/nuevo', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        toastr.success('Registrado correctamente');
-                        $('#modalAgregar').modal('hide');
-                        recargar();
-                    }
-                    else {
-                        toastr.error('Error al registrar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('Error al registrar');
-                    closeLoading();
-                });
+        function infoModalSaldo(){
+            let idpresup = {{ $idpresubunidad }};
+            var ruta = "{{ URL::to('/admin/p/modal/saldo/unidad') }}/" + idpresup;
+            $('#tablaSaldo').load(ruta);
+            $('#modalSaldo').modal('show');
         }
 
-        function informacion(id){
-            openLoading();
-            document.getElementById("formulario-editar").reset();
-
-            axios.post(url+'/p/departamentos/informacion',{
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-                        $('#modalEditar').modal('show');
-                        $('#id-editar').val(id);
-                        $('#nombre-editar').val(response.data.lista.nombre);
-                    }else{
-                        toastr.error('Información no encontrada');
-                    }
-
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Información no encontrada');
-                });
+        function infoMovimientoCuenta(){
+            let idpresup = {{ $idpresubunidad }};
+            window.location.href="{{ url('/admin/p/requerimientos/movicuentaunidad/index') }}/" + idpresup;
         }
 
-        function editar(){
-            var id = document.getElementById('id-editar').value;
-            var nombre = document.getElementById('nombre-editar').value;
 
-            if(nombre === ''){
-                toastr.error('Nombre es requerido');
-                return;
-            }
 
-            if(nombre.length > 300){
-                toastr.error('Nombre máximo 300 caracteres');
-                return;
-            }
-
-            openLoading();
-            var formData = new FormData();
-            formData.append('id', id);
-            formData.append('nombre', nombre);
-
-            axios.post(url+'/p/departamentos/editar', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        toastr.success('Actualizado correctamente');
-                        $('#modalEditar').modal('hide');
-                        recargar();
-                    }
-                    else {
-                        toastr.error('Error al actualizar');
-                    }
-
-                })
-                .catch((error) => {
-                    toastr.error('Error al actualizar');
-                    closeLoading();
-                });
-        }
     </script>
 
 

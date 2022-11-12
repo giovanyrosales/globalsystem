@@ -190,6 +190,9 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
+
+            openLoading();
+
             var ruta = "{{ URL::to('/admin/p/cuentas/unidades/tabla') }}";
             $('#tablaDatatable').load(ruta);
 

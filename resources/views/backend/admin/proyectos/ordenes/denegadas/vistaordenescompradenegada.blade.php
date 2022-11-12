@@ -63,6 +63,9 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
+
+            openLoading();
+
             var ruta = "{{ URL::to('/admin/ordenes/compras/denegadas/tabla') }}";
             $('#tablaDatatable').load(ruta);
 

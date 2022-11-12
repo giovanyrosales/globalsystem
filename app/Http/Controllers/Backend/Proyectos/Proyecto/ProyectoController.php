@@ -2272,12 +2272,6 @@ class ProyectoController extends Controller
             ->where('p.proyecto_id', $id)
             ->get();
 
-        $pilaIdCuentaProy = array();
-
-        foreach ($presupuesto as $ll) {
-            array_push($pilaIdCuentaProy, $ll->id); // id cuentaproy
-        }
-
         foreach ($presupuesto as $pp){
 
             // CÁLCULOS

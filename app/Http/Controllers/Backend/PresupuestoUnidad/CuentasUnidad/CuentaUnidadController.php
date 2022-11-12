@@ -31,7 +31,13 @@ class CuentaUnidadController extends Controller
             ->groupBy('pu.id_anio')
             ->get();
 
-        $anios = P_AnioPresupuesto::whereNotIn('id', $listado)->orderBy('nombre')->get();
+        $pilaIdAnio = array();
+
+        foreach ($listado as $dd){
+            array_push($pilaIdAnio, $dd->id_anio);
+        }
+
+        $anios = P_AnioPresupuesto::whereNotIn('id', $pilaIdAnio)->orderBy('nombre')->get();
         $aniostodos = P_AnioPresupuesto::orderBy('nombre')->get();
         $departamentos = P_Departamento::orderBy('nombre')->get();
 

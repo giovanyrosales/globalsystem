@@ -22,7 +22,22 @@
                                     <td>{{ $dato->objeto }}</td>
                                     <td>{{ $dato->monto }}</td>
                                 </tr>
+
+                                @if($loop->last)
+                                    <script>
+                                        setTimeout(function () {
+                                            closeLoading();
+                                        }, 1000);
+                                    </script>
+                                @endif
+
                             @endforeach
+
+                            <script>
+                                setTimeout(function () {
+                                    closeLoading();
+                                }, 1000);
+                            </script>
 
                             </tbody>
                         </table>

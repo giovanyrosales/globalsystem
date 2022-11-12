@@ -17,6 +17,12 @@ class CreatePDepartamentoTable extends Migration
         Schema::create('p_departamento', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 300);
+
+            // permiso para que unidad haga un movimiento de cuenta
+            //0: no
+            //1: si
+            $table->boolean('permiso_movi_unidad');
+
         });
     }
 

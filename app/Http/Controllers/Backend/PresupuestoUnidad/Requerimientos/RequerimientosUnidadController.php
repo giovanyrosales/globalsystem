@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos;
 use App\Http\Controllers\Controller;
 use App\Models\CotizacionUnidad;
 use App\Models\CuentaUnidad;
+use App\Models\MoviCuentaUnidad;
 use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
 use App\Models\P_PresupUnidad;
@@ -56,9 +57,10 @@ class RequerimientosUnidadController extends Controller
             }
 
             // está aprobado, pero es de ver si ya crearon las cuentas unidades
-            if(CuentaUnidad::where('id_presup_unidad', $infoPresuUnidad->first())){
+
+            if(CuentaUnidad::where('id_presup_unidad', $infoPresuUnidad->id)->first()){
                // PASAR A PANTALLA REQUERIMIENTOS
-               return ['success' => 4];
+                return ['success' => 4];
             }else{
                return ['success' => 5];
             }
@@ -80,6 +82,7 @@ class RequerimientosUnidadController extends Controller
         $infoAnio = P_AnioPresupuesto::where('id', $idanio)->first();
 
         $txtanio = $infoAnio->nombre;
+        $bloqueo = $infoAnio->permiso;
 
         $monto = DB::table('cuenta_unidad AS cu')
             ->join('p_presup_unidad AS pu', 'cu.id_presup_unidad', '=', 'pu.id')
@@ -91,7 +94,7 @@ class RequerimientosUnidadController extends Controller
         $monto = '$' . number_format((float)$monto, 2, '.', ',');
 
         $infoPresuUnidad = P_PresupUnidad::where('id_anio', $idanio)
-            ->where('id_departamento', $infoDepartamento->id)
+            ->where('id_departamento', $infoDepartamento->id_departamento)
             ->first();
 
         $conteo = RequisicionUnidad::where('id_presup_unidad', $infoPresuUnidad->id)->count();
@@ -104,7 +107,7 @@ class RequerimientosUnidadController extends Controller
         $idpresubunidad = $infoPresuUnidad->id;
 
         return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.vistarequerimientosunidad', compact('monto'
-        , 'txtanio', 'idanio', 'conteo', 'idpresubunidad'));
+        , 'txtanio', 'idanio', 'conteo', 'idpresubunidad', 'bloqueo'));
     }
 
     // retorna tabla donde están los requerimientos por año
@@ -137,6 +140,169 @@ class RequerimientosUnidadController extends Controller
 
         return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.tablarequerimientosunidad', compact('listaRequisicion'));
     }
+
+    // visualizar MODAL DE SALDOS para unidades. se recibe id p_presup_unidad
+    public function infoModalSaldoUnidad($idpresup){
+
+        // presupuesto
+        $presupuesto = DB::table('cuenta_unidad AS cu')
+            ->join('obj_especifico AS obj', 'cu.id_objespeci', '=', 'obj.id')
+            ->select('obj.nombre', 'obj.id AS idcodigo', 'obj.codigo', 'cu.id', 'cu.saldo_inicial')
+            ->where('cu.id_presup_unidad', $idpresup)
+            ->get();
+
+        foreach ($presupuesto as $pp){
+
+            // CÁLCULOS
+
+            $totalRestante = 0;
+            $totalRetenido = 0;
+
+            // movimiento de cuentas SUBE
+            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $pp->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            // movimiento de cuentas BAJA
+            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $pp->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
+
+            // obtener todas las salidas de material
+            $arrayRestante = DB::table('cuentaunidad_restante AS pd')
+                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero')
+                ->where('pd.id_cuenta_unidad', $pp->id)
+                ->where('rd.cancelado', 0)
+                ->get();
+
+            foreach ($arrayRestante as $dd){
+                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
+            }
+
+            // información de saldos retenidos
+            $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
+                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                ->where('psr.id_cuenta_unidad', $pp->id)
+                ->where('rd.cancelado', 0)
+                ->get();
+
+            foreach ($arrayRetenido as $dd){
+                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
+            }
+
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + ($pp->saldo_inicial - $totalRestante);
+
+            $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
+            $pp->saldo_restante = number_format((float)$totalRestanteSaldo, 2, '.', ',');
+            $pp->total_retenido = number_format((float)$totalRetenido, 2, '.', ',');
+
+            $pp->saldoRestante = $this->redondear_dos_decimal($totalRestanteSaldo);
+            $pp->totalRetenido = $this->redondear_dos_decimal($totalRetenido);
+        }
+
+        return view('backend.admin.presupuestounidad.requerimientos.modal.vistamodalsaldounidad', compact('presupuesto'));
+    }
+
+    function redondear_dos_decimal($valor){
+        $float_redondeado = round($valor * 100) / 100;
+        return $float_redondeado;
+    }
+
+
+    public function indexMovimientoCuentaUnidad($idpresup){
+
+        // obtener usuario
+        $user = Auth::user();
+
+        // conseguir el departamento
+        $infoDepartamento = P_UsuarioDepartamento::where('id_usuario', $user->id)->first();
+
+        // permiso para realizar un movimiento de cuenta
+        $permiso = $infoDepartamento->permiso_movi_unidad;
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.vistamovimientocuentaunidad', compact('idpresup', 'permiso'));
+    }
+
+    public function tablaMovimientoCuentaUnidad($idpresup){
+
+        // obtener usuario
+        $user = Auth::user();
+
+        // conseguir el departamento
+        $infoDepartamento = P_UsuarioDepartamento::where('id_usuario', $user->id)->first();
+
+        // permiso para realizar un movimiento de cuenta
+        $permiso = $infoDepartamento->permiso_movi_unidad;
+
+        $presupuesto = DB::table('cuenta_unidad AS cu')
+            ->join('obj_especifico AS obj', 'cu.id_objespeci', '=', 'obj.id')
+            ->select('obj.nombre', 'obj.id AS idcodigo', 'cu.id_presup_unidad',
+                'obj.codigo', 'cu.id', 'cu.saldo_inicial')
+            ->where('cu.id_presup_unidad', $idpresup)
+            ->get();
+
+        foreach ($presupuesto as $pp) {
+
+            // CÁLCULOS
+
+            $totalRestante = 0;
+            $totalRetenido = 0;
+
+            // movimiento de cuentas SUBE
+            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $pp->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            // movimiento de cuentas BAJA
+            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $pp->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
+
+            // obtener todas las salidas de material
+            $arrayRestante = DB::table('cuentaunidad_restante AS cr')
+                ->join('requisicion_unidad_detalle AS rud', 'cr.id_requi_detalle', '=', 'rud.id')
+                ->select('rud.cantidad', 'rud.dinero')
+                ->where('cr.id_cuenta_unidad', $pp->id)
+                ->where('rud.cancelado', 0)
+                ->get();
+
+            foreach ($arrayRestante as $dd) {
+                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
+            }
+
+            // información de saldos retenidos
+            $arrayRetenido = DB::table('cuentaunidad_retenido AS cr')
+                ->join('requisicion_unidad_detalle AS rud', 'cr.id_requi_detalle', '=', 'rud.id')
+                ->select('rud.cantidad', 'rud.dinero', 'rud.cancelado')
+                ->where('cr.id_cuenta_unidad', $pp->id)
+                ->where('rud.cancelado', 0)
+                ->get();
+
+            foreach ($arrayRetenido as $dd) {
+                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
+            }
+
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + ($pp->saldo_inicial - $totalRestante);
+
+            // usado para ver puedo hacer un movimiento de cuenta unidad
+            $pp->permiso = $permiso;
+
+            $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
+            $pp->saldo_restante = number_format((float)$totalRestanteSaldo, 2, '.', ',');
+            $pp->total_retenido = number_format((float)$totalRetenido, 2, '.', ',');
+        }
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.tablamovimientocuentaunidad', compact('presupuesto'));
+    }
+
 
 
 }

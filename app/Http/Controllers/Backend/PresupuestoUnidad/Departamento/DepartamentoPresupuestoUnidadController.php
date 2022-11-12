@@ -24,6 +24,7 @@ class DepartamentoPresupuestoUnidadController extends Controller
     // retorna tabla con los departamentos
     public function tablaDepartamentos(){
         $lista = P_Departamento::orderBy('nombre', 'ASC')->get();
+
         return view('backend.admin.presupuestounidad.configuracion.departamentos.tabladepartamentopresupuesto', compact('lista'));
     }
 
@@ -39,6 +40,7 @@ class DepartamentoPresupuestoUnidadController extends Controller
 
         $dato = new P_Departamento();
         $dato->nombre = $request->nombre;
+        $dato->permiso_movi_unidad = 0;// no permiso para hacer un movimiento de cuenta unidades
 
         if($dato->save()){
             return ['success' => 1];
@@ -80,6 +82,7 @@ class DepartamentoPresupuestoUnidadController extends Controller
 
             P_Departamento::where('id', $request->id)->update([
                 'nombre' => $request->nombre,
+                'permiso_movi_unidad' => $request->toggle
             ]);
 
             return ['success' => 1];

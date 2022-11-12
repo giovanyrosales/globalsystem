@@ -8,6 +8,7 @@
                             <thead>
                             <tr>
                                 <th style="width: 15%">Nombre</th>
+                                <th style="width: 20%">Movimiento Cuenta Unidad</th>
                                 <th style="width: 7%">Opciones</th>
                             </tr>
                             </thead>
@@ -16,6 +17,14 @@
                             @foreach($lista as $dato)
                                 <tr>
                                     <td>{{ $dato->nombre }}</td>
+                                    <td>
+                                        @if($dato->permiso_movi_unidad == 1)
+                                            <span class="badge bg-danger">Autorizado</span>
+                                        @else
+                                            <span class="badge bg-success">No Autorizado</span>
+                                        @endif
+
+                                    </td>
                                     <td>
                                         <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar

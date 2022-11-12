@@ -790,5 +790,18 @@ Route::post('/admin/p/anio/permiso/requerimiento', [RequerimientosUnidadControll
 Route::get('/admin/p/requerimientos/vista/{idanio}', [RequerimientosUnidadController::class, 'indexRequerimientosUnidades']);
 // retorna tabla donde están los requerimientos por año
 Route::get('/admin/p/requerimientos/tabla/{idanio}', [RequerimientosUnidadController::class, 'tablaRequerimientosUnidades']);
+// visualizar MODAL DE SALDOS para unidades. se recibe id p_presup_unidad
+Route::get('/admin/p/modal/saldo/unidad/{idpresup}', [RequerimientosUnidadController::class,'infoModalSaldoUnidad']);
+
+// * MOVIMIENTOS DE CUENTA PARA UNIDAD
+
+// retorna vista para movimientos de cuenta para unidad
+Route::get('/admin/p/requerimientos/movicuentaunidad/index/{idpresup}', [RequerimientosUnidadController::class, 'indexMovimientoCuentaUnidad']);
+// retorna tabla para movimientos de cuenta para unidad
+Route::get('/admin/p/requerimientos/movicuentaunidad/tabla/{idpresup}', [RequerimientosUnidadController::class, 'tablaMovimientoCuentaUnidad']);
+
+
+
+
 
 

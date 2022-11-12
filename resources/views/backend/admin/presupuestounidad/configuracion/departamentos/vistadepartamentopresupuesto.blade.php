@@ -5,6 +5,8 @@
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
+
 @stop
 
 <style>
@@ -99,6 +101,18 @@
                                         <input type="hidden" id="id-editar">
                                         <input type="text" maxlength="300" autocomplete="off" class="form-control" id="nombre-editar" placeholder="Nombre">
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Movimiento Cuenta Unidad</label><br>
+                                        <label class="switch" style="margin-top:10px">
+                                            <input type="checkbox" id="toggle-editar">
+                                            <div class="slider round">
+                                                <span class="on">Autorizar</span>
+                                                <span class="off">Denegar</span>
+                                            </div>
+                                        </label>
+                                    </div>
+
 
                                 </div>
                             </div>
@@ -195,6 +209,13 @@
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(id);
                         $('#nombre-editar').val(response.data.lista.nombre);
+
+                        if(response.data.lista.permiso_movi_unidad === 0){
+                            $("#toggle-editar").prop("checked", false);
+                        }else{
+                            $("#toggle-editar").prop("checked", true);
+                        }
+
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -209,6 +230,8 @@
         function editar(){
             var id = document.getElementById('id-editar').value;
             var nombre = document.getElementById('nombre-editar').value;
+            var t = document.getElementById('toggle-editar').checked;
+            var toggle = t ? 1 : 0;
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -224,6 +247,7 @@
             var formData = new FormData();
             formData.append('id', id);
             formData.append('nombre', nombre);
+            formData.append('toggle', toggle);
 
             axios.post(url+'/p/departamentos/editar', formData, {
             })
