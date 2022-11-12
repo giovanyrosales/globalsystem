@@ -2410,6 +2410,7 @@ class ProyectoController extends Controller
                 ->whereIn('pd.id_partida_adicional', $arrayPartidaAdicional)
                 ->where('m.nombre', 'LIKE', "%{$query}%")
                 ->groupBy('m.id')
+                ->take(40)
                 ->get();
 
             $arrayUnido = $arrayIdMateriales->merge($arrayIdMatePartidaAdic);

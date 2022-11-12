@@ -37,7 +37,7 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ConfiguracionPres
 use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ReportesPresupuestoUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos\RequerimientosUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\CuentasUnidad\CuentaUnidadController;
-
+use App\Http\Controllers\Backend\PresupuestoUnidad\MovimientoUnidad\MovimientosUnidadControlles;
 // --- LOGIN ---
 
 Route::get('/', [LoginController::class,'index'])->name('login');
@@ -796,40 +796,59 @@ Route::get('/admin/p/modal/saldo/unidad/{idpresup}', [RequerimientosUnidadContro
 // * MOVIMIENTOS DE CUENTA PARA UNIDAD
 
 // retorna vista para movimientos de cuenta para unidad
-Route::get('/admin/p/requerimientos/movicuentaunidad/index/{idpresup}', [RequerimientosUnidadController::class, 'indexMovimientoCuentaUnidad']);
+Route::get('/admin/p/requerimientos/movicuentaunidad/index/{idpresup}', [MovimientosUnidadControlles::class, 'indexMovimientoCuentaUnidad']);
 // retorna tabla para movimientos de cuenta para unidad
-Route::get('/admin/p/requerimientos/movicuentaunidad/tabla/{idpresup}', [RequerimientosUnidadController::class, 'tablaMovimientoCuentaUnidad']);
+Route::get('/admin/p/requerimientos/movicuentaunidad/tabla/{idpresup}', [MovimientosUnidadControlles::class, 'tablaMovimientoCuentaUnidad']);
 // información de saldos para cambiar cuenta de unidades
-Route::post('/admin/p/movicuentaunidad/informacion',  [RequerimientosUnidadController::class,'informacionMoviCuentaUnidad']);
+Route::post('/admin/p/movicuentaunidad/informacion',  [MovimientosUnidadControlles::class,'informacionMoviCuentaUnidad']);
 // al mover select de movimiento cuenta unidad, retorna saldo restante del obj seleccionado
-Route::post('/admin/p/movicuentaunidad/informacion/saldo',  [RequerimientosUnidadController::class,'infoSaldoRestanteCuentaUnidad']);
+Route::post('/admin/p/movicuentaunidad/informacion/saldo',  [MovimientosUnidadControlles::class,'infoSaldoRestanteCuentaUnidad']);
 // registrar un nuevo movimiento de cuenta unidad por jefe de unidad
-Route::post('/admin/p/registrar/movimiento/cuentaunidad',  [RequerimientosUnidadController::class,'nuevaMoviCuentaUnidad']);
+Route::post('/admin/p/registrar/movimiento/cuentaunidad',  [MovimientosUnidadControlles::class,'nuevaMoviCuentaUnidad']);
 
 
 // retorna vista con los historicos movimientos cuenta unidad por ID PRESUP UNIDAD
-Route::get('/admin/p/movicuentaunidad/historico/{id}', [RequerimientosUnidadController::class,'indexMoviCuentaUnidadHistorico']);
+Route::get('/admin/p/movicuentaunidad/historico/{id}', [MovimientosUnidadControlles::class,'indexMoviCuentaUnidadHistorico']);
 // retorna tabla con los historicos movimientos cuenta unidad por ID PRESUP UNIDAD
-Route::get('/admin/p/movicuentaunidad/tablahistorico/{id}', [RequerimientosUnidadController::class,'tablaMoviCuentaUnidadHistorico']);
+Route::get('/admin/p/movicuentaunidad/tablahistorico/{id}', [MovimientosUnidadControlles::class,'tablaMoviCuentaUnidadHistorico']);
 
 // ver los movimientos historicos para que jefe presupuesto los apruebe
-Route::get('/admin/p/movicuentaunidad/presupuesto/index', [RequerimientosUnidadController::class,'indexMovimientoCuentaUnidadTodos'])->name('p.admin.movimientos.pendientes.historicos.unidades.index');
+Route::get('/admin/p/movicuentaunidad/presupuesto/index', [MovimientosUnidadControlles::class,'indexMovimientoCuentaUnidadTodos'])->name('p.admin.movimientos.pendientes.historicos.unidades.index');
 // ver tabla de los movimientos historicos de cuenta unidad, jefatura presupuesto para aprobar
-Route::get('/admin/p/movicuentaunidad/presupuesto/tabla', [RequerimientosUnidadController::class,'tablaMovimientoCuentaUnidadTodos']);
+Route::get('/admin/p/movicuentaunidad/presupuesto/tabla', [MovimientosUnidadControlles::class,'tablaMovimientoCuentaUnidadTodos']);
 // información para jefe de presupuesto para que revise un movimiento de cuenta unidad
-Route::post('/admin/p/movimientohistorico/unidad/verificar/informacion',  [RequerimientosUnidadController::class,'infoHistoricoMovimientoUnidadParaAutorizar']);
+Route::post('/admin/p/movimientohistorico/unidad/verificar/informacion',  [MovimientosUnidadControlles::class,'infoHistoricoMovimientoUnidadParaAutorizar']);
 // borrar movimiento de cuenta para unidades
-Route::post('/admin/p/movimientohistorico/unidades/denegar/borrar',  [RequerimientosUnidadController::class,'denegarBorrarMovimientoCuentaUnidad']);
+Route::post('/admin/p/movimientohistorico/unidades/denegar/borrar',  [MovimientosUnidadControlles::class,'denegarBorrarMovimientoCuentaUnidad']);
 // autorizar movimiento de cuenta unidad
-Route::post('/admin/p/movimientohistorico/unidades/autorizar',  [RequerimientosUnidadController::class,'autorizarMovimientoCuentaUnidad']);
+Route::post('/admin/p/movimientohistorico/unidades/autorizar',  [MovimientosUnidadControlles::class,'autorizarMovimientoCuentaUnidad']);
 
 // ver los movimientos de cuenta unidad aprobados
-Route::get('/admin/p/movicuentaunidad/aprobados/presupuesto/index', [RequerimientosUnidadController::class,'indexMovimientoCuentaUnidadAprobados'])->name('p.admin.movimientos.aprobados.historicos.unidades.index');
+Route::get('/admin/p/movicuentaunidad/aprobados/presupuesto/index', [MovimientosUnidadControlles::class,'indexMovimientoCuentaUnidadAprobados'])->name('p.admin.movimientos.aprobados.historicos.unidades.index');
 // ver tabla de los movimientos historicos aprobados de cuenta unidad
-Route::get('/admin/p/movicuentaunidad/aprobados/presupuesto/tabla', [RequerimientosUnidadController::class,'tablaMovimientoCuentaUnidadAprobados']);
+Route::get('/admin/p/movicuentaunidad/aprobados/presupuesto/tabla', [MovimientosUnidadControlles::class,'tablaMovimientoCuentaUnidadAprobados']);
 // descargar documento reforma de movimiento cuenta unidad
-Route::get('/admin/p/movicuentaunidad/bajar/reforma/{id}',  [RequerimientosUnidadController::class,'descargarReformaMovimientoUnidades']);
+Route::get('/admin/p/movicuentaunidad/bajar/reforma/{id}',  [MovimientosUnidadControlles::class,'descargarReformaMovimientoUnidades']);
 // guardar documento reforma para movimiento cuenta unidades
-Route::post('/admin/p/movicuentaunidad/documento/guardar',  [RequerimientosUnidadController::class,'guardarDocumentoReformaMoviUnidad']);
+Route::post('/admin/p/movicuentaunidad/documento/guardar',  [MovimientosUnidadControlles::class,'guardarDocumentoReformaMoviUnidad']);
+
+
+// * REQUISICIONES PARA UNIDAD
+
+// busca materiales para pedir requisición unidades
+Route::post('/admin/buscar/material/requisicion/unidad',  [RequerimientosUnidadController::class,'buscadorMaterialRequisicionUnidad']);
+// registrar una nueva requisición para unidades
+Route::post('/admin/p/regisrar/requisicion/unidades', [RequerimientosUnidadController::class, 'nuevoRequisicionUnidades']);
+// borrar requisición de unidades
+Route::post('/admin/p/requisicion/unidad/borrar/todo', [RequerimientosUnidadController::class, 'borrarRequisicionUnidades']);
+
+
+
+
+
+
+
+
+
 
 
