@@ -342,7 +342,7 @@
 
                         Swal.fire({
                             title: 'Movimiento Denegado',
-                            text: "Se denego el Permiso para crear un movimiento de Cuenta",
+                            text: "Se denegó el Permiso para crear un movimiento de Cuenta",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -392,7 +392,7 @@
                         Swal.fire({
                             title: 'Movimiento Creado',
                             text: "Se debera esperar que sea Aprobado el Movimiento de Cuenta",
-                            icon: 'info',
+                            icon: 'success',
                             showCancelButton: false,
                             allowOutsideClick: false,
                             confirmButtonColor: '#28a745',

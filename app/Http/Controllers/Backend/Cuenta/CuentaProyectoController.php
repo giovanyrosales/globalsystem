@@ -53,7 +53,7 @@ class CuentaProyectoController extends Controller
     // retorna tabla con los historicos movimientos por proyecto ID
     public function tablaMoviCuentaProyHistorico($id){
 
-        // ID PROYECTO
+        // ID PROYECTOID PRESUP UNIDAD
         $pila = array();
         $listado = CuentaProy::where('proyecto_id', $id)->get();
 
@@ -313,8 +313,7 @@ class CuentaProyectoController extends Controller
     }
 
     // descargar un documento Reforma de movimiento de cuenta
-    public function descargarReforma($id)
-    {
+    public function descargarReforma($id){
 
         $url = MoviCuentaProy::where('id', $id)->pluck('reforma')->first();
         $pathToFile = "storage/archivos/" . $url;
@@ -324,8 +323,7 @@ class CuentaProyectoController extends Controller
     }
 
     // guardar un documento Reforma para movimiento de cuenta
-    public function guardarDocumentoReforma(Request $request)
-    {
+    public function guardarDocumentoReforma(Request $request){
 
         $rules = array(
             'id' => 'required',
@@ -397,11 +395,8 @@ class CuentaProyectoController extends Controller
         }
     }
 
-    // MDOFISDFGNISD GFGR
-
     // información de un movimiento de cuenta
-    public function informacionMoviCuentaProy(Request $request)
-    {
+    public function informacionMoviCuentaProy(Request $request){
 
         $regla = array(
             'id' => 'required', // ID CUENTA PROY
@@ -797,8 +792,7 @@ class CuentaProyectoController extends Controller
     }
 
     // ver información del movimiento de cuenta para que jefe presupuesto Apruebe o Denegar
-    public function informacionHistoricoParaAutorizar(Request $request)
-    {
+    public function informacionHistoricoParaAutorizar(Request $request){
 
         $regla = array(
             'id' => 'required', // ID movicuentaproy
@@ -900,9 +894,8 @@ class CuentaProyectoController extends Controller
         }
     }
 
-
-    public function denegarBorrarMovimientoCuenta(Request $request)
-    {
+    // denegar y borrar un movimiento de cuenta
+    public function denegarBorrarMovimientoCuenta(Request $request){
         $regla = array(
             'id' => 'required', // ID movicuentaproy
         );
@@ -994,6 +987,7 @@ class CuentaProyectoController extends Controller
                 // se está haciendo cálculos únicamente con la cuenta que BAJARA, la que subirá no se hace ningún cálculo
 
                 // movimiento de cuentas (sube y baja)
+                // CALCULOS SOLO CON LA CUENTA QUE BAJARA...
                 $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $infoMovimiento->id_cuentaproy_baja)
                     ->where('autorizado', 1) // autorizado por presupuesto
                     ->sum('dinero');

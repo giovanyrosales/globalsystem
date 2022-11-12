@@ -521,6 +521,24 @@
                                 </li>
                             @endcan
 
+                            @can('p.sidebar.historico.movimiento.pendientes.cuentas.unidades')
+                                <li class="nav-item">
+                                    <a href="{{ route('p.admin.movimientos.pendientes.historicos.unidades.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Movimientos Pendientes</p>
+                                    </a>
+                                </li>
+                            @endcan
+
+                            @can('p.sidebar.historico.movimiento.aprobados.cuentas.unidades')
+                                <li class="nav-item">
+                                    <a href="{{ route('p.admin.movimientos.aprobados.historicos.unidades.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Movimientos Autorizados</p>
+                                    </a>
+                                </li>
+                            @endcan
+
                         </ul>
                     </li>
                 @endcan

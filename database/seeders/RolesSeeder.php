@@ -211,6 +211,14 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'boton.cotizar.requisicion.unidad', 'description' => 'boton cotizar requisicion para unidad'])->syncRoles($roleUnidad);
         Permission::create(['name' => 'boton.editar.requisicion.unidad', 'description' => 'boton editar requisicion para unidad'])->syncRoles($roleUnidad);
         Permission::create(['name' => 'boton.borrar.requisicion.unidad', 'description' => 'boton borrar requisicion para unidad'])->syncRoles($roleUnidad);
+        Permission::create(['name' => 'boton.agregar.movimiento.cuenta.unidad', 'description' => 'utilizado por jefe unidad realizar un movimiento de cuenta unidad'])->syncRoles($roleUnidad);
+        Permission::create(['name' => 'p.sidebar.historico.movimiento.pendientes.cuentas.unidades', 'description' => 'para ver históricos de movimientos pendientes de cuenta para unidades'])->syncRoles($rolePresupuesto);
+        Permission::create(['name' => 'p.sidebar.historico.movimiento.aprobados.cuentas.unidades', 'description' => 'para ver históricos de movimientos aprobados de cuenta para unidades'])->syncRoles($rolePresupuesto);
+        Permission::create(['name' => 'boton.revision.movimiento.cuenta.unidad', 'description' => 'boton para revisar el nuevo movimiento de cuenta para unidad'])->syncRoles($rolePresupuesto);
+
+        Permission::create(['name' => 'boton.reforma.movimiento.cuenta.unidad', 'description' => 'boton para ver reforma o subir a movimiento cuenta unidad'])->syncRoles($rolePresupuesto);
+
+
 
 
 

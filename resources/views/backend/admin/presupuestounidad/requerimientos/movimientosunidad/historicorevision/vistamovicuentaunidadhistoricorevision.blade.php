@@ -19,9 +19,9 @@
 
     <section class="content-header">
         <div class="container-fluid">
-            <div class="row mb-6">
-                <div class="col-sm-5">
-                    <h1>Histórico</h1>
+            <div class="row mb-8">
+                <div class="col-sm-8">
+                    <h1>Histórico de Movimiento Pendientes para Cuenta Unidad</h1>
                 </div>
 
             </div>
@@ -200,8 +200,8 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            let id = {{ $id }}; // id PROYECTO
-            var ruta = "{{ URL::to('/admin/movicuentaproy/tablahistorico/') }}/" + id;
+
+            var ruta = "{{ URL::to('/admin/p/movicuentaunidad/presupuesto/tabla') }}";
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -213,8 +213,7 @@
 
         function recargar(){
 
-            let id = {{ $id }}; // id PROYECTO
-            var ruta = "{{ URL::to('/admin/movicuentaproy/tablahistorico/') }}/" + id;
+            var ruta = "{{ URL::to('/admin/p/movicuentaunidad/presupuesto/tabla') }}";
             $('#tablaDatatable').load(ruta);
         }
 
@@ -289,7 +288,7 @@
             openLoading();
             document.getElementById("formulario-nuevo").reset();
 
-            axios.post(url+'/movimientohistorico/verificar/informacion',{
+            axios.post(url+'/p/movimientohistorico/unidad/verificar/informacion',{
                 'id': id
             })
                 .then((response) => {
@@ -341,7 +340,7 @@
             var id = document.getElementById('id-control').value;
 
             openLoading();
-            axios.post(url+'/movimientohistorico/denegar/borrar',{
+            axios.post(url+'/p/movimientohistorico/unidades/denegar/borrar',{
                 'id': id
             })
                 .then((response) => {
@@ -349,24 +348,7 @@
                     $('#modalAgregar').modal('hide');
 
                     // el movimiento ya fue autorizado
-                    if(response.data.success === 1){
-                        let mensaje = response.data.mensaje;
-
-                        Swal.fire({
-                            title: 'Estado Proyecto',
-                            html: mensaje,
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2){
+                   if(response.data.success === 1){
                         recargar();
 
                         Swal.fire({
@@ -383,17 +365,17 @@
                             }
                         })
                     }
-                    else if(response.data.success === 3) {
+                    else if(response.data.success === 2) {
                         toastr.success('Movimiento Denegado');
                         recargar();
                     }
                     else{
-                        toastr.error('Información no encontrada');
+                        toastr.error('Error al denegar');
                     }
                 })
                 .catch((error) => {
                     closeLoading();
-                    toastr.error('Información no encontrada');
+                    toastr.error('Error al denegar');
                 });
         }
 
@@ -434,7 +416,7 @@
             formData.append('documento', documento.files[0]);
 
             openLoading();
-            axios.post(url+'/movimientohistorico/autorizar/actualizar', formData, {
+            axios.post(url+'/p/movimientohistorico/unidades/autorizar', formData, {
 
             })
                 .then((response) => {
@@ -491,25 +473,6 @@
                     else if(response.data.success === 3){
                         toastr.success('Movimiento Autorizado');
                         recargar();
-                    }
-
-                    else if(response.data.success === 4) {
-
-                        let mensaje = response.data.mensaje;
-
-                        Swal.fire({
-                            title: 'Estado Proyecto',
-                            html: mensaje,
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
                     }
                     else{
                         toastr.error('Error al registrar');

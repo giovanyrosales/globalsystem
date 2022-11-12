@@ -12,7 +12,6 @@
                                 <th>Cuenta Disminuye</th>
                                 <th style="font-weight: bold">Monto</th>
                                 <th>Estado</th>
-                                <th>Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -29,36 +28,6 @@
                                     @else
                                         <td><span class="badge bg-success">Autorizada</span></td>
                                     @endif
-
-                                    <td>
-                                            @can('boton.agregar.reforma.movimiento.cuenta')
-                                                @if($dato->reforma != null)
-                                                    <button href="{{ url('/admin/movicuentaproy/documento/'.$dato->id) }}" style="font-weight: bold; color: white !important;">
-                                                        <button class="button button-primary button-rounded button-pill button-small"><i class="fa fa-download"></i> Descargar</button>
-                                                    </button>
-                                                @endif
-                                            @endcan
-
-                                            @can('boton.descargar.reforma.movimiento.cuenta')
-
-                                                @if($dato->reforma == null && $dato->autorizado == 1)
-                                                    <button type="button" style="margin-top: 5px;font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="infoSubirDoc({{ $dato->id }})">
-                                                        <i class="fas fa-upload" title="Cargar Reforma"></i>&nbsp; Cargar Reforma
-                                                    </button>
-                                                @endif
-                                            @endcan
-
-                                            @can('boton.revision.movimiento.cuenta')
-
-                                                    @if($dato->autorizado == 0)
-                                                        <button type="button" style="margin-top: 5px; font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="infoRevisarMovimiento({{ $dato->id }})">
-                                                            <i class="fas fa-check" title="Cargar Reforma"></i>&nbsp; Revisar
-                                                        </button>
-                                                    @endif
-
-                                            @endcan
-
-                                    </td>
                                 </tr>
                             @endforeach
 

@@ -64,12 +64,12 @@
                     <form>
 
                         @if($bloqueo == 1)
-                            <label>Sin permiso para Crear Requisición</label>
-                        @else
                             <button type="button" style="margin: 20px; font-weight: bold; background-color: #28a745; color: white !important;"
                                     class="button button-3d button-rounded button-pill button-small" onclick="infoModalSaldo()">
                                 <i class="fas fa-plus-square" title="Agregar Requisición"></i>&nbsp; Agregar Requisición
                             </button>
+                        @else
+                            <label style="margin: 20px">Sin permiso para Crear Requisición</label>
                         @endif
 
 

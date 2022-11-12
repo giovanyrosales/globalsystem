@@ -33,9 +33,9 @@
                                     <td>
                                             @can('boton.agregar.reforma.movimiento.cuenta')
                                                 @if($dato->reforma != null)
-                                                    <button href="{{ url('/admin/movicuentaproy/documento/'.$dato->id) }}" style="font-weight: bold; color: white !important;">
+                                                    <a href="{{ url('/admin/movicuentaproy/documento/'.$dato->id) }}" style="font-weight: bold; color: white !important;">
                                                         <button class="button button-primary button-rounded button-pill button-small"><i class="fa fa-download"></i> Descargar</button>
-                                                    </button>
+                                                    </a>
                                                 @endif
                                             @endcan
 

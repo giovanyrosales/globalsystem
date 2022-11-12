@@ -7,33 +7,43 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Código</th>
-                                <th>Obj Específico</th>
-                                <th>Saldo Inicial</th>
-                                <th>Saldo Restante</th>
-                                <th>Saldo Retenido</th>
+                                <th>Departamento</th>
+                                <th>Fecha</th>
+                                <th>Cuenta Aumento</th>
+                                <th>Cuenta Disminuye</th>
+                                <th style="font-weight: bold">Monto</th>
+                                <th>Estado</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($presupuesto as $dato)
+                            @foreach($infoMovimiento as $dato)
                                 <tr>
-                                    <td>{{ $dato->codigo }}</td>
-                                    <td>{{ $dato->nombre }}</td>
-                                    <td>${{ $dato->saldo_inicial }}</td>
-                                    <td style="font-weight: bold">${{ $dato->saldo_restante }}</td>
-                                    <td>${{ $dato->total_retenido }}</td>
+                                    <td>{{ $dato->departamento }}</td>
+                                    <td>{{ $dato->fecha }}</td>
+                                    <td>{{ $dato->cuentaaumenta }}</td>
+                                    <td>{{ $dato->cuentabaja }}</td>
+                                    <td style="font-weight: bold">${{ $dato->dinero }}</td>
+
+                                    @if($dato->autorizado == 0)
+                                        <td><span class="badge bg-warning">Pendiente</span></td>
+                                    @else
+                                        <td><span class="badge bg-success">Autorizada</span></td>
+                                    @endif
 
                                     <td>
-                                        <!-- solo jefe de unidad puede hacer un movimiento, si esta autorizado -->
-                                        @can('boton.agregar.movimiento.cuenta.unidad')
-                                            @if($dato->permiso == 1)
-                                                <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacionAgregar({{ $dato->id }})">
-                                                    <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aumentar
-                                                </button>
-                                            @endif
+
+                                        @can('boton.revision.movimiento.cuenta.unidad')
+
+                                                @if($dato->autorizado == 0)
+                                                    <button type="button" style="margin-top: 5px; font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="infoRevisarMovimiento({{ $dato->id }})">
+                                                        <i class="fas fa-check" title="Cargar Reforma"></i>&nbsp; Revisar
+                                                    </button>
+                                                @endif
+
                                         @endcan
+
                                     </td>
                                 </tr>
                             @endforeach

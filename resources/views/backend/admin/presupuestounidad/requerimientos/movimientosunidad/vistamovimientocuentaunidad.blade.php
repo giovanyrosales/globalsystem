@@ -30,21 +30,6 @@
                         Histórico
                     </button>
 
-                    <!-- botón para dar permiso para hacer un movimiento de cuenta. para jefe presupuesto -->
-                    @can('boton.autorizar.denegar.movimiento.cuenta')
-                        @if($permiso == 1)
-                            <button type="button" style="margin-top: 15px;font-weight: bold; color: white !important;" onclick="modalPermisoDenegar()" class="button button-caution button-3d button-rounded button-pill button-small">
-                                <i class="fas fa-stop"></i>
-                                Denegar Movimiento
-                            </button>
-                        @else
-                            <button type="button" style="margin-top: 15px;font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalPermisoAprobar()" class="button button-3d button-rounded button-pill button-small">
-                                <i class="fas fa-check"></i>
-                                Autorizar Movimiento
-                            </button>
-                        @endif
-                    @endcan
-
                 </div>
 
             </div>
@@ -124,12 +109,11 @@
 
                                     <div class="form-group">
                                         <label>Obj. Específico a Modificar para Disminuir Saldo</label>
-                                        <select class="form-control" id="select-cuentaproy" onchange="buscarSaldoRestante()" style="width: 100%">
+                                        <select class="form-control" id="select-cuentaunidad" onchange="buscarSaldoRestante()" style="width: 100%">
                                         </select>
                                     </div>
 
                                     <div class="col-md-12 row">
-
 
                                         <div class="form-group col-md-6">
                                             <label style="font-weight: bold">Saldo Restante:</label>
@@ -176,7 +160,7 @@
             var ruta = "{{ URL::to('/admin/p/requerimientos/movicuentaunidad/tabla') }}/" + id;
             $('#tablaDatatable').load(ruta);
 
-            $('#select-proyecto').select2({
+            $('#select-cuentaunidad').select2({
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
@@ -199,14 +183,14 @@
 
         function verHistorico(){
             let id = {{ $idpresup }}; // ID presup_unidad
-            window.location.href="{{ url('/admin/movicuentaproy/historico') }}/" + id;
+            window.location.href="{{ url('/admin/p/movicuentaunidad/historico') }}/" + id;
         }
 
         function buscarSaldoRestante(){
-            let id = document.getElementById('select-cuentaproy').value;
+            let id = document.getElementById('select-cuentaunidad').value;
             openLoading();
 
-            axios.post(url+'/movicuentaproy/info/saldo',{
+            axios.post(url+'/p/movicuentaunidad/informacion/saldo',{
                 'id': id
             })
                 .then((response) => {
@@ -225,10 +209,11 @@
         }
 
         function informacionAgregar(id){
+            // id de cuenta unidad
             openLoading();
             document.getElementById("formulario-nuevo").reset();
 
-            axios.post(url+'/movicuentaproy/informacion',{
+            axios.post(url+'/p/movicuentaunidad/informacion',{
                 'id': id
             })
                 .then((response) => {
@@ -248,12 +233,12 @@
                         var fecha = new Date();
                         $('#fecha-editar').val(fecha.toJSON().slice(0,10));
 
-                        document.getElementById("select-cuentaproy").options.length = 0;
+                        document.getElementById("select-cuentaunidad").options.length = 0;
 
-                        $('#select-cuentaproy').append('<option value="0">Seleccionar Opción</option>');
+                        $('#select-cuentaunidad').append('<option value="0">Seleccionar Opción</option>');
 
-                        $.each(response.data.arraycuentaproy, function( key, val ){
-                            $('#select-cuentaproy').append('<option value="' +val.id +'">'+val.codigo + ' - ' + val.nombre +'</option>');
+                        $.each(response.data.arraycuentaunidad, function( key, val ){
+                            $('#select-cuentaunidad').append('<option value="' +val.id +'">'+val.codigo + ' - ' + val.nombre +'</option>');
                         });
 
                     }else{
@@ -286,12 +271,12 @@
 
         function nuevoMovimientoCuenta(){
 
-            // ID CUENTAPROY
-            var idcuentaproy = document.getElementById('id-editar').value;
+            // ID CUENTA UNIDAD
+            var idcuentaunidad = document.getElementById('id-editar').value;
 
             var saldomodificar = document.getElementById('saldo-modificar').value;
 
-            var selectcuenta = document.getElementById('select-cuentaproy').value;
+            var selectcuenta = document.getElementById('select-cuentaunidad').value;
             var fecha = document.getElementById('fecha-nuevo').value;
 
             var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
@@ -328,12 +313,12 @@
 
             openLoading();
             var formData = new FormData();
-            formData.append('idcuentaproy', idcuentaproy); // id cuentaproy a subir
+            formData.append('idcuentaunidad', idcuentaunidad); // id cuenta unidad a subir
             formData.append('saldomodificar', saldomodificar); // dinero
-            formData.append('selectcuenta', selectcuenta); // id cuentaproy a descontar
+            formData.append('selectcuenta', selectcuenta); // id cuenta unidad a descontar
             formData.append('fecha', fecha);
 
-            axios.post(url+'/movicuentaproy/nuevo', formData, {
+            axios.post(url+'/p/registrar/movimiento/cuentaunidad', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -342,7 +327,7 @@
 
                         Swal.fire({
                             title: 'Movimiento Denegado',
-                            text: "Se denego el Permiso para crear un movimiento de Cuenta",
+                            text: "Se denegó el Permiso para crear un movimiento de Cuenta",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -392,7 +377,7 @@
                         Swal.fire({
                             title: 'Movimiento Creado',
                             text: "Se debera esperar que sea Aprobado el Movimiento de Cuenta",
-                            icon: 'info',
+                            icon: 'success',
                             showCancelButton: false,
                             allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
@@ -435,161 +420,9 @@
         }
 
 
-        function modalPermisoAprobar(){
-            Swal.fire({
-                title: 'Aprobar un Movimiento',
-                text: "Solo se autoriza realizar un movimiento de cuenta",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Si'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    autorizarMovimiento();
-                }
-            })
-        }
 
-        // autoriza realizar 1 solo movimiento de cuenta
-        function autorizarMovimiento(){
 
-            openLoading();
 
-            // id proyecto
-            let id = {{$idpresup}};
-
-            axios.post(url+'/movicuentaproy/autorizar/movimiento',{
-                'id' : id
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-
-                        let mensaje = response.data.mensaje;
-
-                        Swal.fire({
-                            title: 'Estado Proyecto',
-                            html: mensaje,
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-
-                    }
-                    else if(response.data.success === 2) {
-
-                        Swal.fire({
-                            title: 'Autorizado',
-                            text: "Solo se podrá hacer un movimiento de cuenta",
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            closeOnClickOutside: false,
-                            allowOutsideClick: false,
-                            confirmButtonText: 'Aceptar'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        });
-                    }
-
-                    else {
-                        toastr.error('Error al registrar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('Error al registrar');
-                    closeLoading();
-                });
-        }
-
-        function modalPermisoDenegar(){
-            Swal.fire({
-                title: 'Denegar un Movimiento',
-                text: "Solo se autoriza realizar un movimiento de cuenta",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Si'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    denegarMovimiento();
-                }
-            })
-        }
-
-        // quita la autorización de realizar un movimiento de cuenta
-        function denegarMovimiento(){
-
-            openLoading();
-
-            // id proyecto
-            let id = {{$idpresup}};
-
-            axios.post(url+'/movicuentaproy/denegar/movimiento', {
-                'id' : id
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-
-                        let mensaje = response.data.mensaje;
-
-                        Swal.fire({
-                            title: 'Estado Proyecto',
-                            html: mensaje,
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-
-                    else if(response.data.success === 2){
-
-                        Swal.fire({
-                            title: 'Movimiento Denegado',
-                            text: "Se ha cancelado un movimiento de cuenta",
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            closeOnClickOutside: false,
-                            allowOutsideClick: false,
-                            confirmButtonText: 'Aceptar'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        });
-                    }
-
-                    else {
-                        toastr.error('Error al registrar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('Error al registrar');
-                    closeLoading();
-                });
-        }
     </script>
 
 @endsection
