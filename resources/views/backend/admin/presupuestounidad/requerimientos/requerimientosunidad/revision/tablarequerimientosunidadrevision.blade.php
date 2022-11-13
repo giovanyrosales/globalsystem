@@ -7,38 +7,32 @@
                         <table id="tabla-requisicion" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 4%">#</th>
-                                <th style="width: 10%">Fecha</th>
-                                <th style="width: 18%">Opciones</th>
+                                <th style="width: 12%">Departamento</th>
+                                <th style="width: 15%">Destino</th>
+                                <th style="width: 15%">Necesidad</th>
+                                <th style="width: 12%">Fecha Requisición</th>
+                                <th style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($listaRequisicion as $dato)
 
-                                    <tr>
-                                    <td style="width: 4%">{{ $dato->numero }}</td>
+                                <tr>
+                                    <td style="width: 4%">{{ $dato->departamento }}</td>
+                                    <td style="width: 10%">{{ $dato->destino }}</td>
+                                    <td style="width: 10%">{{ $dato->necesidad }}</td>
                                     <td style="width: 10%">{{ $dato->fecha }}</td>
 
                                     <td>
 
-
-                                        @can('boton.editar.requisicion')
-                                        <button type="button" class="btn btn-info btn-xs" onclick="vistaEditarRequisicion({{ $dato }})">
-                                            <i class="fas fa-pen-alt" title="{{ $dato->estado }}"></i> {{ $dato->estado }}
+                                        <button type="button" class="btn btn-warning btn-xs" onclick="informacion({{ $dato->id }})">
+                                            <i class="fas fa-edit" title="Revisar"></i>&nbsp; Cotizar
                                         </button>
-                                        @endcan
 
-                                        @can('boton.borrar.requisicion')
-                                            <!-- solo se borrara si no hay ningún material cotizado -->
-                                            @if($dato->haycotizacion)
-                                                <button type="button" class="btn btn-danger btn-xs" onclick="modalBorrarRequisicion({{ $dato->id }})">
-                                                    <i class="fas fa-trash-alt" title="Borrar"></i>&nbsp; Borrar
-                                                </button>
-                                            @endif
-                                        @endcan
 
                                     </td>
+
                                 </tr>
                             @endforeach
 

@@ -12,6 +12,10 @@
         /*Ajustar tablas*/
         table-layout:fixed;
     }
+
+
+    .modal-xl { max-width: 95% !important; }
+
 </style>
 
 <!-- VISTA PARA CREAR NUEVOS REQUERIMIENTOS PARA UNIDADES -->
@@ -183,7 +187,7 @@
         </div>
     </div>
 
-    <!-- modal para ver saldo del proyecto -->
+    <!-- modal para ver saldo de cuenta unidad -->
     <div class="modal fade" id="modalSaldo">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -206,6 +210,87 @@
 
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+
+    <!------------------ MODAL PARA EDITAR REQUISICIÓN ---------------->
+    <div class="modal fade" id="modalEditarRequisicion" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Editar Requisición de Proyecto</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form id="formulario-requisicion-editar">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Fecha *:</label>
+                                        <input type="hidden" id="id-requisicion-editar">
+                                        <input style="width:50%;" type="date" class="form-control" id="fecha-requisicion-editar">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label>Número Req.:</label>
+                                        <input  type="text" class="form-control" id="conteo-requisicion-editar" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label>Destino:</label>
+                                        <input  type="text" class="form-control" id="destino-requisicion-editar">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <label>Necesidad:</label>
+                                        <textarea class="form-control" id="necesidad-requisicion-editar" maxlength="15000" rows="2"></textarea>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <table class="table" id="matriz-requisicion-editar"  data-toggle="table">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 3%">#</th>
+                                        <th style="width: 4%">Cantidad</th>
+                                        <th style="width: 4%">Precio</th>
+                                        <th style="width: 4%">Total</th>
+                                        <th style="width: 7%">Código Específico</th>
+                                        <th style="width: 15%">Descripción</th>
+                                        <th style="width: 5%">Opciones</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                            class="button button-rounded button-pill button-small" id="botonGuardarRequiDetalle" onclick="preguntaGuardarRequisicionEditar()">Guardar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -606,7 +691,7 @@
 
                         Swal.fire({
                             title: 'Permiso Denegado',
-                            text: "Para el Presente Año no es permitido realizar una Requisición",
+                            text: "Para el Presente Año no es permitido realizar modificaciones",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -663,14 +748,14 @@
 
         function vistaEditarRequisicion(dato){
 
-            let id = dato.id;
+            let id = dato.id; // id requisicion unidad
             let conteo = dato.numero;
 
             openLoading();
             document.getElementById("formulario-requisicion-editar").reset();
             $("#matriz-requisicion-editar tbody tr").remove();
 
-            axios.post(url+'/proyecto/vista/requisicion/informacion', {
+            axios.post(url+'/p/requisicion/unidad/informacion', {
                 'id': id
             })
                 .then((response) => {
@@ -986,13 +1071,16 @@
                 formData.append('idarray[]', id); // ID REQUI DETALLE
             }
 
+            let idanio = {{ $idanio }};
+
             openLoading();
             formData.append('fecha', fecha);
             formData.append('destino', destino);
             formData.append('necesidad', necesidad);
             formData.append('idrequisicion', idrequisicion);
+            formData.append('idanio', idanio);
 
-            axios.post(url+'/proyecto/vista/requisicion/editar', formData, {
+            axios.post(url+'/p/requisicion/unidad/editar', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -1024,23 +1112,21 @@
                     }
                     else if(response.data.success === 3){
 
-                        let mensaje = response.data.mensaje;
-
                         Swal.fire({
-                            title: 'Estado Proyecto',
-                            html: mensaje,
+                            title: 'Permiso Denegado',
+                            text: "Para el Presente Año no es permitido realizar modificaciones",
                             icon: 'info',
                             showCancelButton: false,
+                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                location.reload();
                             }
                         })
                     }
-
 
                     else{
                         toastr.error('error al actualizar');
@@ -1100,7 +1186,7 @@
 
                         Swal.fire({
                             title: 'Permiso Denegado',
-                            text: "Para el Presente Año no es permitido realizar una Requisición",
+                            text: "Para el Presente Año no es permitido realizar modificaciones",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,

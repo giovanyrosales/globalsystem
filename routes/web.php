@@ -38,6 +38,8 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\Presupuesto\ReportesPresupues
 use App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos\RequerimientosUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\CuentasUnidad\CuentaUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\MovimientoUnidad\MovimientosUnidadControlles;
+use App\Http\Controllers\Backend\PresupuestoUnidad\Cotizaciones\CotizacionesUnidadController;
+
 // --- LOGIN ---
 
 Route::get('/', [LoginController::class,'index'])->name('login');
@@ -841,10 +843,20 @@ Route::post('/admin/buscar/material/requisicion/unidad',  [RequerimientosUnidadC
 Route::post('/admin/p/regisrar/requisicion/unidades', [RequerimientosUnidadController::class, 'nuevoRequisicionUnidades']);
 // borrar requisición de unidades
 Route::post('/admin/p/requisicion/unidad/borrar/todo', [RequerimientosUnidadController::class, 'borrarRequisicionUnidades']);
+// informacion de una requisicion unidad
+Route::post('/admin/p/requisicion/unidad/informacion', [RequerimientosUnidadController::class, 'informacionRequisicionUnidad']);
+// modificar las requisiciones de unidad
+Route::post('/admin/p/requisicion/unidad/editar', [RequerimientosUnidadController::class, 'editarRequisicionUnidad']);
 
 
+// * LISTADO DE REQUERIMIENTOS UACI UNIDAD
 
-
+// retorna vista de requerimientos pendientes unidad
+Route::get('/admin/p/requerimientos/pendiente/unidad/index', [CotizacionesUnidadController::class,'indexListarRequerimientosPendienteUnidad'])->name('admin.listar.requerimientos.unidad.pendientes');
+// retorna tabla de requerimientos pendientes para unidad
+Route::get('/admin/p/requerimientos/pendiente/unidad/tabla', [CotizacionesUnidadController::class,'indexTablaListarRequerimientosPendienteUnidad']);
+// informacion de requisición para hacer la cotizacion
+Route::post('/admin/p/requerimientos/listado/cotizar/info', [CotizacionesUnidadController::class, 'informacionRequerimientoCotizarInfo']);
 
 
 

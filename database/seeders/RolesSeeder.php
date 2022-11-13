@@ -48,6 +48,11 @@ class RolesSeeder extends Seeder
         // Recursos Humanos
         //$roleRRHH = Role::create(['name' => 'rrhh']);
 
+
+
+
+
+
         // ROLES Y PERMISOS
         Permission::create(['name' => 'sidebar.roles.y.permisos', 'description' => 'sidebar seccion roles y permisos'])->syncRoles($roleAdmin);
 

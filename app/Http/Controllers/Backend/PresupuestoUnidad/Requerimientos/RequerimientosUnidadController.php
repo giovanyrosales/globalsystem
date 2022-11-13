@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos;
 
 use App\Http\Controllers\Controller;
 use App\Models\CotizacionUnidad;
+use App\Models\CotizacionUnidadDetalle;
 use App\Models\Cuenta;
 use App\Models\CuentaUnidad;
 use App\Models\CuentaUnidadRetenido;
 use App\Models\MoviCuentaUnidad;
 use App\Models\ObjEspecifico;
+use App\Models\OrdenUnidad;
 use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
 use App\Models\P_Materiales;
@@ -483,6 +485,185 @@ class RequerimientosUnidadController extends Controller
 
             return ['success' => 3];
         }else{
+            return ['success' => 99];
+        }
+    }
+
+    // informacion de una requisicion unidad
+    function informacionRequisicionUnidad(Request $request){
+        $rules = array(
+            'id' => 'required', // id fila requisicion
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()){
+            return ['success' => 0];
+        }
+
+        if($info = RequisicionUnidad::where('id', $request->id)->first()){
+
+            $detalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)
+                ->orderBy('id', 'ASC')
+                ->get();
+
+            foreach ($detalle as $deta) {
+
+                $multi = ($deta->cantidad * $deta->dinero);
+                $multi = number_format((float)$multi, 2, '.', ',');
+                $deta->multiplicado = $multi;
+
+                $infoCatalogo = P_Materiales::where('id', $deta->id_material)->first();
+
+                //-------------------------------------------
+
+                // VERIFICAR QUE ESTE MATERIAL ESTE COTIZADO. PARA NO BORRARLO O PARA CANCELAR SI YA NO LO VA A QUERER
+
+                $infoCotiDetalle = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $deta->id)->get();
+                $pilaIdCotizacion = array();
+                $haycoti = false;
+                foreach ($infoCotiDetalle as $dd){
+                    $haycoti = true;
+                    array_push($pilaIdCotizacion, $dd->id_cotizacion_unidad);
+                }
+
+                // saber si ya fue aprobado alguna cotizacion o todas han sido denegadas
+                $infoCoti = CotizacionUnidad::whereIn('id', $pilaIdCotizacion)
+                    ->where('estado', 1) // aprobados
+                    ->count();
+
+                if($infoCoti > 0){
+                    // COTI APROBADA, NO PUEDE BORRAR
+                    $infoEstado = 1;
+
+                    // verificar si la orden de compra con esa cotización fue denegada, para cancelar
+
+                    // todas las cotizaciones donde puede estar este MATERIAL DE REQUI DETALLE
+                    $arrayCoti = CotizacionUnidad::whereIn('id', $pilaIdCotizacion)->get();
+                    $pilaCoti = array();
+                    foreach ($arrayCoti as $dd){
+                        array_push($pilaCoti, $dd->id);
+                    }
+
+                    // ver si existe al menos 1 orden
+                    if(OrdenUnidad::whereIn('id_cotizacion', $pilaCoti)->first()){
+                        $conteoOrden = OrdenUnidad::whereIn('id_cotizacion', $pilaCoti)
+                            ->where('estado', 0) // APROBADA LA ORDEN
+                            ->count();
+
+                        if($conteoOrden > 0){
+                            // material tiene una orden aprobada
+                        }else{
+                            // material tiene una orden denegada
+                            $infoEstado = 2;
+                        }
+                    }
+                }else{
+                    // COTI DENEGADA, PUEDE CANCELAR MATERIAL
+                    $infoEstado = 2;
+                }
+
+                $deta->cotizado = $infoEstado;
+                $deta->haycoti = $haycoti;
+                //-------------------------------------------------
+
+                $infoObjeto = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
+                $infoUnidad = P_UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
+
+                $unidoCodigo = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+                $unidoNombre = $infoCatalogo->descripcion . " - " . $infoUnidad->nombre;
+
+                $deta->descripcion = $unidoNombre;
+                $deta->codigo = $unidoCodigo;
+
+
+            }// end foreach
+
+            // conocer si hay una cotizacion hecha, asi no puede editar detalles como fecha, destino, necesidad
+            $btnEditar = false;
+            if(CotizacionUnidad::where('id_requisicion_unidad', $info->id)->first()){
+                $btnEditar = true;
+            }
+
+            return ['success' => 1, 'info' => $info, 'detalle' => $detalle, 'btneditar' => $btnEditar];
+        }
+        return ['success' => 2];
+    }
+
+    // modificar las requisiciones de unidad
+    public function editarRequisicionUnidad(Request $request){
+
+        $regla = array(
+            'idrequisicion' => 'required', // id requisicion unidad
+            'idanio' => 'required'
+        );
+
+        $validator = Validator::make($request->all(), $regla);
+
+        if ($validator->fails()){
+            return ['success' => 0];
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            $infoAnio = P_AnioPresupuesto::where('id', $request->idanio)->first();
+
+            if($infoAnio->permiso == 0){
+                // no hay permiso para modificar requisiciones
+                return ['success' => 3];
+            }
+
+            // ACTUALIZAR SOLAMENTE SI NO TIENE COTIZACIÓN
+            if(!CotizacionUnidad::where('id_requisicion_unidad', $request->idrequisicion)->first()){
+                RequisicionUnidad::where('id', $request->idrequisicion)->update([
+                    'destino' => $request->destino,
+                    'fecha' => $request->fecha,
+                    'necesidad' => $request->necesidad,
+                ]);
+            }
+
+            // agregar id a pila
+            $pila = array();
+            for ($i = 0; $i < count($request->idarray); $i++) {
+                // Los id que sean 0, seran nuevos registros
+                if($request->idarray[$i] != 0) {
+                    array_push($pila, $request->idarray[$i]);
+                }
+            }
+
+            // OBTENER LOS ID REQUISICION DETALLE QUE SE VAN A BORRAR,
+            // Y SOLO VERIFICAR QUE NO ESTE COTIZADO
+            $infoRequiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->idrequisicion)
+                ->whereNotIn('id', $pila)
+                ->get();
+
+            $pilaBorrar = array();
+
+            // ya con los id a borrar. verificar que no esten cotizados
+            foreach ($infoRequiDetalle as $dd){
+                array_push($pilaBorrar, $dd->id);
+                if($dd->estado == 1){
+                    // MATERIAL COTIZADO, RETORNAR
+
+                    $infoCatalogo = P_Materiales::where('id', $dd->id_material)->first();
+                    return ['success' => 1, 'nombre' => $infoCatalogo->nombre];
+                }
+            }
+
+            // YA SE PUEDE BORRAR SI HAY MATERIALES A BORRAR.
+            // borrar de saldo retenido y de la requisicion detalle
+            CuentaUnidadRetenido::whereIn('id_requi_detalle', $pilaBorrar)->delete();
+
+            RequisicionUnidadDetalle::whereIn('id', $pilaBorrar)->delete();
+
+            DB::commit();
+            return ['success' => 2];
+
+        }catch(\Throwable $e){
+            Log::info('ee ' . $e);
+            DB::rollback();
             return ['success' => 99];
         }
     }

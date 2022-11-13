@@ -219,9 +219,9 @@
 
                             @can('sidebar.requerimientosunidad.listar')
                                 <li class="nav-item">
-                                    <a href="#" target="frameprincipal" class="nav-link">
+                                    <a href="{{ route('admin.listar.requerimientos.unidad.pendientes') }}" target="frameprincipal" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Listar Requerimientos Unidad</p>
+                                        <p>Listar Requerimientos</p>
                                     </a>
                                 </li>
                             @endcan
@@ -229,6 +229,10 @@
                         </ul>
                     </li>
                 @endcan
+
+
+
+
                 @can('sidebar.seccion.cotizacionesunidad')
                 <li class="nav-item">
 

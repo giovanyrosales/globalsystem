@@ -21,11 +21,6 @@
                                     <td style="width: 10%">{{ $dato->fecha }}</td>
 
                                     <td>
-                                        @can('boton.cotizar.requisicion.unidad')
-                                            <button type="button" class="btn btn-success btn-xs" onclick="vistaCotizacion({{ $dato->id }})">
-                                                <i class="fas fa-book-open" title="Cotizar"></i>&nbsp; Cotizar
-                                            </button>
-                                        @endcan
 
                                         @can('boton.editar.requisicion.unidad')
                                             <button type="button" class="btn btn-info btn-xs" onclick="vistaEditarRequisicion({{ $dato }})">
