@@ -289,6 +289,8 @@ class RequerimientosUnidadController extends Controller
     // registrar una nueva requisición para unidades
     public function nuevoRequisicionUnidades(Request $request){
 
+        Log::info($request->all());
+
         $rules = array(
             'fecha' => 'required',
             'idpresubuni' => 'required',
@@ -415,6 +417,7 @@ class RequerimientosUnidadController extends Controller
                     $rDetalle->id_requisicion_unidad = $r->id;
                     $rDetalle->id_material = $request->datainfo[$i];
                     $rDetalle->cantidad = $request->cantidad[$i];
+                    $rDetalle->material_descripcion = $request->materialDescriptivo[$i];
                     $rDetalle->estado = 0;
                     $rDetalle->dinero = $infoCatalogo->costo; // lo que vale el material en ese momento
                     $rDetalle->cancelado = 0;

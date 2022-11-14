@@ -152,7 +152,8 @@
 
             openLoading();
 
-            var ruta = "{{ URL::to('/admin/p/ordenes/compras/unidades/tabla') }}";
+            let idanio = {{ $idanio }};
+            var ruta = "{{ URL::to('/admin/p/ordenes/comprasunidades/aprobadas/tabla') }}/" + idanio;
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -162,7 +163,8 @@
     <script>
 
         function recargar(){
-            var ruta = "{{ URL::to('/admin/p/ordenes/compras/unidades/tabla') }}";
+            let idanio = {{ $idanio }};
+            var ruta = "{{ URL::to('/admin/p/ordenes/comprasunidades/aprobadas/tabla') }}/" + idanio;
             $('#tablaDatatable').load(ruta);
         }
 

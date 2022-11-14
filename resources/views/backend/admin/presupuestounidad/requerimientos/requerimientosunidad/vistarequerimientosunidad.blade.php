@@ -102,8 +102,6 @@
     </div>
 
 
-
-
     <!------------------ MODAL PARA AGREGAR REQUISICION ---------------->
     <div class="modal fade" id="modalAgregarRequisicion" tabindex="-1">
         <div class="modal-dialog modal-xl">
@@ -137,7 +135,7 @@
 
                                 <div class="col-md-8">
                                     <div class="form-group">
-                                        <label>Destino:</label>
+                                        <label>Destino *:</label>
                                         <input  type="text" class="form-control" autocomplete="off" id="destino-requisicion-nuevo">
                                     </div>
                                 </div>
@@ -153,7 +151,7 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <br>
-                                        <button type="button" onclick="addAgregarFilaNuevaRequisicion()" class="button button-3d button-rounded button-pill button-small"
+                                        <button type="button" onclick="modalNuevaSolicitud()" class="button button-3d button-rounded button-pill button-small"
                                                 style="margin-top:10px; font-weight: bold; background-color: #17a2b8; color: white !important;">
                                             <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar</button>
                                     </div>
@@ -297,6 +295,64 @@
 
 
 
+    <!-- ************************************************ -->
+
+
+    <div class="modal fade" id="modalNuevoSolicitud">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Solicitud de Material</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-nuevo-material">
+                        <div class="card-body">
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Cantidad</label>
+                                            <input type="number" class="form-control" autocomplete="off" id="cantidad-material-nuevo">
+                                        </div>
+
+                                        <label>Material del Presupuesto</label>
+                                        <table class="table" id="matriz-busqueda" data-toggle="table">
+                                            <tbody>
+                                            <tr style="width: 100%">
+                                                <td >
+                                                    <input type='text' id="materialnuevosolicitado" autocomplete="off" data-info='0' class='form-control' onkeyup='buscarMaterialRequisicion(this)' maxlength='300'  >
+                                                    <div class='droplistado' style='position: absolute; z-index: 9; width: 85% !important;'></div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div class="form-group">
+                                            <label>Descripción del Material</label>
+                                            <input type="text" class="form-control" autocomplete="off" id="descripcion-material-nuevo">
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="verificarNuevaFila()">Agregar Fila</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 @extends('backend.menus.footerjs')
@@ -323,10 +379,8 @@
             window.seguroBuscador = true;
 
             $(document).click(function(){
-                $(".droplista").hide();
-                $(".droplistaeditar").hide();
-                $(".droplistapresupuesto").hide();
-                $(".droplistapresupuestoEditar").hide();
+                $(".droplistado").hide();
+                $(".droplistadoeditar").hide();
             });
 
             $(document).ready(function() {
@@ -364,8 +418,6 @@
             window.location.href="{{ url('/admin/p/requerimientos/movicuentaunidad/index') }}/" + idpresup;
         }
 
-
-
         // para modal agregar Requisicion por parte de administradora
         function buscarMaterialRequisicion(e){
 
@@ -390,10 +442,11 @@
                     'idpresuunidad': idpresubuni,
                 })
                     .then((response) => {
+
                         seguroBuscador = true;
                         $(row).each(function (index, element) {
-                            $(this).find(".droplista").fadeIn();
-                            $(this).find(".droplista").html(response.data);
+                            $(this).find(".droplistado").fadeIn();
+                            $(this).find(".droplistado").html(response.data);
                         });
 
                     })
@@ -403,7 +456,52 @@
             }
         }
 
-        function addAgregarFilaNuevaRequisicion(){
+        function verificarNuevaFila(){
+
+            var cantidad = document.getElementById('cantidad-material-nuevo').value;
+            var descripcion = document.getElementById('descripcion-material-nuevo').value;
+            var idmaterial = document.querySelector('#materialnuevosolicitado');
+            var nomMaterial = document.getElementById('materialnuevosolicitado').value;
+
+            if(idmaterial.dataset.info == 0){
+                toastr.error("Se debe seleccionar un Material del Buscador");
+                return;
+            }
+
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+            //*************
+
+            if(cantidad === ''){
+                toastr.error('Cantidad es requerida');
+                return;
+            }
+
+            if(!cantidad.match(reglaNumeroDecimal)) {
+                toastr.error('Cantidad debe ser número Decimal y no Negativo. Solo 2 decimales');
+                return;
+            }
+
+            if(cantidad <= 0){
+                toastr.error('Cantidad no debe ser negativo o cero');
+                return;
+            }
+
+            if(cantidad > 9000000){
+                toastr.error('Cantidad máximo 9 millones');
+                return;
+            }
+
+            if(descripcion === ''){
+                toastr.error('Descripción es requerido');
+                return;
+            }
+
+            if(descripcion.length > 300){
+                toastr.error('Descripción máximo 300 caracteres');
+                return;
+            }
+
 
             var nFilas = $('#matriz-requisicion >tbody >tr').length;
             nFilas += 1;
@@ -415,12 +513,12 @@
                 "</td>"+
 
                 "<td>"+
-                "<input name='cantidadarray[]' maxlength='10' class='form-control' type='number'>"+
+                "<input name='cantidadarray[]' disabled class='form-control' value='" + cantidad + "'>"+
                 "</td>"+
 
                 "<td>"+
-                "<input name='descripcionarray[]' data-info='0' autocomplete='off' class='form-control' style='width:100%' onkeyup='buscarMaterialRequisicion(this)' maxlength='400'  type='text'>"+
-                "<div class='droplista' style='position: absolute; z-index: 9; width: 75% !important;'></div>"+
+                "<input name='descripcionarray[]' disabled data-info='" + idmaterial.dataset.info + "'  value='" + nomMaterial + "' class='form-control'>"+
+                "<input name='materialdescripcionarray[]' disabled type='hidden' class='form-control' value='" + descripcion + "'>"+
                 "</td>"+
 
                 "<td>"+
@@ -429,6 +527,7 @@
 
                 "</tr>";
 
+            $('#modalNuevoSolicitud').modal('hide');
             $("#matriz-requisicion tbody").append(markup);
         }
 
@@ -566,6 +665,10 @@
             var cantidad = $("input[name='cantidadarray[]']").map(function(){return $(this).val();}).get();
             var descripcion = $("input[name='descripcionarray[]']").map(function(){return $(this).val();}).get();
             var descripcionAtributo = $("input[name='descripcionarray[]']").map(function(){return $(this).attr("data-info");}).get();
+
+            // una descripción mas descriptiva del material
+            var materialDescriptivo = $("input[name='materialdescripcionarray[]']").map(function(){return $(this).val();}).get();
+
             var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             for(var a = 0; a < cantidad.length; a++){
@@ -624,6 +727,7 @@
 
                 formData.append('cantidad[]', cantidad[p]);
                 formData.append('datainfo[]', descripcionAtributo[p]);
+                formData.append('materialDescriptivo[]', materialDescriptivo[p]);
             }
 
             let idpresubuni = {{ $idpresubunidad }};
@@ -1234,6 +1338,16 @@
                     closeLoading();
                 });
         }
+
+        //*********************************************
+
+        function modalNuevaSolicitud(){
+            document.getElementById("formulario-nuevo-material").reset();
+            $('#modalNuevoSolicitud').modal('show');
+        }
+
+
+
 
     </script>
 

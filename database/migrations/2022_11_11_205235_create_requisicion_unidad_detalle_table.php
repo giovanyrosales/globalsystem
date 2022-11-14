@@ -26,6 +26,9 @@ class CreateRequisicionUnidadDetalleTable extends Migration
 
             $table->boolean('cancelado');
 
+            // una descripción mas descriptiva del material
+            $table->string('material_descripcion', 300);
+
             //0: defecto
             //1: material cotizado
             // ayuda para volver a cotizarlo si fue denegado la cotización

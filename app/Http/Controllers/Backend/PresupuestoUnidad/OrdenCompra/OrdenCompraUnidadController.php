@@ -203,18 +203,30 @@ class OrdenCompraUnidadController extends Controller
         return $pdf->stream('Orden_Compra.pdf');
     }
 
+    public function vistaAñoOrdenesComprasUnidadesAprobadas(){
+        $anios = P_AnioPresupuesto::orderBy('id', 'ASC')->get();
+
+        return view('backend.admin.presupuestounidad.ordenes.ordenesaprobadas.vistaanioordenesaprobadasunidades', compact('anios'));
+    }
+
 
     // retorna vista con las ordenes de compras para unidades
-    public function indexOrdenesComprasAprobadasUnidades(){
+    public function indexOrdenesComprasAprobadasUnidades($idanio){
 
-        return view('backend.admin.presupuestounidad.ordenes.ordenesaprobadas.vistaordenesunidadcompraaprobada');
+        return view('backend.admin.presupuestounidad.ordenes.ordenesaprobadas.vistaordenesunidadcompraaprobada', compact('idanio'));
     }
 
     // retorna tabla con las ordenes de compras
-    public function tablaOrdenesComprasAprobadasUnidades(){
+    public function tablaOrdenesComprasAprobadasUnidades($idanio){
 
-        $lista = OrdenUnidad::where('estado', 0) // no denegadas
-        ->orderBy('fecha_orden')
+        $lista = DB::table('orden_unidad AS or')
+            ->join('cotizacion_unidad AS cu', 'or.id_cotizacion', '=', 'cu.id')
+            ->join('requisicion_unidad AS requ', 'cu.id_requisicion_unidad', '=', 'requ.id')
+            ->join('p_presup_unidad AS presu', 'requ.id_presup_unidad', '=', 'presu.id')
+            ->select('presu.id_anio', 'or.estado', 'or.fecha_orden', 'or.id_cotizacion', 'or.id')
+            ->where('presu.id_anio', $idanio)
+            ->where('or.estado', 0) // solo aprobadas
+            ->orderBy('or.fecha_orden')
             ->get();
 
         foreach($lista as $val){
@@ -339,7 +351,7 @@ class OrdenCompraUnidadController extends Controller
             ->join('p_presup_unidad AS presu', 'requ.id_presup_unidad', '=', 'presu.id')
             ->select('presu.id_anio', 'or.estado', 'or.fecha_orden', 'or.id_cotizacion', 'or.id')
             ->where('presu.id_anio', $idanio)
-            ->where('or.estado', 1) // solo aprobadas
+            ->where('or.estado', 1) // solo denegadas
             ->orderBy('or.fecha_orden')
             ->get();
 

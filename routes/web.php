@@ -910,10 +910,11 @@ Route::get('/admin/p/ordencompra/unidad/pdf/{id}/{cantidad}', [OrdenCompraUnidad
 
 // * ORDENES DE COMPRAS PROCESADAS
 
+Route::get('/admin/p/ordenes/comprasunidades/aprobadas/anio', [OrdenCompraUnidadController::class,'vistaAñoOrdenesComprasUnidadesAprobadas'])->name('admin.ordenes.compra.unidades.procesadas');
 // retorna vista con las ordenes de compras para unidades
-Route::get('/admin/p/ordenes/compras/unidades/index', [OrdenCompraUnidadController::class,'indexOrdenesComprasAprobadasUnidades'])->name('admin.ordenes.compra.unidades.procesadas');
+Route::get('/admin/p/ordenes/comprasunidades/aprobadas/index/{idanio}', [OrdenCompraUnidadController::class,'indexOrdenesComprasAprobadasUnidades']);
 // retorna tabla con las ordenes de compras para unidades
-Route::get('/admin/p/ordenes/compras/unidades/tabla', [OrdenCompraUnidadController::class,'tablaOrdenesComprasAprobadasUnidades']);
+Route::get('/admin/p/ordenes/comprasunidades/aprobadas/tabla/{idanio}', [OrdenCompraUnidadController::class,'tablaOrdenesComprasAprobadasUnidades']);
 // anular una orden de compra para unidades.
 Route::post('/admin/p/orden/compraunidad/anular',  [OrdenCompraUnidadController::class,'anularCompraUnidades']);
 
