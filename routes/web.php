@@ -855,12 +855,35 @@ Route::post('/admin/p/requisicion/unidad/editar', [RequerimientosUnidadControlle
 Route::get('/admin/p/requerimientos/pendiente/unidad/index', [CotizacionesUnidadController::class,'indexListarRequerimientosPendienteUnidad'])->name('admin.listar.requerimientos.unidad.pendientes');
 // retorna tabla de requerimientos pendientes para unidad
 Route::get('/admin/p/requerimientos/pendiente/unidad/tabla', [CotizacionesUnidadController::class,'indexTablaListarRequerimientosPendienteUnidad']);
-// informacion de requisición para hacer la cotizacion
+// información de requisición para hacer la cotizacion
 Route::post('/admin/p/requerimientos/listado/cotizar/info', [CotizacionesUnidadController::class, 'informacionRequerimientoCotizarInfo']);
+// se envía los ID requi_detalle de proyectos para verificar y retornar información de lo que se cotizara
+Route::post('/admin/p/requerimientos/unidad/verificar', [CotizacionesUnidadController::class, 'verificarRequerimientoUnidadAcotizar']);
+// guardar cotización para requerimiento de unidad
+Route::post('/admin/p/requerimientos/cotizacion/unidad/guardar', [CotizacionesUnidadController::class, 'guardarNuevaCotizacionRequeriUnidad']);
+
+// * COTIZACIONES PARA UNIDAD
+
+// busqueda de año para ver cotizaciones pendiente de unidad
+Route::get('/admin/p/cotizacion/unidad/pendiente/anio', [CotizacionesUnidadController::class,'indexAnioCotiUnidadPendiente'])->name('cotizaciones.pendientes.unidad.index');
+
+// retorna vista con las cotizaciones pendientes
+Route::get('/admin/p/cotizacion/unidad/pendiente/index/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesPendiente']);
+// retorna tabla con las cotizaciones pendientes
+Route::get('/admin/p/cotizacion/unidad/pendiente/tabla/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesPendienteTabla']);
+// ver detalle de una cotización para unidades
+Route::get('/admin/p/cotizacion/unidad/vistadetalle/{id}', [CotizacionesUnidadController::class,'indexCotizacionUnidadDetalle']);
+// autorizar cotización unidad jefe uaci
+Route::post('/admin/p/cotizacion/unidad/autorizar',  [CotizacionesUnidadController::class,'autorizarCotizacionUnidad']);
 
 
+// - AUTORIZADAS
 
-
-
+// busqueda de año para ver cotizaciones autorizadas de unidad
+Route::get('/admin/p/cotizacion/unidad/autorizadas/anio', [CotizacionesUnidadController::class,'indexAnioCotiUnidadAutorizada'])->name('cotizaciones.autorizadas.unidad.index');
+// retorna vista con las cotizaciones autorizaciones para unidades
+Route::get('/admin/p/cotizacion/unidad/autorizadas/index/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesAutorizadas']);
+// retorna tabla de cotizaciones unidad autorizadas
+Route::get('/admin/p/cotizacion/unidad/autorizadas/tabla/{idanio}', [CotizacionesUnidadController::class,'tablaCotizacionesUnidadesAutorizadas']);
 
 

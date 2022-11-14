@@ -10,6 +10,7 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
 
+                <!-- ROLES Y PERMISO -->
                 @can('sidebar.roles.y.permisos')
                  <li class="nav-item">
 
@@ -47,6 +48,7 @@
                  </li>
                 @endcan
 
+                <!-- ESTADISTICAS -->
                 @can('sidebar.estadisticas')
                 <li class="nav-item has-treeview">
                     <a href="{{ route('admin.estadisticas.index') }}" target="frameprincipal" class="nav-link">
@@ -58,6 +60,8 @@
                 </li>
                 @endcan
 
+
+                <!-- PROYECTOS -->
                 @can('sidebar.seccion.proyecto')
                 <li class="nav-item">
 
@@ -94,6 +98,7 @@
                 @endcan
 
 
+                <!-- REQUERIMIENTOS PARA PROYECTOS -->
                 @can('sidebar.seccion.requerimientos')
                     <li class="nav-item">
 
@@ -120,6 +125,7 @@
                     </li>
                 @endcan
 
+                <!-- COTIZACIONES PARA PROYECTOS -->
                 @can('sidebar.seccion.cotizaciones')
                 <li class="nav-item">
 
@@ -163,6 +169,10 @@
                 </li>
                 @endcan
 
+
+
+
+            <!-- ORDENES DE COMPRA PARA PROYECTOS -->
                 @can('sidebar.seccion.ordenescompra')
 
                         <li class="nav-item">
@@ -204,6 +214,7 @@
 
                 @endcan
 
+                <!-- REQUERIMIENTOS PARA UNIDAD -->
                 @can('sidebar.seccion.requerimientosunidad')
                     <li class="nav-item">
 
@@ -231,63 +242,55 @@
                 @endcan
 
 
+                <!-- COTIZACIONES PARA UNIDAD -->
+                @can('sidebar.seccion.cotizaciones.unidad')
+                    <li class="nav-item">
 
+                        <a href="#" class="nav-link nav-">
+                            <i class="fas fa-tasks"></i>
+                            <p>
+                                Cotizaciones Unidad
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
 
-                @can('sidebar.seccion.cotizacionesunidad')
-                <li class="nav-item">
+                        <ul class="nav nav-treeview">
+                            @can('sidebar.cotizacion.unidad.pendiente')
+                                <li class="nav-item">
+                                    <a href="{{ route('cotizaciones.pendientes.unidad.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Cotización Pendiente</p>
+                                    </a>
+                                </li>
+                            @endcan
 
-                    <a href="#" class="nav-link nav-">
-                        <i class="fas fa-tasks"></i>
-                        <p>
-                            Cotizaciones
-                            <i class="fas fa-angle-left right"></i>
-                        </p>
-                    </a>
+                            @can('sidebar.cotizacion.unidad.procesada')
+                                <li class="nav-item">
+                                    <a href="{{ route('cotizaciones.autorizadas.unidad.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Cotización Procesada</p>
+                                    </a>
+                                </li>
+                            @endcan
 
-                    <ul class="nav nav-treeview">
-                        @can('sidebar.cotizacionunidad.pendiente')
-                        <li class="nav-item">
-                            <a href="{{ route('cotizaciones.pendientesunidad.index') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Cotización Pendiente</p>
-                            </a>
-                        </li>
-                        @endcan
+                            @can('sidebar.cotizacionunidad.denegada')
+                                <li class="nav-item">
+                                    <a href="{{ route('cotizaciones.denegadasunidad.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Cotización Denegadasx</p>
+                                    </a>
+                                </li>
+                            @endcan
 
-                        @can('sidebar.cotizacionunidad.procesada')
-                        <li class="nav-item">
-                            <a href="{{ route('cotizaciones.autorizadasunidad.index') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Cotización Procesada</p>
-                            </a>
-                        </li>
-                        @endcan
-
-                        @can('sidebar.cotizacionunidad.denegada')
-                        <li class="nav-item">
-                            <a href="{{ route('cotizaciones.denegadasunidad.index') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Cotización Denegadasx</p>
-                            </a>
-                        </li>
-                        @endcan
-
-                    </ul>
-                </li>
-                @endcan
-
-                @can('sidebar.seccion.ordenescompraunidad')
-                <li class="nav-item has-treeview">
-                    <a href="{{ route('ordenes.comprasunidad.index') }}" target="frameprincipal" class="nav-link">
-                        <i class="nav-icon fas fa-list"></i>
-                        <p>
-                            Ordenes de Compra
-                        </p>
-                    </a>
-                </li>
+                        </ul>
+                    </li>
                 @endcan
 
 
+
+
+
+            <!-- CONFIGURACIONES PARA PROYECTO -->
                 @can('sidebar.seccion.configuraciones')
                 <li class="nav-item">
 
@@ -465,6 +468,7 @@
                 @endcan
 
 
+                <!-- CONFIGURACIONES PARA UNIDADES -->
                 @can('sidebar.seccion.configuraciones.presupuesto.unidades')
 
                     <li class="nav-item">
@@ -547,6 +551,7 @@
                     </li>
                 @endcan
 
+                    <!-- REVISION DE PRESUPUESTO UNIDADES Y REPORTES -->
                     @can('sidebar.revision.presupuesto.unidades')
                     <li class="nav-item">
 
@@ -582,6 +587,7 @@
                     </li>
                     @endcan
 
+                <!-- CREACION DE PRESUPUESTO DE UNIDADES -->
                 @can('sidebar.p.presupuesto.crear')
                     <li class="nav-item">
 
@@ -618,18 +624,17 @@
                 @endcan
 
 
+                <!-- VISTA PARA AÑOS DONDE QUIERE HACER REQUERIMIENTO LA UNIDAD  -->
                 @can('sidebar.p.requerimientos.unidades')
-                <li class="nav-item has-treeview">
-                    <a href="{{ route('admin.p.unidad.requerimientos.index') }}" target="frameprincipal" class="nav-link">
-                        <i class="nav-icon fas fa-list-alt"></i>
-                        <p>
-                            Requerimientos
-                        </p>
-                    </a>
-                </li>
+                    <li class="nav-item has-treeview">
+                        <a href="{{ route('admin.p.unidad.requerimientos.index') }}" target="frameprincipal" class="nav-link">
+                            <i class="nav-icon fas fa-list-alt"></i>
+                            <p>
+                                Requerimientos
+                            </p>
+                        </a>
+                    </li>
                 @endcan
-
-
 
             </ul>
         </nav>
