@@ -209,7 +209,7 @@ class CotizacionesUnidadController extends Controller
 
                     // como ese material puede estar en multiples cotizaciones
                     $arrayCotiDetalle = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $datainfo->id)
-                        ->select('cotizacion_id')
+                        ->select('id_cotizacion_unidad')
                         ->get();
 
                     // Por cada ID material de reui detalle, ya obtuve todos los ID
@@ -554,7 +554,150 @@ class CotizacionesUnidadController extends Controller
         return view('backend.admin.presupuestounidad.cotizaciones.procesada.tablacotizacionprocesadaunidad', compact('lista'));
     }
 
+    // denegar una cotización de unidad
+    public function denegarCotizacionUnidad(Request $request){
+
+        DB::beginTransaction();
+
+        try {
+
+            // COTIZACIÓN DENEGADA
+            $infoCotizacion = CotizacionUnidad::where('id', $request->id)->first();
+            $infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
+            $infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
+            $infoAnio = P_AnioPresupuesto::where('id', $infoPresupUni->id_anio)->first();
+
+            if($infoAnio->permiso == 0){
+                // sin permiso
+                return ['success' => 1];
+            }
+
+            CotizacionUnidad::where('id', $request->id)->update([
+                'estado' => 2,
+                'fecha_estado' => Carbon::now('America/El_Salvador')
+            ]);
+
+            // Hoy verificar cuales materiales fueron cotizados y volver a 0.
+            // Para que puedan ser cotizados de nuevo.
+
+            $listado = CotizacionUnidadDetalle::where('id_cotizacion_unidad', $request->id)->get();
+
+            foreach ($listado as $ll){
+                RequisicionUnidadDetalle::where('id', $ll->id_requi_unidaddetalle)->update([
+                    'estado' => 0,
+                ]);
+            }
+
+            DB::commit();
+            return ['success' => 2, 'idanio' => $infoPresupUni->id_anio];
+
+        }catch(\Throwable $e){
+            //Log::info('ee' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
 
 
+    //**** DENEGADAS
+
+    public function indexAnioCotiUnidadDenegadas(){
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+        return view('backend.admin.presupuestounidad.cotizaciones.denegadas.vistaaniocotiunidaddenegadas', compact('anios'));
+    }
+
+    // retorna vista con las cotizaciones denegadas para unidades
+    public function indexCotizacionesUnidadesDenegadas($idanio){
+        $contrato = Administradores::orderBy('nombre')->get();
+        return view('backend.admin.presupuestounidad.cotizaciones.denegadas.vistacotizaciondenegadaunidad', compact('contrato', 'idanio'));
+    }
+
+    // retorna tabla con las cotizaciones autorizaciones para unidades
+    public function tablaCotizacionesUnidadesDenegadas($idanio){
+
+        // autorizadas
+        $lista = DB::table('cotizacion_unidad AS cu')
+            ->join('requisicion_unidad AS ru', 'cu.id_requisicion_unidad', '=', 'ru.id')
+            ->join('p_presup_unidad AS pu', 'ru.id_presup_unidad', '=', 'pu.id')
+            ->select('cu.id', 'cu.estado', 'cu.id_proveedor', 'cu.id_requisicion_unidad', 'cu.fecha', 'pu.id_anio')
+            ->where('cu.estado', 2) // DENEGADAS
+            ->where('pu.id_anio', $idanio)
+            ->orderBy('cu.fecha', 'DESC') // la ultima cotizacion quiero primero
+            ->get();
+
+        foreach ($lista as $dd){
+
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+
+            $infoProveedor = Proveedores::where('id', $dd->id_proveedor)->first();
+            $infoRequisicion = RequisicionUnidad::where('id', $dd->id_requisicion_unidad)->first();
+            $infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
+            $infoDepar = P_Departamento::where('id', $infoPresupUni->id_departamento)->first();
+
+            $dd->proveedor = $infoProveedor->nombre;
+            $dd->necesidad = $infoRequisicion->necesidad;
+            $dd->destino = $infoRequisicion->destino;
+            $dd->departamento = $infoDepar->nombre;
+
+            if(OrdenUnidad::where('id_cotizacion', $dd->id)->first()){
+                $dd->bloqueo = true;
+            }else{
+                $dd->bloqueo = false;
+            }
+        }
+
+        return view('backend.admin.presupuestounidad.cotizaciones.denegadas.tablacotizaciondenegadaunidad', compact('lista'));
+    }
+
+    public function vistaDetalleCotizacionUnidad($id){
+        // id de cotizacion
+
+        $cotizacion = CotizacionUnidad::where('id', $id)->first();
+        $infoRequisicion = RequisicionUnidad::where('id', $cotizacion->id_requisicion_unidad)->first();
+        $infoProveedor = Proveedores::where('id', $cotizacion->id_proveedor)->first();
+
+        $proveedor = $infoProveedor->nombre;
+
+        $infoCotiDetalle = CotizacionUnidadDetalle::where('id_cotizacion_unidad', $id)->get();
+        $conteo = 0;
+        $fecha = date("d-m-Y", strtotime($cotizacion->fecha));
+
+        $totalCantidad = 0;
+        $totalPrecio = 0;
+        $totalTotal = 0;
+
+        foreach ($infoCotiDetalle as $de){
+
+            $conteo += 1;
+            $de->conteo = $conteo;
+
+            $multi = $de->cantidad * $de->precio_u;
+            $totalCantidad = $totalCantidad + $de->cantidad;
+            $totalPrecio = $totalPrecio + $de->precio_u;
+            $totalTotal = $totalTotal + $multi;
+
+            $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $de->id_requi_unidaddetalle)->first();
+            $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
+
+            if($infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
+                $de->nombrematerial = $infoMaterial->descripcion . " - " . $infoUnidad->nombre;
+            }else{
+                $de->nombrematerial = $infoMaterial->descripcion;
+            }
+
+            $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
+            $de->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+
+            $de->precio_u = number_format((float)$de->precio_u, 2, '.', ',');
+            $de->total = number_format((float)$multi, 2, '.', ',');
+        }
+
+        $totalCantidad = number_format((float)$totalCantidad, 2, '.', ',');
+        $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
+        $totalTotal = number_format((float)$totalTotal, 2, '.', ',');
+
+        return view('backend.admin.presupuestounidad.cotizaciones.individual.vistacotizaciondetalleunidad', compact('id', 'infoRequisicion',
+            'proveedor', 'infoCotiDetalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
+    }
 
 }

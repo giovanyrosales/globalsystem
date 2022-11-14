@@ -12,7 +12,6 @@
                                 <th style="width: 10%">Fecha</th>
                                 <th style="width: 17%">Necesidad</th>
                                 <th style="width: 17%">Proveedor</th>
-
                                 <th style="width: 12%">Opciones</th>
                             </tr>
                             </thead>
@@ -26,21 +25,9 @@
                                     <td>{{ $dato->necesidad }}</td>
                                     <td>{{ $dato->proveedor }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="verProcesadas({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
+                                        <button type="button" class="btn btn-warning btn-xs" onclick="verInformacion({{ $dato->id }})">
+                                            <i class="fas fa-eye" title="Ver"></i>&nbsp; Ver
                                         </button>
-
-                                        <!-- verifica que no haya orden de compra aun para esta cotizacion -->
-                                        @if(!$dato->bloqueo)
-
-                                            @can('boton.cotizacion.unidad.generar.orden')
-                                            <br><br>
-                                            <button type="button" class="btn btn-info btn-xs" onclick="abrirModalOrden({{ $dato->id }})">
-                                                <i class="fas fa-pen" title="Generar Orden"></i>&nbsp; Generar Orden
-                                            </button>
-                                            @endcan
-
-                                        @endif
 
                                     </td>
                                 </tr>

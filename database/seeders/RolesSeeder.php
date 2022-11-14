@@ -230,6 +230,14 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'texto.esperando.aprobacion.cotizacion.unidad', 'description' => 'texto esperando aprobacion o denegacion de cotización unidad'])->syncRoles($roleUaciUnidad);
 
         Permission::create(['name' => 'sidebar.cotizacion.unidad.procesada', 'description' => 'sidebar ver torizaciones autorizadas para unidades'])->syncRoles($roleUaciUnidad, $roleJefeUaci);
+        Permission::create(['name' => 'sidebar.cotizacion.unidad.denegadas', 'description' => 'sidebar ver busqueda de año para cotizaciones denegadas'])->syncRoles($roleUaciUnidad);
+        Permission::create(['name' => 'boton.cotizacion.unidad.generar.orden', 'description' => 'boton para generar orden de compra para cotizaciones de unidad'])->syncRoles($roleUaciUnidad);
+
+        Permission::create(['name' => 'sidebar.seccion.ordenescompra.unidades', 'description' => 'sidebar para ver ordenes de compra para unidades'])->syncRoles($roleUaciUnidad, $roleJefeUaci);
+        Permission::create(['name' => 'ordenes.compras.procesadas.unidades.index', 'description' => 'ver ordenes de compras aprobadas para unidades'])->syncRoles($roleUaciUnidad, $roleJefeUaci);
+        Permission::create(['name' => 'ordenes.compras.denegadas.unidades.index', 'description' => 'ver ordenes de compras denegadas para unidades'])->syncRoles($roleJefeUaci);
+
+        Permission::create(['name' => 'boton.anular.orden.compra.unidad', 'description' => 'boton para anular orden de compra ya aprobada de unidades'])->syncRoles($roleJefeUaci);
 
 
 

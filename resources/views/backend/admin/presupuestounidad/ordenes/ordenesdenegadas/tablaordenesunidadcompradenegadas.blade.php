@@ -8,43 +8,50 @@
                             <thead>
                             <tr>
                                 <th style="width: 15%">Departamento</th>
-                                <th style="width: 35%">Destino</th>
-                                <th style="width: 10%">Fecha</th>
-                                <th style="width: 17%">Necesidad</th>
+                                <th style="width: 10%">Num. de Orden</th>
+                                <th style="width: 17%">Requi. Destino</th>
+                                <th style="width: 17%">Cotización #</th>
                                 <th style="width: 17%">Proveedor</th>
-
                                 <th style="width: 12%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($lista as $dato)
+
                                 <tr>
+
                                     <td>{{ $dato->departamento }}</td>
-                                    <td>{{ $dato->destino }}</td>
-                                    <td>{{ $dato->fecha }}</td>
-                                    <td>{{ $dato->necesidad }}</td>
-                                    <td>{{ $dato->proveedor }}</td>
+                                    <td>{{ $dato->id }}</td>
+                                    <td>{{ $dato->requidestino }}</td>
+                                    <td>{{ $dato->id_cotizacion }}</td>
+                                    <td>{{ $dato->nomproveedor }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="verProcesadas({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
-                                        </button>
 
-                                        <!-- verifica que no haya orden de compra aun para esta cotizacion -->
-                                        @if(!$dato->bloqueo)
-
-                                            @can('boton.cotizacion.unidad.generar.orden')
-                                            <br><br>
-                                            <button type="button" class="btn btn-info btn-xs" onclick="abrirModalOrden({{ $dato->id }})">
-                                                <i class="fas fa-pen" title="Generar Orden"></i>&nbsp; Generar Orden
+                                        <!-- ORDEN NO ANULADA -->
+                                            <button type="button" class="btn btn-primary btn-xs" onclick="verProcesadas({{ $dato->id_cotizacion }})">
+                                                <i class="fas fa-list-alt" title="Detalle"></i>&nbsp; Detalle
                                             </button>
-                                            @endcan
 
-                                        @endif
+                                        </td>
+                                    </tr>
 
-                                    </td>
-                                </tr>
+                                @if($loop->last)
+                                    <script>
+                                        setTimeout(function () {
+                                            closeLoading();
+                                        }, 1000);
+                                    </script>
+                                @endif
+
                             @endforeach
+
+                                <script>
+                                    setTimeout(function () {
+                                        closeLoading();
+                                    }, 1000);
+                                </script>
+
 
                             </tbody>
                         </table>

@@ -39,6 +39,7 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos\Requerimientos
 use App\Http\Controllers\Backend\PresupuestoUnidad\CuentasUnidad\CuentaUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\MovimientoUnidad\MovimientosUnidadControlles;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Cotizaciones\CotizacionesUnidadController;
+use App\Http\Controllers\Backend\PresupuestoUnidad\OrdenCompra\OrdenCompraUnidadController;
 
 // --- LOGIN ---
 
@@ -885,5 +886,52 @@ Route::get('/admin/p/cotizacion/unidad/autorizadas/anio', [CotizacionesUnidadCon
 Route::get('/admin/p/cotizacion/unidad/autorizadas/index/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesAutorizadas']);
 // retorna tabla de cotizaciones unidad autorizadas
 Route::get('/admin/p/cotizacion/unidad/autorizadas/tabla/{idanio}', [CotizacionesUnidadController::class,'tablaCotizacionesUnidadesAutorizadas']);
+// denegar una cotización de unidad
+Route::post('/admin/p/cotizacion/denegar',  [CotizacionesUnidadController::class,'denegarCotizacionUnidad']);
+// vista de cotización detalle para procesadas o denegadas
+Route::get('/admin/p/cotizacion/unidad/detalle/{idcoti}', [CotizacionesUnidadController::class,'vistaDetalleCotizacionUnidad']);
+
+
+// - DENEGADAS
+// busqueda de año para ver cotizaciones denegadas de unidad
+Route::get('/admin/p/cotizacion/unidad/denegadas/anio', [CotizacionesUnidadController::class,'indexAnioCotiUnidadDenegadas'])->name('cotizaciones.denegadas.unidad.index');
+// retorna vista con las cotizaciones denegadas para unidades
+Route::get('/admin/p/cotizacion/unidad/denegadas/index/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesDenegadas']);
+// retorna tabla de cotizaciones unidad denegadas
+Route::get('/admin/p/cotizacion/unidad/denegadas/tabla/{idanio}', [CotizacionesUnidadController::class,'tablaCotizacionesUnidadesDenegadas']);
+
+
+// ORDENES DE COMPRA PARA UNIDADES
+
+// crear una nueva orden de compra para unidades
+Route::post('/admin/p/ordencompra/unidad/generar',  [OrdenCompraUnidadController::class,'generarOrdenCompraUnidades']);
+// generar PDF de orden de compra de unidades y variable {cantidad} es # de material por hoja
+Route::get('/admin/p/ordencompra/unidad/pdf/{id}/{cantidad}', [OrdenCompraUnidadController::class,'vistaPdfOrdenUnidad']);
+
+// * ORDENES DE COMPRAS PROCESADAS
+
+// retorna vista con las ordenes de compras para unidades
+Route::get('/admin/p/ordenes/compras/unidades/index', [OrdenCompraUnidadController::class,'indexOrdenesComprasAprobadasUnidades'])->name('admin.ordenes.compra.unidades.procesadas');
+// retorna tabla con las ordenes de compras para unidades
+Route::get('/admin/p/ordenes/compras/unidades/tabla', [OrdenCompraUnidadController::class,'tablaOrdenesComprasAprobadasUnidades']);
+// anular una orden de compra para unidades.
+Route::post('/admin/p/orden/compraunidad/anular',  [OrdenCompraUnidadController::class,'anularCompraUnidades']);
+
+// * ORDENES DE COMPRA DENEGADAS
+
+Route::get('/admin/p/ordenes/compras/unidades/denegadas/anio', [OrdenCompraUnidadController::class,'vistaAñoOrdenesComprasUnidadesDenegadas'])->name('admin.ordenes.compra.unidades.denegadas');
+// retorna vista para las ordenes de compra anuladas para unidades
+Route::get('/admin/p/ordenes/compras/unidades/denegadas/index/{idanio}', [OrdenCompraUnidadController::class,'indexOrdenesComprasUnidadesDenegadas']);
+// retorna tabla para las ordenes de compra anuladas para unidades
+Route::get('/admin/p/ordenes/compras/unidades/denegadas/tabla/{idanio}', [OrdenCompraUnidadController::class,'tablaOrdenesComprasUnidadesDenegadas']);
+
+// vista detalle de una cotización unidad, esto se mira desde las ordenes de compra
+Route::get('/admin/p/detalle/ordencompra/coti/unidad/{idorden}', [OrdenCompraUnidadController::class,'vistaDetalleCotizacionUnidadOrden']);
+
+
+// generar acta de una orden de compra para unidad
+Route::post('/admin/p/ordenes/unidad/generar/acta',  [OrdenCompraUnidadController::class,'generarActadeCompraUnidades']);
+// generar PDF de la acta de compra para unidad
+Route::get('/admin/p/ordenes/acta/unidad/reporte/{id}', [OrdenCompraUnidadController::class,'reporteActaGeneradaUnidades']);
 
 

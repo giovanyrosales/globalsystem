@@ -19,12 +19,7 @@
 
                             @foreach($lista as $dato)
 
-                                @if($dato->estado == 1)
-                                    <tr class="table-danger">
-                                    @else
-                                    <tr>
-                                @endif
-
+                                <tr>
                                     <td>{{ $dato->proyecto_cod }}</td>
                                     <td>{{ $dato->id }}</td>
                                     <td>{{ $dato->requidestino }}</td>

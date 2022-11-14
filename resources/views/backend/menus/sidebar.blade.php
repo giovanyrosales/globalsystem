@@ -273,11 +273,11 @@
                                 </li>
                             @endcan
 
-                            @can('sidebar.cotizacionunidad.denegada')
+                            @can('sidebar.cotizacion.unidad.denegadas')
                                 <li class="nav-item">
-                                    <a href="{{ route('cotizaciones.denegadasunidad.index') }}" target="frameprincipal" class="nav-link">
+                                    <a href="{{ route('cotizaciones.denegadas.unidad.index') }}" target="frameprincipal" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Cotización Denegadasx</p>
+                                        <p>Cotización Denegadas</p>
                                     </a>
                                 </li>
                             @endcan
@@ -288,6 +288,47 @@
 
 
 
+            <!-- ORDENES DE COMPRA PARA UNIDADES -->
+                @can('sidebar.seccion.ordenescompra.unidades')
+
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Ordenes de Compra Unidad
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            @can('ordenes.compras.procesadas.unidades.index')
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.ordenes.compra.unidades.procesadas') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>
+                                            Ordenes Procesadas
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+
+                            @can('ordenes.compras.denegadas.unidades.index')
+                                    <li class="nav-item">
+                                    <a href="{{ route('admin.ordenes.compra.unidades.denegadas') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>
+                                            Ordenes Denegadas
+                                        </p>
+                                    </a>
+                                </li>
+                            @endcan
+
+                        </ul>
+                    </li>
+
+                @endcan
 
 
             <!-- CONFIGURACIONES PARA PROYECTO -->

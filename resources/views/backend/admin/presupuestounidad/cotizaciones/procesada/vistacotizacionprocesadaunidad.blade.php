@@ -19,7 +19,7 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Cotizaciones Autorizadas</h1>
+                <h1>Cotizaciones Unidad Autorizadas</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -135,8 +135,8 @@
             $('#tablaDatatable').load(ruta);
         }
 
-        function verProcesadas(id){
-            window.location.href="{{ url('/admin/cotizacion/proyecto/detalle') }}/" + id;
+        function verProcesadas(idcoti){
+            window.location.href="{{ url('/admin/p/cotizacion/unidad/detalle') }}/" + idcoti;
         }
 
         function abrirModalOrden(id){
@@ -145,7 +145,6 @@
         }
 
         function verificarOrden(){
-
             var fecha = document.getElementById('fecha_orden').value;
             var lugar = document.getElementById('lugar').value;
             var admin = document.getElementById('select-administrador').value;
@@ -173,7 +172,7 @@
             formData.append('lugar', lugar);
             formData.append('admin', admin);
 
-            axios.post(url+'/ordenes/proyecto/generar/nuevo', formData, {
+            axios.post(url+'/p/ordencompra/unidad/generar', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -188,10 +187,10 @@
                         let id = response.data.id;
 
                         // vista pdf
-                        window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + id + "/" + 10);
+                        window.open("{{ URL::to('admin/p/ordencompra/unidad/pdf') }}/" + id + "/" + 10);
                     }
                     else if(response.data.success === 2) {
-                        // la orden de compra con la cotización, no estaba aprobada.
+                        // La orden de compra con la cotización, no estaba aprobada.
                         // solo por seguridad.
 
                         Swal.fire({
@@ -211,21 +210,21 @@
                     }
                     else if(response.data.success === 3) {
 
-                        let mensaje = response.data.mensaje;
-
                         Swal.fire({
-                            title: 'Estado Proyecto',
-                            html: mensaje,
+                            title: 'Permiso Denegado',
+                            text: "Para el Presente Año no es permitido realizar modificaciones",
                             icon: 'info',
                             showCancelButton: false,
+                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                location.reload();
                             }
                         })
+
                     }
                     else {
                         toastr.error('Error al crear orden');

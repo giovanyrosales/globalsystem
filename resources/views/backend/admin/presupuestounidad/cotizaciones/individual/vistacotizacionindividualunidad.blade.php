@@ -264,33 +264,35 @@
 
             openLoading();
 
-            axios.post(url+'/cotizacion/proyecto/denegar', {
+            axios.post(url+'/p/cotizacion/denegar', {
                 'id': id
             })
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
-                        let mensaje = response.data.mensaje;
 
                         Swal.fire({
-                            title: 'Estado Proyecto',
-                            html: mensaje,
+                            title: 'Permiso Denegado',
+                            text: "Para el Presente Año no es permitido realizar modificaciones",
                             icon: 'info',
                             showCancelButton: false,
+                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                location.reload();
                             }
                         })
                     }
                     else if(response.data.success === 2){
 
+                        let idanio = response.data.idanio;
+
                         Swal.fire({
                             title: 'Cotización Denegada',
-                            text: "",
+                            text: "Se redireccionara a Cotizaciones Denegadas",
                             icon: 'success',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -299,7 +301,9 @@
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href="{{ url('/admin/cotizacion/proyecto/denegadas/index') }}";
+
+                                // id cotizacion unidad
+                                window.location.href="{{ url('/admin/p/cotizacion/unidad/denegadas/index') }}/" + idanio;
                             }
                         })
                     }

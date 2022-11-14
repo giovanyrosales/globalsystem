@@ -16,6 +16,7 @@ class CreateOrdenUnidadTable extends Migration
         Schema::create('orden_unidad', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_cotizacion')->unsigned();
+            $table->bigInteger('id_admin_contrato')->unsigned();
 
             $table->date('fecha_orden');
             $table->text('lugar')->nullable();
@@ -29,6 +30,7 @@ class CreateOrdenUnidadTable extends Migration
             $table->dateTime('fecha_anulada')->nullable();
 
             $table->foreign('id_cotizacion')->references('id')->on('cotizacion_unidad');
+            $table->foreign('id_admin_contrato')->references('id')->on('administradores');
         });
     }
 
