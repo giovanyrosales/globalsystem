@@ -942,6 +942,8 @@ Route::get('/admin/p/ordenes/acta/unidad/reporte/{id}', [OrdenCompraUnidadContro
 Route::get('/admin/p/movicuentaunidad/solicitud/material/{id}', [MovimientosUnidadControlles::class,'indexSolicitudMovimientoUnidadMaterial']);
 // retorna tabla para ver materiales solicitados y se quita dinero de un código
 Route::get('/admin/p/movicuentaunidad/solicitud/materialtabla/{id}', [MovimientosUnidadControlles::class,'tablaSolicitudMovimientoUnidadMaterial']);
+// buscador de material de solicitud
+Route::post('/admin/p/buscar/material/solicitud/unidad',  [MovimientosUnidadControlles::class,'buscadorMaterialSolicitudUnidad']);
 
 
 

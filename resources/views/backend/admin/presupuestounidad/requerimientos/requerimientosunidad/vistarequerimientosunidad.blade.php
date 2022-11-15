@@ -375,13 +375,14 @@
 
             document.getElementById("divcontenedor").style.display = "block";
 
+            document.getElementById("mySelect").disabled = true;
+
             // variable global para setear input al buscar nuevo material
             window.txtContenedorGlobal = this;
             window.seguroBuscador = true;
 
             $(document).click(function(){
                 $(".droplistado").hide();
-                $(".droplistadoeditar").hide();
             });
 
             $(document).ready(function() {

@@ -824,14 +824,14 @@ class MovimientosUnidadControlles extends Controller
     //* *************************
 
     // retorna vista para ver materiales solicitados y se quita dinero de un código
-    public function indexSolicitudMovimientoUnidadMaterial($id){
+    public function indexSolicitudMovimientoUnidadMaterial($idpresubunidad){
         // ID: PRESUP UNIDAD
 
-        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.vistamovimientounidadsolicitudmaterial', compact('id'));
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.vistamovimientounidadsolicitudmaterial', compact('idpresubunidad'));
     }
 
     // retorna tabla para ver materiales solicitados y se quita dinero de un código
-    public function tablaSolicitudMovimientoUnidadMaterial($id){
+    public function tablaSolicitudMovimientoUnidadMaterial($idpresubunidad){
 
         return "tabla";
 
@@ -863,6 +863,68 @@ class MovimientosUnidadControlles extends Controller
         }
 
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.tablamovimientounidadsolicitudmaterial', compact('infoMovimiento'));
+    }
+
+
+    public function buscadorMaterialSolicitudUnidad(Request $request){
+
+        if($request->get('query')){
+            $query = $request->get('query');
+
+            return "sdfdsf";
+
+            // idpresuunidad
+
+            $arrayPresuDetalle = P_PresupUnidadDetalle::where('id_presup_unidad', $request->idpresuunidad)->get();
+
+            $pilaIdMateriales = array();
+
+            foreach ($arrayPresuDetalle as $dd){
+                array_push($pilaIdMateriales, $dd->id_material);
+            }
+
+            // array de materiales materiales adicionales
+            $arrayMateriales = P_Materiales::whereIn('id', $pilaIdMateriales)
+                ->where('descripcion', 'LIKE', "%{$query}%")
+                ->take(40)
+                ->get();
+
+            // BÚSQUEDA
+
+            $output = '<ul class="dropdown-menu" style="display:block; position:relative;">';
+            $tiene = true;
+            foreach($arrayMateriales as $row){
+
+                $infoUnidad = P_UnidadMedida::where('id', $row->id_unidadmedida)->first();
+                $row->unido = $row->descripcion . ' - ' . $infoUnidad->nombre;
+
+                // si solo hay 1 fila, No mostrara el hr, salto de linea
+                if(count($arrayMateriales) == 1){
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValorSolicitud(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->unido.'</a></li>
+                ';
+                    }
+                }
+
+                else{
+                    if(!empty($row)){
+                        $tiene = false;
+                        $output .= '
+                 <li onclick="modificarValorSolicitud(this)" id="'.$row->id.'"><a href="#" style="margin-left: 3px">'.$row->unido.'</a></li>
+                   <hr>
+                ';
+                    }
+                }
+            }
+
+            $output .= '</ul>';
+            if($tiene){
+                $output = '';
+            }
+            echo $output;
+        }
     }
 
 }
