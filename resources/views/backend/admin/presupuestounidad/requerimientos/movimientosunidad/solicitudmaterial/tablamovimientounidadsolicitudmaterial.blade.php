@@ -7,50 +7,29 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 15%">Departamento</th>
-                                <th style="width: 10%">Num. de Orden</th>
-                                <th style="width: 17%">Requi. Destino</th>
-                                <th style="width: 17%">Cotización #</th>
-                                <th style="width: 17%">Proveedor</th>
-                                <th style="width: 12%">Opciones</th>
+                                <th>Fecha</th>
+                                <th>Cuenta Aumento</th>
+                                <th>Cuenta Disminuye</th>
+                                <th style="font-weight: bold">Monto</th>
+                                <th>Estado</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($lista as $dato)
-
+                            @foreach($infoMovimiento as $dato)
                                 <tr>
-                                    <td>{{ $dato->departamento }}</td>
-                                    <td>{{ $dato->id }}</td>
-                                    <td>{{ $dato->requidestino }}</td>
-                                    <td>{{ $dato->id_cotizacion }}</td>
-                                    <td>{{ $dato->nomproveedor }}</td>
-                                    <td>
+                                    <td>{{ $dato->fecha }}</td>
+                                    <td>{{ $dato->cuentaaumenta }}</td>
+                                    <td>{{ $dato->cuentabaja }}</td>
+                                    <td style="font-weight: bold">${{ $dato->dinero }}</td>
 
-                                        <!-- ORDEN NO ANULADA -->
-                                            <button type="button" class="btn btn-primary btn-xs" onclick="verProcesadas({{ $dato->id_cotizacion }})">
-                                                <i class="fas fa-list-alt" title="Detalle"></i>&nbsp; Detalle
-                                            </button>
-
-                                        </td>
-                                    </tr>
-
-                                @if($loop->last)
-                                    <script>
-                                        setTimeout(function () {
-                                            closeLoading();
-                                        }, 1000);
-                                    </script>
-                                @endif
-
+                                    @if($dato->autorizado == 0)
+                                        <td><span class="badge bg-warning">Pendiente</span></td>
+                                    @else
+                                        <td><span class="badge bg-success">Autorizada</span></td>
+                                    @endif
+                                </tr>
                             @endforeach
-
-                                <script>
-                                    setTimeout(function () {
-                                        closeLoading();
-                                    }, 1000);
-                                </script>
-
 
                             </tbody>
                         </table>
@@ -60,6 +39,7 @@
         </div>
     </div>
 </section>
+
 
 <script>
     $(function () {
@@ -96,7 +76,6 @@
                     "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
-
             },
             "responsive": true, "lengthChange": true, "autoWidth": false,
         });

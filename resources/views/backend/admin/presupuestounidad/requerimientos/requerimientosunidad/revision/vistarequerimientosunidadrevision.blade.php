@@ -92,7 +92,7 @@
                                 <div class="col-md-12">
                                     <div class="row">
                                         <!-- Selección del lado izquierdo -->
-                                        <div class="col-xs-5 col-md-5 col-sm-5">
+                                        <div class="col-xs-7 col-md-7 col-sm-7">
                                             <label>Lista de Items de Requisición</label>
                                             <select name="from[]" id="mySideToSideSelect" class="form-control" size="8" multiple="multiple">
 
@@ -110,7 +110,7 @@
                                         </div>
 
                                         <!-- Selección del lado derecho -->
-                                        <div class="col-xs-5 col-md-5 col-sm-5">
+                                        <div class="col-xs-3 col-md-3 col-sm-3">
                                             <label>Lista de Items a cotizar</label>
                                             <select name="to[]" id="mySideToSideSelect_to" class="form-control" size="8" multiple="multiple"></select>
                                         </div>
@@ -149,7 +149,7 @@
                                     <tr>
                                         <th style="width: 3%">#</th>
                                         <th style="width: 5%">Cantidad</th>
-                                        <th style="width: 12%">Descripción</th>
+                                        <th style="width: 12%">Descripción Material</th>
                                         <th style="width: 5%">Medida</th>
                                         <th style="width: 5%">Precio U.</th>
                                         <th style="width: 5%">Total</th>
@@ -244,7 +244,7 @@
 
                         // ID ES DE: REQUISICION_DETALLE
                         $.each(response.data.listado, function( key, val ){
-                            $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.nombre+'</option>');
+                            $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.material_descripcion+'</option>');
                         });
                     }
                     else {
@@ -353,7 +353,7 @@
                                 "</td>"+
 
                                 "<td>"+
-                                "<input value='"+infodetalle[i].nombre+"' disabled class='form-control'>"+
+                                "<input value='"+infodetalle[i].material_descripcion+"' disabled class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+

@@ -168,7 +168,7 @@ class MovimientosUnidadControlles extends Controller
 
             // obtener todas las salidas de material
             $arrayRestante = DB::table('cuentaunidad_restante AS cr')
-                ->join('requisicion_detalle AS rd', 'cr.id_requi_detalle', '=', 'rd.id')
+                ->join('requisicion_unidad_detalle AS rd', 'cr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('cr.id_cuenta_unidad', $lista->id)
                 ->where('rd.cancelado', 0)
@@ -180,7 +180,7 @@ class MovimientosUnidadControlles extends Controller
 
             // obtener todas las salidas de material
             $arrayRetenido = DB::table('cuentaunidad_retenido AS cr')
-                ->join('requisicion_detalle AS rd', 'cr.id_requi_detalle', '=', 'rd.id')
+                ->join('requisicion_unidad_detalle AS rd', 'cr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('cr.id_cuenta_unidad', $lista->id)
                 ->where('rd.cancelado', 0)
@@ -236,7 +236,7 @@ class MovimientosUnidadControlles extends Controller
 
             // obtener saldos restante
             $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuenta_unidad', $lista->id)
                 ->where('rd.cancelado', 0)
@@ -248,7 +248,7 @@ class MovimientosUnidadControlles extends Controller
 
             // información de saldos retenidos
             $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('psr.id_cuenta_unidad', $lista->id)
                 ->where('rd.cancelado', 0)
@@ -305,7 +305,7 @@ class MovimientosUnidadControlles extends Controller
 
             // obtener todas las salidas de material
             $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('pd.id_cuenta_unidad', $infoCuentaProy->id)
                 ->where('rd.cancelado', 0)
@@ -317,7 +317,7 @@ class MovimientosUnidadControlles extends Controller
 
             // obtener saldos retenidos
             $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('psr.id_cuenta_unidad', $infoCuentaProy->id)
                 ->where('rd.cancelado', 0)
@@ -517,7 +517,7 @@ class MovimientosUnidadControlles extends Controller
 
             // obtener todas las salidas de material
             $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero')
                 ->where('pd.id_cuenta_unidad', $infoCuentaUnidad->id)
                 ->where('rd.cancelado', 0)
@@ -530,7 +530,7 @@ class MovimientosUnidadControlles extends Controller
 
             // información de saldos retenidos
             $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                 ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                 ->where('psr.id_cuenta_unidad', $infoCuentaUnidad->id)
                 ->where('rd.cancelado', 0)
@@ -624,7 +624,7 @@ class MovimientosUnidadControlles extends Controller
 
                 // obtener saldo restante
                 $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                    ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                    ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('pd.id_cuenta_unidad', $infoCuentaUnidad->id)
                     ->where('rd.cancelado', 0)
@@ -636,7 +636,7 @@ class MovimientosUnidadControlles extends Controller
 
                 // obtener saldos retenidos
                 $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                    ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                    ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('psr.id_cuenta_unidad', $infoCuentaUnidad->id)
                     ->where('rd.cancelado', 0)
@@ -818,6 +818,51 @@ class MovimientosUnidadControlles extends Controller
             DB::rollback();
             return ['success' => 99];
         }
+    }
+
+
+    //* *************************
+
+    // retorna vista para ver materiales solicitados y se quita dinero de un código
+    public function indexSolicitudMovimientoUnidadMaterial($id){
+        // ID: PRESUP UNIDAD
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.vistamovimientounidadsolicitudmaterial', compact('id'));
+    }
+
+    // retorna tabla para ver materiales solicitados y se quita dinero de un código
+    public function tablaSolicitudMovimientoUnidadMaterial($id){
+
+        return "tabla";
+
+        // ID: PRESUP UNIDAD
+
+        $pilaIdCuentaUnidad = array();
+        $listado = CuentaUnidad::where('id_presup_unidad', $id)->get();
+
+        foreach ($listado as $ll) {
+            array_push($pilaIdCuentaUnidad, $ll->id);
+        }
+
+        $infoMovimiento = MoviCuentaUnidad::whereIn('id_cuentaunidad_sube', $pilaIdCuentaUnidad)
+            ->orderBy('fecha', 'ASC')
+            ->get();
+
+        foreach ($infoMovimiento as $dd) {
+
+            $infoCuentaUnidadAumenta = CuentaUnidad::where('id', $dd->id_cuentaunidad_sube)->first();
+            $infoCuentaUnidadBaja = CuentaUnidad::where('id', $dd->id_cuentaunidad_baja)->first();
+
+            $infoObjetoAumenta = ObjEspecifico::where('id', $infoCuentaUnidadAumenta->id_objespeci)->first();
+            $infoObjetoBaja = ObjEspecifico::where('id', $infoCuentaUnidadBaja->id_objespeci)->first();
+
+            $dd->cuentaaumenta = $infoObjetoAumenta->codigo . " - " . $infoObjetoAumenta->nombre;
+            $dd->cuentabaja = $infoObjetoBaja->codigo . " - " . $infoObjetoBaja->nombre;
+
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+        }
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.tablamovimientounidadsolicitudmaterial', compact('infoMovimiento'));
     }
 
 }

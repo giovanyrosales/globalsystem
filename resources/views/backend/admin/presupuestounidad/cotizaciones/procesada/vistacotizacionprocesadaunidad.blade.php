@@ -141,6 +141,7 @@
 
         function abrirModalOrden(id){
             $('#id-coti').val(id);
+            document.getElementById("formulario-crear-orden").reset();
             $('#modalGenerarOrden').modal('show');
         }
 

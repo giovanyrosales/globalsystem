@@ -29,7 +29,11 @@
                         <i class="fas fa-list-alt"></i>
                         Histórico
                     </button>
-
+                    <button type="button" style="margin-top: 15px;font-weight: bold; background-color: #17a2b8; color: white !important;"
+                            onclick="verSolicitudes()" class="button button-3d button-rounded button-pill button-small">
+                        <i class="fas fa-list-alt"></i>
+                        Solicitud Material
+                    </button>
                 </div>
 
             </div>
@@ -419,7 +423,12 @@
                 });
         }
 
-
+        // vista para solicitar material que no esta en mi presupuesto y quitara
+        // dinero de un código
+        function verSolicitudes(){
+            let id = {{ $idpresup }}; // ID presup_unidad
+            window.location.href="{{ url('/admin/p/movicuentaunidad/solicitud/material') }}/" + id;
+        }
 
 
 

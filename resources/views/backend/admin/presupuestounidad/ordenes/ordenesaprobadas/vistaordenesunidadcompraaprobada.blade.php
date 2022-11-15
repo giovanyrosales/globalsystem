@@ -358,6 +358,13 @@
             window.open("{{ URL::to('admin/p/ordencompra/unidad/pdf') }}/" + id + "/" + cantidad);
         }
 
+        function verDetalles(id){
+            // ID COTIZACION
+
+            window.location.href="{{ url('/admin/p/detalle/ordencompra/coti/unidad/') }}/" + id;
+        }
+
+
     </script>
 
 

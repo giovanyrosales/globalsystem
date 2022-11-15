@@ -289,8 +289,6 @@ class RequerimientosUnidadController extends Controller
     // registrar una nueva requisición para unidades
     public function nuevoRequisicionUnidades(Request $request){
 
-        Log::info($request->all());
-
         $rules = array(
             'fecha' => 'required',
             'idpresubuni' => 'required',
@@ -357,7 +355,7 @@ class RequerimientosUnidadController extends Controller
 
                 // obtener todas las salidas de material
                 $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                    ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                    ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
                     ->where('pd.id_cuenta_unidad', $infoCuentaUnidad->id)
                     ->where('rd.cancelado', 0)
@@ -368,8 +366,8 @@ class RequerimientosUnidadController extends Controller
                 }
 
                 // información de saldos retenidos
-                $arrayRetenido = DB::table('cuentaunidad_restante AS psr')
-                    ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
+                    ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('psr.id_cuenta_unidad', $infoCuentaUnidad->id)
                     ->where('rd.cancelado', 0)
@@ -389,6 +387,10 @@ class RequerimientosUnidadController extends Controller
                 // Verificar cantidad * dinero del material nuevo.
                 // Este dinero se está solicitando para la fila.
                 $saldoMaterial = $request->cantidad[$i] * $infoCatalogo->costo;
+
+                Log::info('total calculado ' . $totalCalculado);
+                Log::info('saldo material ' . $saldoMaterial);
+
 
                 if($this->redondear_dos_decimal($totalCalculado) < $this->redondear_dos_decimal($saldoMaterial)){
 

@@ -936,3 +936,15 @@ Route::post('/admin/p/ordenes/unidad/generar/acta',  [OrdenCompraUnidadControlle
 Route::get('/admin/p/ordenes/acta/unidad/reporte/{id}', [OrdenCompraUnidadController::class,'reporteActaGeneradaUnidades']);
 
 
+// * MOVIMIENTO DE CUENTA DE UNIDAD PARA SOLICITAR MATERIAL QUE NO ESTA EN EL PRESUPUESTO
+
+// retorna vista para ver materiales solicitados y se quita dinero de un código
+Route::get('/admin/p/movicuentaunidad/solicitud/material/{id}', [MovimientosUnidadControlles::class,'indexSolicitudMovimientoUnidadMaterial']);
+// retorna tabla para ver materiales solicitados y se quita dinero de un código
+Route::get('/admin/p/movicuentaunidad/solicitud/materialtabla/{id}', [MovimientosUnidadControlles::class,'tablaSolicitudMovimientoUnidadMaterial']);
+
+
+
+
+
+

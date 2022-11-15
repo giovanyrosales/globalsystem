@@ -162,8 +162,9 @@
                                     <thead>
                                     <tr>
                                         <th style="width: 3%">#</th>
-                                        <th style="width: 5%">Cantidad</th>
-                                        <th style="width: 15%">Descripción</th>
+                                        <th style="width: 4%">Cantidad</th>
+                                        <th style="width: 10%">Material</th>
+                                        <th style="width: 12%">Descripción</th>
                                         <th style="width: 5%">Opciones</th>
                                     </tr>
                                     </thead>
@@ -270,8 +271,8 @@
                                         <th style="width: 4%">Cantidad</th>
                                         <th style="width: 4%">Precio</th>
                                         <th style="width: 4%">Total</th>
-                                        <th style="width: 7%">Código Específico</th>
-                                        <th style="width: 15%">Descripción</th>
+                                        <th style="width: 7%">Material</th>
+                                        <th style="width: 15%">Descripción Material</th>
                                         <th style="width: 5%">Opciones</th>
                                     </tr>
                                     </thead>
@@ -518,7 +519,10 @@
 
                 "<td>"+
                 "<input name='descripcionarray[]' disabled data-info='" + idmaterial.dataset.info + "'  value='" + nomMaterial + "' class='form-control'>"+
-                "<input name='materialdescripcionarray[]' disabled type='hidden' class='form-control' value='" + descripcion + "'>"+
+                "</td>"+
+
+                "<td>"+
+                "<input name='materialdescripcionarray[]' disabled value='" + descripcion + "' class='form-control'>"+
                 "</td>"+
 
                 "<td>"+
@@ -913,11 +917,11 @@
                                 "</td>"+
 
                                 "<td>"+
-                                "<input value='"+infodetalle[i].codigo+"' disabled class='form-control'>"+
+                                "<input value='"+infodetalle[i].descripcion+"' disabled class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
-                                "<input class='form-control' disabled value='"+infodetalle[i].descripcion+"' style='width:100%' type='text'>"+
+                                "<input class='form-control' disabled value='"+infodetalle[i].material_descripcion+"' style='width:100%' type='text'>"+
                                 "</td>";
 
                             // si hay cotización

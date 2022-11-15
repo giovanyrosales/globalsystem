@@ -276,7 +276,7 @@ class CotizacionesUnidadController extends Controller
 
                 // obtener lo guardado de ordenes de compra, para obtener su restante
                 $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                    ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                    ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero')
                     ->where('pd.id_cuenta_unidad', $infoCuentaUnidad->id)
                     ->where('rd.cancelado', 0)
@@ -288,7 +288,7 @@ class CotizacionesUnidadController extends Controller
 
                 // información de saldos retenidos
                 $infoSaldoRetenido = DB::table('cuentaunidad_retenido AS psr')
-                    ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                    ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
                     ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
                     ->where('psr.id_cuenta_unidad', $infoCuentaUnidad->id)
                     ->where('rd.cancelado', 0)
@@ -441,9 +441,9 @@ class CotizacionesUnidadController extends Controller
             $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
 
             if($infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
-                $de->nombrematerial = $infoMaterial->descripcion . " - " . $infoUnidad->nombre;
+                $de->nombrematerial = $infoRequiDetalle->material_descripcion . " - " . $infoUnidad->nombre;
             }else{
-                $de->nombrematerial = $infoMaterial->descripcion;
+                $de->nombrematerial = $infoRequiDetalle->material_descripcion;
             }
 
             $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
@@ -679,11 +679,16 @@ class CotizacionesUnidadController extends Controller
             $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $de->id_requi_unidaddetalle)->first();
             $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
 
-            if($infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
-                $de->nombrematerial = $infoMaterial->descripcion . " - " . $infoUnidad->nombre;
+            /*if($infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
+                $de->nombrematerial = $infoRequiDetalle->material_descripcion . " - " . $infoUnidad->nombre;
             }else{
-                $de->nombrematerial = $infoMaterial->descripcion;
-            }
+                $de->nombrematerial = $infoRequiDetalle->material_descripcion;
+            }*/
+            $de->nombrematerial = $infoRequiDetalle->material_descripcion;
+
+            $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+            $de->unidadmedida = $infoUnidad->nombre;
+
 
             $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
             $de->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;

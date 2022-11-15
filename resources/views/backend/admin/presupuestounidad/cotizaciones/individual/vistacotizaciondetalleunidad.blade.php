@@ -75,7 +75,8 @@
                             <tr>
                                 <th style="width: 3%">#</th>
                                 <th style="width: 6%">Cantidad</th>
-                                <th style="width: 15%">Descripción</th>
+                                <th style="width: 14%">Descripción Material</th>
+                                <th style="width: 7%">Unidad Medida</th>
                                 <th style="width: 5%">Precio Unitario
                                 <th style="width: 5%">Total</th>
                                 <th style="width: 5%">Cod. Presup</th>
@@ -88,6 +89,7 @@
                                     <td><p id="fila{{$dd->conteo}}" class='form-control'>{{$dd->conteo}}</p></td>
                                     <td><input disabled class="form-control" value="{{$dd->cantidad}}"></td>
                                     <td><input disabled class="form-control" type="text" value="{{$dd->nombrematerial}}"></td>
+                                    <td><input disabled class="form-control" type="text" value="{{$dd->unidadmedida}}"></td>
                                     <td><input disabled class="form-control" value="${{$dd->precio_u }}"></td>
                                     <td><input disabled class="form-control" value="${{$dd->total }}"></td>
                                     <td><input disabled class="form-control" value="{{$dd->objeto }}"></td>
@@ -97,6 +99,7 @@
                             <tr>
                                 <td><p class='form-control'>Total</p></td>
                                 <td><input disabled class="form-control" type="text" value="{{$totalCantidad}}"></td>
+                                <td><input disabled class="form-control" type="text"></td>
                                 <td><input disabled class="form-control" type="text"></td>
                                 <td><input disabled class="form-control" value="${{$totalPrecio }}"></td>
                                 <td><input disabled class="form-control" value="${{$totalTotal }}"></td>

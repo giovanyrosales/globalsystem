@@ -152,9 +152,9 @@ class OrdenCompraUnidadController extends Controller
             $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
 
             if(strlen($infoMaterial->descripcion) >= 25){
-                $subcadena = substr($infoMaterial->descripcion, 0, 25);
+                $subcadena = substr($infoRequiDetalle->material_descripcion, 0, 25);
             }else{
-                $subcadena = $infoMaterial->descripcion;
+                $subcadena = $infoRequiDetalle->material_descripcion;
             }
 
             $multi = $dd->cantidad * $dd->precio_u;
@@ -408,11 +408,15 @@ class OrdenCompraUnidadController extends Controller
             $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $de->id_requi_unidaddetalle)->first();
             $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
 
-            if($infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
-                $de->nombrematerial = $infoMaterial->descripcion . " - " . $infoUnidad->nombre;
+            /*if($infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
+                $de->nombrematerial = $infoRequiDetalle->material_descripcion . " - " . $infoUnidad->nombre;
             }else{
-                $de->nombrematerial = $infoMaterial->descripcion;
-            }
+
+            }*/
+
+            $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+            $de->nombrematerial = $infoRequiDetalle->material_descripcion;
+            $de->unidadmedida = $infoUnidad->nombre;
 
             $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
             $de->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;

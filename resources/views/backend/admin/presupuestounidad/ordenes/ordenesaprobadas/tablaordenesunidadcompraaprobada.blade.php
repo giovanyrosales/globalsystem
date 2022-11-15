@@ -36,6 +36,10 @@
                                             @endcan
                                         @endif
 
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="verDetalles({{ $dato->id_cotizacion }})">
+                                            <i class="fas fa-list-alt" title="Detalle"></i>&nbsp; Detalle
+                                        </button>
+                                        <br> <br>
                                         <button type="button" class="btn btn-success btn-xs" onclick="Imprimir({{ $dato->id }})">
                                             <i class="fa fa-print" title="Generar Acta"></i>&nbsp; Imprimir Orden
                                         </button>
