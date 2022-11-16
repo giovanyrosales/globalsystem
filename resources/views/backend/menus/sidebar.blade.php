@@ -588,6 +588,15 @@
                                 </li>
                             @endcan
 
+                            @can('p.sidebar.solicitud.materiales.cuentas.unidades')
+                                <li class="nav-item">
+                                    <a href="{{ route('p.admin.nuevas.solicitudes.materiales') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Solicitudes de Materiales</p>
+                                    </a>
+                                </li>
+                            @endcan
+
                         </ul>
                     </li>
                 @endcan

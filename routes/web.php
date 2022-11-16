@@ -952,6 +952,19 @@ Route::post('/admin/p/select/obj/saldos/solicitud/material',  [MovimientosUnidad
 Route::post('/admin/p/guardar/solicitud/material',  [MovimientosUnidadControlles::class,'guardarSolicitudMaterialUnidad']);
 
 
+// PRESUPUESTO REVISA SOLICITUDES DE MATERIAL QUE NO DEJO EN PRESUPUESTO
+
+
+Route::get('/admin/p/revision/solicitud/material/unidades', [MovimientosUnidadControlles::class,'indexRevisionSolicitudMaterialUnidad'])->name('p.admin.nuevas.solicitudes.materiales');
+// retorna tabla para ver materiales solicitados y se quita dinero de un código
+Route::get('/admin/p/revision/solicitud/material/unidades/tabla', [MovimientosUnidadControlles::class,'tablaRevisionSolicitudMaterialUnidad']);
+// revision por presupuesto de material solicitado por una unidad
+Route::post('/admin/p/solicitud/material/revision/presupuesto',  [MovimientosUnidadControlles::class,'informacionSolicitudMaterialPresupuesto']);
+
+
+
+
+
 
 
 
