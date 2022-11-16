@@ -939,11 +939,17 @@ Route::get('/admin/p/ordenes/acta/unidad/reporte/{id}', [OrdenCompraUnidadContro
 // * MOVIMIENTO DE CUENTA DE UNIDAD PARA SOLICITAR MATERIAL QUE NO ESTA EN EL PRESUPUESTO
 
 // retorna vista para ver materiales solicitados y se quita dinero de un código
-Route::get('/admin/p/movicuentaunidad/solicitud/material/{id}', [MovimientosUnidadControlles::class,'indexSolicitudMovimientoUnidadMaterial']);
+Route::get('/admin/p/movicuentaunidad/solicitud/material/{idpresup}', [MovimientosUnidadControlles::class,'indexSolicitudMovimientoUnidadMaterial']);
 // retorna tabla para ver materiales solicitados y se quita dinero de un código
-Route::get('/admin/p/movicuentaunidad/solicitud/materialtabla/{id}', [MovimientosUnidadControlles::class,'tablaSolicitudMovimientoUnidadMaterial']);
+Route::get('/admin/p/movicuentaunidad/solicitud/materialtabla/{idpresup}', [MovimientosUnidadControlles::class,'tablaSolicitudMovimientoUnidadMaterial']);
 // buscador de material de solicitud
 Route::post('/admin/p/buscar/material/solicitud/unidad',  [MovimientosUnidadControlles::class,'buscadorMaterialSolicitudUnidad']);
+// llenar select para obtener obj específico a descontar para obtener nuevo material
+Route::post('/admin/p/select/objespecifico/solicitud',  [MovimientosUnidadControlles::class,'buscadorObjEspeciSolicitudMaterial']);
+// obtener saldo restando MENOS el saldo retenido de un obj especifico
+Route::post('/admin/p/select/obj/saldos/solicitud/material',  [MovimientosUnidadControlles::class,'infoSaldoRestanteSolicitudMaterial']);
+// guardar solicitud de materiales
+Route::post('/admin/p/guardar/solicitud/material',  [MovimientosUnidadControlles::class,'guardarSolicitudMaterialUnidad']);
 
 
 

@@ -7,27 +7,22 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Cuenta Aumento</th>
-                                <th>Cuenta Disminuye</th>
-                                <th style="font-weight: bold">Monto</th>
-                                <th>Estado</th>
+                                <th>Material Solicitado</th>
+                                <th>Cantidad</th>
+                                <th>Periodo</th>
+                                <th>Total</th>
+                                <th>Objeto Específico a Descontar</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($infoMovimiento as $dato)
+                            @foreach($lista as $dato)
                                 <tr>
-                                    <td>{{ $dato->fecha }}</td>
-                                    <td>{{ $dato->cuentaaumenta }}</td>
-                                    <td>{{ $dato->cuentabaja }}</td>
-                                    <td style="font-weight: bold">${{ $dato->dinero }}</td>
-
-                                    @if($dato->autorizado == 0)
-                                        <td><span class="badge bg-warning">Pendiente</span></td>
-                                    @else
-                                        <td><span class="badge bg-success">Autorizada</span></td>
-                                    @endif
+                                    <td>{{ $dato->material }}</td>
+                                    <td>{{ $dato->cantidad }}</td>
+                                    <td>{{ $dato->periodo }}</td>
+                                    <td>{{ $dato->total }}</td>
+                                    <td>{{ $dato->objnombre }}</td>
                                 </tr>
                             @endforeach
 

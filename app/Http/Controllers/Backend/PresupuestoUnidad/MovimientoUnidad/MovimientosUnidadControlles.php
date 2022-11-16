@@ -10,7 +10,11 @@ use App\Models\MoviCuentaUnidad;
 use App\Models\ObjEspecifico;
 use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
+use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
+use App\Models\P_PresupUnidadDetalle;
+use App\Models\P_SolicitudMaterial;
+use App\Models\P_UnidadMedida;
 use App\Models\P_UsuarioDepartamento;
 use App\Models\RequisicionUnidad;
 use Illuminate\Http\Request;
@@ -833,45 +837,34 @@ class MovimientosUnidadControlles extends Controller
     // retorna tabla para ver materiales solicitados y se quita dinero de un código
     public function tablaSolicitudMovimientoUnidadMaterial($idpresubunidad){
 
-        return "tabla";
-
         // ID: PRESUP UNIDAD
 
-        $pilaIdCuentaUnidad = array();
-        $listado = CuentaUnidad::where('id_presup_unidad', $id)->get();
+        $lista = P_SolicitudMaterial::where('id_presup_unidad', $idpresubunidad)->get();
 
-        foreach ($listado as $ll) {
-            array_push($pilaIdCuentaUnidad, $ll->id);
+        foreach ($lista as $dd) {
+
+            $infoMaterial = P_Materiales::where('id', $dd->id_material)->first();
+            $infoCuenta = CuentaUnidad::where('id', $dd->id_cuentaunidad)->first();
+            $infoObj = ObjEspecifico::where('id', $infoCuenta->id_objespeci)->first();
+
+            $dd->material = $infoMaterial->descripcion;
+            $dd->objnombre = $infoObj->codigo . ' - ' . $infoObj->nombre;
+
+            $total = ($dd->cantidad * $infoMaterial->costo) * $dd->periodo;
+
+            $total = "$" . number_format((float)$total, 2, '.', ',');
+
+            $dd->total = $total;
         }
 
-        $infoMovimiento = MoviCuentaUnidad::whereIn('id_cuentaunidad_sube', $pilaIdCuentaUnidad)
-            ->orderBy('fecha', 'ASC')
-            ->get();
-
-        foreach ($infoMovimiento as $dd) {
-
-            $infoCuentaUnidadAumenta = CuentaUnidad::where('id', $dd->id_cuentaunidad_sube)->first();
-            $infoCuentaUnidadBaja = CuentaUnidad::where('id', $dd->id_cuentaunidad_baja)->first();
-
-            $infoObjetoAumenta = ObjEspecifico::where('id', $infoCuentaUnidadAumenta->id_objespeci)->first();
-            $infoObjetoBaja = ObjEspecifico::where('id', $infoCuentaUnidadBaja->id_objespeci)->first();
-
-            $dd->cuentaaumenta = $infoObjetoAumenta->codigo . " - " . $infoObjetoAumenta->nombre;
-            $dd->cuentabaja = $infoObjetoBaja->codigo . " - " . $infoObjetoBaja->nombre;
-
-            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
-        }
-
-        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.tablamovimientounidadsolicitudmaterial', compact('infoMovimiento'));
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.tablamovimientounidadsolicitudmaterial', compact('lista'));
     }
 
-
+    // buscador de material de solicitud
     public function buscadorMaterialSolicitudUnidad(Request $request){
 
         if($request->get('query')){
             $query = $request->get('query');
-
-            return "sdfdsf";
 
             // idpresuunidad
 
@@ -884,7 +877,7 @@ class MovimientosUnidadControlles extends Controller
             }
 
             // array de materiales materiales adicionales
-            $arrayMateriales = P_Materiales::whereIn('id', $pilaIdMateriales)
+            $arrayMateriales = P_Materiales::whereNotIn('id', $pilaIdMateriales)
                 ->where('descripcion', 'LIKE', "%{$query}%")
                 ->take(40)
                 ->get();
@@ -926,5 +919,224 @@ class MovimientosUnidadControlles extends Controller
             echo $output;
         }
     }
+
+
+    public function buscadorObjEspeciSolicitudMaterial(Request $request){
+
+        $regla = array(
+            'idmaterial' => 'required',
+            'idpresup' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($lista = P_Materiales::where('id', $request->idmaterial)->first()){
+
+            //id_objespecifico
+
+            $detalle = DB::table('p_presup_unidad_detalle AS ppu')
+            ->join('p_materiales AS m', 'ppu.id_material', '=', 'm.id')
+            ->select('m.id_objespecifico')
+            ->where('ppu.id_presup_unidad', $request->idpresup)
+            ->whereNotIn('m.id_objespecifico', [$lista->id_objespecifico])
+            ->groupBy('m.id_objespecifico')
+            ->get();
+
+            $pilaArray = array();
+
+            foreach ($detalle as $p){
+                array_push($pilaArray, $p->id_objespecifico);
+            }
+
+            $arrayobj = ObjEspecifico::whereIn('id', $pilaArray)->get();
+
+            return ['success' => 1, 'arrayobj' => $arrayobj];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    // obtener saldo restando MENOS el saldo retenido de un obj especifico
+    public function infoSaldoRestanteSolicitudMaterial(Request $request){
+
+        $regla = array(
+            'idobj' => 'required', // ID objeto específico
+            'idpresup' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        if ($lista = CuentaUnidad::where('id_presup_unidad', $request->idpresup)
+            ->where('id_objespeci', $request->idobj)
+            ->first()) {
+
+            // CÁLCULOS
+
+            $totalRestante = 0;
+            $totalRetenido = 0;
+
+            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $lista->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $lista->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
+
+            // obtener saldos restante
+            $arrayRestante = DB::table('cuentaunidad_restante AS pd')
+                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero')
+                ->where('pd.id_cuenta_unidad', $lista->id)
+                ->where('rd.cancelado', 0)
+                ->get();
+
+            foreach ($arrayRestante as $dd) {
+                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
+            }
+
+            // información de saldos retenidos
+            $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
+                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                ->where('psr.id_cuenta_unidad', $lista->id)
+                ->where('rd.cancelado', 0)
+                ->get();
+
+            foreach ($arrayRetenido as $dd) {
+                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
+            }
+
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + ($lista->saldo_inicial - $totalRestante);
+
+            // se debe quitar el retenido
+            $totalCalculado = $totalRestanteSaldo - $totalRetenido;
+
+            $totalCalculado = "$" . number_format((float)$totalCalculado, 2, '.', ',');
+
+            return ['success' => 1, 'restante' => $totalCalculado];
+        } else {
+            return ['success' => 2];
+        }
+    }
+
+    // guardar solicitud de materiales
+    public function guardarSolicitudMaterialUnidad(Request $request){
+
+        $regla = array(
+            'idobj' => 'required', // ID objeto específico
+            'idpresup' => 'required',
+            'idmaterial' => 'required',
+            'cantidad' => 'required',
+            'periodo' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            if ($lista = CuentaUnidad::where('id_presup_unidad', $request->idpresup)
+                ->where('id_objespeci', $request->idobj)
+                ->first()) {
+
+                $totalRestante = 0;
+                $totalRetenido = 0;
+
+                $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $lista->id)
+                    ->where('autorizado', 1) // autorizado por presupuesto
+                    ->sum('dinero');
+
+                $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $lista->id)
+                    ->where('autorizado', 1) // autorizado por presupuesto
+                    ->sum('dinero');
+
+                $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
+
+                // obtener saldos restante
+                $arrayRestante = DB::table('cuentaunidad_restante AS pd')
+                    ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                    ->select('rd.cantidad', 'rd.dinero')
+                    ->where('pd.id_cuenta_unidad', $lista->id)
+                    ->where('rd.cancelado', 0)
+                    ->get();
+
+                foreach ($arrayRestante as $dd) {
+                    $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
+                }
+
+                // información de saldos retenidos
+                $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
+                    ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                    ->where('psr.id_cuenta_unidad', $lista->id)
+                    ->where('rd.cancelado', 0)
+                    ->get();
+
+                foreach ($arrayRetenido as $dd) {
+                    $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
+                }
+
+                // aquí se obtiene el Saldo Restante del código
+                $totalRestanteSaldo = $totalMoviCuenta + ($lista->saldo_inicial - $totalRestante);
+
+                // se debe quitar el retenido
+                $totalCalculado = $totalRestanteSaldo - $totalRetenido;
+
+                // obtener dinero
+                $infoMaterial = P_Materiales::where('id', $request->idmaterial)->first();
+
+                // periodo siempre sera mínimo 1
+                $totalMaterial = ($infoMaterial->costo * $request->cantidad) * $request->periodo;
+
+                // ver que haya saldo disponible
+                if($this->redondear_dos_decimal($totalCalculado) < $this->redondear_dos_decimal($totalMaterial)){
+
+                    // saldo insuficiente.
+
+                    $totalMaterial = number_format((float)$totalMaterial, 2, '.', ',');
+                    $totalCalculado = number_format((float)$totalCalculado, 2, '.', ',');
+
+                    return ['success' => 1, 'restante' => $totalCalculado, 'costo' => $totalMaterial];
+                }else{
+
+                    // guardar ya
+                    $deta = new P_SolicitudMaterial();
+                    $deta->id_presup_unidad = $request->idpresup;
+                    $deta->id_material = $request->idmaterial;
+                    $deta->cantidad = $request->cantidad;
+                    $deta->periodo = $request->periodo;
+                    $deta->id_cuentaunidad = $lista->id; // cuenta unidad que bajara
+                    $deta->save();
+
+                    DB::commit();
+                    return ['success' => 2];
+                }
+            }else{
+                // cuenta unidad no encontrada
+                return ['success' => 3];
+            }
+
+        } catch (\Throwable $e) {
+            Log::info('ee' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
 
 }
