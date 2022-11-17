@@ -14,6 +14,7 @@ use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
 use App\Models\P_PresupUnidadDetalle;
 use App\Models\P_SolicitudMaterial;
+use App\Models\P_SolicitudMaterialDetalle;
 use App\Models\P_UnidadMedida;
 use App\Models\P_UsuarioDepartamento;
 use App\Models\RequisicionUnidad;
@@ -1138,9 +1139,8 @@ class MovimientosUnidadControlles extends Controller
         }
     }
 
-
+    // retorna vista para ver materiales solicitados y se quita dinero de un código
     public function indexRevisionSolicitudMaterialUnidad(){
-
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.revision.vistarevisionsolicitudmaterial');
     }
 
@@ -1173,7 +1173,7 @@ class MovimientosUnidadControlles extends Controller
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.revision.tablarevisionsolicitudmaterial', compact('lista'));
     }
 
-
+    // revision por presupuesto de material solicitado por una unidad
     public function informacionSolicitudMaterialPresupuesto(Request $request){
 
         $regla = array(
@@ -1256,5 +1256,228 @@ class MovimientosUnidadControlles extends Controller
             return ['success' => 2];
         }
     }
+
+    // borrar solicitud material solicitado
+    public function borrarSolicitudMaterialPresupuesto(Request $request){
+
+        $regla = array(
+            'idsolicitud' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        if(P_SolicitudMaterial::where('id', $request->idsolicitud)->first()){
+
+            P_SolicitudMaterial::where('id', $request->idsolicitud)->delete();
+            return ['success' => 1];
+        }
+        else {
+            return ['success' => 2];
+        }
+    }
+
+    // aprobar solicitud de material solicitado y sumar a obj y descontar a otro obj
+    function aprobarSolicitudMaterialPresupuesto(Request $request){
+
+        $regla = array(
+            'idsolicitud' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            $infoSolicitud = P_SolicitudMaterial::where('id', $request->idsolicitud)->first();
+
+            $infoMaterial = P_Materiales::where('id', $infoSolicitud->id_material)->first();
+            $infoCuentaDescontar = CuentaUnidad::where('id', $infoSolicitud->id_cuentaunidad)->first();
+
+            $totalsolicitado = ($infoSolicitud->cantidad * $infoMaterial->costo) * $infoSolicitud->periodo;
+
+
+            // *** BUSCAR RESTANTE
+
+            $totalRestante = 0;
+            $totalRetenido = 0;
+
+            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $infoCuentaDescontar->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $infoCuentaDescontar->id)
+                ->where('autorizado', 1) // autorizado por presupuesto
+                ->sum('dinero');
+
+            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
+
+            // obtener saldos restante
+            $arrayRestante = DB::table('cuentaunidad_restante AS pd')
+                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero')
+                ->where('pd.id_cuenta_unidad', $infoCuentaDescontar->id)
+                ->where('rd.cancelado', 0)
+                ->get();
+
+            foreach ($arrayRestante as $dd) {
+                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
+            }
+
+            // información de saldos retenidos
+            $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
+                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
+                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
+                ->where('psr.id_cuenta_unidad', $infoCuentaDescontar->id)
+                ->where('rd.cancelado', 0)
+                ->get();
+
+            foreach ($arrayRetenido as $dd) {
+                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
+            }
+
+            // aquí se obtiene el Saldo Restante del código
+            $totalRestanteSaldo = $totalMoviCuenta + ($infoCuentaDescontar->saldo_inicial - $totalRestante);
+
+            // se debe quitar el retenido
+            $totalCalculado = $totalRestanteSaldo - $totalRetenido;
+
+            // ver que haya saldo disponible para PODER RESTARSERLO
+            if($this->redondear_dos_decimal($totalCalculado) < $this->redondear_dos_decimal($totalsolicitado)){
+
+                // saldo insuficiente.
+
+                $totalsolicitado = number_format((float)$totalsolicitado, 2, '.', ',');
+                $totalCalculado = number_format((float)$totalCalculado, 2, '.', ',');
+
+                return ['success' => 1, 'restante' => $totalCalculado, 'costo' => $totalsolicitado];
+            }else{
+                // SI HAY SALDO AL QUE SE VA A DESCONTAR
+
+                // la cuenta unidad con el obj específico ya existe. así que solo subir saldo inicial
+                if($infoCC = CuentaUnidad::where('id_presup_unidad' , $infoSolicitud->id_presup_unidad)
+                    ->where('id_objespeci', $infoMaterial->id_objespecifico)
+                    ->first()){
+
+                    // suma de dinero
+                    $saldoInicialSubir = $infoCC->saldo_inicial + $totalsolicitado;
+
+                    $totalQuedaraBajar = $infoCuentaDescontar->saldo_inicial - $totalsolicitado;
+
+
+                    // guardar solicitud
+
+                    $deta = new P_SolicitudMaterialDetalle();
+                    $deta->id_material = $infoSolicitud->id_material;
+                    $deta->id_presup_unidad = $infoSolicitud->id_presup_unidad;
+                    $deta->id_cuentaunidad_sube = $infoCC->id;
+                    $deta->id_cuentaunidad_baja = $infoSolicitud->id_cuentaunidad;
+                    $deta->unidades = $infoSolicitud->cantidad;
+                    $deta->periodo = $infoSolicitud->periodo;
+                    $deta->saldo_inicial_sube = $infoCC->saldo_inicial; // lo que había antes de modificarse
+                    $deta->saldo_inicial_baja = $infoCuentaDescontar->saldo_inicial; // lo que habia en la cuenta inicial antes que bajara
+                    $deta->dinero_solicitado = $totalsolicitado;
+                    $deta->save();
+
+                    // actualizar subir saldo
+                    CuentaUnidad::where('id', $infoCC->id)->update([
+                        'saldo_inicial' => $saldoInicialSubir,
+                    ]);
+
+                    // BAJAR SALDO
+                    CuentaUnidad::where('id', $infoCuentaDescontar->id)->update([
+                        'saldo_inicial' => $totalQuedaraBajar,
+                    ]);
+
+                    // guardar material
+                    $nuevoMate = new P_PresupUnidadDetalle();
+                    $nuevoMate->id_presup_unidad = $infoSolicitud->id_presup_unidad;
+                    $nuevoMate->id_material = $infoSolicitud->id_material;
+                    $nuevoMate->cantidad = $infoSolicitud->cantidad;
+                    $nuevoMate->precio = $infoMaterial->costo;
+                    $nuevoMate->periodo = $infoSolicitud->periodo;
+                    $nuevoMate->save();
+
+                    // borrar solicitud
+                    P_SolicitudMaterial::where('id', $request->idsolicitud)->delete();
+
+                    return ['success' => 2];
+                }else{
+
+
+                    // guardar nueva cuenta unidad, con el saldo solicitado
+                    $nuevaCuenta = new CuentaUnidad();
+                    $nuevaCuenta->id_presup_unidad = $infoSolicitud->id_presup_unidad;
+                    $nuevaCuenta->id_objespeci = $infoMaterial->id_objespecifico;
+                    $nuevaCuenta->saldo_inicial = $totalsolicitado;
+                    $nuevaCuenta->save();
+
+                    // suma de dinero
+                    $saldoInicialSubir = $infoCC->saldo_inicial + $totalsolicitado;
+
+                    $totalQuedaraBajar = $infoCuentaDescontar->saldo_inicial - $totalsolicitado;
+
+                    // guardar solicitud
+
+                    $deta = new P_SolicitudMaterialDetalle();
+                    $deta->id_material = $infoSolicitud->id_material;
+                    $deta->id_presup_unidad = $infoSolicitud->id_presup_unidad;
+                    $deta->id_cuentaunidad_sube = $nuevaCuenta->id;
+                    $deta->id_cuentaunidad_baja = $infoSolicitud->id_cuentaunidad;
+                    $deta->unidades = $infoSolicitud->cantidad;
+                    $deta->periodo = $infoSolicitud->periodo;
+                    $deta->saldo_inicial_sube = $totalsolicitado; // lo que había antes de modificarse
+                    $deta->saldo_inicial_baja = $infoCuentaDescontar->saldo_inicial; // lo que había en la cuenta inicial antes que bajara
+                    $deta->dinero_solicitado = $totalsolicitado;
+                    $deta->save();
+
+                    $deta = new P_SolicitudMaterialDetalle();
+                    $deta->id_material = $infoSolicitud->id_material;
+                    $deta->id_presup_unidad = $infoSolicitud->id_presup_unidad;
+                    $deta->id_cuentaunidad_sube = $infoCC->id;
+                    $deta->id_cuentaunidad_baja = $infoSolicitud->id_cuentaunidad;
+                    $deta->unidades = $infoSolicitud->cantidad;
+                    $deta->periodo = $infoSolicitud->periodo;
+                    $deta->saldo_inicial_sube = $infoCC->saldo_inicial; // lo que había antes de modificarse
+                    $deta->saldo_inicial_baja = $infoCuentaDescontar->saldo_inicial; // lo que habia en la cuenta inicial antes que bajara
+                    $deta->dinero_solicitado = $totalsolicitado;
+                    $deta->save();
+
+
+
+
+                    // actualizar subir saldo
+                    CuentaUnidad::where('id', $infoCC->id)->update([
+                        'saldo_inicial' => $saldoInicialSubir,
+                    ]);
+
+                    // BAJAR SALDO
+                    CuentaUnidad::where('id', $infoCuentaDescontar->id)->update([
+                        'saldo_inicial' => $totalQuedaraBajar,
+                    ]);
+
+                    // borrar solicitud
+                    P_SolicitudMaterial::where('id', $request->idsolicitud)->delete();
+
+
+                    return ['success' => 2];
+                }
+            }
+
+        } catch (\Throwable $e) {
+            Log::info('ee' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
 
 }
