@@ -929,6 +929,9 @@ Route::get('/admin/p/ordenes/compras/unidades/denegadas/tabla/{idanio}', [OrdenC
 // vista detalle de una cotización unidad, esto se mira desde las ordenes de compra
 Route::get('/admin/p/detalle/ordencompra/coti/unidad/{idorden}', [OrdenCompraUnidadController::class,'vistaDetalleCotizacionUnidadOrden']);
 
+// ver materiales en un MODAL de presupuesto unidad para ver que puede pedir en Requerimientos
+Route::get('/admin/p/listado/materiales/presupuestounidad/{id}', [MovimientosUnidadControlles::class,'verCatalogoMaterialRequisicionUnidad']);
+
 
 // generar acta de una orden de compra para unidad
 Route::post('/admin/p/ordenes/unidad/generar/acta',  [OrdenCompraUnidadController::class,'generarActadeCompraUnidades']);

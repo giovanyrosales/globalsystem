@@ -296,8 +296,9 @@
 
                     else if(response.data.success === 2) {
 
-
-
+                        $('#modalNuevoSolicitud').modal('hide');
+                        toastr.success('Aprobado correctamente');
+                        recargar();
                     }
                     else{
                         toastr.error('Error al borrar');

@@ -45,6 +45,10 @@ class CreatePSolicitudMaterialDetalleTable extends Migration
             // dinero que subio. seria el precio unitario del material en ese momento
             $table->decimal('dinero_solicitado', 10, 2);
 
+            // 0: esta cuenta unidad ya existia
+            // 1: la cuenta unidad fue creada
+            $table->boolean('cuenta_creada');
+
 
             $table->foreign('id_material')->references('id')->on('p_materiales');
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');

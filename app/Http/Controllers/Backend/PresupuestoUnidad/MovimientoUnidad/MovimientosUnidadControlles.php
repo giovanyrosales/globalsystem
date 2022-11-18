@@ -1385,6 +1385,7 @@ class MovimientosUnidadControlles extends Controller
                     $deta->saldo_inicial_sube = $infoCC->saldo_inicial; // lo que había antes de modificarse
                     $deta->saldo_inicial_baja = $infoCuentaDescontar->saldo_inicial; // lo que habia en la cuenta inicial antes que bajara
                     $deta->dinero_solicitado = $totalsolicitado;
+                    $deta->cuenta_creada = 0; // solo para ver si esta cuenta fue creada
                     $deta->save();
 
                     // actualizar subir saldo
@@ -1409,9 +1410,9 @@ class MovimientosUnidadControlles extends Controller
                     // borrar solicitud
                     P_SolicitudMaterial::where('id', $request->idsolicitud)->delete();
 
+                    DB::commit();
                     return ['success' => 2];
                 }else{
-
 
                     // guardar nueva cuenta unidad, con el saldo solicitado
                     $nuevaCuenta = new CuentaUnidad();
@@ -1420,9 +1421,7 @@ class MovimientosUnidadControlles extends Controller
                     $nuevaCuenta->saldo_inicial = $totalsolicitado;
                     $nuevaCuenta->save();
 
-                    // suma de dinero
-                    $saldoInicialSubir = $infoCC->saldo_inicial + $totalsolicitado;
-
+                    // SOLO OBTENER EL SALDO A BAJAR, YA QUE EL SALDO INICIAL SE COLOCO AL CREAR LA CUENTA UNIDAD
                     $totalQuedaraBajar = $infoCuentaDescontar->saldo_inicial - $totalsolicitado;
 
                     // guardar solicitud
@@ -1437,37 +1436,29 @@ class MovimientosUnidadControlles extends Controller
                     $deta->saldo_inicial_sube = $totalsolicitado; // lo que había antes de modificarse
                     $deta->saldo_inicial_baja = $infoCuentaDescontar->saldo_inicial; // lo que había en la cuenta inicial antes que bajara
                     $deta->dinero_solicitado = $totalsolicitado;
+                    $deta->cuenta_creada = 1;
                     $deta->save();
 
-                    $deta = new P_SolicitudMaterialDetalle();
-                    $deta->id_material = $infoSolicitud->id_material;
-                    $deta->id_presup_unidad = $infoSolicitud->id_presup_unidad;
-                    $deta->id_cuentaunidad_sube = $infoCC->id;
-                    $deta->id_cuentaunidad_baja = $infoSolicitud->id_cuentaunidad;
-                    $deta->unidades = $infoSolicitud->cantidad;
-                    $deta->periodo = $infoSolicitud->periodo;
-                    $deta->saldo_inicial_sube = $infoCC->saldo_inicial; // lo que había antes de modificarse
-                    $deta->saldo_inicial_baja = $infoCuentaDescontar->saldo_inicial; // lo que habia en la cuenta inicial antes que bajara
-                    $deta->dinero_solicitado = $totalsolicitado;
-                    $deta->save();
-
-
-
-
-                    // actualizar subir saldo
-                    CuentaUnidad::where('id', $infoCC->id)->update([
-                        'saldo_inicial' => $saldoInicialSubir,
-                    ]);
+                    // COMO SE CREO LA CUENTA UNIDAD, ESTA NO TIENE PORQUE SUBIR SU MONTO INICIAL
 
                     // BAJAR SALDO
                     CuentaUnidad::where('id', $infoCuentaDescontar->id)->update([
                         'saldo_inicial' => $totalQuedaraBajar,
                     ]);
 
+                    // guardar material
+                    $nuevoMate = new P_PresupUnidadDetalle();
+                    $nuevoMate->id_presup_unidad = $infoSolicitud->id_presup_unidad;
+                    $nuevoMate->id_material = $infoSolicitud->id_material;
+                    $nuevoMate->cantidad = $infoSolicitud->cantidad;
+                    $nuevoMate->precio = $infoMaterial->costo;
+                    $nuevoMate->periodo = $infoSolicitud->periodo;
+                    $nuevoMate->save();
+
                     // borrar solicitud
                     P_SolicitudMaterial::where('id', $request->idsolicitud)->delete();
 
-
+                    DB::commit();
                     return ['success' => 2];
                 }
             }
@@ -1477,6 +1468,34 @@ class MovimientosUnidadControlles extends Controller
             DB::rollback();
             return ['success' => 99];
         }
+    }
+
+
+    public function verCatalogoMaterialRequisicionUnidad($id){
+
+        // id presupuesto unidad
+
+        // presupuesto
+        $presupuesto = DB::table('p_presup_unidad_detalle AS p')
+            ->join('p_materiales AS m', 'p.id_material', '=', 'm.id')
+            ->select('m.descripcion', 'm.id AS idmaterial', 'm.costo', 'p.id_presup_unidad', 'm.id_objespecifico', 'm.id_unidadmedida')
+            ->where('p.id_presup_unidad', $id)
+            ->get();
+
+        foreach ($presupuesto as $pp){
+
+            $infoMedida = P_UnidadMedida::where('id', $pp->id_unidadmedida)->first();
+            $pp->medida = $infoMedida->nombre;
+
+            $infoObjeto = ObjEspecifico::where('id', $pp->id_objespecifico)->first();
+
+            $pp->objcodigo = $infoObjeto->codigo;
+            $pp->objnombre = $infoObjeto->nombre;
+
+            $pp->actual = '$' . number_format((float)$pp->costo, 2, '.', ',');
+        }
+
+        return view('backend.admin.presupuestounidad.requerimientos.modal.modalcatalogomaterial', compact('presupuesto'));
     }
 
 

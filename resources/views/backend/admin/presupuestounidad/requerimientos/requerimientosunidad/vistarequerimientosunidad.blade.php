@@ -43,12 +43,24 @@
                                     class="button button-primary button-3d button-rounded button-pill button-small" onclick="infoModalSaldo()">
                                 <i class="fas fa-list-alt" title="Saldos"></i>&nbsp; Saldos
                             </button>
+
                             <br>
                             <button type="button" style="margin-top: 15px; font-weight: bold; color: white !important;"
                                     class="button button-primary button-3d button-rounded button-pill button-small" onclick="infoMovimientoCuenta()">
                                 <i class="fas fa-list-alt" title="Movimiento de Cuenta"></i>&nbsp; Movimiento de Cuenta
                             </button>
 
+                            <br>
+                            <button type="button" style="margin-top: 15px; font-weight: bold; color: white !important;"
+                                    class="button button-primary button-3d button-rounded button-pill button-small" onclick="verSolicitudes()">
+                                <i class="fas fa-list-alt" title="Solicitud Materiales"></i>&nbsp; Solicitud Materiales
+                            </button>
+
+                            <br>
+                            <button type="button" style="margin-top: 20px; font-weight: bold; background-color: #6c757d; color: white !important;"
+                                    class="button button-3d button-rounded button-pill button-small" onclick="vistaCatalogoMaterial()">
+                                <i class="fas fa-list-alt" title="Materiales Presupuesto"></i>&nbsp; Materiales Presupuesto
+                            </button>
 
                         </div>
 
@@ -349,6 +361,33 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                     <button type="button" class="btn btn-primary" onclick="verificarNuevaFila()">Agregar Fila</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="modalCatalogoMaterial">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Catálogo de Materiales</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="tablaCatalogoMaterial">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </div>
@@ -1349,7 +1388,20 @@
             $('#modalNuevoSolicitud').modal('show');
         }
 
+        function vistaCatalogoMaterial(){
+            let idpresubuni = {{ $idpresubunidad }};
 
+            var ruta = "{{ URL::to('/admin/p/listado/materiales/presupuestounidad') }}/" + idpresubuni;
+            $('#tablaCatalogoMaterial').load(ruta);
+            $('#modalCatalogoMaterial').modal('show');
+        }
+
+        // vista para solicitar material que no esta en mi presupuesto y quitara
+        // dinero de un código
+        function verSolicitudes(){
+            let id = {{ $idpresubunidad }}; // ID presup_unidad
+            window.location.href="{{ url('/admin/p/movicuentaunidad/solicitud/material') }}/" + id;
+        }
 
 
     </script>
