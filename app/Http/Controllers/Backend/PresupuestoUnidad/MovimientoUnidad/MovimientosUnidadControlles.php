@@ -1382,8 +1382,8 @@ class MovimientosUnidadControlles extends Controller
                     $deta->id_cuentaunidad_baja = $infoSolicitud->id_cuentaunidad;
                     $deta->unidades = $infoSolicitud->cantidad;
                     $deta->periodo = $infoSolicitud->periodo;
-                    $deta->saldo_inicial_sube = $infoCC->saldo_inicial; // lo que había antes de modificarse
-                    $deta->saldo_inicial_baja = $infoCuentaDescontar->saldo_inicial; // lo que habia en la cuenta inicial antes que bajara
+                    $deta->copia_saldoini_antes_subir = $infoCC->saldo_inicial; // lo que había antes de modificarse
+                    $deta->copia_saldoini_antes_bajar = $infoCuentaDescontar->saldo_inicial; // lo que habia en la cuenta inicial antes que bajara
                     $deta->dinero_solicitado = $totalsolicitado;
                     $deta->cuenta_creada = 0; // solo para ver si esta cuenta fue creada
                     $deta->save();
@@ -1433,8 +1433,8 @@ class MovimientosUnidadControlles extends Controller
                     $deta->id_cuentaunidad_baja = $infoSolicitud->id_cuentaunidad;
                     $deta->unidades = $infoSolicitud->cantidad;
                     $deta->periodo = $infoSolicitud->periodo;
-                    $deta->saldo_inicial_sube = $totalsolicitado; // lo que había antes de modificarse
-                    $deta->saldo_inicial_baja = $infoCuentaDescontar->saldo_inicial; // lo que había en la cuenta inicial antes que bajara
+                    $deta->copia_saldoini_antes_subir = $totalsolicitado; // lo que había antes de modificarse
+                    $deta->copia_saldoini_antes_bajar = $infoCuentaDescontar->saldo_inicial; // lo que había en la cuenta inicial antes que bajara
                     $deta->dinero_solicitado = $totalsolicitado;
                     $deta->cuenta_creada = 1;
                     $deta->save();
@@ -1478,8 +1478,10 @@ class MovimientosUnidadControlles extends Controller
         // presupuesto
         $presupuesto = DB::table('p_presup_unidad_detalle AS p')
             ->join('p_materiales AS m', 'p.id_material', '=', 'm.id')
-            ->select('m.descripcion', 'm.id AS idmaterial', 'm.costo', 'p.id_presup_unidad', 'm.id_objespecifico', 'm.id_unidadmedida')
+            ->join('obj_especifico AS obj', 'm.id_objespecifico', '=', 'obj.id')
+            ->select('m.descripcion', 'm.id AS idmaterial', 'obj.codigo', 'm.costo', 'p.id_presup_unidad', 'm.id_objespecifico', 'm.id_unidadmedida')
             ->where('p.id_presup_unidad', $id)
+            ->orderBy('obj.codigo', 'ASC')
             ->get();
 
         foreach ($presupuesto as $pp){

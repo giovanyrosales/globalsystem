@@ -27,6 +27,10 @@ class CreatePPresupUnidadTable extends Migration
 
             $table->bigInteger('id_estado')->unsigned();
 
+            // como los saldos iniciales pueden ser modificados de la cuenta_unidad, aqui se guarda
+            // el monto aprobado cuando Presupuesto creo todas las cuentas unidades
+            $table->decimal('saldo_aprobado', 10, 2);
+
             $table->foreign('id_anio')->references('id')->on('p_anio_presupuesto');
             $table->foreign('id_departamento')->references('id')->on('p_departamento');
             $table->foreign('id_estado')->references('id')->on('p_estado');

@@ -214,6 +214,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             $pr->id_anio = $request->anio;
             $pr->id_departamento = $infoDepa->id_departamento;
             $pr->id_estado = 1; // editable
+            $pr->saldo_aprobado = 0; // cuando Presupuesto cree cuenta unidad esto se va a Setear.
             $pr->save();
 
             if($request->idmaterial != null) {

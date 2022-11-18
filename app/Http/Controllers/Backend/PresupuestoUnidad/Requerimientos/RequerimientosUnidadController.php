@@ -96,18 +96,11 @@ class RequerimientosUnidadController extends Controller
         $txtanio = $infoAnio->nombre;
         $bloqueo = $infoAnio->permiso;
 
-        $monto = DB::table('cuenta_unidad AS cu')
-            ->join('p_presup_unidad AS pu', 'cu.id_presup_unidad', '=', 'pu.id')
-            ->select('cu.saldo_inicial')
-            ->where('pu.id_anio', $idanio)
-            ->where('pu.id_departamento', $infoDepartamento->id_departamento)
-            ->sum('cu.saldo_inicial');
-
-        $monto = '$' . number_format((float)$monto, 2, '.', ',');
-
         $infoPresuUnidad = P_PresupUnidad::where('id_anio', $idanio)
             ->where('id_departamento', $infoDepartamento->id_departamento)
             ->first();
+
+        $monto = '$' . number_format((float)$infoPresuUnidad->saldo_aprobado, 2, '.', ',');
 
         $conteo = RequisicionUnidad::where('id_presup_unidad', $infoPresuUnidad->id)->count();
         if($conteo == null){

@@ -37,10 +37,12 @@ class CreatePSolicitudMaterialDetalleTable extends Migration
             $table->integer('periodo');
 
             // Este es el dinero que tenía tabla CUENTA UNIDAD antes de SUBIR DINERO SOLICITADO
-            $table->decimal('saldo_inicial_sube', 10, 2);
+            // COPIAS
+            $table->decimal('copia_saldoini_antes_subir', 10, 2);
 
             // Este es el dinero que tenía tabla CUENTA UNIDAD antes de BAJAR DINERO SOLICITADO
-            $table->decimal('saldo_inicial_baja', 10, 2);
+            // COPIAS
+            $table->decimal('copia_saldoini_antes_bajar', 10, 2);
 
             // dinero que subio. seria el precio unitario del material en ese momento
             $table->decimal('dinero_solicitado', 10, 2);

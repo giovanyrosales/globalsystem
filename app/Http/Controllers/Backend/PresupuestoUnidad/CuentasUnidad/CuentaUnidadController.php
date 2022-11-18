@@ -167,10 +167,17 @@ class CuentaUnidadController extends Controller
                     if($dineroObjeto > 0){
                         // GUARDAR CUENTA UNIDAD
                         $dato = new CuentaUnidad();
-                        $dato->id_presup_unidad = $dd->id;
+                        $dato->id_presup_unidad =
                         $dato->id_objespeci = $obj->id;
                         $dato->saldo_inicial = $dineroObjeto;
                         $dato->save();
+
+                        // ACTUALIZAR PARA QUE ME QUEDE REGISTRADO UNA COPIA DEL SALDO INICIAL.
+                        // YA QUE SALDO INICIAL DE LAS CUENTAS PUEDEN SER TOCADOS
+                        P_PresupUnidad::where('id',$dd->id)->update([
+                            'saldo_aprobado' => $dineroObjeto,
+                        ]);
+
                     }
                 }
             }
@@ -270,6 +277,12 @@ class CuentaUnidadController extends Controller
                             $dato->id_objespeci = $obj->id;
                             $dato->saldo_inicial = $dineroObjeto;
                             $dato->save();
+
+                            // ACTUALIZAR PARA QUE ME QUEDE REGISTRADO UNA COPIA DEL SALDO INICIAL.
+                            // YA QUE SALDO INICIAL DE LAS CUENTAS PUEDEN SER TOCADOS
+                            P_PresupUnidad::where('id',$dd->id)->update([
+                                'saldo_aprobado' => $dineroObjeto,
+                            ]);
                         }
                     }
                 }
