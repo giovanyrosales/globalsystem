@@ -23,6 +23,8 @@ class CreateProyectosTable extends Migration
             $table->bigInteger('id_naturaleza')->nullable()->unsigned();
             $table->bigInteger('id_estado')->nullable()->unsigned();
             $table->bigInteger('id_bolson')->nullable()->unsigned();
+            $table->bigInteger('id_formulador')->unsigned();
+
 
             $table->string('codigo',100)->unique();
             $table->string('nombre',300);
@@ -32,7 +34,6 @@ class CreateProyectosTable extends Migration
             $table->date('fechafin')->nullable();
             $table->date('fecha');
             $table->string('ejecutor',300)->nullable();
-            $table->string('formulador',300)->nullable();
             $table->string('supervisor',300)->nullable();
             $table->string('encargado',300)->nullable();
             $table->string('codcontable', 150)->nullable();
@@ -78,6 +79,7 @@ class CreateProyectosTable extends Migration
             $table->foreign('id_naturaleza')->references('id')->on('naturaleza');
             $table->foreign('id_estado')->references('id')->on('estado_proyecto');
             $table->foreign('id_bolson')->references('id')->on('bolson');
+            $table->foreign('id_formulador')->references('id')->on('usuario');
         });
     }
 

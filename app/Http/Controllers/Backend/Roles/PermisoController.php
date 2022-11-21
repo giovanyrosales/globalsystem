@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\P_Departamento;
 use App\Models\P_UsuarioDepartamento;
 use App\Models\Usuario;
+use App\Models\UsuarioFormulador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -243,6 +244,75 @@ class PermisoController extends Controller
             return ['success' => 2];
         }
     }
+
+
+    //******************  ASIGNACIÓN DE USUARIO A FORMULADOR  *************************************************
+
+    // retorna vista para asignar usuario a un departamento
+    public function indexUsuarioFormulador(){
+
+        $usuarios = Usuario::orderBy('nombre')->get();
+
+        return view('backend.admin.rolesypermisos.usuarioformulador.vistausuarioformulador', compact('usuarios'));
+    }
+
+    // retorna tabla de usuarios asignados a un departamento
+    public function tablaUsuarioFormulador(){
+
+        $listado = DB::table('usuario_formulador AS pud')
+            ->join('usuario AS u', 'pud.id_usuario', '=', 'u.id')
+            ->select('pud.id', 'u.nombre', 'u.usuario')
+            ->orderBy('u.nombre')
+            ->get();
+
+        return view('backend.admin.rolesypermisos.usuarioformulador.tablausuarioformulador', compact('listado'));
+    }
+
+    // crear nueva asignación de usuario a departamento
+    public function nuevoUsuarioFormulador(Request $request){
+
+        $regla = array(
+            'usuario' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        // verificar si existe el usuario
+        if(UsuarioFormulador::where('id_usuario', $request->usuario)->first()){
+            return ['success' => 1];
+        }
+
+        $dato = new UsuarioFormulador();
+        $dato->id_usuario = $request->usuario;
+        $dato->save();
+
+        return ['success' => 2];
+    }
+
+    // borrar
+    public function borrarUsuarioFormulador(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(UsuarioFormulador::where('id', $request->id)->first()){
+
+            UsuarioFormulador::where('id', $request->id)->delete();
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
 
 
 }

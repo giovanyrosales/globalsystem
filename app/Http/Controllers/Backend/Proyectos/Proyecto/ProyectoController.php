@@ -35,7 +35,9 @@ use App\Models\Requisicion;
 use App\Models\RequisicionDetalle;
 use App\Models\TipoPartida;
 use App\Models\UnidadMedida;
+use App\Models\UsuarioFormulador;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -57,9 +59,15 @@ class ProyectoController extends Controller
         $arrayLineaTrabajo = LineaTrabajo::orderBy('codigo')->get();
         $arrayFuenteFinanciamiento = FuenteFinanciamiento::orderBy('codigo')->get();
         $arrayFuenteRecursos = FuenteRecursos::orderBy('codigo')->get();
+        $formuladores = DB::table('usuario_formulador AS pud')
+            ->join('usuario AS u', 'pud.id_usuario', '=', 'u.id')
+            ->select('u.id', 'u.nombre')
+            ->orderBy('u.nombre')
+            ->get();
 
         return view('backend.admin.proyectos.nuevo.vistanuevoproyecto', compact('arrayNaturaleza',
-            'arrayAreaGestion', 'arrayLineaTrabajo', 'arrayFuenteFinanciamiento', 'arrayFuenteRecursos'));
+            'arrayAreaGestion', 'arrayLineaTrabajo', 'arrayFuenteFinanciamiento', 'arrayFuenteRecursos',
+        'formuladores'));
     }
 
     // registra un nuevo proyecto
@@ -68,8 +76,6 @@ class ProyectoController extends Controller
         if(Proyecto::where('codigo', $request->codigo)->first()){
             return ['success' => 1];
         }
-
-        $infoGeneral = InformacionGeneral::where('id', 1)->first();
 
         $p = new Proyecto();
         $p->id_linea = $request->linea;
@@ -87,7 +93,7 @@ class ProyectoController extends Controller
         $p->fechafin = null;
         $p->fecha = Carbon::now('America/El_Salvador');
         $p->ejecutor = $request->ejecutor;
-        $p->formulador = $request->formulador;
+        $p->id_formulador = $request->formulador;
         $p->supervisor = $request->supervisor;
         $p->encargado = $request->encargado;
         $p->codcontable = $request->codcontable;
@@ -161,6 +167,11 @@ class ProyectoController extends Controller
             $arrayFuenteFinanciamiento = FuenteFinanciamiento::orderBy('codigo')->get();
             $arrayFuenteRecursos = FuenteRecursos::orderBy('codigo')->get();
             $arrayEstado = EstadoProyecto::orderBy('nombre')->get();
+            $arrayFormulador = DB::table('usuario_formulador AS pud')
+                ->join('usuario AS u', 'pud.id_usuario', '=', 'u.id')
+                ->select('u.id', 'u.nombre')
+                ->orderBy('u.nombre')
+                ->get();
 
             // evitar null
             foreach ($arrayAreaGestion as $ll){
@@ -191,7 +202,7 @@ class ProyectoController extends Controller
                 'arrayAreaGestion' => $arrayAreaGestion, 'arrayLineaTrabajo' => $arrayLineaTrabajo,
                 'arrayFuenteFinanciamiento' => $arrayFuenteFinanciamiento,
                 'arrayFuenteRecursos' => $arrayFuenteRecursos,
-                'arrayEstado' => $arrayEstado];
+                'arrayEstado' => $arrayEstado, 'arrayFormulador' => $arrayFormulador];
         }else{
             return ['success' => 2];
         }
@@ -214,12 +225,21 @@ class ProyectoController extends Controller
             return ['success' => 1];
         }
 
+
+
         DB::beginTransaction();
 
         try {
 
             $infoProyecto = Proyecto::where('id', $request->id)->first();
 
+            // usuario logeado
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 4];
+            }
 
             if($infoProyecto->id_estado == 3){
                 // pausado

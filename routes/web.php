@@ -83,6 +83,15 @@ Route::post('/admin/p/usuario/departamento/nuevo', [PermisoController::class, 'n
 Route::post('/admin/p/usuario/departamento/informacion', [PermisoController::class, 'informacionUsuarioDepartamento']);
 Route::post('/admin/p/usuario/departamento/editar', [PermisoController::class, 'editarUsuarioDepartamento']);
 
+// --- ASIGNAR USUARIO SEA FORMULADOR ---
+// puede editar el proyecto y puede crear las partidas, y otro usuario puede solamente ver
+
+Route::get('/admin/usuario/formulador/index', [PermisoController::class,'indexUsuarioFormulador'])->name('admin.usuario.formulador.index');
+Route::get('/admin/usuario/formulador/tabla', [PermisoController::class,'tablaUsuarioFormulador']);
+Route::post('/admin/usuario/formulador/nuevo', [PermisoController::class, 'nuevoUsuarioFormulador']);
+Route::post('/admin/usuario/formulador/borrar', [PermisoController::class, 'borrarUsuarioFormulador']);
+
+
 // --- PERFIL DE USUARIO ---
 Route::get('/admin/editar-perfil/index', [PerfilController::class,'indexEditarPerfil'])->name('admin.perfil');
 Route::post('/admin/editar-perfil/actualizar', [PerfilController::class, 'editarUsuario']);

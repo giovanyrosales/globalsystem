@@ -44,6 +44,13 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="{{ route('admin.usuario.formulador.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Usuario Formulador</p>
+                            </a>
+                        </li>
+
                     </ul>
                  </li>
                 @endcan

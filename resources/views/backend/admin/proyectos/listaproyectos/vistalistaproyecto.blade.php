@@ -171,7 +171,9 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Formulador:</label>
-                                        <input type="text" maxlength="300" id="formulador" placeholder="Nombre de formulador" class="form-control" autocomplete="off">
+                                        <select class="form-control" id="select-formulador" >
+
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -542,6 +544,16 @@
                         document.getElementById("select-area-gestion").options.length = 0;
                         document.getElementById("select-linea").options.length = 0;
 
+                        document.getElementById("select-formulador").options.length = 0;
+
+                        $.each(response.data.arrayFormulador, function( key, val ){
+                            if(response.data.info.id_naturaleza == val.id){
+                                $('#select-formulador').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
+                            }else{
+                                $('#select-formulador').append('<option value="' +val.id +'">'+ val.nombre +'</option>');
+                            }
+                        });
+
                         $.each(response.data.arrayNaturaleza, function( key, val ){
                             if(response.data.info.id_naturaleza == val.id){
                                 $('#select-naturaleza').append('<option value="' +val.id +'" selected="selected">'+ val.nombre +'</option>');
@@ -655,7 +667,7 @@
             var fechainicio = document.getElementById('fecha-inicio').value; // null
             var acuerdoApertura = document.getElementById('acuerdo-apertura'); // null file
             var ejecutor = document.getElementById('ejecutor').value; // null
-            var formulador = document.getElementById('formulador').value; // null
+            var idformulador = document.getElementById('select-formulador').value;
             var supervisor = document.getElementById('supervisor').value; // null
             var encargado = document.getElementById('encargado').value; // null
 
@@ -667,6 +679,11 @@
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
+                return;
+            }
+
+            if(idformulador === ''){
+                toastr.error('Formulador es requerido');
                 return;
             }
 
@@ -707,11 +724,6 @@
                 return;
             }
 
-            if(formulador.length > 300){
-                toastr.error('Formulador máximo 300 caracteres');
-                return;
-            }
-
             if(supervisor.length > 300){
                 toastr.error('Supervisor máximo 300 caracteres');
                 return;
@@ -738,7 +750,7 @@
             formData.append('fechainicio', fechainicio);
             formData.append('documento', acuerdoApertura.files[0]);
             formData.append('ejecutor', ejecutor);
-            formData.append('formulador', formulador);
+            formData.append('idformulador', idformulador);
             formData.append('supervisor', supervisor);
             formData.append('encargado', encargado);
 
@@ -783,7 +795,23 @@
 
                             }
                         })
+                    }
+                    else if(response.data.success === 4){
 
+                        // solo usuario formulador puede editar
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede modificar el proyecto',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
                     }
                     else {
                         toastr.error('Error al actualizar');

@@ -149,7 +149,11 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Formulador:</label>
-                                <input type="text" maxlength="300" id="formulador" placeholder="Nombre de formulador" class="form-control" autocomplete="off">
+                                <select class="form-control" id="select-formulador" >
+                                    @foreach($formuladores as $sel)
+                                        <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -233,12 +237,17 @@
             var codcontable = document.getElementById('codcontable').value; // null
 
             var ejecutor = document.getElementById('ejecutor').value; // null
-            var formulador = document.getElementById('formulador').value; // null
             var supervisor = document.getElementById('supervisor').value; // null
             var encargado = document.getElementById('encargado').value; // null
+            var idformulador = document.getElementById('select-formulador').value;
 
             if(codigo === ''){
                 toastr.error('Código es requerido');
+                return;
+            }
+
+            if(idformulador === ''){
+                toastr.error('Formulador es requerido');
                 return;
             }
 
@@ -282,11 +291,6 @@
                 return;
             }
 
-            if(formulador.length > 300){
-                toastr.error('Formulador máximo 300 caracteres');
-                return;
-            }
-
             if(supervisor.length > 300){
                 toastr.error('Supervisor máximo 300 caracteres');
                 return;
@@ -310,7 +314,7 @@
             formData.append('contraparte', contraparte);
             formData.append('codcontable', codcontable);
             formData.append('ejecutor', ejecutor);
-            formData.append('formulador', formulador);
+            formData.append('formulador', idformulador);
             formData.append('supervisor', supervisor);
             formData.append('encargado', encargado);
 
