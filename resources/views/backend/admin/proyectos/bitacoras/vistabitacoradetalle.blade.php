@@ -171,6 +171,23 @@
                         $('#modalAgregar').modal('hide');
                         recargar();
                     }
+                    else  if(response.data.success === 3) {
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede modificar el proyecto',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
                     else {
                         toastr.error('Error al borrar');
                     }
@@ -239,6 +256,23 @@
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
+                    }
+                    else if(response.data.success === 3) {
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede modificar el proyecto',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
                     }
                     else {
                         toastr.error('Error al registrar');

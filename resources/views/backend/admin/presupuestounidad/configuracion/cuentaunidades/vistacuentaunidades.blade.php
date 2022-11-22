@@ -238,19 +238,18 @@
                     // ya existe un registro para este año para la inserción automática
                     if(response.data.success === 1){
 
-                        recargar();
-
                         Swal.fire({
                             title: 'Mismo Año Encontrado',
                             html: "No se puede crear la Cuentas Unidades",
                             icon: 'info',
                             showCancelButton: false,
+                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                recargar();
                             }
                         })
                     }

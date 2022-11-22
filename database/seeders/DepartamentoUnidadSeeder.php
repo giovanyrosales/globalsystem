@@ -248,5 +248,21 @@ class DepartamentoUnidadSeeder extends Seeder
             'nombre' => 'PLANTA RECICLADORA',
             'permiso_movi_unidad' => 0
         ]);
+
+
+
+        P_Departamento::create([
+            'nombre' => 'ACTIVIDADES DEPORTIVAS',
+            'permiso_movi_unidad' => 0
+        ]);
+
+        P_Departamento::create([
+            'nombre' => 'CONCEJO - CONTRIBUCIONES',
+            'permiso_movi_unidad' => 0
+        ]);
+
+
+
+
     }
 }

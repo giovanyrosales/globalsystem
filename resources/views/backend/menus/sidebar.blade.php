@@ -280,14 +280,15 @@
                                 </li>
                             @endcan
 
-                            @can('sidebar.cotizacion.unidad.denegadas')
-                                <li class="nav-item">
-                                    <a href="{{ route('cotizaciones.denegadas.unidad.index') }}" target="frameprincipal" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Cotización Denegadas</p>
-                                    </a>
-                                </li>
-                            @endcan
+                                @can('sidebar.cotizacion.unidad.denegadas')
+                                    <li class="nav-item">
+                                        <a href="{{ route('cotizaciones.denegadas.unidad.index') }}" target="frameprincipal" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Cotización Denegada</p>
+                                        </a>
+                                    </li>
+                                @endcan
+
 
                         </ul>
                     </li>

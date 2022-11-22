@@ -98,6 +98,8 @@
 
                                         @elseif($proyecto->id_estado == 4)
                                             <label style="float: right; color: red; font-size: 16px">Proyecto esta Finalizado</label>
+                                        @elseif($proyecto->id_estado == 1)
+                                            <label style="float: right; color: red; font-size: 16px">Proyecto No Esta Iniciado para Crear Partida Adicionales</label>
                                         @endif
                                     @endif
 
@@ -666,7 +668,7 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Editar Presupuesto de Proyecto</h4>
+                <h4 class="modal-title">Editar Partida Presupuesto de Proyecto</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -1487,6 +1489,25 @@
                         $('#modalEditarRequisicion').modal('hide');
                         recargarRequisicion();
                     }
+                    else if(response.data.success === 3) {
+
+                        // solo formulador puede cancelar material
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede modificar el proyecto',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
                     else{
                         toastr.error('error al actualizar');
                     }
@@ -1713,6 +1734,22 @@
                         $('#modalAgregarBitacora').modal('hide');
                         recargarBitacora();
                         toastr.success('Agregado correctamente');
+                    }
+                    else if (response.data.success === 3) {
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede modificar el proyecto',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
 
                     }
                     else {
@@ -1774,11 +1811,27 @@
 
                     }
                     else if (response.data.success === 2) {
-
                         recargarBitacora();
                         toastr.success('Borrado correctamente');
-
                     }
+
+                    else if (response.data.success === 3) {
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede modificar el proyecto',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
                     else {
                         toastr.error('Error al borrar');
                     }
@@ -2224,6 +2277,25 @@
                         recargarPresupuesto(); // recarga la tabla
                         limpiarPresupuesto(); // limpia la tabla
                     }
+                    else if(response.data.success === 4){
+
+                        // solo formulador puede agregar partida
+
+                        Swal.fire({
+                            title: 'No Puede Crear',
+                            html: 'Solo el Usuario Asignado como Formulador puede crear Partida al proyecto',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
                     else{
                         toastr.error('error al crear presupuesto');
                     }
@@ -2420,7 +2492,7 @@
             colorBlancoTablaPresupuestoEditar();
 
             Swal.fire({
-                title: 'Editar Presupuesto',
+                title: 'Editar Partida Presupuesto',
                 text: "",
                 icon: 'info',
                 showCancelButton: true,
@@ -2501,6 +2573,23 @@
                         window.contadorGlobal = response.data.contador;
                         recargarPresupuesto();
                     }
+                    else if(response.data.success === 4){
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede modificar el proyecto',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
                     else{
                         toastr.error('error al buscar');
                     }
@@ -2696,7 +2785,24 @@
                         recargarPresupuesto();
                         $('#modalEditarPresupuesto').modal('hide');
                     }
+                    else if(response.data.success === 4) {
 
+                        // solo formulador puede editar
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede modificar el proyecto',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
                     else{
                         toastr.error('Error al actualizar');
                     }

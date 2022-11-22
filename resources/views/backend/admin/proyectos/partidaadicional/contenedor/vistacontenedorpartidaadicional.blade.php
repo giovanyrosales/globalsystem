@@ -294,6 +294,23 @@
                             }
                         })
                     }
+                    else if(response.data.success === 3) {
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede crear Solicitud',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+                    }
                     else {
                         toastr.error('Error al registrar');
                     }
@@ -395,6 +412,23 @@
 
                             }
                         })
+                    }
+                    else if(response.data.success === 5) {
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede borrar',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
                     }
                     else {
                         toastr.error('Error al borrar');
@@ -590,6 +624,24 @@
                         recargar();
 
                     }
+
+                    else if(response.data.success === 5){
+
+                        Swal.fire({
+                            title: 'No Puede Modificar',
+                            html: 'Solo el Usuario Asignado como Formulador puede actualizar',
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+                    }
+
                     else {
                         toastr.error('Error al actualizar');
                     }

@@ -15,7 +15,7 @@ class CreateFuenterTable extends Migration
         Schema::create('fuenter', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_fuentef')->unsigned();
-            $table->bigInteger('id_p_anio')->unsigned();
+            $table->bigInteger('id_p_anio')->unsigned()->nullable();
 
             $table->string('codigo', 100);
             $table->string('nombre', 300)->nullable();
