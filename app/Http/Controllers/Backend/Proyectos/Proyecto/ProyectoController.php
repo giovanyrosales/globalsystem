@@ -2290,6 +2290,7 @@ class ProyectoController extends Controller
             ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
             ->select('obj.nombre', 'obj.id AS idcodigo', 'obj.codigo', 'p.id', 'p.saldo_inicial')
             ->where('p.proyecto_id', $id)
+            ->orderBy('obj.codigo', 'ASC')
             ->get();
 
         foreach ($presupuesto as $pp){
@@ -2711,9 +2712,78 @@ class ProyectoController extends Controller
 
                     if($infoProyecto->id_bolson != null){
 
+
+                        // dinero sobrante de proyecto finalizado
+                        $dineroSobrante = 0;
+
+
+                        // OBTENER SALDO RESTANTE
+                        $presupuesto = DB::table('cuentaproy AS p')
+                            ->join('obj_especifico AS obj', 'p.objespeci_id', '=', 'obj.id')
+                            ->select('obj.nombre', 'obj.id AS idcodigo', 'obj.codigo', 'p.id', 'p.saldo_inicial')
+                            ->where('p.proyecto_id', $infoProyecto->id)
+                            ->orderBy('obj.codigo', 'ASC')
+                            ->get();
+
+                        foreach ($presupuesto as $pp){
+
+                            // CÁLCULOS
+
+                            $totalRestante = 0;
+
+                            // movimiento de cuentas SUBE
+                            $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $pp->id)
+                                ->where('autorizado', 1) // autorizado por presupuesto
+                                ->sum('dinero');
+
+                            // movimiento de cuentas BAJA
+                            $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $pp->id)
+                                ->where('autorizado', 1) // autorizado por presupuesto
+                                ->sum('dinero');
+
+                            $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
+
+                            // obtener todas las salidas de material
+                            $arrayRestante = DB::table('cuentaproy_restante AS pd')
+                                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
+                                ->select('rd.cantidad', 'rd.dinero')
+                                ->where('pd.id_cuentaproy', $pp->id)
+                                ->where('rd.cancelado', 0)
+                                ->get();
+
+                            foreach ($arrayRestante as $dd){
+                                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
+                            }
+
+                            $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $infoProyecto->id)->get();
+
+                            $sumaPartidaAdicional = 0;
+                            foreach ($infoCuentaPartida as $dd){
+                                if($pp->idcodigo == $dd->objespeci_id){
+                                    $sumaPartidaAdicional += $dd->monto;
+                                }
+                            }
+
+                            //* NOTA: SALDO RETENIDO NO SE TOMARA EN CUENTA, YA QUE CUANDO PROYECTO ES FINALIZADO
+                            // TODOS LOS PROCESOS SE BLOQUEAN
+
+
+                            // sumando partidas adicionales que coincidan con el obj específico + saldo inicial
+                            $sumaPartidaAdicional += $pp->saldo_inicial;
+
+                            // aquí se obtiene el Saldo Restante del código
+                            $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
+
+                            $dineroSobrante += $totalRestanteSaldo;
+                        }
+
+                        $dineroSobrante = $this->redondear_dos_decimal($dineroSobrante);
+
                         // se puede FINALIZAR proyecto
                         Proyecto::where('id', $request->id)->update([
                             'id_estado' => 4,
+                            'monto_finalizado' => $dineroSobrante,
+                            'fechafin' => Carbon::now('America/El_Salvador')
                         ]);
 
                         DB::commit();
@@ -2732,6 +2802,7 @@ class ProyectoController extends Controller
             }
 
         }catch(\Throwable $e){
+            Log::info('ee ' . $e);
             DB::rollback();
             return ['success' => 99];
         }
