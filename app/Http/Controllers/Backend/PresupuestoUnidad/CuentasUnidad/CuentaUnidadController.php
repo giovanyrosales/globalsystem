@@ -52,21 +52,23 @@ class CuentaUnidadController extends Controller
 
             $infoPresup = P_PresupUnidad::where('id', $dd->id_presup_unidad)->first();
 
-            $infoDepartamento = P_Departamento::where('id', $infoPresup->id_departamento)->first();
             $infoAnio = P_AnioPresupuesto::where('id', $infoPresup->id_anio)->first();
+            $infoDepartamento = P_Departamento::where('id', $infoPresup->id_departamento)->first();
+
             $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
 
             $dd->departamento = $infoDepartamento->nombre;
             $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
             $dd->anio = $infoAnio->nombre;
 
-            $dd->monto = "$" . number_format((float)$dd->saldo_inicial, 2, '.', ',');
+            // SALDO DE CUENTA UNIDAD FIJO, NUNCA CAMBIARA
+            $dd->monto = "$" . number_format((float)$dd->saldo_inicial_fijo, 2, '.', ',');
         }
 
         return view('backend.admin.presupuestounidad.configuracion.cuentaunidades.tablacuentaunidades', compact('listado'));
     }
 
-    // crear las cuentas unidades para todos los presupuesto aprobado
+    // crear las cuentas unidades para todos los presupuesto aprobado POR AÑO
     public function registrarCuentasUnidades(Request $request){
 
         $rules = array(
@@ -167,14 +169,15 @@ class CuentaUnidadController extends Controller
                     if($dineroObjeto > 0){
                         // GUARDAR CUENTA UNIDAD
                         $dato = new CuentaUnidad();
-                        $dato->id_presup_unidad =
+                        $dato->id_presup_unidad = $dd->id;
                         $dato->id_objespeci = $obj->id;
                         $dato->saldo_inicial = $dineroObjeto;
+                        $dato->saldo_inicial_fijo = $dineroObjeto;
                         $dato->save();
 
                         // ACTUALIZAR PARA QUE ME QUEDE REGISTRADO UNA COPIA DEL SALDO INICIAL.
                         // YA QUE SALDO INICIAL DE LAS CUENTAS PUEDEN SER TOCADOS
-                        P_PresupUnidad::where('id',$dd->id)->update([
+                        P_PresupUnidad::where('id', $dd->id)->update([
                             'saldo_aprobado' => $dineroObjeto,
                         ]);
 
@@ -276,6 +279,7 @@ class CuentaUnidadController extends Controller
                             $dato->id_presup_unidad = $dd->id;
                             $dato->id_objespeci = $obj->id;
                             $dato->saldo_inicial = $dineroObjeto;
+                            $dato->saldo_inicial_fijo = $dineroObjeto;
                             $dato->save();
 
                             // ACTUALIZAR PARA QUE ME QUEDE REGISTRADO UNA COPIA DEL SALDO INICIAL.

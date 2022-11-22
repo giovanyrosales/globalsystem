@@ -59,6 +59,13 @@ class RolesSeeder extends Seeder
         // ESTADISTICAS
         Permission::create(['name' => 'sidebar.estadisticas', 'description' => 'sidebar seccion estadisticas'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleJefeUaci, $roleAdministrador, $roleSecretaria);
 
+
+        // clasificaciones
+        Permission::create(['name' => 'sidebar.clasificaciones', 'description' => 'clasificaciones de los materiales de proyecto'])->syncRoles($roleUaci, $rolePresupuesto);
+
+
+
+
         // SECCION PROYECTO
         Permission::create(['name' => 'sidebar.seccion.proyecto', 'description' => 'sidebar seccion proyecto'])->syncRoles($roleUaci, $rolePresupuesto, $roleIng, $roleAdministrador);
 
@@ -67,7 +74,7 @@ class RolesSeeder extends Seeder
 
             // botones
             Permission::create(['name' => 'boton.ver.proyecto', 'description' => 'sidebar seccion proyecto - boton ver proyecto'])->syncRoles($roleIng, $roleUaci, $roleAdministrador);
-            Permission::create(['name' => 'boton.editar.proyecto', 'description' => 'sidebar seccion proyecto - boton editar proyecto'])->syncRoles($rolePresupuesto, $roleUaci, $roleIng);
+            Permission::create(['name' => 'boton.editar.proyecto', 'description' => 'sidebar seccion proyecto - boton editar proyecto'])->syncRoles($roleIng);
             Permission::create(['name' => 'boton.pdf.generar.presupuesto', 'description' => 'sidebar seccion proyecto - boton generar presupuesto para proyecto pdf'])->syncRoles($roleIng);
 
             Permission::create(['name' => 'boton.agregar.requisicion', 'description' => 'sidebar seccion proyecto - boton agregar nueva requisicion'])->syncRoles($roleAdministrador);
@@ -187,12 +194,12 @@ class RolesSeeder extends Seeder
         // ************** PERMISOS PARA PRESUPUESTO DE UNIDADES ***************
 
         // CONFIGURACIÓN PARA PRESUPUESTO DE UNIDADES
-        Permission::create(['name' => 'sidebar.seccion.configuraciones.presupuesto.unidades', 'description' => 'sidebar sección configuración para presupuesto de unidades'])->syncRoles($rolePresupuesto);
+        Permission::create(['name' => 'sidebar.seccion.configuraciones.presupuesto.unidades', 'description' => 'sidebar sección configuración para presupuesto de unidades'])->syncRoles($rolePresupuesto, $roleUaciUnidad);
 
         Permission::create(['name' => 'p.anio.presupuesto.unidades', 'description' => 'crear años para presupuesto de unidades'])->syncRoles($rolePresupuesto);
         Permission::create(['name' => 'p.departamento.presupuesto.unidades', 'description' => 'crear departamentos para presupuesto de unidades'])->syncRoles($rolePresupuesto);
         Permission::create(['name' => 'p.unidadmedida.presupuesto.unidades', 'description' => 'crear unidad de medida para presupuesto de unidades'])->syncRoles($rolePresupuesto);
-        Permission::create(['name' => 'p.materiales.presupuesto.unidades', 'description' => 'crear materiales para presupuesto de unidades'])->syncRoles($rolePresupuesto);
+        Permission::create(['name' => 'p.materiales.presupuesto.unidades', 'description' => 'crear materiales para presupuesto de unidades'])->syncRoles($rolePresupuesto, $roleUaciUnidad);
 
         // REPORTES PARA PRESUPUESTO DE UNIDADES
 
@@ -230,7 +237,7 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'texto.esperando.aprobacion.cotizacion.unidad', 'description' => 'texto esperando aprobacion o denegacion de cotización unidad'])->syncRoles($roleUaciUnidad);
 
         Permission::create(['name' => 'sidebar.cotizacion.unidad.procesada', 'description' => 'sidebar ver torizaciones autorizadas para unidades'])->syncRoles($roleUaciUnidad, $roleJefeUaci);
-        Permission::create(['name' => 'sidebar.cotizacion.unidad.denegadas', 'description' => 'sidebar ver busqueda de año para cotizaciones denegadas'])->syncRoles($roleUaciUnidad);
+        Permission::create(['name' => 'sidebar.cotizacion.unidad.denegadas', 'description' => 'sidebar ver busqueda de año para cotizaciones denegadas'])->syncRoles($roleUaciUnidad, $roleJefeUaci);
         Permission::create(['name' => 'boton.cotizacion.unidad.generar.orden', 'description' => 'boton para generar orden de compra para cotizaciones de unidad'])->syncRoles($roleUaciUnidad);
 
         Permission::create(['name' => 'sidebar.seccion.ordenescompra.unidades', 'description' => 'sidebar para ver ordenes de compra para unidades'])->syncRoles($roleUaciUnidad, $roleJefeUaci);

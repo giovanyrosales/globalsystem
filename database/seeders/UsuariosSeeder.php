@@ -36,7 +36,7 @@ class UsuariosSeeder extends Seeder
         ])->assignRole('presupuesto');
 
         Usuario::create([
-            'nombre' => 'Giovany Rosales',
+            'nombre' => 'Ingeniero',
             'usuario' => 'ingenieria',
             'password' => bcrypt('1234'),
             'activo' => 1,

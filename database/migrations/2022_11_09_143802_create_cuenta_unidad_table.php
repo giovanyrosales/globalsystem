@@ -18,7 +18,11 @@ class CreateCuentaUnidadTable extends Migration
             $table->bigInteger('id_presup_unidad')->unsigned();
             $table->bigInteger('id_objespeci')->unsigned(); // objeto específico
 
-            $table->decimal('saldo_inicial', 10,2); // no cambia nunca
+            // este puede ser modificado en algún momento
+            $table->decimal('saldo_inicial', 10,2); // PUEDE CAMBIAR
+
+            // NO CAMBIA NUNCA, ES FIJO
+            $table->decimal('saldo_inicial_fijo', 10,2);
 
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
             $table->foreign('id_objespeci')->references('id')->on('obj_especifico');

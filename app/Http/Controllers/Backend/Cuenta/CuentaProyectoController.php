@@ -27,6 +27,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+
 
 class CuentaProyectoController extends Controller
 {
@@ -1313,6 +1315,15 @@ class CuentaProyectoController extends Controller
                 return ['success' => 1, 'mensaje' => $texto];
             }
 
+
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 3];
+            }
+
+
             $co = new PartidaAdicionalContenedor();
             $co->id_proyecto = $request->idproyecto;
             $co->fecha = $request->fecha;
@@ -1447,6 +1458,12 @@ class CuentaProyectoController extends Controller
                 return ['success' => 4, 'mensaje' => $texto];
             }
 
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 5];
+            }
 
             // obtener dependencias
             $arrayPartida = PartidaAdicional::where('id_partidaadic_conte', $request->id)->get();
@@ -1531,6 +1548,12 @@ class CuentaProyectoController extends Controller
             return ['success' => 4, 'mensaje' => $texto];
         }
 
+        $user = Auth::user();
+
+        // solo id formulador podra editar
+        if($user->id != $infoProyecto->id_formulador){
+            return ['success' => 5];
+        }
 
 
         DB::beginTransaction();
@@ -1592,7 +1615,6 @@ class CuentaProyectoController extends Controller
             $infoContenedor = PartidaAdicionalContenedor::where('id', $infoPartida->id_partidaadic_conte)->first();
             $infoProyecto = Proyecto::where('id', $infoContenedor->id_proyecto)->first();
 
-
             // modo revision
             if($infoContenedor->estado == 1){
                 return ['success' => 1];
@@ -1615,6 +1637,13 @@ class CuentaProyectoController extends Controller
 
                 $texto = "El estado del proyecto es Finalizado";
                 return ['success' => 4, 'mensaje' => $texto];
+            }
+
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 5];
             }
 
 
@@ -1667,7 +1696,7 @@ class CuentaProyectoController extends Controller
     }
 
     // editar la información de una partida adicional
-    public function editarPresupuesto(Request $request){
+    public function editarPresupuestoPartidaAdicional(Request $request){
 
         DB::beginTransaction();
 
@@ -1680,7 +1709,6 @@ class CuentaProyectoController extends Controller
 
             $infoContenedor = PartidaAdicionalContenedor::where('id', $infoPartida->id_partidaadic_conte)->first();
             $infoProyecto = Proyecto::where('id', $infoContenedor->id_proyecto)->first();
-
 
             // Modo revision
             if ($infoContenedor->estado == 1) {
@@ -1706,6 +1734,12 @@ class CuentaProyectoController extends Controller
                 return ['success' => 4, 'mensaje' => $texto];
             }
 
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 5];
+            }
 
             // actualizar registros requisicion
             PartidaAdicional::where('id', $request->idpartida)->update([
@@ -1816,6 +1850,16 @@ class CuentaProyectoController extends Controller
                 return ['success' => 1, 'mensaje' => $texto];
             }
 
+
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 5];
+            }
+
+
+
             // ya esta aprobada
             if($infoPartida->estado == 2){
                 return ['success' => 2];
@@ -1907,6 +1951,8 @@ class CuentaProyectoController extends Controller
                 $montoBolsonActual = $montoBolsonInicial - ($proyectoMontoBolson + $partidaAdicionalMonto + $proyectoFinalizadoMonto);
 
                 $montoBolsonActual = "$" . number_format((float)$montoBolsonActual, 2, '.', ',');
+
+                $montoFinalPartidaAdicional = "$" . number_format((float)$montoFinalPartidaAdicional, 2, '.', ',');
 
                 return ['success' => 5, 'info' => $infoPartidaConte, 'montopartida' => $montoFinalPartidaAdicional,
                     'nombolson' => $infoBolson->nombre, 'bolsonrestante' => $montoBolsonActual];

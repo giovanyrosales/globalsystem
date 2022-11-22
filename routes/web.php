@@ -306,7 +306,7 @@ Route::post('/admin/proyecto/borrar/partida/adicional',  [CuentaProyectoControll
 // obtiene información de la partida adicional de un proyecto
 Route::post('/admin/proyecto/partida/adicional/informacion', [CuentaProyectoController::class, 'informacionPartidaAdicional']);
 // editar la información de una partida adicional
-Route::post('/admin/proyecto/partida/adicional/editar', [CuentaProyectoController::class, 'editarPresupuesto']);
+Route::post('/admin/proyecto/partida/adicional/editar', [CuentaProyectoController::class, 'editarPresupuestoPartidaAdicional']);
 // información de contenedor partida adicional
 Route::post('/admin/partida/adicio/contenedor/estado/informacion', [CuentaProyectoController::class, 'informacionEstadoContenedorPartidaAdic']);
 // actualizar estado de contenedor partida adicional

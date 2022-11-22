@@ -481,7 +481,7 @@
                         // asignar ID contenedor
                         $('#id-contenedor').val(id);
 
-                        document.getElementById("txt-monto-partida").innerHTML = "$" + response.data.montopartida;
+                        document.getElementById("txt-monto-partida").innerHTML = response.data.montopartida;
                         document.getElementById("txt-nombre-bolson").innerHTML = response.data.nombolson;
                         document.getElementById("txt-restante-bolson").innerHTML = response.data.bolsonrestante;
 

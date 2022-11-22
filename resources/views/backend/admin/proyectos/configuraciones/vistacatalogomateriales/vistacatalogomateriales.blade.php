@@ -59,6 +59,9 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
+
+            openLoading();
+
             var ruta = "{{ URL::to('/admin/vista/catalogo/material/tabla') }}";
             $('#tablaDatatable').load(ruta);
 

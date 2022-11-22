@@ -381,9 +381,6 @@ class RequerimientosUnidadController extends Controller
                 // Este dinero se está solicitando para la fila.
                 $saldoMaterial = $request->cantidad[$i] * $infoCatalogo->costo;
 
-                Log::info('total calculado ' . $totalCalculado);
-                Log::info('saldo material ' . $saldoMaterial);
-
 
                 if($this->redondear_dos_decimal($totalCalculado) < $this->redondear_dos_decimal($saldoMaterial)){
 

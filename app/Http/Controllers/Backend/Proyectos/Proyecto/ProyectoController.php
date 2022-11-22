@@ -226,7 +226,6 @@ class ProyectoController extends Controller
         }
 
 
-
         DB::beginTransaction();
 
         try {
@@ -254,8 +253,6 @@ class ProyectoController extends Controller
                 $texto = "El estado del proyecto es Finalizado";
                 return ['success' => 3, 'mensaje' => $texto];
             }
-
-
 
 
             if ($request->hasFile('documento')) {
@@ -290,7 +287,7 @@ class ProyectoController extends Controller
                         $pro->acuerdoapertura = $nomDocumento;
                     }
                     $pro->ejecutor = $request->ejecutor;
-                    $pro->formulador = $request->formulador;
+                    $pro->id_formulador = $request->idformulador;
                     $pro->supervisor = $request->supervisor;
                     $pro->encargado = $request->encargado;
                     $pro->save();
@@ -322,7 +319,7 @@ class ProyectoController extends Controller
                     $pro->fechaini = $request->fechainicio;
                 }
                 $pro->ejecutor = $request->ejecutor;
-                $pro->formulador = $request->formulador;
+                $pro->id_formulador = $request->idformulador;
                 $pro->supervisor = $request->supervisor;
                 $pro->encargado = $request->encargado;
                 $pro->save();
@@ -332,6 +329,7 @@ class ProyectoController extends Controller
             }
 
         }catch(\Throwable $e){
+            Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 99];
         }
@@ -425,7 +423,12 @@ class ProyectoController extends Controller
                 return ['success' => 1, 'mensaje' => $texto];
             }
 
+            $user = Auth::user();
 
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 3];
+            }
 
             if ($request->hasFile('documento')) {
 
@@ -503,6 +506,14 @@ class ProyectoController extends Controller
                 $texto = "El estado del proyecto es Finalizado";
                 return ['success' => 1, 'mensaje' => $texto];
             }
+
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 3];
+            }
+
 
             // obtener listado
             $lista = BitacoraDetalle::where('id_bitacora', $request->id)->get();
@@ -639,6 +650,14 @@ class ProyectoController extends Controller
                 return ['success' => 1, 'mensaje' => $texto];
             }
 
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 3];
+            }
+
+
             $doc = $infoDetalle->documento;
 
             BitacoraDetalle::where('id', $request->id)->delete();
@@ -679,6 +698,13 @@ class ProyectoController extends Controller
 
             $texto = "El estado del proyecto es Finalizado";
             return ['success' => 1, 'mensaje' => $texto];
+        }
+
+        $user = Auth::user();
+
+        // solo id formulador podra editar
+        if($user->id != $infoProyecto->id_formulador){
+            return ['success' => 3];
         }
 
 
@@ -1105,6 +1131,20 @@ class ProyectoController extends Controller
     // petición para cancelar un material de requisición
     public function cancelarMaterialRequisicion(Request $request){
 
+        // ID REQUISICION DETALLE
+
+
+        $infoRequiDetalle = RequisicionDetalle::where('id', $request->id)->first();
+        $infoRequisicion = Requisicion::where('id', $infoRequiDetalle->requisicion_id)->first();
+        $infoProyecto = Proyecto::where('id', $infoRequisicion->id_proyecto)->first();
+
+        $user = Auth::user();
+
+        // solo id formulador podra editar
+        if($user->id != $infoProyecto->id_formulador){
+            return ['success' => 3];
+        }
+
         // verificar que este material no este cotizado con una autorizada.
 
         // obtener todas las cotizaciones id donde esté cotizado
@@ -1411,23 +1451,30 @@ class ProyectoController extends Controller
             return ['success' => 0];
         }
 
-        if($infop = Proyecto::where('id', $request->id)->first()){
+        DB::beginTransaction();
+
+        try {
+
+            $infoProyecto = Proyecto::where('id', $request->id)->first();
             //0: presupuesto en desarrollo
             //1: listo para revision
             //2: aprobado
 
-            if ($infop->presu_aprobado == 1){
+            if ($infoProyecto->presu_aprobado == 1){
                 return ['success' => 1];
             }
 
-            if ($infop->presu_aprobado == 2){
+            if ($infoProyecto->presu_aprobado == 2){
                 return ['success' => 2];
             }
-        }
 
-        DB::beginTransaction();
+            // usuario logeado
+            $user = Auth::user();
 
-        try {
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 4];
+            }
 
             $r = new Partida();
             $r->proyecto_id = $request->id;
@@ -1464,7 +1511,7 @@ class ProyectoController extends Controller
         }catch(\Throwable $e){
             //Log::info('ee' . $e);
             DB::rollback();
-            return ['success' => 4];
+            return ['success' => 99];
         }
     }
 
@@ -1512,20 +1559,24 @@ class ProyectoController extends Controller
 
         try {
 
-            if($infopa = Partida::where('id', $request->idpartida)->first()) {
+            $infoPartida = Partida::where('id', $request->idpartida)->first();
+            $infoProyecto = Proyecto::where('id', $infoPartida->proyecto_id)->first();
 
-                if ($proy = Proyecto::where('id', $infopa->proyecto_id)->first()) {
+            // Modo revision
+            if ($infoProyecto->presu_aprobado == 1) {
+                return ['success' => 1];
+            }
 
-                    // Modo revision
-                    if ($proy->presu_aprobado == 1) {
-                        return ['success' => 1];
-                    }
+            // presupuesto aprobado
+            if ($infoProyecto->presu_aprobado == 2) {
+                return ['success' => 2];
+            }
 
-                    // presupuesto aprobado
-                    if ($proy->presu_aprobado == 2) {
-                        return ['success' => 2];
-                    }
-                }
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 4];
             }
 
             // actualizar registros requisicion
@@ -1594,31 +1645,45 @@ class ProyectoController extends Controller
 
         if ($validar->fails()){return ['success' => 0];}
 
-        if($info = Partida::where('id', $request->id)->first()){
+        DB::beginTransaction();
 
-            if($pro = Proyecto::where('id', $info->proyecto_id)->first()){
-                if($pro->presu_aprobado == 1){ // en revisión
-                    return ['success' => 1];
-                }
+        try {
 
-                if($pro->presu_aprobado == 2){ // aprobado
-                    return ['success' => 2];
-                }
+            $infoPartida = Partida::where('id', $request->id)->first();
+            $infoProyecto = Proyecto::where('id', $infoPartida->proyecto_id)->first();
+
+            if($infoProyecto->presu_aprobado == 1){ // en revisión
+                return ['success' => 1];
+            }
+
+            if($infoProyecto->presu_aprobado == 2){ // aprobado
+                return ['success' => 2];
+            }
+
+            $user = Auth::user();
+
+            // solo id formulador podra editar
+            if($user->id != $infoProyecto->id_formulador){
+                return ['success' => 4];
             }
 
             // borrar listado
             PartidaDetalle::where('partida_id', $request->id)->delete();
             Partida::where('id', $request->id)->delete();
 
-            $conteoPartida = Partida::where('proyecto_id', $info->proyecto_id)->count();
+            $conteoPartida = Partida::where('proyecto_id', $infoPartida->proyecto_id)->count();
             if($conteoPartida == 0){
                 $conteoPartida = 1;
             }else{
                 $conteoPartida += 1;
             }
 
+            DB::commit();
             return ['success' => 3, 'contador' => $conteoPartida];
-        }else{
+
+        }catch(\Throwable $e){
+            Log::info('error: ' . $e);
+            DB::rollback();
             return ['success' => 99];
         }
     }
