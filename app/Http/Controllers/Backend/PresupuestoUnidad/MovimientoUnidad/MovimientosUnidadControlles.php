@@ -936,8 +936,6 @@ class MovimientosUnidadControlles extends Controller
 
         if($lista = P_Materiales::where('id', $request->idmaterial)->first()){
 
-            //id_objespecifico
-
             $detalle = DB::table('p_presup_unidad_detalle AS ppu')
             ->join('p_materiales AS m', 'ppu.id_material', '=', 'm.id')
             ->select('m.id_objespecifico')
@@ -954,7 +952,9 @@ class MovimientosUnidadControlles extends Controller
 
             $arrayobj = ObjEspecifico::whereIn('id', $pilaArray)->get();
 
-            return ['success' => 1, 'arrayobj' => $arrayobj];
+            $costoactual = "$" . number_format((float)$lista->costo, 2, '.', ',');
+
+            return ['success' => 1, 'arrayobj' => $arrayobj, 'costoactual' => $costoactual];
         }else{
             return ['success' => 2];
         }
@@ -1120,9 +1120,9 @@ class MovimientosUnidadControlles extends Controller
                     $deta = new P_SolicitudMaterial();
                     $deta->id_presup_unidad = $request->idpresup;
                     $deta->id_material = $request->idmaterial;
+                    $deta->id_cuentaunidad = $lista->id; // cuenta unidad que bajara
                     $deta->cantidad = $request->cantidad;
                     $deta->periodo = $request->periodo;
-                    $deta->id_cuentaunidad = $lista->id; // cuenta unidad que bajara
                     $deta->save();
 
                     DB::commit();
@@ -1169,6 +1169,10 @@ class MovimientosUnidadControlles extends Controller
             $total = "$" . number_format((float)$total, 2, '.', ',');
 
             $dd->total = $total;
+
+            $costoactual = "$" . number_format((float)$infoMaterial->costo, 2, '.', ',');
+
+            $dd->costoactual = $costoactual;
         }
 
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.revision.tablarevisionsolicitudmaterial', compact('lista'));

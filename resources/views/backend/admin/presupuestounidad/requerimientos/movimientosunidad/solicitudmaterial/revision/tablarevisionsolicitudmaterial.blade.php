@@ -9,6 +9,7 @@
                             <tr>
                                 <th>Departamento</th>
                                 <th>Material Solicitado</th>
+                                <th>Costo Actual</th>
                                 <th>Cantidad</th>
                                 <th>Periodo</th>
                                 <th>Total</th>
@@ -22,6 +23,7 @@
                                 <tr>
                                     <td>{{ $dato->departamento }}</td>
                                     <td>{{ $dato->material }}</td>
+                                    <td>{{ $dato->costoactual }}</td>
                                     <td>{{ $dato->cantidad }}</td>
                                     <td>{{ $dato->periodo }}</td>
                                     <td>{{ $dato->total }}</td>

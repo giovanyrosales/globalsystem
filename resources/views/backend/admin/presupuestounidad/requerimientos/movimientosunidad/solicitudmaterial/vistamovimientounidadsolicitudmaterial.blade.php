@@ -83,6 +83,11 @@
                                         </table>
 
                                         <div class="form-group" style="margin-top: 15px">
+                                            <label>Costo Actual del Material</label>
+                                            <input type="text" class="form-control" autocomplete="off" disabled id="costo-actual">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
                                             <label>Unidades</label>
                                             <input type="number" class="form-control" autocomplete="off" id="cantidad-material-nuevo">
                                         </div>
@@ -194,6 +199,7 @@
                     document.getElementById("select-obj").options.length = 0;
                     document.getElementById("select-obj").disabled = true;
                     $('#saldo-restante').val('');
+                    $('#costo-actual').val('');
                 }
 
                 axios.post(url+'/p/buscar/material/solicitud/unidad', {
@@ -244,8 +250,11 @@
                         $('#select-obj').append('<option selected value="0">Seleccionar Objeto Específico</option>');
 
                         $.each(response.data.arrayobj, function( key, val ){
-                            $('#select-obj').append('<option value="' +val.id +'">'+val.nombre+'</option>');
+                            $('#select-obj').append('<option value="' +val.id +'">'+val.codigo + ' - ' + val.nombre+'</option>');
                         });
+
+                        $('#costo-actual').val(response.data.costoactual);
+
                     }else{
                         toastr.error('información no encontrada');
                     }
