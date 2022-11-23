@@ -119,7 +119,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Agregar Requisición de Proyecto</h4>
+                    <h4 class="modal-title">Agregar Requisición de Unidad</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -231,7 +231,7 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Editar Requisición de Proyecto</h4>
+                    <h4 class="modal-title">Editar Requisición de Unidad</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1075,7 +1075,7 @@
         function borrarRequiDetalleFila(id){
             openLoading();
 
-            axios.post(url+'/proyecto/requisicion/material/borrarfila', {
+            axios.post(url+'/p/requisicion/unidad/material/borrarfila', {
                 'id': id
             })
                 .then((response) => {
@@ -1102,6 +1102,7 @@
 
                     }else if(response.data.success === 2){
                         toastr.success('Borrado correctamente');
+                        $('#modalEditarRequisicion').modal('hide');
                         recargarRequisicion();
                     }
                     else{
@@ -1117,7 +1118,7 @@
         function cancelarMaterialCotizado(id){
             openLoading();
 
-            axios.post(url+'/proyecto/requisicion/material/cancelar', {
+            axios.post(url+'/p/requisicion/unidad/material/cancelar', {
                 'id': id
             })
                 .then((response) => {

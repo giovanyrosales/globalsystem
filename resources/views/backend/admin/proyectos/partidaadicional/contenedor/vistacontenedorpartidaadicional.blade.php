@@ -25,13 +25,17 @@
                 <div class="col-sm-5">
                     <h1>Solicitudes para Partidas Adicionales</h1>
 
-                    <!-- Botón para crear solicitud de partida adicional -->
-                    @can('boton.modal.crear.solicitud.partida.adicional')
-                        <button type="button" style="margin-top: 15px;font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalSolicitudPartidaAdicional()" class="button button-3d button-rounded button-pill button-small">
-                            <i class="fas fa-plus"></i>
-                            Crear Solicitud Partida Adicional
-                        </button>
-                    @endcan
+                @can('boton.crear.vista.partida.adicionales')
+                    @if($infoPro->permiso_partida_adic == 1)
+                        <!-- Botón para crear solicitud de partida adicional -->
+                        @can('boton.modal.crear.solicitud.partida.adicional')
+                            <button type="button" style="margin-top: 15px;font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalSolicitudPartidaAdicional()" class="button button-3d button-rounded button-pill button-small">
+                                <i class="fas fa-plus"></i>
+                                Crear Solicitud Partida Adicional
+                            </button>
+                        @endcan
+                    @endif
+                @endcan
 
                 </div>
 
@@ -272,8 +276,8 @@
 
                             }
                         })
-
                     }
+
                     else if(response.data.success === 2) {
                         $('#modalAgregar').modal('hide');
 

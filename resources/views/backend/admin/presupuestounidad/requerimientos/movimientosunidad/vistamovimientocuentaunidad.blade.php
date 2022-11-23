@@ -23,7 +23,7 @@
         <div class="container-fluid">
             <div class="row mb-6">
                 <div class="col-sm-5">
-                    <h1>Movimiento Cuenta de Proyecto</h1>
+                    <h1>Movimiento Cuenta de Unidad</h1>
                     <button type="button" style="margin-top: 15px;font-weight: bold; background-color: #17a2b8; color: white !important;"
                             onclick="verHistorico()" class="button button-3d button-rounded button-pill button-small">
                         <i class="fas fa-list-alt"></i>

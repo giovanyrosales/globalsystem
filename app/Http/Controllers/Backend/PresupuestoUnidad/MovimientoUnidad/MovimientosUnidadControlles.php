@@ -151,8 +151,9 @@ class MovimientosUnidadControlles extends Controller
             // obtener CUENTA UNIDAD. menos la seleccionada
             $arrayCuentaUnidad = DB::table('cuenta_unidad AS cu')
                 ->join('obj_especifico AS obj', 'cu.id_objespeci', '=', 'obj.id')
-                ->select('obj.nombre', 'obj.codigo', 'cu.id',)
+                ->select('obj.nombre', 'obj.codigo', 'cu.id', 'cu.id_presup_unidad')
                 ->where('cu.id', '!=', $lista->id)
+                ->where('cu.id_presup_unidad', $lista->id_presup_unidad)
                 ->get();
 
             // CÁLCULOS

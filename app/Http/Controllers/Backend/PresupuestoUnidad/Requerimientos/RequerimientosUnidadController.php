@@ -100,7 +100,9 @@ class RequerimientosUnidadController extends Controller
             ->where('id_departamento', $infoDepartamento->id_departamento)
             ->first();
 
-        $monto = '$' . number_format((float)$infoPresuUnidad->saldo_aprobado, 2, '.', ',');
+        $monto = CuentaUnidad::where('id_presup_unidad', $infoPresuUnidad->id)->sum('saldo_inicial_fijo');
+
+        $monto = '$' . number_format((float)$monto, 2, '.', ',');
 
         $conteo = RequisicionUnidad::where('id_presup_unidad', $infoPresuUnidad->id)->count();
         if($conteo == null){
@@ -658,6 +660,103 @@ class RequerimientosUnidadController extends Controller
 
         }catch(\Throwable $e){
             Log::info('ee ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
+    // cancelar material de requisicion unidad detalle
+    public function cancelarMaterialRequisicionUnidad(Request $request){
+
+        // ID REQUISICION DETALLE de unidad
+
+
+        $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $request->id)->first();
+        $infoRequisicion = RequisicionUnidad::where('id', $infoRequiDetalle->requisicion_id)->first();
+
+        // verificar que este material no este cotizado con una autorizada.
+
+        // obtener todas las cotizaciones id donde esté cotizado
+        $lista = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $request->id)->get();
+
+        $pila = array();
+        foreach ($lista as $dd){
+            array_push($pila, $dd->id_cotizacion_unidad);
+        }
+
+        // saber si hay una cotización autorizada. CON ESTE MATERIAL
+        // EL ESTADO 1, APROBADA, 2: DENEGADA
+        // ES DECIR, MIENTRAS EL ESTADO DE LA COTIZACION ESTA EN DEFAULT Y APROBADO.
+        // NO PODRA CANCELAR EL MATERIAL
+        $conteo = CotizacionUnidad::whereIn('id', $pila)
+            ->whereIn('estado', [0, 1])
+            ->count();
+
+        if($conteo > 0){
+
+            // si hay cotización, hoy verificar si orden de compra fue anulada
+            $arrayCoti = CotizacionUnidad::whereIn('id', $pila)->get();
+            $pilaCoti = array();
+            foreach ($arrayCoti as $dd){
+                array_push($pilaCoti, $dd->id);
+            }
+
+            // ver si existe al menos 1 orden
+            if(OrdenUnidad::whereIn('id_cotizacion_unidad', $pilaCoti)->first()){
+                $conteoOrden = OrdenUnidad::whereIn('id_cotizacion_unidad', $pilaCoti)
+                    ->where('estado', 0) // APROBADA LA ORDEN
+                    ->count();
+
+                if($conteoOrden > 0){
+                    // material tiene una orden aprobada
+                }else{
+                    // material tiene una orden denegada
+
+                    // SE PUEDE CANCELAR PORQUE TIENE UNA ORDEN DE COMPRA CANCELADA
+
+                    RequisicionUnidadDetalle::where('id', $request->id)->update([
+                        'cancelado' => 1,
+                    ]);
+
+                    return ['success' => 2];
+                }
+            }
+
+            // MATERIAL FUE APROBADO O ---- ESPERANDO APROBACIÓN ----, NO SE PUEDE CANCELAR YA
+            // solo para mostrar mensaje que la coti fue aprobada y no se puede borrar.
+            $infoTipo = CotizacionUnidad::whereIn('id', $pila)->where('estado', 1)->count();
+            return ['success' => 1, 'tipo' => $infoTipo];
+        }
+
+        // SE PUEDE CANCELAR, PORQUE NINGUNA COTI ESTA APROBADA
+        RequisicionUnidadDetalle::where('id', $request->id)->update([
+            'cancelado' => 1,
+        ]);
+
+        return ['success' => 2];
+    }
+
+    // borrar fila de requisicion unidad detalle
+    public function borrarMaterialRequisicionFilaUnidad(Request $request){
+        DB::beginTransaction();
+
+        try {
+
+            // verificar si hay una cotización con este material
+
+            if(CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $request->id)->first()){
+                return ['success' => 1];
+            }
+
+            if(RequisicionUnidadDetalle::where('id', $request->id)->first()){
+                CuentaUnidadRetenido::where('id_requi_detalle', $request->id)->delete();
+                RequisicionUnidadDetalle::where('id', $request->id)->delete();
+            }
+
+            DB::commit();
+            return ['success' => 2];
+        }catch(\Throwable $e){
+            Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 99];
         }

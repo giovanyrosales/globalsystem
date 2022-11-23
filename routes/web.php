@@ -858,6 +858,11 @@ Route::post('/admin/p/requisicion/unidad/informacion', [RequerimientosUnidadCont
 // modificar las requisiciones de unidad
 Route::post('/admin/p/requisicion/unidad/editar', [RequerimientosUnidadController::class, 'editarRequisicionUnidad']);
 
+// cancelar material de requisicion unidad detalle
+Route::post('/admin/p/requisicion/unidad/material/cancelar', [RequerimientosUnidadController::class, 'cancelarMaterialRequisicionUnidad']);
+// borrar fila de requisicion unidad detalle
+Route::post('/admin/p/requisicion/unidad/material/borrarfila', [RequerimientosUnidadController::class, 'borrarMaterialRequisicionFilaUnidad']);
+
 
 // * LISTADO DE REQUERIMIENTOS UACI UNIDAD
 

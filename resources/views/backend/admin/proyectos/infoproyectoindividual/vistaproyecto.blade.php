@@ -83,27 +83,15 @@
                                 <!-- permiso para habilitar botón y agregar partidas adicionales -->
                                 <!-- debe estar proyecto en estado INICIADO -->
 
-                                @can('boton.crear.vista.partida.adicionales')
+                                <button type="button" style="margin-top: 15px; font-weight: bold; background-color: #28a745; color: white !important;" onclick="vistaPartidaAdicional()" class="button button-3d button-rounded button-pill button-small">
+                                    <i class="fas fa-list-alt"></i>
+                                    Partidas Adicionales
+                                </button>
 
-                                    @if($proyecto->permiso_partida_adic == 1)
-                                        @if($proyecto->id_estado == 2)
 
-                                            <button type="button" style="margin-top: 15px; font-weight: bold; background-color: #28a745; color: white !important;" onclick="vistaPartidaAdicional()" class="button button-3d button-rounded button-pill button-small">
-                                                <i class="fas fa-list-alt"></i>
-                                                Partidas Adicionales
-                                            </button>
-                                        @elseif($proyecto->id_estado == 3)
 
-                                            <label style="float: right; color: red; font-size: 16px">Proyecto Esta Pausado</label>
 
-                                        @elseif($proyecto->id_estado == 4)
-                                            <label style="float: right; color: red; font-size: 16px">Proyecto esta Finalizado</label>
-                                        @elseif($proyecto->id_estado == 1)
-                                            <label style="float: right; color: red; font-size: 16px">Proyecto No Esta Iniciado para Crear Partida Adicionales</label>
-                                        @endif
-                                    @endif
 
-                                @endcan
 
                             </div>
                         </div>
