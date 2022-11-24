@@ -719,16 +719,28 @@ class MovimientosUnidadControlles extends Controller
         }
     }
 
+    public function indexMovimientoCuentaUnidadAprobadosAnio(){
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.historicoaprobado.vistaaniocuentahistoricounidad', compact('anios'));
+    }
+
     // ver los movimientos de cuenta unidad aprobados
-    public function indexMovimientoCuentaUnidadAprobados(){
-        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.historicoaprobado.vistamovicuentaunidadhistoricoaprobado');
+    public function indexMovimientoCuentaUnidadAprobados($idanio){
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.historicoaprobado.vistamovicuentaunidadhistoricoaprobado', compact('idanio'));
     }
 
     // ver tabla de los movimientos historicos de cuenta unidad aprobados
-    public function tablaMovimientoCuentaUnidadAprobados(){
+    public function tablaMovimientoCuentaUnidadAprobados($idanio){
 
         $pilaIdCuentaUnidad = array();
-        $listado = CuentaUnidad::get();
+
+        $listado = DB::table('cuenta_unidad AS cu')
+            ->join('p_presup_unidad AS pru', 'cu.id_presup_unidad', '=', 'pru.id')
+            ->select('cu.id', 'cu.id_presup_unidad', 'pru.id_anio', 'cu.id_objespeci', 'cu.saldo_inicial')
+            ->where('pru.id_anio', $idanio)
+            ->get();
 
         foreach ($listado as $ll) {
             array_push($pilaIdCuentaUnidad, $ll->id);
@@ -1505,5 +1517,52 @@ class MovimientosUnidadControlles extends Controller
         return view('backend.admin.presupuestounidad.requerimientos.modal.modalcatalogomaterial', compact('presupuesto'));
     }
 
+
+    public function vistaAñoPresupuestoMaterialAprobados(){
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.aprobados.vistaaniosolicitudmaterialaprobados', compact('anios'));
+    }
+
+    public function indexRevisionSolicitudMaterialAprobada($idanio){
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.aprobados.vistarevisionsolicitudmaterialaprobados', compact('idanio'));
+
+    }
+
+
+    public function tablaRevisionSolicitudMaterialUnidadAprobados($idanio){
+
+        return "ttab";
+
+        $lista = P_SolicitudMaterial::all();
+
+        foreach ($lista as $dd) {
+
+            $infoPresup = P_PresupUnidad::where('id', $dd->id_presup_unidad)->first();
+            $infoDepar = P_Departamento::where('id', $infoPresup->id_departamento)->first();
+
+            $dd->departamento = $infoDepar->nombre;
+
+            $infoMaterial = P_Materiales::where('id', $dd->id_material)->first();
+            $infoCuenta = CuentaUnidad::where('id', $dd->id_cuentaunidad)->first();
+            $infoObj = ObjEspecifico::where('id', $infoCuenta->id_objespeci)->first();
+
+            $dd->material = $infoMaterial->descripcion;
+            $dd->objnombre = $infoObj->codigo . ' - ' . $infoObj->nombre;
+
+            $total = ($dd->cantidad * $infoMaterial->costo) * $dd->periodo;
+
+            $total = "$" . number_format((float)$total, 2, '.', ',');
+
+            $dd->total = $total;
+
+            $costoactual = "$" . number_format((float)$infoMaterial->costo, 2, '.', ',');
+
+            $dd->costoactual = $costoactual;
+        }
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.revision.tablarevisionsolicitudmaterial', compact('lista'));
+    }
 
 }

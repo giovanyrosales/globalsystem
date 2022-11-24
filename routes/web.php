@@ -836,9 +836,14 @@ Route::post('/admin/p/movimientohistorico/unidades/denegar/borrar',  [Movimiento
 Route::post('/admin/p/movimientohistorico/unidades/autorizar',  [MovimientosUnidadControlles::class,'autorizarMovimientoCuentaUnidad']);
 
 // ver los movimientos de cuenta unidad aprobados
-Route::get('/admin/p/movicuentaunidad/aprobados/presupuesto/index', [MovimientosUnidadControlles::class,'indexMovimientoCuentaUnidadAprobados'])->name('p.admin.movimientos.aprobados.historicos.unidades.index');
+
+// año para buscar movimientos de cuenta unidad aprobados
+Route::get('/admin/p/movicuentaunidad/aprobados/presupuesto/anio', [MovimientosUnidadControlles::class,'indexMovimientoCuentaUnidadAprobadosAnio'])->name('p.admin.movimientos.aprobados.historicos.unidades.index');
+
+
+Route::get('/admin/p/movicuentaunidad/aprobados/presupuesto/index/{idanio}', [MovimientosUnidadControlles::class,'indexMovimientoCuentaUnidadAprobados']);
 // ver tabla de los movimientos historicos aprobados de cuenta unidad
-Route::get('/admin/p/movicuentaunidad/aprobados/presupuesto/tabla', [MovimientosUnidadControlles::class,'tablaMovimientoCuentaUnidadAprobados']);
+Route::get('/admin/p/movicuentaunidad/aprobados/presupuesto/tabla/{idanio}', [MovimientosUnidadControlles::class,'tablaMovimientoCuentaUnidadAprobados']);
 // descargar documento reforma de movimiento cuenta unidad
 Route::get('/admin/p/movicuentaunidad/bajar/reforma/{id}',  [MovimientosUnidadControlles::class,'descargarReformaMovimientoUnidades']);
 // guardar documento reforma para movimiento cuenta unidades
@@ -983,10 +988,23 @@ Route::post('/admin/p/borrar/solicitud/material/presupuesto',  [MovimientosUnida
 Route::post('/admin/p/aprobar/solicitud/material/presupuesto',  [MovimientosUnidadControlles::class,'aprobarSolicitudMaterialPresupuesto']);
 
 
+// SOLICITUDES APROBADAS DE MATERIAL PARA UNIDADES
+
+// ver año de solicitud aprobada
+
+Route::get('/admin/p/anio/aprobadas/material/solicitudes', [MovimientosUnidadControlles::class,'vistaAñoPresupuestoMaterialAprobados'])->name('p.admin.nuevas.solicitudes.materiales.aprobados');
+
+Route::get('/admin/p/aprobados/solicitud/material/{idanio}', [MovimientosUnidadControlles::class,'indexRevisionSolicitudMaterialAprobada']);
+Route::get('/admin/p/aprobados/solicitud/material/tabla/{idanio}', [MovimientosUnidadControlles::class,'tablaRevisionSolicitudMaterialUnidadAprobados']);
 
 
 
-
-
+/*
+// retorna vista para ver materiales solicitados y se quita dinero de un código
+// retorna tabla para ver materiales solicitados y se quita dinero de un código
+Route::get('/admin/p/revision/solicitud/material/unidades/tabla', [MovimientosUnidadControlles::class,'tablaRevisionSolicitudMaterialUnidad']);
+// revision por presupuesto de material solicitado por una unidad
+Route::post('/admin/p/solicitud/material/revision/presupuesto',  [MovimientosUnidadControlles::class,'informacionSolicitudMaterialPresupuesto']);
+*/
 
 

@@ -247,6 +247,7 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'boton.anular.orden.compra.unidad', 'description' => 'boton para anular orden de compra ya aprobada de unidades'])->syncRoles($roleJefeUaci);
 
         Permission::create(['name' => 'p.sidebar.solicitud.materiales.cuentas.unidades', 'description' => 'sidebar para que Presupuesto revise solicitud de materiales de unidad'])->syncRoles($rolePresupuesto);
+        Permission::create(['name' => 'p.sidebar.solicitud.aprobadas.materiales.cuentas.unidades', 'description' => 'sidebar para que Presupuesto revise solicitud de materiales de unidad Aprobados'])->syncRoles($rolePresupuesto);
 
 
 

@@ -98,7 +98,8 @@
     <script type="text/javascript">
         $(document).ready(function(){
 
-            var ruta = "{{ URL::to('/admin/p/movicuentaunidad/aprobados/presupuesto/tabla') }}";
+            let idanio = {{ $idanio }};
+            var ruta = "{{ URL::to('/admin/p/movicuentaunidad/aprobados/presupuesto/tabla') }}/" + idanio;
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -110,7 +111,8 @@
 
         function recargar(){
 
-            var ruta = "{{ URL::to('/admin/p/movicuentaunidad/aprobados/presupuesto/tabla') }}";
+            let idanio = {{ $idanio }};
+            var ruta = "{{ URL::to('/admin/p/movicuentaunidad/aprobados/presupuesto/tabla') }}/" + idanio;
             $('#tablaDatatable').load(ruta);
         }
 

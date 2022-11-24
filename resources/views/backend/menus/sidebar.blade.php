@@ -605,6 +605,15 @@
                                 </li>
                             @endcan
 
+                            @can('p.sidebar.solicitud.aprobadas.materiales.cuentas.unidades')
+                                <li class="nav-item">
+                                    <a href="{{ route('p.admin.nuevas.solicitudes.materiales.aprobados') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Solicitudes Aprobadas</p>
+                                    </a>
+                                </li>
+                            @endcan
+
                         </ul>
                     </li>
                 @endcan
