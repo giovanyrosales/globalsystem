@@ -22,6 +22,7 @@
             <div class="row mb-10">
                 <div class="col-sm-10">
                     <h1>Revisión de Solicitudes de Material Para Presupuesto</h1>
+                    <h1>Año: {{ $anio }}</h1>
                 </div>
 
             </div>
@@ -46,17 +47,17 @@
         </div>
     </section>
 
-    <div class="modal fade" id="modalNuevoSolicitud">
+    <div class="modal fade" id="modalInformacion">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Solicitud de Material</h4>
+                    <h4 class="modal-title">Información</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="formulario-nuevo-material">
+                    <form id="formulario-informacion">
                         <div class="card-body">
 
                             <div class="card-body">
@@ -64,41 +65,39 @@
                                     <div class="col-md-12">
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Material Solicitado</label>
-                                            <input type="hidden" class="form-control" id="id-solicitud">
-
-                                            <input type="text" class="form-control" disabled autocomplete="off" id="material-nuevo">
+                                            <label>Departamento</label>
+                                            <input type="text" class="form-control" disabled id="txt-departamento">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Precio Unitario</label>
-                                            <input type="text" class="form-control" disabled autocomplete="off" id="precio-unitario">
+                                            <label>Material</label>
+                                            <input type="text" class="form-control" disabled id="txt-material">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
                                             <label>Unidades</label>
-                                            <input type="text" class="form-control" disabled id="cantidad-material-nuevo">
+                                            <input type="text" class="form-control" disabled id="txt-unidades">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
                                             <label>Periodo</label>
-                                            <input type="text" class="form-control" disabled id="periodo-material-nuevo">
+                                            <input type="text" class="form-control" disabled id="txt-periodo">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Total a Solicitar</label>
-                                            <input type="text" class="form-control" disabled id="total-solicitado">
+                                            <label>Monto Solicitado</label>
+                                            <input type="text" class="form-control" disabled id="txt-montosolicitado">
                                         </div>
 
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Objeto Específico a Descontar</label>
-                                            <input type="text" class="form-control" disabled id="objeto-nuevo">
-                                        </div>
+
+                                        <hr>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Saldo Restante <p style="color: red">(Se resta Saldo Retenido)</p></label>
-                                            <input type="text" class="form-control" disabled id="saldo-restante">
+                                            <label>Monto Solicitado</label>
+                                            <input type="text" class="form-control" disabled id="txt-montosolicitado">
                                         </div>
+
+
 
                                     </div>
                                 </div>
@@ -109,8 +108,6 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-danger" onclick="preguntarBorrar()">Denegar</button>
-                    <button type="button" class="btn btn-primary" onclick="preguntarSolicitud()">Aprobar</button>
                 </div>
             </div>
         </div>
@@ -137,7 +134,7 @@
         $(document).ready(function(){
 
             let idanio = {{ $idanio }};
-            var ruta = "{{ URL::to('/admin/p/aprobados/solicitud/material') }}/" + idanio;
+            var ruta = "{{ URL::to('/admin/p/aprobados/solicitud/material/tabla') }}/" + idanio;
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -146,45 +143,30 @@
 
     <script>
 
-        function recargar(){
-            let idanio = {{ $idanio }};
-            var ruta = "{{ URL::to('/admin/p/aprobados/solicitud/material') }}/" + idanio;
-            $('#tablaDatatable').load(ruta);
-        }
-
         function informacion(id){
-            // id p_materialsolicitud
 
             openLoading();
 
-            var formData = new FormData();
-            formData.append('idsolicitud', id);
+            document.getElementById("formulario-informacion").reset();
 
-            axios.post(url+'/p/solicitud/material/revision/presupuesto', formData, {
+            axios.post(url+'/p/aprobados/solicitud/material/informacion', {
+                'id' : id
             })
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
 
-                        $('#id-solicitud').val(id);
+                        $.each(response.data.infolista, function( key, val ) {
 
-                        let nommaterial = response.data.nommaterial;
-                        let unitario = response.data.unitario;
-                        let cantidad = response.data.info.cantidad;
-                        let periodo = response.data.info.periodo;
-                        let objeto = response.data.objeto;
-                        let restante = response.data.restante;
-                        let totalsolicitado = response.data.totalsolicitado;
+                            $('#txt-departamento').val(val.departamento);
+                            $('#txt-material').val(val.material);
+                            $('#txt-unidades').val(val.unidades);
+                            $('#txt-periodo').val(val.periodo);
+                            $('#txt-montosolicitado').val(val.solicitado);
 
-                        $('#material-nuevo').val(nommaterial);
-                        $('#precio-unitario').val(unitario);
-                        $('#cantidad-material-nuevo').val(cantidad);
-                        $('#periodo-material-nuevo').val(periodo);
-                        $('#objeto-nuevo').val(objeto);
-                        $('#saldo-restante').val(restante);
-                        $('#total-solicitado').val(totalsolicitado);
+                        });
 
-                        $('#modalNuevoSolicitud').modal('show');
+                        $('#modalInformacion').modal('show');
                     }else{
                         toastr.error('información no encontrada');
                     }
@@ -195,122 +177,7 @@
                 });
         }
 
-        function preguntarSolicitud(){
 
-            Swal.fire({
-                title: 'Aprobar Solicitud',
-                text: "",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aprobar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    aprobarSolicitud();
-                }
-            })
-        }
-
-        function preguntarBorrar(){
-            Swal.fire({
-                title: 'Denegar Solicitud',
-                text: "",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Denegar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    borrarSolicitud();
-                }
-            })
-        }
-
-        function borrarSolicitud(){
-
-            let id = document.getElementById('id-solicitud').value;
-
-            openLoading();
-
-            var formData = new FormData();
-            formData.append('idsolicitud', id);
-
-            axios.post(url+'/p/borrar/solicitud/material/presupuesto', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-
-                        $('#modalNuevoSolicitud').modal('hide');
-                        toastr.success('Solicitud eliminada');
-                        recargar();
-                    }else{
-                        toastr.error('Error al borrar');
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Error al borrar');
-                });
-        }
-
-        function aprobarSolicitud(){
-
-            let id = document.getElementById('id-solicitud').value;
-
-            openLoading();
-
-            var formData = new FormData();
-            formData.append('idsolicitud', id);
-
-            axios.post(url+'/p/aprobar/solicitud/material/presupuesto', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        // dinero restante insuficiente para RESTARLE LO QUE SE SOLICITA
-
-                        let restante = response.data.restante;
-                        let costo = response.data.costo;
-
-                        Swal.fire({
-                            title: 'Saldo Insuficiente',
-                            html: "La Cuenta a Descontar no tiene suficiente Saldo " + "<br>"
-                                + "Saldo Restante $"+ restante +"<br>"
-                                + "Saldo de Material solicitado $"+ costo +"<br>"
-                            ,
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-
-                    else if(response.data.success === 2) {
-
-                        $('#modalNuevoSolicitud').modal('hide');
-                        toastr.success('Aprobado correctamente');
-                        recargar();
-                    }
-                    else{
-                        toastr.error('Error al borrar');
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Error al borrar');
-                });
-        }
 
     </script>
 

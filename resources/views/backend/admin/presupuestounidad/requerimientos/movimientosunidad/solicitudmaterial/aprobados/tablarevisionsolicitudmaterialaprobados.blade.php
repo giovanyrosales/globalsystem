@@ -8,12 +8,10 @@
                             <thead>
                             <tr>
                                 <th>Departamento</th>
-                                <th>Material Solicitado</th>
-                                <th>Costo Actual</th>
-                                <th>Cantidad</th>
+                                <th>Material</th>
+                                <th>Unidades</th>
                                 <th>Periodo</th>
-                                <th>Total</th>
-                                <th>Objeto Específico a Descontar</th>
+                                <th>Monto Solicitado</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -23,11 +21,9 @@
                                 <tr>
                                     <td>{{ $dato->departamento }}</td>
                                     <td>{{ $dato->material }}</td>
-                                    <td>{{ $dato->costoactual }}</td>
-                                    <td>{{ $dato->cantidad }}</td>
+                                    <td>{{ $dato->unidades }}</td>
                                     <td>{{ $dato->periodo }}</td>
-                                    <td>{{ $dato->total }}</td>
-                                    <td>{{ $dato->objnombre }}</td>
+                                    <td>{{ $dato->solicitado }}</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-info" title="Revisar"></i>&nbsp; Revisar

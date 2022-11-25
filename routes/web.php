@@ -996,15 +996,7 @@ Route::get('/admin/p/anio/aprobadas/material/solicitudes', [MovimientosUnidadCon
 
 Route::get('/admin/p/aprobados/solicitud/material/{idanio}', [MovimientosUnidadControlles::class,'indexRevisionSolicitudMaterialAprobada']);
 Route::get('/admin/p/aprobados/solicitud/material/tabla/{idanio}', [MovimientosUnidadControlles::class,'tablaRevisionSolicitudMaterialUnidadAprobados']);
+Route::post('/admin/p/aprobados/solicitud/material/informacion', [MovimientosUnidadControlles::class,'presupuestoMaterialAprobadosInformacion']);
 
-
-
-/*
-// retorna vista para ver materiales solicitados y se quita dinero de un código
-// retorna tabla para ver materiales solicitados y se quita dinero de un código
-Route::get('/admin/p/revision/solicitud/material/unidades/tabla', [MovimientosUnidadControlles::class,'tablaRevisionSolicitudMaterialUnidad']);
-// revision por presupuesto de material solicitado por una unidad
-Route::post('/admin/p/solicitud/material/revision/presupuesto',  [MovimientosUnidadControlles::class,'informacionSolicitudMaterialPresupuesto']);
-*/
 
 

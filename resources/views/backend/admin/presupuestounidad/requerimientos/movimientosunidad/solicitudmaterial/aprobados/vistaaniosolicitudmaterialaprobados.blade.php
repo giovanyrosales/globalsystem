@@ -88,7 +88,7 @@
                 return;
             }
 
-            window.location.href="{{ url('/admin/p/movicuentaunidad/aprobados/presupuesto/index') }}/" + anio;
+            window.location.href="{{ url('/admin/p/aprobados/solicitud/material') }}/" + anio;
         }
 
     </script>

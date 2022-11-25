@@ -1526,43 +1526,64 @@ class MovimientosUnidadControlles extends Controller
 
     public function indexRevisionSolicitudMaterialAprobada($idanio){
 
-        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.aprobados.vistarevisionsolicitudmaterialaprobados', compact('idanio'));
+        $infoAnio = P_AnioPresupuesto::where('id', $idanio)->first();
+        $anio = $infoAnio->nombre;
 
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.aprobados.vistarevisionsolicitudmaterialaprobados', compact('idanio', 'anio'));
     }
 
 
     public function tablaRevisionSolicitudMaterialUnidadAprobados($idanio){
 
-        return "ttab";
+        $lista = DB::table('p_solicitud_material_detalle AS ps')
+            ->join('p_presup_unidad AS pp', 'ps.id_presup_unidad', '=', 'pp.id')
+            ->select('pp.id_anio', 'pp.id AS idpresup', 'ps.id', 'ps.id_material', 'ps.id_cuentaunidad_sube', 'ps.id_cuentaunidad_baja',
+            'ps.unidades', 'ps.periodo', 'ps.copia_saldoini_antes_subir', 'ps.copia_saldoini_antes_bajar',
+            'ps.dinero_solicitado', 'ps.cuenta_creada')
+            ->where('pp.id_anio', $idanio)
+            ->get();
 
-        $lista = P_SolicitudMaterial::all();
+        foreach ($lista as $dd){
 
-        foreach ($lista as $dd) {
-
-            $infoPresup = P_PresupUnidad::where('id', $dd->id_presup_unidad)->first();
-            $infoDepar = P_Departamento::where('id', $infoPresup->id_departamento)->first();
-
-            $dd->departamento = $infoDepar->nombre;
-
+            $infoPresup = P_PresupUnidad::where('id', $dd->idpresup)->first();
             $infoMaterial = P_Materiales::where('id', $dd->id_material)->first();
-            $infoCuenta = CuentaUnidad::where('id', $dd->id_cuentaunidad)->first();
-            $infoObj = ObjEspecifico::where('id', $infoCuenta->id_objespeci)->first();
+            $infoDepartamento = P_Departamento::where('id', $infoPresup->id_departamento)->first();
 
             $dd->material = $infoMaterial->descripcion;
-            $dd->objnombre = $infoObj->codigo . ' - ' . $infoObj->nombre;
+            $dd->departamento = $infoDepartamento->nombre;
 
-            $total = ($dd->cantidad * $infoMaterial->costo) * $dd->periodo;
-
-            $total = "$" . number_format((float)$total, 2, '.', ',');
-
-            $dd->total = $total;
-
-            $costoactual = "$" . number_format((float)$infoMaterial->costo, 2, '.', ',');
-
-            $dd->costoactual = $costoactual;
+            $dd->solicitado = '$' . number_format((float)$dd->dinero_solicitado, 2, '.', ',');
         }
 
-        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.revision.tablarevisionsolicitudmaterial', compact('lista'));
+
+        return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.aprobados.tablarevisionsolicitudmaterialaprobados', compact('lista'));
     }
+
+    public function presupuestoMaterialAprobadosInformacion(Request $request){
+
+        $lista = DB::table('p_solicitud_material_detalle AS ps')
+            ->join('p_presup_unidad AS pp', 'ps.id_presup_unidad', '=', 'pp.id')
+            ->select('pp.id_anio', 'pp.id AS idpresup', 'ps.id', 'ps.id_material', 'ps.id_cuentaunidad_sube', 'ps.id_cuentaunidad_baja',
+                'ps.unidades', 'ps.periodo', 'ps.copia_saldoini_antes_subir', 'ps.copia_saldoini_antes_bajar',
+                'ps.dinero_solicitado', 'ps.cuenta_creada')
+            ->where('ps.id', $request->id)
+            ->get();
+
+        foreach ($lista as $dd){
+
+            $infoPresup = P_PresupUnidad::where('id', $dd->idpresup)->first();
+            $infoMaterial = P_Materiales::where('id', $dd->id_material)->first();
+            $infoDepartamento = P_Departamento::where('id', $infoPresup->id_departamento)->first();
+
+            $dd->material = $infoMaterial->descripcion;
+            $dd->departamento = $infoDepartamento->nombre;
+
+            $dd->solicitado = '$' . number_format((float)$dd->dinero_solicitado, 2, '.', ',');
+        }
+
+        return ['success' => 1, 'infolista' => $lista];
+    }
+
+
 
 }
