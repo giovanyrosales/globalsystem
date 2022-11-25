@@ -24,6 +24,9 @@ class CreatePSolicitudMaterialTable extends Migration
             $table->decimal('cantidad', 10, 2);
             $table->integer('periodo');
 
+            // cuando se hizo la solicitud
+            $table->dateTime('fechahora');
+
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
             $table->foreign('id_material')->references('id')->on('p_materiales');
             $table->foreign('id_cuentaunidad')->references('id')->on('cuenta_unidad');

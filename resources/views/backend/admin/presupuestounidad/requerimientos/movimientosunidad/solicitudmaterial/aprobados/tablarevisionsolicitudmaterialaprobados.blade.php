@@ -7,6 +7,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                <th>Fecha</th>
                                 <th>Departamento</th>
                                 <th>Material</th>
                                 <th>Unidades</th>
@@ -19,6 +20,7 @@
 
                             @foreach($lista as $dato)
                                 <tr>
+                                    <td>{{ $dato->fechahora }}</td>
                                     <td>{{ $dato->departamento }}</td>
                                     <td>{{ $dato->material }}</td>
                                     <td>{{ $dato->unidades }}</td>

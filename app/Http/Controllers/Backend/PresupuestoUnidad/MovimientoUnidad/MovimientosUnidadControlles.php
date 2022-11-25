@@ -18,6 +18,7 @@ use App\Models\P_SolicitudMaterialDetalle;
 use App\Models\P_UnidadMedida;
 use App\Models\P_UsuarioDepartamento;
 use App\Models\RequisicionUnidad;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -869,6 +870,8 @@ class MovimientosUnidadControlles extends Controller
             $total = "$" . number_format((float)$total, 2, '.', ',');
 
             $dd->total = $total;
+
+            $dd->fechahora = date("d-m-Y h:i A", strtotime($dd->fechahora));
         }
 
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.tablamovimientounidadsolicitudmaterial', compact('lista'));
@@ -1135,6 +1138,7 @@ class MovimientosUnidadControlles extends Controller
                     $deta->id_cuentaunidad = $lista->id; // cuenta unidad que bajara
                     $deta->cantidad = $request->cantidad;
                     $deta->periodo = $request->periodo;
+                    $deta->fechahora = Carbon::now('America/El_Salvador');
                     $deta->save();
 
                     DB::commit();
@@ -1403,6 +1407,7 @@ class MovimientosUnidadControlles extends Controller
                     $deta->copia_saldoini_antes_bajar = $infoCuentaDescontar->saldo_inicial; // lo que habia en la cuenta inicial antes que bajara
                     $deta->dinero_solicitado = $totalsolicitado;
                     $deta->cuenta_creada = 0; // solo para ver si esta cuenta fue creada
+                    $deta->fechahora = Carbon::now('America/El_Salvador');
                     $deta->save();
 
                     // actualizar subir saldo
@@ -1454,6 +1459,7 @@ class MovimientosUnidadControlles extends Controller
                     $deta->copia_saldoini_antes_bajar = $infoCuentaDescontar->saldo_inicial; // lo que había en la cuenta inicial antes que bajara
                     $deta->dinero_solicitado = $totalsolicitado;
                     $deta->cuenta_creada = 1;
+                    $deta->fechahora = Carbon::now('America/El_Salvador');
                     $deta->save();
 
                     // COMO SE CREO LA CUENTA UNIDAD, ESTA NO TIENE PORQUE SUBIR SU MONTO INICIAL
@@ -1539,7 +1545,7 @@ class MovimientosUnidadControlles extends Controller
             ->join('p_presup_unidad AS pp', 'ps.id_presup_unidad', '=', 'pp.id')
             ->select('pp.id_anio', 'pp.id AS idpresup', 'ps.id', 'ps.id_material', 'ps.id_cuentaunidad_sube', 'ps.id_cuentaunidad_baja',
             'ps.unidades', 'ps.periodo', 'ps.copia_saldoini_antes_subir', 'ps.copia_saldoini_antes_bajar',
-            'ps.dinero_solicitado', 'ps.cuenta_creada')
+            'ps.dinero_solicitado', 'ps.cuenta_creada', 'ps.fechahora')
             ->where('pp.id_anio', $idanio)
             ->get();
 
@@ -1553,8 +1559,9 @@ class MovimientosUnidadControlles extends Controller
             $dd->departamento = $infoDepartamento->nombre;
 
             $dd->solicitado = '$' . number_format((float)$dd->dinero_solicitado, 2, '.', ',');
-        }
 
+            $dd->fechahora = date("d-m-Y h:i A", strtotime($dd->fechahora));
+        }
 
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.aprobados.tablarevisionsolicitudmaterialaprobados', compact('lista'));
     }
@@ -1565,11 +1572,11 @@ class MovimientosUnidadControlles extends Controller
             ->join('p_presup_unidad AS pp', 'ps.id_presup_unidad', '=', 'pp.id')
             ->select('pp.id_anio', 'pp.id AS idpresup', 'ps.id', 'ps.id_material', 'ps.id_cuentaunidad_sube', 'ps.id_cuentaunidad_baja',
                 'ps.unidades', 'ps.periodo', 'ps.copia_saldoini_antes_subir', 'ps.copia_saldoini_antes_bajar',
-                'ps.dinero_solicitado', 'ps.cuenta_creada')
+                'ps.dinero_solicitado', 'ps.cuenta_creada', 'ps.fechahora')
             ->where('ps.id', $request->id)
             ->get();
 
-        foreach ($lista as $dd){
+        foreach ($lista as $dd) {
 
             $infoPresup = P_PresupUnidad::where('id', $dd->idpresup)->first();
             $infoMaterial = P_Materiales::where('id', $dd->id_material)->first();
@@ -1579,6 +1586,34 @@ class MovimientosUnidadControlles extends Controller
             $dd->departamento = $infoDepartamento->nombre;
 
             $dd->solicitado = '$' . number_format((float)$dd->dinero_solicitado, 2, '.', ',');
+
+            $dd->antessubir = '$' . number_format((float)$dd->copia_saldoini_antes_subir, 2, '.', ',');
+
+            $dd->antesbajar = '$' . number_format((float)$dd->copia_saldoini_antes_bajar, 2, '.', ',');
+
+
+            // *** SUBIDA
+
+            // objeto especifico que subio
+            $infoCuentaSube = CuentaUnidad::where('id', $dd->id_cuentaunidad_sube)->first();
+            $infoObjSube = ObjEspecifico::where('id', $infoCuentaSube->id_objespeci)->first();
+
+            $dd->txtobjsube = $infoObjSube->codigo . ' - ' . $infoObjSube->nombre;
+
+
+            // *** BAJADA
+            $infoCuentaBaja = CuentaUnidad::where('id', $dd->id_cuentaunidad_baja)->first();
+            $infoObjBaja = ObjEspecifico::where('id', $infoCuentaBaja->id_objespeci)->first();
+
+            $dd->txtobjbaja = $infoObjBaja->codigo . ' - ' . $infoObjBaja->nombre;
+
+            if($dd->cuenta_creada == 1){
+                $txtcreada = "Si";
+            }else{
+                $txtcreada = "No";
+            }
+
+            $dd->txtcreada = $txtcreada;
         }
 
         return ['success' => 1, 'infolista' => $lista];

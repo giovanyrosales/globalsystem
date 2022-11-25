@@ -21,7 +21,7 @@
         <div class="container-fluid">
             <div class="row mb-10">
                 <div class="col-sm-10">
-                    <h1>Revisión de Solicitudes de Material Para Presupuesto</h1>
+                    <h1>Revisión de Solicitudes Aprobadas de Material Para Presupuesto</h1>
                     <h1>Año: {{ $anio }}</h1>
                 </div>
 
@@ -91,12 +91,36 @@
 
 
                                         <hr>
+                                        <label>Cuenta Unidad que Sube</label>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Monto Solicitado</label>
-                                            <input type="text" class="form-control" disabled id="txt-montosolicitado">
+                                            <label>Objeto Específico</label>
+                                            <input type="text" class="form-control" disabled id="txt-objespeci-subir">
                                         </div>
 
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Saldo Inicial que tenía antes de ser modificado</label>
+                                            <input type="text" class="form-control" disabled id="txt-antessubir">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>La Cuenta Unidad Fue Creada</label>
+                                            <input type="text" class="form-control" disabled id="txt-creada">
+                                        </div>
+
+
+                                        <hr>
+                                        <label>Cuenta Unidad que Baja</label>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Objeto Específico</label>
+                                            <input type="text" class="form-control" disabled id="txt-objespeci-bajar">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Saldo Inicial que tenía antes de ser modificado</label>
+                                            <input type="text" class="form-control" disabled id="txt-antesbajar">
+                                        </div>
 
 
                                     </div>
@@ -159,10 +183,21 @@
                         $.each(response.data.infolista, function( key, val ) {
 
                             $('#txt-departamento').val(val.departamento);
+                            $('#txt-departamento').val(val.departamento);
                             $('#txt-material').val(val.material);
                             $('#txt-unidades').val(val.unidades);
                             $('#txt-periodo').val(val.periodo);
                             $('#txt-montosolicitado').val(val.solicitado);
+
+                            $('#txt-objespeci-subir').val(val.txtobjsube);
+                            $('#txt-antessubir').val(val.antessubir);
+
+
+                            $('#txt-objespeci-bajar').val(val.txtobjbaja);
+                            $('#txt-antesbajar').val(val.antesbajar);
+
+                            $('#txt-creada').val(val.txtcreada);
+
 
                         });
 

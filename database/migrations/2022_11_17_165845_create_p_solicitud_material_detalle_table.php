@@ -51,6 +51,8 @@ class CreatePSolicitudMaterialDetalleTable extends Migration
             // 1: la cuenta unidad fue creada
             $table->boolean('cuenta_creada');
 
+            // cuando fue aprobada la solicitud
+            $table->dateTime('fechahora');
 
             $table->foreign('id_material')->references('id')->on('p_materiales');
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
