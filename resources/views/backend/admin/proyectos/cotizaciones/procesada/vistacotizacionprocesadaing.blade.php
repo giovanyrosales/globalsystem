@@ -142,6 +142,7 @@
             $('#modalGenerarOrden').modal('show');
         }
 
+        // AQUI SE DESCUENTA EL SALDO RESTANTE AL GENERAR ORDEN DE COMPRA
         function verificarOrden(){
 
             var fecha = document.getElementById('fecha_orden').value;
@@ -224,6 +225,32 @@
 
                             }
                         })
+                    }
+                    else if(response.data.success === 4) {
+
+                        // NO HAY FONDOS SUFICIENTES
+
+                        let restante = response.data.restante;
+                        let solicitado = response.data.solicitado;
+
+                        Swal.fire({
+                            title: 'Saldo Insuficiente',
+                            html: "La Cuenta a Descontar no tiene suficiente Saldo " + "<br>"
+                                + "Saldo Restante (Se resta el Retenido) $"+ restante +"<br>"
+                                + "Monto Solicitado $"+ solicitado +"<br>"
+                            ,
+                            icon: 'info',
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+
+                            }
+                        })
+
+
                     }
                     else {
                         toastr.error('Error al crear orden');

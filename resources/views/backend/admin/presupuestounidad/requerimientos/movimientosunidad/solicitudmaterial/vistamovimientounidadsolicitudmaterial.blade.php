@@ -71,10 +71,10 @@
                                     <div class="col-md-12">
 
                                         <label>Material del Presupuesto</label>
-                                        <table class="table" id="matriz-busqueda" data-toggle="table">
+                                        <table class="table">
                                             <tbody>
-                                            <tr style="width: 100%">
-                                                <td >
+                                            <tr>
+                                                <td>
                                                     <input type='text' id="materialnuevosolicitado" autocomplete="off" data-info='0' class='form-control' onkeyup='buscarMaterialSolicitud(this)' maxlength='300'  >
                                                     <div class='droplistado' style='position: absolute; z-index: 9; width: 85% !important;'></div>
                                                 </td>

@@ -339,6 +339,37 @@
                 @endcan
 
 
+            <!-- DESCARGOS DIRECTOS -->
+                @can('sidebar.descargos.directos')
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Descargos Directos
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            @can('sidebar.descargos.directos.revision')
+                                <li class="nav-item">
+                                    <a href="{{ route('crear.descargos.directos') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Crear</p>
+                                    </a>
+                                </li>
+                            @endcan
+
+
+                        </ul>
+                    </li>
+                @endcan
+
+
+
+
             <!-- CONFIGURACIONES PARA PROYECTO -->
                 @can('sidebar.seccion.configuraciones')
                 <li class="nav-item">

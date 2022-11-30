@@ -40,6 +40,8 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\CuentasUnidad\CuentaUnidadCon
 use App\Http\Controllers\Backend\PresupuestoUnidad\MovimientoUnidad\MovimientosUnidadControlles;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Cotizaciones\CotizacionesUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\OrdenCompra\OrdenCompraUnidadController;
+use App\Http\Controllers\Backend\DescargosDirectos\DescargosDirectosController;
+
 
 // --- LOGIN ---
 
@@ -997,6 +999,34 @@ Route::get('/admin/p/anio/aprobadas/material/solicitudes', [MovimientosUnidadCon
 Route::get('/admin/p/aprobados/solicitud/material/{idanio}', [MovimientosUnidadControlles::class,'indexRevisionSolicitudMaterialAprobada']);
 Route::get('/admin/p/aprobados/solicitud/material/tabla/{idanio}', [MovimientosUnidadControlles::class,'tablaRevisionSolicitudMaterialUnidadAprobados']);
 Route::post('/admin/p/aprobados/solicitud/material/informacion', [MovimientosUnidadControlles::class,'presupuestoMaterialAprobadosInformacion']);
+
+
+// DESCARGOS DIRECTOS
+Route::get('/admin/descargos/directos/index', [DescargosDirectosController::class,'indexDescargosDirectos'])->name('crear.descargos.directos');
+Route::post('/admin/verificar/tipodescargo/directo/informacion', [DescargosDirectosController::class,'tipoDescargoDirectoInformacion']);
+
+// retorna los objeto especificos del proyecto seleccionado
+Route::post('/admin/obj/proyecto/descargodirecto/informacion', [DescargosDirectosController::class,'objEspecificosSegunProyecto']);
+
+// retorna saldo restante (- el saldo retenido) de cuenta proy
+Route::post('/admin/obj/cuentaproy/saldo/descargodirecto/info', [DescargosDirectosController::class,'infoCuentaProySaldos']);
+
+// guardar un descargo directo PARA PROYECTO
+Route::post('/admin/guardar/descargodirecto/tipo/proyecto', [DescargosDirectosController::class,'guardarDescargoDirectoProyecto']);
+
+// retorna el departamento con el monto disponible
+Route::post('/admin/unidades/descargodirecto/anio/presupuesto', [DescargosDirectosController::class,'buscarUnidadSegunAnio']);
+
+// retorna saldo restante (- el saldo retenido) de cuenta unidad
+Route::post('/admin/obj/cuentaunidad/saldo/descargodirecto/info', [DescargosDirectosController::class,'infoCuentaUnidadSaldos']);
+
+
+// guardar un descargo directo PARA PROVEEDOR
+Route::post('/admin/guardar/descargodirecto/tipo/proveedor', [DescargosDirectosController::class,'guardarDescargoDirectoProveedor']);
+
+
+// guardar un descargo directo PARA CONTRIBUCION
+Route::post('/admin/guardar/descargodirecto/tipo/contribucion', [DescargosDirectosController::class,'guardarDescargoDirectoContribucion']);
 
 
 

@@ -250,6 +250,10 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'p.sidebar.solicitud.aprobadas.materiales.cuentas.unidades', 'description' => 'sidebar para que Presupuesto revise solicitud de materiales de unidad Aprobados'])->syncRoles($rolePresupuesto);
 
 
+        // DESCARGOS DIRECTOS
+        Permission::create(['name' => 'sidebar.descargos.directos', 'description' => 'ver sidebar de descargos directos'])->syncRoles($roleUaci);
+        Permission::create(['name' => 'sidebar.descargos.directos.revision', 'description' => 'ver index de solicitud de descargos directos'])->syncRoles($roleUaci);
+
 
 
     }
