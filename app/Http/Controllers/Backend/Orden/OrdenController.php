@@ -9,6 +9,7 @@ use App\Models\CatalogoMateriales;
 use App\Models\Cotizacion;
 use App\Models\CotizacionDetalle;
 use App\Models\CuentaProy;
+use App\Models\CuentaproyPartidaAdicional;
 use App\Models\CuentaProyRestante;
 use App\Models\CuentaProyRetenido;
 use App\Models\MoviCuentaProy;
@@ -91,82 +92,8 @@ class OrdenController extends Controller
                 return ['success' => 3, 'mensaje' => $texto];
             }
 
-
-
-            // VALIDAR QUE HAYA DINERO
-
-
-            // CÁLCULOS
-/*
-            $totalRestante = 0;
-            $totalRetenido = 0;
-
-            // movimiento de cuentas SUBE
-            $infoMoviCuentaProySube = MoviCuentaProy::where('id_cuentaproy_sube', $request->idcuentaproy)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            // movimiento de cuentas BAJA
-            $infoMoviCuentaProyBaja = MoviCuentaProy::where('id_cuentaproy_baja', $request->idcuentaproy)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
-
-            // obtener todas las salidas de material
-            $arrayRestante = DB::table('cuentaproy_restante AS pd')
-                ->join('requisicion_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
-                ->where('pd.id_cuentaproy', $request->idcuentaproy)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRestante as $dd){
-                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
-            }
-
-            $infoCuentaPartida = CuentaproyPartidaAdicional::where('id_proyecto', $infoCuentaProy->proyecto_id)
-                ->where('objespeci_id', $infoCuentaProy->objespeci_id)
-                ->get();
-
-            $sumaPartidaAdicional = 0;
-
-            foreach ($infoCuentaPartida as $dd){
-                $sumaPartidaAdicional += $dd->monto;
-            }
-
-            // información de saldos retenidos
-            $arrayRetenido = DB::table('cuentaproy_retenido AS psr')
-                ->join('requisicion_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('psr.id_cuentaproy', $request->idcuentaproy)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRetenido as $dd){
-                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-            }
-
-            // sumando partidas adicionales que coincidan con el obj específico + saldo inicial
-            $sumaPartidaAdicional += $infoCuentaProy->saldo_inicial;
-
-            // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + ($sumaPartidaAdicional - $totalRestante);
-
-            $totalCalculado = $totalRestanteSaldo - $totalRetenido;
-
-            if($this->redondear_dos_decimal($totalCalculado) < $this->redondear_dos_decimal($request->montodescontar)){
-
-                // EL SALDO NO ALCANZA
-
-                $restante = number_format((float)$totalCalculado, 2, '.', ',');
-                $solicitado = number_format((float)$request->montodescontar, 2, '.', ',');
-
-                return ['success' => 1, 'restante' => $restante, 'solicitado' => $solicitado];
-            }else {
-
-            }
-*/
+            // LA ORDEN DE COMPRA NO NECESITA VALIDACIÓN DE SI HAY DINERO, YA QUE CUANDO SE HACE LA
+            // COTIZACIÓN, SE RESERVA EL DINERO, Y ESTE NO CAMBIARA EN NINGÚN MOMENTO
 
             $or = new Orden();
             $or->admin_contrato_id = $request->admin;
@@ -209,6 +136,11 @@ class OrdenController extends Controller
             DB::rollback();
             return ['success' => 99];
         }
+    }
+
+    function redondear_dos_decimal($valor){
+        $float_redondeado = round($valor * 100) / 100;
+        return $float_redondeado;
     }
 
     // generar PDF de orden de compra y variable {cantidad} es # de material por hoja

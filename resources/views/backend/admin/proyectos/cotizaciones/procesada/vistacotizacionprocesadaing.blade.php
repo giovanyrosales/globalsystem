@@ -186,6 +186,7 @@
 
                         let id = response.data.id;
 
+                        return;
                         // vista pdf
                         window.open("{{ URL::to('admin/ordenes/proyecto/pdf') }}/" + id + "/" + 10);
                     }
@@ -232,10 +233,12 @@
 
                         let restante = response.data.restante;
                         let solicitado = response.data.solicitado;
+                        let material = response.data.material;
 
                         Swal.fire({
                             title: 'Saldo Insuficiente',
                             html: "La Cuenta a Descontar no tiene suficiente Saldo " + "<br>"
+                                + "Material: "+ material +"<br>"
                                 + "Saldo Restante (Se resta el Retenido) $"+ restante +"<br>"
                                 + "Monto Solicitado $"+ solicitado +"<br>"
                             ,
