@@ -713,4 +713,83 @@ class DescargosDirectosController extends Controller
     }
 
 
+    //******************************
+
+    public function indexDescargosDirectosHistorial(){
+        return view('backend.admin.descargosdirectos.historial.vistahistorialdescargodirectos');
+    }
+
+
+    public function tablaDescargosDirectosHistorial(){
+
+        $lista = DescargosDirectos::orderBy('fecha', 'DESC')->get();
+
+        foreach ($lista as $dd){
+
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+
+            if($dd->tipodescargo == 1){
+                $tipodescargo = "Proveedor";
+            }
+            else if($dd->tipodescargo == 2){
+                $tipodescargo = "Proyecto";
+            }
+            else{
+                $tipodescargo = "Contribución";
+            }
+
+            $dd->tipodescargo = $tipodescargo;
+
+            $dd->montodescontar = "$" . number_format((float)$dd->montodescontar, 2, '.', ',');
+        }
+
+        return view('backend.admin.descargosdirectos.historial.tablahistorialdescargodirectos', compact('lista'));
+    }
+
+
+    public function informacionDescargosDirectosHistorial(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        if($infoDescarga = DescargosDirectos::where('id', $request->id)->first()){
+
+            $fecha = date("d-m-Y", strtotime($infoDescarga->fecha));
+            $montodescargo = "$" . number_format((float)$infoDescarga->montodescontar, 2, '.', ',');
+
+            if($infoDescarga->saldo_cuentaproy_tenia != null){
+                $saldocuentaproy = "$" . number_format((float)$infoDescarga->saldo_cuentaproy_tenia, 2, '.', ',');
+            }else{
+                $saldocuentaproy = 0;
+            }
+
+            if($infoDescarga->saldo_cuentaunidad_tenia != null){
+                $saldocuentaunidad = "$" . number_format((float)$infoDescarga->saldo_cuentaproy_tenia, 2, '.', ',');
+            }else{
+                $saldocuentaunidad = 0;
+            }
+
+            $infoProveedor = Proveedores::where('id', $infoDescarga->proveedores_id)->first();
+            $proveedor = $infoProveedor->nombre;
+
+            $infoLinea = LineaTrabajo::where('id', $infoDescarga->lineatrabajo_id)->first();
+            $lineatrabajo = $infoLinea->codigo . ' - ' . $infoLinea->nombre;
+
+            $infoFuente = FuenteFinanciamiento::where('id', $infoDescarga->fuentef_id)->first();
+            $fuentef = $infoFuente->codigo . ' - ' . $infoFuente->nombre;
+
+
+            return ['success' => 1, 'datos' => $infoDescarga];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+
 }

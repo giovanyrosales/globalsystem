@@ -1020,13 +1020,17 @@ Route::post('/admin/unidades/descargodirecto/anio/presupuesto', [DescargosDirect
 // retorna saldo restante (- el saldo retenido) de cuenta unidad
 Route::post('/admin/obj/cuentaunidad/saldo/descargodirecto/info', [DescargosDirectosController::class,'infoCuentaUnidadSaldos']);
 
-
 // guardar un descargo directo PARA PROVEEDOR
 Route::post('/admin/guardar/descargodirecto/tipo/proveedor', [DescargosDirectosController::class,'guardarDescargoDirectoProveedor']);
 
-
 // guardar un descargo directo PARA CONTRIBUCION
 Route::post('/admin/guardar/descargodirecto/tipo/contribucion', [DescargosDirectosController::class,'guardarDescargoDirectoContribucion']);
+
+// vista historial para descargos directos
+Route::get('/admin/descargos/directos/historial/index', [DescargosDirectosController::class,'indexDescargosDirectosHistorial'])->name('historial.descargos.directos');
+Route::get('/admin/descargos/directos/historial/tabla', [DescargosDirectosController::class,'tablaDescargosDirectosHistorial']);
+Route::get('/admin/descargos/directos/historial/informacion', [DescargosDirectosController::class,'informacionDescargosDirectosHistorial']);
+
 
 
 

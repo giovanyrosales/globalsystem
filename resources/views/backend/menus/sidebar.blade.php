@@ -362,11 +362,18 @@
                                 </li>
                             @endcan
 
+                            @can('sidebar.descargos.directos.historial')
+                                <li class="nav-item">
+                                    <a href="{{ route('historial.descargos.directos') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Historial</p>
+                                    </a>
+                                </li>
+                            @endcan
 
                         </ul>
                     </li>
                 @endcan
-
 
 
 
