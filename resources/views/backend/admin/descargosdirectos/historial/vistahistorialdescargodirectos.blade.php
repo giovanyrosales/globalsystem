@@ -46,11 +46,13 @@
         </div>
     </section>
 
+    <!-- PROVEEDOR -->
+
     <div class="modal fade" id="modalProveedor">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Información</h4>
+                    <h4 class="modal-title">Tipo Descargo: Proveedor</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -64,61 +66,53 @@
                                     <div class="col-md-12">
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Departamento</label>
-                                            <input type="text" class="form-control" disabled id="txt-departamento">
+                                            <label>Fecha</label>
+                                            <input type="text" class="form-control" disabled id="fecha-1">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Material</label>
-                                            <input type="text" class="form-control" disabled id="txt-material">
+                                            <label>Número orden</label>
+                                            <input type="text" class="form-control" disabled id="numorden-1">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Unidades</label>
-                                            <input type="text" class="form-control" disabled id="txt-unidades">
+                                            <label>Número de Acuerdo</label>
+                                            <input type="text" class="form-control" disabled id="numacuerdo-1">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Periodo</label>
-                                            <input type="text" class="form-control" disabled id="txt-periodo">
+                                            <label>Cuenta Unidad</label>
+                                            <input type="text" class="form-control" disabled id="cuentaunidad-1">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Monto Solicitado</label>
-                                            <input type="text" class="form-control" disabled id="txt-montosolicitado">
-                                        </div>
-
-
-                                        <hr>
-                                        <label>Cuenta Unidad que Sube</label>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Objeto Específico</label>
-                                            <input type="text" class="form-control" disabled id="txt-objespeci-subir">
+                                            <label>Saldo Anterior antes de Bajar</label>
+                                            <input type="text" class="form-control" disabled id="saldoanterior-1">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Saldo Inicial que tenía antes de ser modificado</label>
-                                            <input type="text" class="form-control" disabled id="txt-antessubir">
+                                            <label>Proveedor</label>
+                                            <input type="text" class="form-control" disabled id="proveedor-1">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>La Cuenta Unidad Fue Creada</label>
-                                            <input type="text" class="form-control" disabled id="txt-creada">
-                                        </div>
-
-
-                                        <hr>
-                                        <label>Cuenta Unidad que Baja</label>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Objeto Específico</label>
-                                            <input type="text" class="form-control" disabled id="txt-objespeci-bajar">
+                                            <label>Línea de Trabajo</label>
+                                            <input type="text" class="form-control" disabled id="lineatrabajo-1">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Saldo Inicial que tenía antes de ser modificado</label>
-                                            <input type="text" class="form-control" disabled id="txt-antesbajar">
+                                            <label>Fuente de Financiamiento</label>
+                                            <input type="text" class="form-control" disabled id="fuentef-1">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Concepto</label>
+                                            <input type="text" class="form-control" disabled id="concepto-1">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Monto Descontar</label>
+                                            <input type="text" class="form-control" disabled id="montodescontar-1">
                                         </div>
 
 
@@ -135,18 +129,21 @@
             </div>
         </div>
     </div>
+
+
+    <!-- PROYECTO -->
 
     <div class="modal fade" id="modalProyecto">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Información</h4>
+                    <h4 class="modal-title">Tipo Descargo: Proyecto</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="formulario-proveedor">
+                    <form id="formulario-proyecto">
                         <div class="card-body">
 
                             <div class="card-body">
@@ -154,61 +151,48 @@
                                     <div class="col-md-12">
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Departamento</label>
-                                            <input type="text" class="form-control" disabled id="txt-departamento">
+                                            <label>Fecha</label>
+                                            <input type="text" class="form-control" disabled id="fecha-2">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Material</label>
-                                            <input type="text" class="form-control" disabled id="txt-material">
+                                            <label>Número orden</label>
+                                            <input type="text" class="form-control" disabled id="numorden-2">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Unidades</label>
-                                            <input type="text" class="form-control" disabled id="txt-unidades">
+                                            <label>Número de Acuerdo</label>
+                                            <input type="text" class="form-control" disabled id="numacuerdo-2">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Periodo</label>
-                                            <input type="text" class="form-control" disabled id="txt-periodo">
+                                            <label>Cuenta Proyecto</label>
+                                            <input type="text" class="form-control" disabled id="cuentaproyecto-2">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Monto Solicitado</label>
-                                            <input type="text" class="form-control" disabled id="txt-montosolicitado">
-                                        </div>
-
-
-                                        <hr>
-                                        <label>Cuenta Unidad que Sube</label>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Objeto Específico</label>
-                                            <input type="text" class="form-control" disabled id="txt-objespeci-subir">
+                                            <label>Saldo Anterior antes de Bajar</label>
+                                            <input type="text" class="form-control" disabled id="saldoanterior-2">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Saldo Inicial que tenía antes de ser modificado</label>
-                                            <input type="text" class="form-control" disabled id="txt-antessubir">
+                                            <label>Línea de Trabajo</label>
+                                            <input type="text" class="form-control" disabled id="lineatrabajo-2">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>La Cuenta Unidad Fue Creada</label>
-                                            <input type="text" class="form-control" disabled id="txt-creada">
-                                        </div>
-
-
-                                        <hr>
-                                        <label>Cuenta Unidad que Baja</label>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Objeto Específico</label>
-                                            <input type="text" class="form-control" disabled id="txt-objespeci-bajar">
+                                            <label>Fuente de Financiamiento</label>
+                                            <input type="text" class="form-control" disabled id="fuentef-2">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Saldo Inicial que tenía antes de ser modificado</label>
-                                            <input type="text" class="form-control" disabled id="txt-antesbajar">
+                                            <label>Concepto</label>
+                                            <input type="text" class="form-control" disabled id="concepto-2">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Monto Descontar</label>
+                                            <input type="text" class="form-control" disabled id="montodescontar-2">
                                         </div>
 
 
@@ -226,11 +210,13 @@
         </div>
     </div>
 
+    <!-- CONTRIBUCIÓN -->
+
     <div class="modal fade" id="modalContribucion">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Información</h4>
+                    <h4 class="modal-title">Tipo Descargo: Contribución</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -244,63 +230,54 @@
                                     <div class="col-md-12">
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Departamento</label>
-                                            <input type="text" class="form-control" disabled id="txt-departamento">
+                                            <label>Fecha</label>
+                                            <input type="text" class="form-control" disabled id="fecha-3">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Material</label>
-                                            <input type="text" class="form-control" disabled id="txt-material">
+                                            <label>Número orden</label>
+                                            <input type="text" class="form-control" disabled id="numorden-3">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Unidades</label>
-                                            <input type="text" class="form-control" disabled id="txt-unidades">
+                                            <label>Número de Acuerdo</label>
+                                            <input type="text" class="form-control" disabled id="numacuerdo-3">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Periodo</label>
-                                            <input type="text" class="form-control" disabled id="txt-periodo">
+                                            <label>Cuenta Unidad</label>
+                                            <input type="text" class="form-control" disabled id="cuentaunidad-3">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Monto Solicitado</label>
-                                            <input type="text" class="form-control" disabled id="txt-montosolicitado">
-                                        </div>
-
-
-                                        <hr>
-                                        <label>Cuenta Unidad que Sube</label>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Objeto Específico</label>
-                                            <input type="text" class="form-control" disabled id="txt-objespeci-subir">
+                                            <label>Saldo Anterior antes de Bajar</label>
+                                            <input type="text" class="form-control" disabled id="saldoanterior-3">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Saldo Inicial que tenía antes de ser modificado</label>
-                                            <input type="text" class="form-control" disabled id="txt-antessubir">
+                                            <label>Beneficiario</label>
+                                            <input type="text" class="form-control" disabled id="beneficiario-3">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>La Cuenta Unidad Fue Creada</label>
-                                            <input type="text" class="form-control" disabled id="txt-creada">
-                                        </div>
-
-
-                                        <hr>
-                                        <label>Cuenta Unidad que Baja</label>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Objeto Específico</label>
-                                            <input type="text" class="form-control" disabled id="txt-objespeci-bajar">
+                                            <label>Línea de Trabajo</label>
+                                            <input type="text" class="form-control" disabled id="lineatrabajo-3">
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Saldo Inicial que tenía antes de ser modificado</label>
-                                            <input type="text" class="form-control" disabled id="txt-antesbajar">
+                                            <label>Fuente de Financiamiento</label>
+                                            <input type="text" class="form-control" disabled id="fuentef-3">
                                         </div>
 
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Concepto</label>
+                                            <input type="text" class="form-control" disabled id="concepto-3">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Monto Descontar</label>
+                                            <input type="text" class="form-control" disabled id="montodescontar-3">
+                                        </div>
 
                                     </div>
                                 </div>
@@ -344,10 +321,7 @@
 
     <script>
 
-        function informacion(e){
-
-            let id = e.id;
-            let tipo = e.tipodescargo;
+        function informacion(id){
 
             openLoading();
 
@@ -355,35 +329,62 @@
             document.getElementById("formulario-proyecto").reset();
             document.getElementById("formulario-contribucion").reset();
 
-            axios.post(url+'/', {
+            axios.post(url+'/descargos/directos/historial/informacion', {
                 'id' : id
             })
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
 
-                        $.each(response.data.infolista, function( key, val ) {
+                        if(response.data.datos.tipodescargo === 1){
 
-                            $('#txt-departamento').val(val.departamento);
-                            $('#txt-departamento').val(val.departamento);
-                            $('#txt-material').val(val.material);
-                            $('#txt-unidades').val(val.unidades);
-                            $('#txt-periodo').val(val.periodo);
-                            $('#txt-montosolicitado').val(val.solicitado);
-
-                            $('#txt-objespeci-subir').val(val.txtobjsube);
-                            $('#txt-antessubir').val(val.antessubir);
-
-
-                            $('#txt-objespeci-bajar').val(val.txtobjbaja);
-                            $('#txt-antesbajar').val(val.antesbajar);
-
-                            $('#txt-creada').val(val.txtcreada);
+                            $('#fecha-1').val(response.data.fecha);
+                            $('#numorden-1').val(response.data.datos.numero_orden);
+                            $('#numacuerdo-1').val(response.data.datos.numero_acuerdo);
+                            $('#cuentaunidad-1').val(response.data.cuentaunidad);
+                            $('#saldoanterior-1').val(response.data.saldocuentaunidad);
+                            $('#proveedor-1').val(response.data.proveedor);
+                            $('#lineatrabajo-1').val(response.data.lineatrabajo);
+                            $('#fuentef-1').val(response.data.fuentef);
+                            $('#concepto-1').val(response.data.datos.concepto);
+                            $('#montodescontar-1').val(response.data.montodescargo);
 
 
-                        });
+                            $('#modalProveedor').modal('show');
+                        }
+                        else if(response.data.datos.tipodescargo === 2){
 
-                        $('#modalInformacion').modal('show');
+                            $('#fecha-2').val(response.data.fecha);
+                            $('#numorden-2').val(response.data.datos.numero_orden);
+                            $('#numacuerdo-2').val(response.data.datos.numero_acuerdo);
+                            $('#cuentaproyecto-2').val(response.data.cuentaproy);
+                            $('#saldoanterior-2').val(response.data.saldocuentaproy);
+                            $('#proveedor-2').val(response.data.proveedor);
+                            $('#lineatrabajo-2').val(response.data.lineatrabajo);
+                            $('#fuentef-2').val(response.data.fuentef);
+                            $('#concepto-2').val(response.data.datos.concepto);
+                            $('#montodescontar-2').val(response.data.montodescargo);
+
+
+                            $('#modalProyecto').modal('show');
+                        }
+                        else{
+
+                            $('#fecha-3').val(response.data.fecha);
+                            $('#numorden-3').val(response.data.datos.numero_orden);
+                            $('#numacuerdo-3').val(response.data.datos.numero_acuerdo);
+                            $('#cuentaunidad-3').val(response.data.cuentaunidad);
+                            $('#saldoanterior-3').val(response.data.saldocuentaunidad);
+                            $('#lineatrabajo-3').val(response.data.lineatrabajo);
+                            $('#fuentef-3').val(response.data.fuentef);
+                            $('#concepto-3').val(response.data.datos.concepto);
+                            $('#montodescontar-3').val(response.data.montodescargo);
+                            $('#beneficiario-3').val(response.data.datos.beneficiario);
+
+                            $('#modalContribucion').modal('show');
+                        }
+
+
                     }else{
                         toastr.error('información no encontrada');
                     }

@@ -1029,7 +1029,7 @@ Route::post('/admin/guardar/descargodirecto/tipo/contribucion', [DescargosDirect
 // vista historial para descargos directos
 Route::get('/admin/descargos/directos/historial/index', [DescargosDirectosController::class,'indexDescargosDirectosHistorial'])->name('historial.descargos.directos');
 Route::get('/admin/descargos/directos/historial/tabla', [DescargosDirectosController::class,'tablaDescargosDirectosHistorial']);
-Route::get('/admin/descargos/directos/historial/informacion', [DescargosDirectosController::class,'informacionDescargosDirectosHistorial']);
+Route::post('/admin/descargos/directos/historial/informacion', [DescargosDirectosController::class,'informacionDescargosDirectosHistorial']);
 
 
 

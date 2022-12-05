@@ -27,7 +27,7 @@
                                     <td style="width: 10%">{{ $dato->montodescontar }}</td>
 
                                     <td>
-                                        <button type="button" class="btn btn-warning btn-xs" onclick="informacion({{ $dato }})">
+                                        <button type="button" class="btn btn-warning btn-xs" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Revisar"></i>&nbsp; Revisar
                                         </button>
                                     </td>

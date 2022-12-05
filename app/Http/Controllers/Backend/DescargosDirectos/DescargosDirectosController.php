@@ -769,13 +769,30 @@ class DescargosDirectosController extends Controller
             }
 
             if($infoDescarga->saldo_cuentaunidad_tenia != null){
-                $saldocuentaunidad = "$" . number_format((float)$infoDescarga->saldo_cuentaproy_tenia, 2, '.', ',');
+                $saldocuentaunidad = "$" . number_format((float)$infoDescarga->saldo_cuentaunidad_tenia, 2, '.', ',');
             }else{
                 $saldocuentaunidad = 0;
             }
 
-            $infoProveedor = Proveedores::where('id', $infoDescarga->proveedores_id)->first();
-            $proveedor = $infoProveedor->nombre;
+            if($infoProveedor = Proveedores::where('id', $infoDescarga->proveedores_id)->first()){
+                $proveedor = $infoProveedor->nombre;
+            }else{
+                $proveedor = '';
+            }
+
+            if($infoCuentaUni = CuentaUnidad::where('id', $infoDescarga->cuentaunidad_id)->first()){
+                $infoObj = ObjEspecifico::where('id', $infoCuentaUni->id_objespeci)->first();
+                $cuentaunidad = $infoObj->codigo . ' - ' . $infoObj->nombre;
+            }else{
+                $cuentaunidad = '';
+            }
+
+            if($infoCuentaProy = CuentaProy::where('id', $infoDescarga->cuentaproy_id)->first()){
+                $infoObj = ObjEspecifico::where('id', $infoCuentaProy->objespeci_id)->first();
+                $cuentaproy = $infoObj->codigo . ' - ' . $infoObj->nombre;
+            }else{
+                $cuentaproy = '';
+            }
 
             $infoLinea = LineaTrabajo::where('id', $infoDescarga->lineatrabajo_id)->first();
             $lineatrabajo = $infoLinea->codigo . ' - ' . $infoLinea->nombre;
@@ -783,8 +800,11 @@ class DescargosDirectosController extends Controller
             $infoFuente = FuenteFinanciamiento::where('id', $infoDescarga->fuentef_id)->first();
             $fuentef = $infoFuente->codigo . ' - ' . $infoFuente->nombre;
 
-
-            return ['success' => 1, 'datos' => $infoDescarga];
+            return ['success' => 1, 'datos' => $infoDescarga, 'fecha' => $fecha,
+                'montodescargo' => $montodescargo, 'saldocuentaproy' => $saldocuentaproy,
+                'saldocuentaunidad' => $saldocuentaunidad, 'proveedor' => $proveedor,
+                'lineatrabajo' => $lineatrabajo, 'fuentef' => $fuentef, 'cuentaunidad' => $cuentaunidad,
+                'cuentaproy' => $cuentaproy];
         }else{
             return ['success' => 2];
         }
