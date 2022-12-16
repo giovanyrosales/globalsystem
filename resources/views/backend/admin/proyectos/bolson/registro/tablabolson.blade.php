@@ -8,9 +8,9 @@
                             <thead>
                             <tr>
                                 <th style="width: 10%;">Nombre</th>
-                                <th style="width: 10%;"># Cuenta</th>
                                 <th style="width: 10%;">Monto Inicial</th>
                                 <th style="width: 10%;">Monto Restante</th>
+                                <th style="width: 10%;">Fuente de Recursos</th>
                                 <th style="width: 10%;">Opciones</th>
                             </tr>
                             </thead>
@@ -19,9 +19,9 @@
                             @foreach($lista as $dato)
                                 <tr>
                                     <td>{{ $dato->nombre }}</td>
-                                    <td>{{ $dato->num_cuenta }}</td>
                                     <td>{{ $dato->monto_inicial }}</td>
                                     <td>{{ $dato->montorestante }}</td>
+                                    <td>{{ $dato->fuenterecursos }}</td>
                                     <td>
                                         <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Información"></i>&nbsp; Cuentas

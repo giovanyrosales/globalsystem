@@ -11,6 +11,7 @@
                                 <th>Nombre</th>
                                 <th>Año</th>
                                 <th>Fuente F.</th>
+                                <th>Disponibilidad</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -22,6 +23,16 @@
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->fecha }}</td>
                                     <td>{{ $dato->recurso }}</td>
+                                    <td>
+
+                                        @if($dato->activo == 1)
+                                            <span class="badge bg-success">Activo</span>
+                                        @else
+                                            <span class="badge bg-danger">Inactivo</span>
+                                        @endif
+
+                                    </td>
+
                                     <td>
                                         <button type="button" style="font-weight: bold; color: white !important;"
                                                 class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">

@@ -496,6 +496,8 @@ Route::post('/admin/bolson/registrar/nuevo', [BolsonController::class, 'nuevoReg
 Route::get('/admin/bolson/detalle/index/{id}', [BolsonController::class,'indexDetalleBolson']);
 // retorna tabla con detalle de bolsón
 Route::get('/admin/bolson/detalle/tabla/{id}', [BolsonController::class,'tablaDetalleBolson']);
+// retorna lista de fuente de recursos, solo si estan activos
+Route::post('/admin/bolson/retornar/fuente/recursos', [BolsonController::class, 'retornarFuenteRecursosActivos']);
 
 
 // * CLASIFICACIONES

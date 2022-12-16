@@ -312,7 +312,6 @@
                             }
                         });
 
-
                         if(response.data.info.activo === 0){
                             $("#toggle-editar").prop("checked", false);
                         }else{

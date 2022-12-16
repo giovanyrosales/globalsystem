@@ -5,6 +5,7 @@
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
 @stop
 
 <style>
@@ -89,6 +90,9 @@
                                         </select>
                                     </div>
 
+
+
+
                                 </div>
                             </div>
                         </div>
@@ -139,6 +143,17 @@
                                         <label>Fuente de Financiamiento</label>
                                         <select class="form-control" id="select-fuente-f-editar">
                                         </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Disponibilidad</label><br>
+                                        <label class="switch" style="margin-top:10px">
+                                            <input type="checkbox" id="toggle-editar">
+                                            <div class="slider round">
+                                                <span class="on">Activo</span>
+                                                <span class="off">Inactivo</span>
+                                            </div>
+                                        </label>
                                     </div>
 
                                 </div>
@@ -280,6 +295,12 @@
                             }
                         });
 
+                        if(response.data.fuente.activo === 0){
+                            $("#toggle-editar").prop("checked", false);
+                        }else{
+                            $("#toggle-editar").prop("checked", true);
+                        }
+
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -296,6 +317,9 @@
             var codigo = document.getElementById('codigo-editar').value;
             var fuente = document.getElementById('select-fuente-f-editar').value;
             var anio = document.getElementById('select-anios-editar').value;
+
+            var t = document.getElementById('toggle-editar').checked;
+            var toggle = t ? 1 : 0;
 
             if(anio === ''){
                 toastr.error('Año es requerido');
@@ -324,6 +348,7 @@
             formData.append('nombre', nombre);
             formData.append('fuente', fuente);
             formData.append('idanio', anio);
+            formData.append('toggle', toggle);
 
             axios.post(url+'/fuenter/editar', formData, {
             })

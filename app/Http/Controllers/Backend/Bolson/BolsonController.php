@@ -7,6 +7,8 @@ use App\Models\Bolson;
 use App\Models\BolsonDetalle;
 use App\Models\CatalogoMateriales;
 use App\Models\Cuenta;
+use App\Models\FuenteFinanciamiento;
+use App\Models\FuenteRecursos;
 use App\Models\MovimientoBolson;
 use App\Models\ObjEspecifico;
 use App\Models\P_AnioPresupuesto;
@@ -49,7 +51,10 @@ class BolsonController extends Controller
             $puedeAgregar = true;
         }
 
-        return view('backend.admin.proyectos.bolson.registro.vistabolson', compact('listadoanios', 'arrayobj', 'puedeAgregar'));
+        $arrayFuenteFinanciamiento = FuenteFinanciamiento::orderBy('nombre')->get();
+
+        return view('backend.admin.proyectos.bolson.registro.vistabolson', compact('listadoanios', 'arrayobj',
+            'puedeAgregar', 'arrayFuenteFinanciamiento'));
     }
 
     // retorna tabla con lista de bolsones
@@ -108,6 +113,13 @@ class BolsonController extends Controller
 
             $dd->montorestante = '$' . $restaBolsonInicial;
             $dd->monto_inicial = "$" . number_format((float)$dd->monto_inicial, 2, '.', ',');
+
+
+            $infoFuenteR = FuenteRecursos::where('id', $dd->id_fuenter)->first();
+            $infoAnio = P_AnioPresupuesto::where('id', $infoFuenteR->id_p_anio)->first();
+
+            $dd->fuenterecursos = $infoFuenteR->codigo . ' - ' . $infoFuenteR->nombre . ' (' . $infoAnio->nombre . ')';
+
         }
 
         return view('backend.admin.proyectos.bolson.registro.tablabolson', compact('lista'));
@@ -213,6 +225,7 @@ class BolsonController extends Controller
             'anio' => 'required',
             'fecha' => 'required',
             'nombre' => 'required',
+            'fuenter' => 'required'
         );
 
         $validator = Validator::make($request->all(), $rules);
@@ -307,7 +320,7 @@ class BolsonController extends Controller
         $or = new Bolson();
         $or->id_anio = $request->anio;
         $or->nombre = $request->nombre;
-        $or->num_cuenta = $request->numero;
+        $or->id_fuenter = $request->fuenter;
         $or->fecha = $request->fecha;
         $or->monto_inicial = $totalSaldoInicial;
         $or->save();
@@ -377,6 +390,35 @@ class BolsonController extends Controller
     }
 
 
+    public function retornarFuenteRecursosActivos(Request $request){
+
+        $rules = array(
+            'id' => 'required', // ID DE FUENTE DE FINANCIAMIENTO
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        if(FuenteFinanciamiento::where('id', $request->id)->first()){
+
+            $lista = FuenteRecursos::where('id_fuentef', $request->id)
+                ->where('activo', 1)
+                ->get();
+
+            foreach ($lista as $dd){
+                $anios = P_AnioPresupuesto::where('id', $dd->id_p_anio)->first();
+                $dd->unido = $dd->codigo . ' - ' . $dd->nombre . ' (' . $anios->nombre . ')';
+            }
+
+            return ['success' => 1, 'lista' => $lista];
+        }else{
+
+            return ['success' => 2];
+        }
+    }
 
 
 

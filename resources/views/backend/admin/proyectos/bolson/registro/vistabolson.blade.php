@@ -98,8 +98,19 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Número de Cuenta Bolsón:</label>
-                                        <input type="text" autocomplete="off" class="form-control" maxlength="100" id="numero-nuevo">
+                                        <label>Fuente de Financiamiento:</label>
+                                        <select class="form-control" id="select-fuente-financiamiento" onchange="buscarFuenteRecursos()">
+                                            <option value="" selected disabled>Seleccionar opción...</option>
+                                            @foreach($arrayFuenteFinanciamiento as $sel)
+                                                <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Fuente de Recursos:</label>
+                                        <select class="form-control" id="select-fuente-recursos">
+                                        </select>
                                     </div>
 
                                     <hr>
@@ -318,12 +329,46 @@
                 });
         }
 
+        function buscarFuenteRecursos(){
+
+            let id = document.getElementById('select-fuente-financiamiento').value;
+            // compara si es tipo texto o numero
+            if(id === ''){
+                return;
+            }
+
+            openLoading();
+
+            axios.post(url+'/bolson/retornar/fuente/recursos',{
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1) {
+
+                        document.getElementById("select-fuente-recursos").options.length = 0;
+
+                        $.each(response.data.lista, function( key, val ){
+                            $('#select-fuente-recursos').append('<option value="' +val.id +'">'+val.unido+'</option>');
+                        });
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
+        }
+
         function nuevo(){
 
             var anio = document.getElementById('select-anio').value;
             var fecha = document.getElementById('fecha-nuevo').value;
             var nombre = document.getElementById('nombre-nuevo').value;
-            var numero = document.getElementById('numero-nuevo').value; // null
+            var fuenteRecursos = document.getElementById('select-fuente-recursos').value;
 
             if(anio === ''){
                 toastr.error('Año Presupuesto es requerido');
@@ -345,11 +390,9 @@
                 return;
             }
 
-            if(numero.length > 0){
-                if(numero.length > 100){
-                    toastr.error('Máximo 100 caracteres para número de cuenta');
-                    return;
-                }
+            if(fuenteRecursos === ''){
+                toastr.error('Fuente de Recursos es Requerido')
+                return;
             }
 
             var valores = $('#select-obj').val();
@@ -373,8 +416,8 @@
             formData.append('anio', anio);
             formData.append('fecha', fecha);
             formData.append('nombre', nombre);
-            formData.append('numero', numero);
             formData.append('objetos', selected);
+            formData.append('fuenter', fuenteRecursos);
 
             axios.post(url+'/bolson/registrar/nuevo', formData, {
             })

@@ -21,7 +21,6 @@ class CreateBolsonTable extends Migration
 
             // nombre de la cuenta bolsón
             $table->string('nombre', 200);
-            $table->string('num_cuenta', 100)->nullable(); // num cuenta
 
             // fecha creación
             $table->date('fecha');

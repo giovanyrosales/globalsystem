@@ -20,6 +20,8 @@ class CreateFuenterTable extends Migration
             $table->string('codigo', 100);
             $table->string('nombre', 300)->nullable();
 
+            $table->boolean('activo');
+
             $table->foreign('id_fuentef')->references('id')->on('fuentef');
             $table->foreign('id_p_anio')->references('id')->on('p_anio_presupuesto');
         });

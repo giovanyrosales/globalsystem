@@ -65,6 +65,7 @@ class FuenteRecursosController extends Controller
         $dato->nombre = $request->nombre;
         $dato->id_fuentef = $request->fuente;
         $dato->id_p_anio = $request->idanio;
+        $dato->activo = 1;
 
         if($dato->save()){
             return ['success' => 1];
@@ -108,7 +109,8 @@ class FuenteRecursosController extends Controller
         $regla = array(
             'id' => 'required',
             'codigo' => 'required',
-            'idanio' => 'required'
+            'idanio' => 'required',
+            'toggle' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -121,7 +123,8 @@ class FuenteRecursosController extends Controller
                 'codigo' => $request->codigo,
                 'nombre' => $request->nombre,
                 'id_fuentef' => $request->fuente,
-                'id_p_anio' => $request->idanio
+                'id_p_anio' => $request->idanio,
+                'activo' => $request->toggle
             ]);
 
             return ['success' => 1];
