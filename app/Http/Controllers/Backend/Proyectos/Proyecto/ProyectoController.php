@@ -2879,10 +2879,16 @@ class ProyectoController extends Controller
         // OBTENER EL TOTAL DE LAS PARTIDAS. PARA MOSTRAR AL USUARIO CUANTO DINERO SE USARA Y
         // ELEGIR EL BOLSÓN
 
+        // $request->id  ES EL ID DEL PROYECTO
+
         $montoPartida = $this->montoFinalPartidaProyecto($request->id);
         $montoPartida = "$" . number_format((float)$montoPartida, 2, '.', ',');
 
-        $lista = Bolson::orderBy('nombre')->get();
+        $infoProyecto = Proyecto::where('id', $request->id)->first();
+
+        $lista = Bolson::where('id_fuenter', $infoProyecto->id_fuenter)
+        ->orderBy('nombre')
+        ->get();
 
         return ['success' => 1, 'lista' => $lista, 'presupuesto' => $montoPartida];
     }

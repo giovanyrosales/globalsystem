@@ -103,8 +103,8 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Fuente de Financiamiento:</label>
-                                <select class="form-control" id="select-fuente-financiamiento" >
-                                    <option value="" disabled selected>Seleccione una opción...</option>
+                                <select class="form-control" id="select-fuente-financiamiento" onchange="buscarFuenteRecursos()">
+                                    <option value="" selected disabled>Seleccionar opción...</option>
                                     @foreach($arrayFuenteFinanciamiento as $sel)
                                         <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
                                     @endforeach
@@ -115,10 +115,7 @@
                             <div class="form-group">
                                 <label>Fuente de Recursos:</label>
                                 <select class="form-control" id="select-fuente-recursos" >
-                                    <option value="" disabled selected>Seleccione una opción...</option>
-                                    @foreach($arrayFuenteRecursos as $sel)
-                                        <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
-                                    @endforeach
+
                                 </select>
                             </div>
                         </div>
@@ -221,6 +218,40 @@
                     crearProyecto();
                 }
             })
+        }
+
+        function buscarFuenteRecursos(){
+
+            let id = document.getElementById('select-fuente-financiamiento').value;
+            // compara si es tipo texto o numero
+            if(id === ''){
+                return;
+            }
+
+            openLoading();
+
+            axios.post(url+'/bolson/retornar/fuente/recursos',{
+                'id' : id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1) {
+
+                        document.getElementById("select-fuente-recursos").options.length = 0;
+
+                        $.each(response.data.lista, function( key, val ){
+                            $('#select-fuente-recursos').append('<option value="' +val.id +'">'+val.unido+'</option>');
+                        });
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
         }
 
         function crearProyecto(){
@@ -339,8 +370,21 @@
                         })
                     }
                     else if(response.data.success === 2){
-                        toastr.success('Registrado correctamente');
-                        limpiarFormulario();
+
+                        Swal.fire({
+                            title: 'Proyecto Registrado',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false,
+                            showCancelButton: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
                     }
                     else {
                         toastr.error('Error al registrar');
