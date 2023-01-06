@@ -22,10 +22,7 @@
     <section class="content-header">
         <div class="row">
 
-            <button type="button" style="margin-left: 20px; font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
-                <i class="fas fa-plus-square"></i>
-                Nuevo Registro
-            </button>
+
         </div>
     </section>
 
