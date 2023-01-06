@@ -155,7 +155,7 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/usuario/departamento/tabla') }}";
+            var ruta = "{{ URL::to('/admin/usuario/departamento-vista/tabla') }}";
             $('#tablaDatatable').load(ruta);
 
             $('#select-usuario-nuevo').select2({
