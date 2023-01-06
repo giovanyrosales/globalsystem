@@ -10,7 +10,7 @@
                                 <th style="width: 15%">Nombre</th>
                                 <th style="width: 10%">Usuario</th>
                                 <th style="width: 15%">Departamento</th>
-                                <th style="width: 12%">Opciones</th>
+
                             </tr>
                             </thead>
                             <tbody>
@@ -20,11 +20,7 @@
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->usuario }}</td>
                                     <td>{{ $dato->nombredepa }}</td>
-                                    <td>
-                                        <button type="button" style="font-weight: bold" class="button button-primary button-pill button-small" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
-                                        </button>
-                                    </td>
+
                                 </tr>
                             @endforeach
 
