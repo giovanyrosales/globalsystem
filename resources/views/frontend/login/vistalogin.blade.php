@@ -135,6 +135,8 @@
         formData.append('usuario', usuario);
         formData.append('password', password);
 
+        // /globalsystem/admin/login
+
         axios.post('/globalsystem/admin/login', formData, {
         })
             .then((response) => {

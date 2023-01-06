@@ -15,6 +15,8 @@
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     @yield('content-admin-css')
 
+    <!--  /globalsystem/admin  -->
+
     <script type="text/javascript"> var url = "/globalsystem/admin"; </script>
 </head>
 <body class="hold-transition sidebar-mini">

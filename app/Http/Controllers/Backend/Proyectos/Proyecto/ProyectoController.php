@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Backend\Proyectos\Proyecto;
 
-
 use App\Http\Controllers\Controller;
 use App\Models\AreaGestion;
 use App\Models\Bitacora;
@@ -59,6 +58,7 @@ class ProyectoController extends Controller
         $arrayLineaTrabajo = LineaTrabajo::orderBy('codigo')->get();
         $arrayFuenteFinanciamiento = FuenteFinanciamiento::orderBy('codigo')->get();
         $arrayFuenteRecursos = FuenteRecursos::orderBy('codigo')->get();
+
         $formuladores = DB::table('usuario_formulador AS pud')
             ->join('usuario AS u', 'pud.id_usuario', '=', 'u.id')
             ->select('u.id', 'u.nombre')

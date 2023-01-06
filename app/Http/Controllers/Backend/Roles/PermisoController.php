@@ -246,6 +246,43 @@ class PermisoController extends Controller
     }
 
 
+    //**************************
+
+
+    // retorna vista para asignar usuario a un departamento
+    public function indexUsuarioDepartamentoVista(){
+
+        $usuarios = Usuario::orderBy('nombre')->get();
+        $departamentos = P_Departamento::orderBy('nombre')->get();
+
+        return view('backend.admin.rolesypermisos.usuariodepartamento.vistausuariodepartamentovista', compact('usuarios', 'departamentos'));
+    }
+
+    // retorna tabla de usuarios asignados a un departamento
+    public function tablaUsuarioDepartamentoVista(){
+
+        $listado = DB::table('p_usuario_departamento AS pud')
+            ->join('usuario AS u', 'pud.id_usuario', '=', 'u.id')
+            ->join('p_departamento AS pd', 'pud.id_departamento', '=', 'pd.id')
+            ->select('pud.id', 'u.nombre', 'u.usuario', 'pd.nombre AS nombredepa')
+            ->orderBy('u.nombre')
+            ->get();
+
+        return view('backend.admin.rolesypermisos.usuariodepartamento.tablausuariodepartamentovista', compact('listado'));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     //******************  ASIGNACIÓN DE USUARIO A FORMULADOR  *************************************************
 
     // retorna vista para asignar usuario a un departamento

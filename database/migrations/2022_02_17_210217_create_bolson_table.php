@@ -19,6 +19,10 @@ class CreateBolsonTable extends Migration
             // año de presupuesto unidades
             $table->bigInteger('id_anio')->unsigned();
 
+            // fuente de recursos
+            $table->bigInteger('id_fuenter')->unsigned();
+
+
             // nombre de la cuenta bolsón
             $table->string('nombre', 200);
 
@@ -29,6 +33,7 @@ class CreateBolsonTable extends Migration
             $table->decimal('monto_inicial', 10, 2);
 
             $table->foreign('id_anio')->references('id')->on('p_anio_presupuesto');
+            $table->foreign('id_fuenter')->references('id')->on('fuenter');
         });
     }
 

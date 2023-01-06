@@ -995,7 +995,6 @@
 
         function preguntaAprobarPresupuesto(){
 
-
             var sel = document.getElementById('select-bolson-pendiente').value;
 
             if(sel == '0'){

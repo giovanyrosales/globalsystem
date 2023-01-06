@@ -85,6 +85,11 @@ Route::post('/admin/p/usuario/departamento/nuevo', [PermisoController::class, 'n
 Route::post('/admin/p/usuario/departamento/informacion', [PermisoController::class, 'informacionUsuarioDepartamento']);
 Route::post('/admin/p/usuario/departamento/editar', [PermisoController::class, 'editarUsuarioDepartamento']);
 
+// Para que jefe de presupuesto pueda ver los usuarios asignados a las unidades
+Route::get('/admin/usuario/departamento-vista/index', [PermisoController::class,'indexUsuarioDepartamentoVista'])->name('admin.usuario.departamento.vista.index');
+Route::get('/admin/usuario/departamento-vista/tabla', [PermisoController::class,'tablaUsuarioDepartamentoVista']);
+
+
 // --- ASIGNAR USUARIO SEA FORMULADOR ---
 // puede editar el proyecto y puede crear las partidas, y otro usuario puede solamente ver
 

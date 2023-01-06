@@ -255,6 +255,7 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'sidebar.descargos.directos.revision', 'description' => 'ver index de solicitud de descargos directos'])->syncRoles($roleUaci);
         Permission::create(['name' => 'sidebar.descargos.directos.historial', 'description' => 'ver historial de descargos directos'])->syncRoles($roleUaci);
 
+        Permission::create(['name' => 'sidebar.usuarios.departamentos.asignados', 'description' => 'ver usuarios asignados a una unidad - solo vista'])->syncRoles($rolePresupuesto);
 
 
 

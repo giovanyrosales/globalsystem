@@ -55,6 +55,19 @@
                  </li>
                 @endcan
 
+
+                <!-- Para que jefe de presupuesto pueda ver los usuarios asignados a las unidades -->
+                @can('sidebar.usuarios.departamentos.asignados')
+
+                    <li class="nav-item">
+                        <a href="{{ route('admin.usuario.departamento.vista.index') }}" target="frameprincipal" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Usuario Departamento</p>
+                        </a>
+                    </li>
+
+                @endcan
+
                 <!-- ESTADISTICAS -->
                 @can('sidebar.estadisticas')
                 <li class="nav-item has-treeview">
