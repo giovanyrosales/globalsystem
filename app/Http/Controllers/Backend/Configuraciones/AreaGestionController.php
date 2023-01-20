@@ -17,28 +17,12 @@ class AreaGestionController extends Controller
     // retorna vista con las áreas de gestión
     public function indexAreaGestion(){
 
-        $linea = LineaTrabajo::orderBy('codigo', 'ASC')->get();
-
-        foreach ($linea as $ll){
-            if($ll->nombre == null){
-                $ll->nombre = '';
-            }
-        }
-
-        return view('backend.admin.proyectos.configuraciones.areagestion.vistaareagestion', compact('linea'));
+        return view('backend.admin.proyectos.configuraciones.areagestion.vistaareagestion');
     }
 
     // retorna tabla con las áreas de gestión
     public function tablaAreaGestion(){
         $lista = AreaGestion::orderBy('codigo', 'ASC')->get();
-
-        foreach ($lista as $ll){
-
-            $info = LineaTrabajo::where('id', $ll->id_linea)->first();
-
-            $linea = $info->codigo . " " . $info->nombre;
-            $ll->linea = $linea;
-        }
 
         return view('backend.admin.proyectos.configuraciones.areagestion.tablaareagestion', compact('lista'));
     }
@@ -58,7 +42,6 @@ class AreaGestionController extends Controller
         $dato = new AreaGestion();
         $dato->codigo = $request->codigo;
         $dato->nombre = $request->nombre;
-        $dato->id_linea = $request->fuente;
 
         if($dato->save()){
             return ['success' => 1];
@@ -79,15 +62,7 @@ class AreaGestionController extends Controller
 
         if($lista = AreaGestion::where('id', $request->id)->first()){
 
-            $arrayFuente = LineaTrabajo::orderBy('codigo', 'ASC')->get();
-
-            foreach ($arrayFuente as $ll){
-                if($ll->nombre == null){
-                    $ll->nombre = '';
-                }
-            }
-
-            return ['success' => 1, 'fuente' => $lista, 'idfuente' => $lista->id_linea, 'arrayfuente' => $arrayFuente];
+            return ['success' => 1, 'fuente' => $lista];
         }else{
             return ['success' => 2];
         }
@@ -110,7 +85,6 @@ class AreaGestionController extends Controller
             AreaGestion::where('id', $request->id)->update([
                 'codigo' => $request->codigo,
                 'nombre' => $request->nombre,
-                'id_linea' => $request->fuente
             ]);
 
             return ['success' => 1];

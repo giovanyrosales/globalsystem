@@ -71,6 +71,16 @@
                                         <input type="text" maxlength="300" class="form-control" id="nombre-nuevo" autocomplete="off">
                                     </div>
 
+                                    <div class="form-group">
+                                        <label>Área de Gestión</label>
+                                        <select class="form-control" id="select-area-nuevo">
+                                            <option value="" disabled selected>Seleccione una opción...</option>
+                                            @foreach($area as $sel)
+                                                <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -110,6 +120,12 @@
                                     <div class="form-group">
                                         <label>Nombre</label>
                                         <input type="text" maxlength="300" class="form-control" id="nombre-editar" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Área de Gestión</label>
+                                        <select class="form-control" id="select-area-editar">
+                                        </select>
                                     </div>
 
                                 </div>
@@ -164,6 +180,7 @@
         function nuevo(){
             var codigo = document.getElementById('codigo-nuevo').value;
             var nombre = document.getElementById('nombre-nuevo').value;
+            var area = document.getElementById('select-area-nuevo').value;
 
             if(codigo === ''){
                 toastr.error('Código es requerido');
@@ -175,8 +192,18 @@
                 return;
             }
 
+            if(nombre === ''){
+                toastr.error('Nombre es requerido');
+                return;
+            }
+
             if(nombre.length > 300){
                 toastr.error('Nombre máximo 300 caracteres');
+                return;
+            }
+
+            if(area === ''){
+                toastr.error('Área es requerido');
                 return;
             }
 
@@ -184,6 +211,7 @@
             var formData = new FormData();
             formData.append('codigo', codigo);
             formData.append('nombre', nombre);
+            formData.append('area', area);
 
             axios.post(url+'/linea/trabajo/nuevo', formData, {
             })
@@ -219,6 +247,16 @@
                         $('#codigo-editar').val(response.data.linea.codigo);
                         $('#nombre-editar').val(response.data.linea.nombre);
 
+                        document.getElementById("select-area-editar").options.length = 0;
+
+                        $.each(response.data.arrayarea, function( key, val ){
+                            if(response.data.linea.id_areagestion == val.id){
+                                $('#select-area-editar').append('<option value="' +val.id +'" selected="selected">'+val.codigo + ' ' + val.nombre +'</option>');
+                            }else{
+                                $('#select-area-editar').append('<option value="' +val.id +'">'+val.codigo + ' ' + val.nombre +'</option>');
+                            }
+                        });
+
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -233,6 +271,7 @@
             var id = document.getElementById('id-editar').value;
             var nombre = document.getElementById('nombre-editar').value;
             var codigo = document.getElementById('codigo-editar').value;
+            var area = document.getElementById('select-area-editar').value;
 
             if(codigo === ''){
                 toastr.error('Código es requerido');
@@ -244,8 +283,23 @@
                 return;
             }
 
+            if(nombre === ''){
+                toastr.error('Nombre es requerido');
+                return;
+            }
+
             if(nombre.length > 300){
                 toastr.error('Nombre máximo 300 caracteres');
+                return;
+            }
+
+            if(nombre.length > 300){
+                toastr.error('Nombre máximo 300 caracteres');
+                return;
+            }
+
+            if(area === ''){
+                toastr.error('Área es requerido');
                 return;
             }
 
@@ -254,6 +308,7 @@
             formData.append('id', id);
             formData.append('codigo', codigo);
             formData.append('nombre', nombre);
+            formData.append('area', area);
 
             axios.post(url+'/linea/trabajo/editar', formData, {
             })

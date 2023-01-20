@@ -9,6 +9,7 @@
                             <tr>
                                 <th>Código</th>
                                 <th>Nombre</th>
+                                <th style="width: 12%">Área de Gestión</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -18,6 +19,7 @@
                                 <tr>
                                     <td>{{ $dato->codigo }}</td>
                                     <td>{{ $dato->nombre }}</td>
+                                    <td>{{ $dato->area }}</td>
                                     <td>
                                         <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar

@@ -9,7 +9,7 @@
                             <tr>
                                 <th style="width: 10%">Código</th>
                                 <th style="width: 12%">Nombre</th>
-                                <th style="width: 12%">Línea de Trabajo</th>
+
                                 <th style="width: 8%">Opciones</th>
                             </tr>
                             </thead>
@@ -19,7 +19,7 @@
                                 <tr>
                                     <td>{{ $dato->codigo }}</td>
                                     <td>{{ $dato->nombre }}</td>
-                                    <td>{{ $dato->linea }}</td>
+
                                     <td>
                                         <button type="button" style="font-weight: bold; color: white !important;"
                                                 class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">

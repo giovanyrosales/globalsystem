@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Configuraciones;
 
 use App\Http\Controllers\Controller;
+use App\Models\AreaGestion;
 use App\Models\LineaTrabajo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -15,12 +16,22 @@ class LineaTrabajoController extends Controller
 
     // retorna vista con las líneas de trabajo
     public function indexLineaTrabajo(){
-        return view('backend.admin.proyectos.configuraciones.lineatrabajo.vistalineadetrabajo');
+
+        $area = AreaGestion::orderBy('codigo', 'ASC')->get();
+
+        return view('backend.admin.proyectos.configuraciones.lineatrabajo.vistalineadetrabajo', compact('area'));
     }
 
     // retorna tabla con las líneas de trabajo
     public function tablaLineaTrabajo(){
         $lista = LineaTrabajo::orderBy('codigo', 'ASC')->get();
+
+        foreach ($lista as $ll){
+
+            $info = AreaGestion::where('id', $ll->id_areagestion)->first();
+            $ll->area = $info->codigo . " " . $info->nombre;
+        }
+
         return view('backend.admin.proyectos.configuraciones.lineatrabajo.tablalineadetrabajo', compact('lista'));
     }
 
@@ -35,10 +46,10 @@ class LineaTrabajoController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
-
         $dato = new LineaTrabajo();
         $dato->codigo = $request->codigo;
         $dato->nombre = $request->nombre;
+        $dato->id_areagestion = $request->area;
 
         if($dato->save()){
             return ['success' => 1];
@@ -59,7 +70,9 @@ class LineaTrabajoController extends Controller
 
         if($lista = LineaTrabajo::where('id', $request->id)->first()){
 
-            return ['success' => 1, 'linea' => $lista];
+            $arrayarea = AreaGestion::orderBy('id', 'ASC')->get();
+
+            return ['success' => 1, 'linea' => $lista, 'arrayarea' => $arrayarea];
         }else{
             return ['success' => 2];
         }
@@ -81,7 +94,8 @@ class LineaTrabajoController extends Controller
 
             LineaTrabajo::where('id', $request->id)->update([
                 'codigo' => $request->codigo,
-                'nombre' => $request->nombre
+                'nombre' => $request->nombre,
+                'id_areagestion' => $request->area
             ]);
 
             return ['success' => 1];

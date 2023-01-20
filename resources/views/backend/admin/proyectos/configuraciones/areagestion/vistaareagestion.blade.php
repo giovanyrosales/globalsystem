@@ -70,16 +70,6 @@
                                         <input type="text" maxlength="300" class="form-control" id="nombre-nuevo" autocomplete="off">
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Línea de Trabajo</label>
-                                        <select class="form-control" id="select-fuente-l-nuevo">
-                                            <option value="" disabled selected>Seleccione una opción...</option>
-                                            @foreach($linea as $sel)
-                                                <option value="{{ $sel->id }}">{{ $sel->codigo }} - {{ $sel->nombre }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
@@ -118,12 +108,6 @@
                                     <div class="form-group">
                                         <label>Nombre</label>
                                         <input type="text" maxlength="300" class="form-control" id="nombre-editar" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Línea de Trabajo</label>
-                                        <select class="form-control" id="select-fuente-l-editar">
-                                        </select>
                                     </div>
 
                                 </div>
@@ -177,7 +161,6 @@
         function nuevo(){
             var codigo = document.getElementById('codigo-nuevo').value;
             var nombre = document.getElementById('nombre-nuevo').value;
-            var fuente = document.getElementById('select-fuente-l-nuevo').value;
 
             if(codigo === ''){
                 toastr.error('Código es requerido');
@@ -189,13 +172,13 @@
                 return;
             }
 
-            if(nombre.length > 300){
-                toastr.error('Nombre máximo 300 caracteres');
+            if(nombre === ''){
+                toastr.error('Nombre es requerido');
                 return;
             }
 
-            if(fuente === ''){
-                toastr.error('Seleccionar Línea de Trabajo');
+            if(nombre.length > 300){
+                toastr.error('Nombre máximo 300 caracteres');
                 return;
             }
 
@@ -203,7 +186,6 @@
             var formData = new FormData();
             formData.append('codigo', codigo);
             formData.append('nombre', nombre);
-            formData.append('fuente', fuente);
 
             axios.post(url+'/areagestion/nuevo', formData, {
             })
@@ -239,16 +221,6 @@
                         $('#codigo-editar').val(response.data.fuente.codigo);
                         $('#nombre-editar').val(response.data.fuente.nombre);
 
-                        document.getElementById("select-fuente-l-editar").options.length = 0;
-
-                        $.each(response.data.arrayfuente, function( key, val ){
-                            if(response.data.idfuente == val.id){
-                                $('#select-fuente-l-editar').append('<option value="' +val.id +'" selected="selected">'+val.codigo + ' ' + val.nombre +'</option>');
-                            }else{
-                                $('#select-fuente-l-editar').append('<option value="' +val.id +'">'+val.codigo + ' ' + val.nombre +'</option>');
-                            }
-                        });
-
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -263,7 +235,6 @@
             var id = document.getElementById('id-editar').value;
             var nombre = document.getElementById('nombre-editar').value;
             var codigo = document.getElementById('codigo-editar').value;
-            var fuente = document.getElementById('select-fuente-l-editar').value;
 
             if(codigo === ''){
                 toastr.error('Código es requerido');
@@ -272,6 +243,11 @@
 
             if(codigo.length > 100){
                 toastr.error('Código máximo 100 caracteres');
+                return;
+            }
+
+            if(nombre === ''){
+                toastr.error('Nombre es requerido');
                 return;
             }
 
@@ -285,7 +261,6 @@
             formData.append('id', id);
             formData.append('codigo', codigo);
             formData.append('nombre', nombre);
-            formData.append('fuente', fuente);
 
             axios.post(url+'/areagestion/editar', formData, {
             })
