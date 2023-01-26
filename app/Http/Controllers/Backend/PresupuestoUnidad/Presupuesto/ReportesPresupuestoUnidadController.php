@@ -14,6 +14,7 @@ use App\Models\P_Departamento;
 use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
 use App\Models\P_PresupUnidadDetalle;
+use App\Models\P_ProyectosAprobados;
 use App\Models\P_UnidadMedida;
 use App\Models\Rubro;
 use Illuminate\Http\Request;
@@ -331,6 +332,27 @@ class ReportesPresupuestoUnidadController extends Controller
         $arrayPresupUnidad = P_PresupUnidad::where('id_anio', $anio)->get();
         $fechaanio = P_AnioPresupuesto::where('id', $anio)->pluck('nombre')->first();
 
+
+        $listadoProyectoAprobados = P_ProyectosAprobados::orderBy('descripcion', 'ASC')->get();
+
+
+        foreach ($listadoProyectoAprobados as $dd){
+
+            $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
+            $infoFuenteR = ObjEspecifico::where('id', $dd->id_fuenter)->first();
+            $infoLinea = ObjEspecifico::where('id', $dd->id_lineatrabajo)->first();
+            $infoArea = ObjEspecifico::where('id', $dd->id_areagestion)->first();
+
+            $dd->codigoobj = $infoObjeto->codigo;
+            $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+            $dd->fuenterecurso = $infoFuenteR->codigo . " - " . $infoFuenteR->nombre;
+            $dd->lineatrabajo = $infoLinea->codigo . " - " . $infoLinea->nombre;
+            $dd->areagestion = $infoArea->codigo . " - " . $infoArea->nombre;
+
+            $dd->costoFormat = '$' . number_format((float)$dd->costo, 2, '.', ',');
+        }
+
+
         $pilaIdPresupUnidad = array();
 
         $totalobj = 0;
@@ -398,7 +420,14 @@ class ReportesPresupuestoUnidadController extends Controller
                         $subLista->multiunidad = number_format((float)$multiunidades, 2, '.', ',');
                     }
 
-                    $sumaObjetoTotal = $sumaObjetoTotal + $sumaObjeto;
+
+                    foreach ($listadoProyectoAprobados as $lpa){
+                        if($ll->codigo == $lpa->codigoobj){
+                            $sumaObjeto += $lpa->costo;
+                        }
+                    }
+
+                    $sumaObjetoTotal += $sumaObjeto;
                     $totalobj = $totalobj + $sumaObjeto;
 
                     $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', ',');
@@ -531,6 +560,33 @@ class ReportesPresupuestoUnidadController extends Controller
         // solo para obtener los nombres
         $dataUnidades = P_Departamento::whereIn('id', $porciones)->orderBy('nombre')->get();
 
+        $pilaArrayIdPres = array();
+
+        foreach ($arrayPresupUnidad as $dd){
+            array_push($pilaArrayIdPres, $dd->id);
+        }
+
+        $listadoProyectoAprobados = P_ProyectosAprobados::whereIn('id_presup_unidad', $pilaArrayIdPres)
+            ->orderBy('descripcion', 'ASC')
+            ->get();
+
+        foreach ($listadoProyectoAprobados as $dd){
+
+            $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
+            $infoFuenteR = ObjEspecifico::where('id', $dd->id_fuenter)->first();
+            $infoLinea = ObjEspecifico::where('id', $dd->id_lineatrabajo)->first();
+            $infoArea = ObjEspecifico::where('id', $dd->id_areagestion)->first();
+
+            $dd->codigoobj = $infoObjeto->codigo;
+            $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+            $dd->fuenterecurso = $infoFuenteR->codigo . " - " . $infoFuenteR->nombre;
+            $dd->lineatrabajo = $infoLinea->codigo . " - " . $infoLinea->nombre;
+            $dd->areagestion = $infoArea->codigo . " - " . $infoArea->nombre;
+
+            $dd->costoFormat = '$' . number_format((float)$dd->costo, 2, '.', ',');
+        }
+
+
         $fechaanio = P_AnioPresupuesto::where('id', $anio)->pluck('nombre')->first();
 
         // listado de materiales
@@ -577,7 +633,6 @@ class ReportesPresupuestoUnidadController extends Controller
         $resultsBloque3 = array();
         $index3 = 0;
 
-        $totalvalor = 0;
 
         // agregar cuentas
         foreach($rubro as $secciones){
@@ -637,6 +692,13 @@ class ReportesPresupuestoUnidadController extends Controller
                         }
                     }
 
+                    foreach ($listadoProyectoAprobados as $lpa){
+                        if($ll->codigo == $lpa->codigoobj){
+                            $sumaObjeto += $lpa->costo;
+                            $sumaGlobalUnidades += $lpa->costo;
+                        }
+                    }
+
                     $sumaObjetoTotal += $sumaObjeto;
                     $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', ',');
                     $ll->sumaobjetoDeci = $sumaObjeto;
@@ -653,7 +715,6 @@ class ReportesPresupuestoUnidadController extends Controller
                 $index2++;
             }
 
-            $totalvalor += $sumaRubro;
             $secciones->sumarubro = number_format((float)$sumaRubro, 2, '.', ',');
             $secciones->sumarubroDecimal = $sumaRubro;
 
@@ -748,7 +809,21 @@ class ReportesPresupuestoUnidadController extends Controller
                                 <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->cantidadpedi</td>
                                 <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->total</td>
                                 </tr>";
+                                }
 
+                                foreach ($listadoProyectoAprobados as $lpa){
+
+                                    if ($dataObj->codigo == $lpa->codigoobj){
+
+                                                $tabla .= "<tr>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataObj->codigo</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$lpa->descripcion</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>PROYECTO</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'></td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$lpa->costoFormat</td>
+                                        </tr>";
+
+                                    }
                                 }
                             }
                         }
@@ -793,12 +868,20 @@ class ReportesPresupuestoUnidadController extends Controller
 
         $presupUnidad = P_PresupUnidad::where('id_anio', $anio)
             ->where('id_departamento', $unidad)
-            ->where('id_estado', 3) // SOLO APROBADADOS
             ->orderBy('id', 'ASC')
             ->first();
 
+            if($presupUnidad == null){
+                return "EL PRESUPUESTO NO FUE ENCONTRADO";
+            }
+
+            if($presupUnidad->id_estado != 3) {
+                return "EL PRESUPUESTO DE LA UNIDAD NO ESTA APROBADO";
+            }
+
             // solo para obtener los nombres
             $dataUnidades = P_Departamento::where('id', $presupUnidad->id_departamento)->first();
+
             $fechaanio = P_AnioPresupuesto::where('id', $anio)->pluck('nombre')->first();
 
             $sumaGlobalUnidades = 0;
@@ -808,12 +891,29 @@ class ReportesPresupuestoUnidadController extends Controller
 
             $infoPresuUniDeta = P_PresupUnidadDetalle::where('id_presup_unidad', $presupUnidad->id)->get();
 
-            $sumacantidad = 0;
+            // LISTADO DE PROYECTO APROBADOS
+            $listadoProyectoAprobados = P_ProyectosAprobados::where('id_presup_unidad', $presupUnidad->id)
+            ->orderBy('descripcion', 'ASC')
+            ->get();
+
+            foreach ($listadoProyectoAprobados as $dd){
+
+                $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
+                $infoFuenteR = ObjEspecifico::where('id', $dd->id_fuenter)->first();
+                $infoLinea = ObjEspecifico::where('id', $dd->id_lineatrabajo)->first();
+                $infoArea = ObjEspecifico::where('id', $dd->id_areagestion)->first();
+
+                $dd->codigoobj = $infoObjeto->codigo;
+                $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+                $dd->fuenterecurso = $infoFuenteR->codigo . " - " . $infoFuenteR->nombre;
+                $dd->lineatrabajo = $infoLinea->codigo . " - " . $infoLinea->nombre;
+                $dd->areagestion = $infoArea->codigo . " - " . $infoArea->nombre;
+
+                $dd->costoFormat = '$' . number_format((float)$dd->costo, 2, '.', ',');
+            }
 
             foreach ($infoPresuUniDeta as $dd){
                 array_push($pilaArrayPresuUni, $dd->id);
-                // solo obtener fila de columna CANTIDAD
-                $sumacantidad += ($dd->cantidad * $dd->periodo);
 
                 array_push($pilaArrayMateriales, $dd->id_material);
             }
@@ -826,8 +926,6 @@ class ReportesPresupuestoUnidadController extends Controller
             $index2 = 0;
             $resultsBloque3 = array();
             $index3 = 0;
-
-            $totalvalor = 0;
 
             // agregar cuentas
             foreach($rubro as $secciones){
@@ -890,6 +988,13 @@ class ReportesPresupuestoUnidadController extends Controller
                             }
                         }
 
+                        foreach ($listadoProyectoAprobados as $lpa){
+                            if($ll->codigo == $lpa->codigoobj){
+                                $sumaObjeto += $lpa->costo;
+                                $sumaGlobalUnidades += $lpa->costo;
+                            }
+                        }
+
                         $sumaObjetoTotal += $sumaObjeto;
                         $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', ',');
                         $ll->sumaobjetoDeci = $sumaObjeto;
@@ -906,7 +1011,7 @@ class ReportesPresupuestoUnidadController extends Controller
                     $index2++;
                 }
 
-                $totalvalor += $sumaRubro;
+                //$totalvalor += $sumaRubro;
                 $secciones->sumarubro = number_format((float)$sumaRubro, 2, '.', ',');
                 $secciones->sumarubroDecimal = $sumaRubro;
 
@@ -915,6 +1020,7 @@ class ReportesPresupuestoUnidadController extends Controller
             }
 
             $sumaGlobalUnidades = number_format((float)($sumaGlobalUnidades), 2, '.', ',');
+
 
             ini_set("pcre.backtrack_limit", "5000000");
             $logoalcaldia = 'images/logo.png';
@@ -982,30 +1088,45 @@ class ReportesPresupuestoUnidadController extends Controller
 
                             foreach ($dataCC->objeto as $dataObj){
 
-                                if($dataObj->sumaobjetoDeci > 0){
+                                if($dataObj->sumaobjetoDeci > 0) {
 
                                     $tabla .= "<tr>
-                            <td style='font-size:11px; text-align: center; font-weight: bold'>$dataObj->codigo</td>
-                            <td style='font-size:11px; text-align: center; font-weight: bold'>$dataObj->nombre</td>
-                            <td style='font-size:11px; text-align: center; font-weight: bold'></td>
-                            <td style='font-size:11px; text-align: center; font-weight: bold'></td>
-                            <td style='font-size:11px; text-align: center; font-weight: bold'></td>
-                            <td style='font-size:11px; text-align: center; font-weight: bold'>$$dataObj->sumaobjeto</td>
-                            </tr>";
+                                        <td style='font-size:11px; text-align: center; font-weight: bold'>$dataObj->codigo</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: bold'>$dataObj->nombre</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: bold'></td>
+                                        <td style='font-size:11px; text-align: center; font-weight: bold'></td>
+                                        <td style='font-size:11px; text-align: center; font-weight: bold'></td>
+                                        <td style='font-size:11px; text-align: center; font-weight: bold'>$$dataObj->sumaobjeto</td>
+                                        </tr>";
 
                                     // MATERIALES
 
-                                    foreach ($dataObj->material as $dataMM){
+                                    foreach ($dataObj->material as $dataMM) {
 
                                         $tabla .= "<tr>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataObj->codigo</td>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->descripcion</td>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->unimedida</td>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->precunitario</td>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->cantidadpedi</td>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->total</td>
-                                </tr>";
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataObj->codigo</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->descripcion</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->unimedida</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->precunitario</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->cantidadpedi</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->total</td>
+                                        </tr>";
+                                    }
 
+                                    foreach ($listadoProyectoAprobados as $lpa){
+
+                                        if ($dataObj->codigo == $lpa->codigoobj){
+
+                                            $tabla .= "<tr>
+                                            <td style='font-size:11px; text-align: center; font-weight: normal'>$dataObj->codigo</td>
+                                            <td style='font-size:11px; text-align: center; font-weight: normal'>$lpa->descripcion</td>
+                                            <td style='font-size:11px; text-align: center; font-weight: normal'>PROYECTO</td>
+                                            <td style='font-size:11px; text-align: center; font-weight: normal'></td>
+                                            <td style='font-size:11px; text-align: center; font-weight: normal'></td>
+                                            <td style='font-size:11px; text-align: center; font-weight: normal'>$lpa->costoFormat</td>
+                                            </tr>";
+
+                                        }
                                     }
                                 }
                             }

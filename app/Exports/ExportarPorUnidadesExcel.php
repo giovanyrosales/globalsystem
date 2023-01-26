@@ -7,6 +7,7 @@ use App\Models\ObjEspecifico;
 use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
 use App\Models\P_PresupUnidadDetalle;
+use App\Models\P_ProyectosAprobados;
 use App\Models\P_UnidadMedida;
 use App\Models\Rubro;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -34,6 +35,32 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
             ->where('id_estado', 3) // SOLO APROBADOS
             ->orderBy('id', 'ASC')
             ->get();
+
+        $pilaArrayIdPres = array();
+
+        foreach ($arrayPresupUnidad as $dd){
+            array_push($pilaArrayIdPres, $dd->id);
+        }
+
+        $listadoProyectoAprobados = P_ProyectosAprobados::whereIn('id_presup_unidad', $pilaArrayIdPres)
+            ->orderBy('descripcion', 'ASC')
+            ->get();
+
+        foreach ($listadoProyectoAprobados as $dd){
+
+            $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
+            $infoFuenteR = ObjEspecifico::where('id', $dd->id_fuenter)->first();
+            $infoLinea = ObjEspecifico::where('id', $dd->id_lineatrabajo)->first();
+            $infoArea = ObjEspecifico::where('id', $dd->id_areagestion)->first();
+
+            $dd->codigoobj = $infoObjeto->codigo;
+            $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+            $dd->fuenterecurso = $infoFuenteR->codigo . " - " . $infoFuenteR->nombre;
+            $dd->lineatrabajo = $infoLinea->codigo . " - " . $infoLinea->nombre;
+            $dd->areagestion = $infoArea->codigo . " - " . $infoArea->nombre;
+
+            $dd->costoFormat = '$' . number_format((float)$dd->costo, 2, '.', ',');
+        }
 
         // listado de materiales
         $materiales = P_Materiales::orderBy('descripcion')->get();
@@ -143,7 +170,14 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
                         }
                     }
 
-                    $sumaObjetoTotal = $sumaObjetoTotal + $sumaObjeto;
+                    foreach ($listadoProyectoAprobados as $lpa){
+                        if($ll->codigo == $lpa->codigoobj){
+                            $sumaObjeto += $lpa->costo;
+                            $sumaGlobalUnidades += $lpa->costo;
+                        }
+                    }
+
+                    $sumaObjetoTotal += $sumaObjeto;
                     $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', ',');
                     $ll->sumaobjetoDeci = $sumaObjeto;
 
@@ -225,8 +259,23 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
                                         'cantidad' => $dataMM->cantidadpedi,
                                         'total' => $dataMM->total,
                                     ];
-
                                 }
+
+
+                                foreach ($listadoProyectoAprobados as $lpa){
+
+                                    if ($dataObj->codigo == $lpa->codigoobj){
+
+                                        $dataArray[] = [
+                                            'codigo' => $dataObj->codigo,
+                                            'descripcion' => $lpa->descripcion,
+                                            'medida' => 'PROYECTO',
+                                            'cantidad' => '',
+                                            'total' => $lpa->costoFormat,
+                                        ];
+                                    }
+                                }
+
                             }
                         }
                     }

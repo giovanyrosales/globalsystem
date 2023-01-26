@@ -64,7 +64,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         $infoDepa = P_UsuarioDepartamento::where('id_usuario', $idusuario)->first();
 
-        // solo sera necesario verificar con tabla presub_unidad
+        // solo será necesario verificar con tabla presub_unidad
 
         // obtener lista de anios del departamento
         $listaAnios = P_PresupUnidad::where('id_departamento', $infoDepa->id_departamento)->get();
@@ -87,7 +87,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         return view('backend.admin.presupuestounidad.crear.vistacrearpresupuestounidad', compact( 'listado', 'unidad'));
     }
 
-    // esta vista retorna con el presupuesto nuevo. y al cargarse desactiva el modal loading de carga
+    // Esta vista retorna con el presupuesto nuevo. y al cargarse desactiva el modal loading de carga
     public function contenedorNuevoPresupuesto(){
 
         $rubro = Rubro::orderBy('codigo', 'ASC')->get();
@@ -121,8 +121,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                 foreach ($subSecciones2 as $ll){
 
                     array_push($resultsBloque3, $ll);
-
-
 
                     if($ll->codigo == 61109){
                         $ll->nombre = $ll->nombre . " ( ACTIVOS FIJOS MENORES A $600.00 )";
@@ -673,8 +671,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             $dd->costoFormat = '$' . number_format((float)$dd->costo, 2, '.', ',');
         }
 
-
-
         // agregar cuentas
         foreach($rubro as $secciones){
             array_push($resultsBloque,$secciones);
@@ -781,7 +777,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         $listadoProyecto = P_ProyectosPendientes::where('id_presup_unidad', $idpresupuesto)
             ->orderBy('descripcion', 'ASC')
             ->get();
-
 
         return view('backend.admin.presupuestounidad.revisar.contenedorpresupuestoindividual', compact( 'estado',
             'idpresupuesto', 'idestado', 'totalvalor',

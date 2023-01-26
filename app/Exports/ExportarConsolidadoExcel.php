@@ -7,6 +7,7 @@ use App\Models\ObjEspecifico;
 use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
 use App\Models\P_PresupUnidadDetalle;
+use App\Models\P_ProyectosAprobados;
 use App\Models\Rubro;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -37,6 +38,24 @@ class ExportarConsolidadoExcel implements FromCollection, WithHeadings
 
         // listado de presupuesto por anio
         $listadoPresupuesto = P_PresupUnidad::where('id_anio', $this->anio)->get();
+
+        $listadoProyectoAprobados = P_ProyectosAprobados::orderBy('descripcion', 'ASC')->get();
+
+        foreach ($listadoProyectoAprobados as $dd){
+
+            $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
+            $infoFuenteR = ObjEspecifico::where('id', $dd->id_fuenter)->first();
+            $infoLinea = ObjEspecifico::where('id', $dd->id_lineatrabajo)->first();
+            $infoArea = ObjEspecifico::where('id', $dd->id_areagestion)->first();
+
+            $dd->codigoobj = $infoObjeto->codigo;
+            $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+            $dd->fuenterecurso = $infoFuenteR->codigo . " - " . $infoFuenteR->nombre;
+            $dd->lineatrabajo = $infoLinea->codigo . " - " . $infoLinea->nombre;
+            $dd->areagestion = $infoArea->codigo . " - " . $infoArea->nombre;
+
+            $dd->costoFormat = '$' . number_format((float)$dd->costo, 2, '.', ',');
+        }
 
         $pila = array();
 
@@ -103,7 +122,13 @@ class ExportarConsolidadoExcel implements FromCollection, WithHeadings
                         $subLista->multiunidad = number_format((float)$multiunidades, 2, '.', ',');
                     }
 
-                    $sumaObjetoTotal = $sumaObjetoTotal + $sumaObjeto;
+                    foreach ($listadoProyectoAprobados as $lpa){
+                        if($ll->codigo == $lpa->codigoobj){
+                            $sumaObjeto += $lpa->costo;
+                        }
+                    }
+
+                    $sumaObjetoTotal += $sumaObjeto;
                     $totalobj = $totalobj + $sumaObjeto;
 
                     $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', ',');
