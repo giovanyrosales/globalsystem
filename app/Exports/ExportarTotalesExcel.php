@@ -6,6 +6,7 @@ use App\Models\ObjEspecifico;
 use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
 use App\Models\P_PresupUnidadDetalle;
+use App\Models\P_ProyectosAprobados;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
@@ -28,6 +29,25 @@ class ExportarTotalesExcel implements FromCollection, WithHeadings
             ->get();
 
         $pilaArrayPresuUni = array();
+
+        $listadoProyectoAprobados = P_ProyectosAprobados::orderBy('descripcion', 'ASC')->get();
+
+        foreach ($listadoProyectoAprobados as $dd){
+
+            $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
+            $infoFuenteR = ObjEspecifico::where('id', $dd->id_fuenter)->first();
+            $infoLinea = ObjEspecifico::where('id', $dd->id_lineatrabajo)->first();
+            $infoArea = ObjEspecifico::where('id', $dd->id_areagestion)->first();
+
+            $dd->codigoobj = $infoObjeto->codigo;
+            $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
+            $dd->fuenterecurso = $infoFuenteR->codigo . " - " . $infoFuenteR->nombre;
+            $dd->lineatrabajo = $infoLinea->codigo . " - " . $infoLinea->nombre;
+            $dd->areagestion = $infoArea->codigo . " - " . $infoArea->nombre;
+
+            $dd->costoFormat = $dd->costo;
+        }
+
 
         foreach ($arrayPresupuestoUni as $p){
             array_push($pilaArrayPresuUni, $p->id);
@@ -60,12 +80,14 @@ class ExportarTotalesExcel implements FromCollection, WithHeadings
                     // solo obtener fila de columna CANTIDAD
                     $sumacantidad = $sumacantidad + ($info->cantidad * $info->periodo);
                 }
+
+
             }
 
             if($sumacantidad > 0){
 
-                $multiFila = number_format((float)($multiFila), 2, '.', ',');
-                $sumacantidad = number_format((float)($sumacantidad), 2, '.', ',');
+                //$multiFila = number_format((float)($multiFila), 2, '.', ',');
+                //$sumacantidad = number_format((float)($sumacantidad), 2, '.', ',');
 
                 $dataArray[] = [
                     'codigo' => $codigo->codigo,
@@ -76,9 +98,19 @@ class ExportarTotalesExcel implements FromCollection, WithHeadings
             }
         }
 
+        foreach ($listadoProyectoAprobados as $lpa){
+            $dataArray[] = [
+                'codigo' => $lpa->codigoobj,
+                'descripcion' => $lpa->descripcion,
+                'sumacantidad' => 'PROYECTO',
+                'total' => $lpa->costoFormat,
+            ];
+        }
+
         usort($dataArray, function ($a, $b) {
             return $a['codigo'] <=> $b['codigo'] ?: $a['descripcion'] <=> $b['descripcion'];
         });
+
 
         return collect($dataArray);
     }
