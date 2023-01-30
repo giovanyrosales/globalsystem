@@ -65,8 +65,8 @@ class ReportesPresupuestoUnidadController extends Controller
         // COLUMNA TOTAL CANTIDAD
         $totalColumnaCantidad = 0;
 
-        $materiales = P_Materiales::orderBy('descripcion')
-            ->get();
+        $materiales = P_Materiales::orderBy('descripcion')->get();
+
         // recorrer cada material
         foreach ($materiales as $mm) {
 
@@ -284,7 +284,7 @@ class ReportesPresupuestoUnidadController extends Controller
                         // CUENTAS
 
                         $tabla .= "<tr>
-                            <td style='font-size:11px; text-align: center; font-weight: bold'>$dataCC->numero</td>
+                            <td style='font-size:11px; text-align: center; font-weight: bold'>$dataCC->codigo</td>
                             <td style='font-size:11px; text-align: center; font-weight: bold'>$dataCC->nombre</td>
                             <td style='font-size:11px; text-align: center; font-weight: bold'></td>
                             <td style='font-size:11px; text-align: center; font-weight: bold'></td>
@@ -296,7 +296,7 @@ class ReportesPresupuestoUnidadController extends Controller
                             if($dataObj->sumaobjetoDeci > 0){
 
                                 $tabla .= "<tr>
-                            <td style='font-size:11px; text-align: center; font-weight: bold'>$dataObj->numero</td>
+                            <td style='font-size:11px; text-align: center; font-weight: bold'>$dataObj->codigo</td>
                             <td style='font-size:11px; text-align: center; font-weight: bold'>$dataObj->nombre</td>
                             <td style='font-size:11px; text-align: center; font-weight: bold'></td>
                             <td style='font-size:11px; text-align: center; font-weight: bold'></td>
