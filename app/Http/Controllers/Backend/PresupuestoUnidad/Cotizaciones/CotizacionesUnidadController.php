@@ -45,6 +45,7 @@ class CotizacionesUnidadController extends Controller
             ->select('r.id')
             ->where('d.estado', 0)
             ->where('d.cancelado', 0)
+            ->where('r.req_revision', 1) // SOLO APROBADAS POR JEFE PRESUPUESTO
             ->groupBy('r.id')
             ->get();
 
@@ -704,5 +705,313 @@ class CotizacionesUnidadController extends Controller
         return view('backend.admin.presupuestounidad.cotizaciones.individual.vistacotizaciondetalleunidad', compact('id', 'infoRequisicion',
             'proveedor', 'infoCotiDetalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
     }
+
+    // PRIMERO PASA POR JEFE DE PRESUPUESTO PARA QUE REVISE SI HAY DINERO
+    public function verRequerimientosPendientes(){
+        return view('backend.admin.presupuestounidad.requerimientos.pendientesaprobar.vistapendientesjefepresupuesto');
+    }
+
+    // TABLA DE REVISIÓN
+    public function verRequerimientosPendientesTabla(){
+
+        // SOLO NO APROBADAS POR JEFE PRESUPUESTO
+        $data = RequisicionUnidad::where('req_revision', 0)->get();
+
+        foreach ($data as $dd){
+
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+
+            $infoPresu = P_PresupUnidad::where('id', $dd->id_presup_unidad)->first();
+            $infoAnio = P_AnioPresupuesto::where('id', $infoPresu->id_anio)->first();
+            $infoDepa = P_Departamento::where('id', $infoPresu->id_departamento)->first();
+
+            $dd->aniopre = $infoAnio->nombre;
+            $dd->departamento = $infoDepa->nombre;
+        }
+
+        return view('backend.admin.presupuestounidad.requerimientos.pendientesaprobar.tablapendientesjefepresupuesto', compact('data'));
+    }
+
+    public function inforRequerimientosPendientesTabla(Request $request){
+
+        if(RequisicionUnidad::where('id', $request->id)->first()){
+
+            $lista = RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)->get();
+            $total = 0;
+
+            foreach ($lista as $dd){
+
+                $total += $dd->cantidad * $dd->dinero;
+
+                $infoMa = P_Materiales::where('id', $dd->id_material)->first();
+                $dd->matedescripcion = $infoMa->descripcion;
+
+                $infoObj = ObjEspecifico::where('id', $infoMa->id_objespecifico)->first();
+                $dd->objcodigo = $infoObj->codigo;
+            }
+
+            $total = number_format((float)$total, 2, '.', ',');
+
+            return ['success' => 1, 'lista' => $lista, 'total' => $total];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+    public function aprobarRequerimientosPendientes(Request $request){
+
+        if(RequisicionUnidad::where('id', $request->id)->first()){
+
+            RequisicionUnidad::where('id', $request->id)->update([
+                'req_revision' => 1, //APROBADA POR JEFE PRESUPUESTO
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    public function pdfRequerimientoUnidadMateriales($id){
+
+        // ID REQUERIMIENTO_UNIDAD
+
+        $infoReq = RequisicionUnidad::where('id', $id)->first();
+
+        $infoPresuUni = P_PresupUnidad::where('id', $infoReq->id_presup_unidad)->first();
+        $infoDepa = P_Departamento::where('id', $infoPresuUni->id_departamento)->first();
+
+        $fecha = date("d-m-Y", strtotime($infoReq->fecha));
+
+        $requiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $id)->get();
+
+        $costoTotalEstimado = 0;
+
+        $cantidad = 7;
+        $dataArray = array();
+        $array_merged = array();
+        $vuelta = 0;
+
+        foreach ($requiDetalle as $dd){
+            $vuelta += 1;
+
+            $infoMaterial = P_Materiales::where('id', $dd->id_material)->first();
+            $infoMedida = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+            $infoObj = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
+
+            $dd->unidadmedida = $infoMedida->nombre;
+            $dd->material = $infoMaterial->descripcion;
+            $dd->codigopres = $infoObj->codigo;
+
+            $multiFila = $dd->cantidad * $dd->dinero;
+
+            $costoTotalEstimado += $multiFila;
+
+            $dd->multifila = number_format((float)$multiFila, 2, '.', ',');
+            $dd->dinero = number_format((float)$dd->dinero, 2, '.', ',');
+
+
+            $dataArray[] = [
+                'cantidad' => $dd->cantidad,
+                'medida' => $infoMedida->nombre,
+                'descripcion' => $dd->material_descripcion,
+                'precio_u' => $dd->dinero,
+                'costofila' => $multiFila,
+                'codigopres' => $infoObj->codigo,
+            ];
+
+            // CANTIDAD POR HOJA
+            if($vuelta == $cantidad){
+                $array_merged[] = array_merge($dataArray);
+                $dataArray = array();
+                $vuelta = 0;
+            }
+        }
+
+        if(!empty($dataArray)){
+            $array_merged[] = array_merge($dataArray);
+        }
+
+
+        $costoTotalEstimado = number_format((float)$costoTotalEstimado, 2, '.', ',');
+
+
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        $mpdf->SetTitle('Requerimiento');
+        $stylesheet = file_get_contents('css/cssrequerimiento.css');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+        $logoalcaldia = 'images/logo.png';
+
+        foreach ($array_merged as $items => $items_value){
+
+            $tabla = "<div class='content'>
+            <img id='logoizq' src='$logoalcaldia'>
+            <p id='titulo'>ALCALDÍA MUNICIPAL DE METAPÁN <br>
+            REQUERIMIENTO <br>
+            </p>
+            <p style='text-align: right; margin-right: 13px;'>No.____________</p>
+            </div>";
+
+            $tabla .= "
+            <table >
+            <tbody>
+            <tr>
+                <th style='width: 20% ;font-weight: normal; text-align: right; font-size: 12px'>ACTA.___________</th>
+                <th style='width: 25% ;font-weight: normal; text-align: right; padding-right: 20px; font-size: 12px'>ACUERDO._______</th>
+                <th style='width: 30% ;font-weight: normal; text-align: right; font-size: 12px'>APROBACIÓN DE PROYECTO._______________&nbsp;&nbsp;</th>
+            </tr>";
+
+            $tabla .= "</tbody></table>";
+
+            $tabla .= "
+        <table id='tablaFor' style='width: 100%'>
+        <tbody>
+        <tr>
+            <td colspan='6' style='text-align: left; font-size:10px;'>NOMBRE O DESTINO DEL PROYECTO: <strong> $infoReq->destino </strong></td>
+        </tr>
+         <tr>
+            <td colspan='4' style='text-align: left; font-size:10px;'>DEPARTAMENTO: <strong> $infoDepa->nombre </strong></td>
+             <td colspan='2' style='text-align: left; font-size:10px;'>FECHA: <strong> $fecha </strong></td>
+        </tr>
+
+        <tr>
+            <td colspan='6' style='text-align: center; background: #b4b4b4; font-weight: bold; font-size:10px;'>DETALLE DE NECESIDAD</td>
+        </tr>
+          <tr>
+            <td colspan='6' style='text-align: left; font-size:10px; font-weight: bold'>$infoReq->necesidad</td>
+        </tr>
+          <tr>
+            <td colspan='6' style='text-align: center; background: #b4b4b4; font-weight: bold; font-size:10px;'>BIEN SOLICITADO</td>
+          </tr>
+
+          <tr>
+            <td style='text-align: center; padding-top: 3px; font-size:11px;'>CANTIDAD</td>
+            <td style='text-align: center; padding-top: 3px;font-size:11px;'>U. MEDIDA</td>
+            <td style='text-align: center; padding-top: 3px;font-size:11px;'>DESCRIPCION/ESPECIFICACION TECNICA DETALLADA</td>
+            <td style='text-align: center; padding-top: 3px;font-size:11px;'>PRECIO U.</td>
+            <td style='text-align: center;padding-top: 3px; font-size:11px;'>COSTO TOTAL ESTIMADO</td>
+            <td style='text-align: center; padding-top: 3px;font-size:11px;'>CODIGO PRES.</td>
+          </tr>
+          ";
+
+
+            foreach ($items_value as $item => $item_value){
+
+                $c_cantidad = $item_value['cantidad'];
+                $c_medida = $item_value['medida'];
+                $c_descripcion = $item_value['descripcion'];
+                $c_preciou = $item_value['precio_u'];
+                $c_costofila = $item_value['costofila'];
+                $c_codigopres = $item_value['codigopres'];
+
+                $tabla .=  "<tr>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_cantidad</td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_medida</td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_descripcion</td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'>$$c_preciou</td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'>$$c_costofila</td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_codigopres</td>
+          </tr>";
+
+
+            }
+
+            $tabla .=  "<tr>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'>$$costoTotalEstimado</td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
+          </tr>";
+
+
+
+            $tabla .= "</tbody></table>";
+
+
+            $tabla .= "
+        <table style='width: 100%; padding-top: 15px; margin-right: 16px; margin-left: 16px'>
+        <tbody>
+        <tr>
+            <td style='text-align: left; font-weight: bold; padding-top: 5px; font-size:11px;'>SOLICITA</td>
+            <td style='text-align: right; font-weight: bold; padding-top: 5px; font-size:11px;'>AUTORIZA</td>
+        </tr>
+
+        <tr>
+            <td style='text-align: left; font-size:11px; padding-top: 3px;'>FIRMA:_____________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 3px;'>FIRMA:____________________</td>
+        </tr>
+
+        <tr>
+            <td style='text-align: left; font-size:11px; padding-top: 5px;'>NOMBRE:_____________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>NOMBRE:____________________</td>
+        </tr>
+
+        <tr>
+            <td style='text-align: left; font-size:11px; padding-top: 5px;'></td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>JEFE:____________________</td>
+        </tr>
+
+        <tr>
+            <td colspan='2' style='text-align: center; font-weight: bold; font-size:11px; padding-top: 10px;'>REVISADO</td>
+
+        </tr>
+
+        <tr>
+            <td colspan='2' style='text-align: center; font-size:11px; padding-top: 11px;'>FIRMA:_____________________</td>
+        </tr>
+         <tr>
+            <td colspan='2' style='text-align: center; font-size:11px; padding-top: 10px;'>NOMBRE:___________________</td>
+        </tr>
+
+
+
+        <tr>
+            <td style='text-align: left; font-weight: bold; padding-top: 5px; font-size:11px;'>PRESUPUESTO</td>
+            <td style='text-align: right; font-weight: bold; padding-top: 5px; font-size:11px;'>RECIBE UACI</td>
+        </tr>
+
+        <tr>
+            <td style='text-align: left; font-size:11px; padding-top: 3px;'>FIRMA:_____________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 3px;'>FIRMA:____________________</td>
+        </tr>
+
+        <tr>
+            <td style='text-align: left; font-size:11px; padding-top: 5px;'>NOMBRE:_____________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>NOMBRE:____________________</td>
+        </tr>
+
+        <tr>
+            <td style='text-align: left; font-size:11px; padding-top: 5px;'>FECHA:____________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>FECHA:____________________</td>
+        </tr>
+
+        <tr>
+            <td style='text-align: left; font-size:11px; padding-top: 5px;'>HORA:____________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>HORA:____________________</td>
+        </tr>
+
+
+
+          ";
+
+
+            $tabla .= "</tbody></table>";
+
+            $mpdf->WriteHTML($stylesheet,1);
+            $mpdf->AddPage();
+            $mpdf->WriteHTML($tabla,2);
+        }
+
+        $mpdf->Output();
+    }
+
+
+
 
 }

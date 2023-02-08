@@ -89,6 +89,14 @@ Route::post('/admin/p/usuario/departamento/editar', [PermisoController::class, '
 Route::get('/admin/usuario/departamento-vista/index', [PermisoController::class,'indexUsuarioDepartamentoVista'])->name('admin.usuario.departamento.vista.index');
 Route::get('/admin/usuario/departamento-vista/tabla', [PermisoController::class,'tablaUsuarioDepartamentoVista']);
 
+// Para que jefe de presupuesto apruebe un requerimiento. esto da tiempo para que revise se hay dinero
+Route::get('/admin/presupuesto/verrequerimientos/pendientes', [CotizacionesUnidadController::class,'verRequerimientosPendientes'])->name('admin.requerimientos.esperar.validad.presupuesto');
+Route::get('/admin/presupuesto/verrequerimientos/pendientes/tabla', [CotizacionesUnidadController::class,'verRequerimientosPendientesTabla']);
+Route::post('/admin/presupuesto/verrequerimientos/pendientes/info', [CotizacionesUnidadController::class,'inforRequerimientosPendientesTabla']);
+Route::post('/admin/presupuesto/verrequerimientos/pendientes/aprobar', [CotizacionesUnidadController::class,'aprobarRequerimientosPendientes']);
+
+
+
 
 // --- ASIGNAR USUARIO SEA FORMULADOR ---
 // puede editar el proyecto y puede crear las partidas, y otro usuario puede solamente ver
@@ -1037,6 +1045,10 @@ Route::post('/admin/guardar/descargodirecto/tipo/contribucion', [DescargosDirect
 Route::get('/admin/descargos/directos/historial/index', [DescargosDirectosController::class,'indexDescargosDirectosHistorial'])->name('historial.descargos.directos');
 Route::get('/admin/descargos/directos/historial/tabla', [DescargosDirectosController::class,'tablaDescargosDirectosHistorial']);
 Route::post('/admin/descargos/directos/historial/informacion', [DescargosDirectosController::class,'informacionDescargosDirectosHistorial']);
+
+// generar pdf para que jefe de cada unidad lo pueda visualizar los materiales que ha solicitado en un nuevo requerimiento
+Route::get('/admin/p/generador/pdf/requisicion/{id}', [CotizacionesUnidadController::class,'pdfRequerimientoUnidadMateriales']);
+
 
 
 

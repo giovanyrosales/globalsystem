@@ -13,15 +13,15 @@
 
 #logoizq{
     float: left;
-    height : 93px;
-    width : 88px;
+    height : 85px;
+    width : 80px;
     margin-right: 20px;
 }
 
 #titulo{
     text-align: center;
-    font-size: 16px;
-    font-weight: bold;"
+    font-size: 22px;
+    font-weight: normal;"
 }
 
 #tablaFor {
@@ -30,7 +30,7 @@
     width: 100%;
     margin-left: 10px;
     margin-right: 10px;
-    margin-top: 35px;
+    margin-top: 10px;
     text-align: center;
 }
 
@@ -53,4 +53,15 @@
     color: #1E1E1E;
     text-align: left;
     font-size: 14px;
+}
+
+.page_break {
+    page-break-before: always;
+}
+
+@page {
+    margin-top: 8mm;
+    margin-bottom: 10mm;
+    margin-left: 5mm;
+    margin-right: 7mm;
 }

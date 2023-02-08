@@ -65,8 +65,19 @@
                             <p>Usuario Departamento</p>
                         </a>
                     </li>
-
                 @endcan
+
+                <!-- Para que jefe de presupuesto pueda aprobar los requerimientos. MIRA DE TODOS LOS AÑOS -->
+                @can('sidebar.requerimientos.pendientes.presupuesto')
+
+                    <li class="nav-item">
+                        <a href="{{ route('admin.requerimientos.esperar.validad.presupuesto') }}" target="frameprincipal" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Requerimientos Pendiente</p>
+                        </a>
+                    </li>
+                @endcan
+
 
                 <!-- ESTADISTICAS -->
                 @can('sidebar.estadisticas')

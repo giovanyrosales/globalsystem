@@ -37,7 +37,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
     public function indexRevisionPresupuestoUnidad(){
 
         $departamentos = P_Departamento::orderBy('nombre')->get();
-        $anios = P_AnioPresupuesto::orderBy('nombre')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
 
         return view('backend.admin.presupuestounidad.revisar.vistarevisar', compact('departamentos', 'anios'));
     }
@@ -45,7 +45,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
     // retorna vista para generar reportes y consolidado de presupuesto de unidades
     public function indexReportePresupuestoUnidad(){
         $departamentos = P_Departamento::orderBy('nombre')->get();
-        $anios = P_AnioPresupuesto::orderBy('nombre')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
 
         return view('backend.admin.presupuestounidad.reportes.vistareportespresupuestounidad', compact('departamentos', 'anios'));
     }
@@ -289,7 +289,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
             array_push($pilaAnios, $p->id_anio);
         }
 
-        $listado = P_AnioPresupuesto::whereIn('id', $pilaAnios)->get();
+        $listado = P_AnioPresupuesto::whereIn('id', $pilaAnios)->orderBy('nombre', 'DESC')->get();
 
         return view('backend.admin.presupuestounidad.editar.vistaanioeditarpresupuesto', compact('listado'));
     }

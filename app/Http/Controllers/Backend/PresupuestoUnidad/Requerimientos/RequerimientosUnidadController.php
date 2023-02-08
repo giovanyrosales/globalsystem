@@ -37,7 +37,7 @@ class RequerimientosUnidadController extends Controller
 
     // retornar vista para poder elegir año de presupuesto para solicitar requerimiento
     public function indexBuscarAñoPresupuesto(){
-        $anios = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
         return view('backend.admin.presupuestounidad.requerimientos.buscaraniopresupuesto.vistaaniorequerimiento', compact('anios'));
     }
 
@@ -313,6 +313,7 @@ class RequerimientosUnidadController extends Controller
             $r->destino = $request->destino;
             $r->fecha = $request->fecha;
             $r->necesidad = $request->necesidad;
+            $r->req_revision = 0; // NECESITA SER REVISADO POR PRESUPUESTO
             $r->save();
 
             for ($i = 0; $i < count($request->cantidad); $i++) {

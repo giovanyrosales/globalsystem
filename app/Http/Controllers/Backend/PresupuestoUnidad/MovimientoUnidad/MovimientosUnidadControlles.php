@@ -721,7 +721,7 @@ class MovimientosUnidadControlles extends Controller
     }
 
     public function indexMovimientoCuentaUnidadAprobadosAnio(){
-        $anios = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
 
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.historicoaprobado.vistaaniocuentahistoricounidad', compact('anios'));
     }
@@ -1525,7 +1525,7 @@ class MovimientosUnidadControlles extends Controller
 
 
     public function vistaAñoPresupuestoMaterialAprobados(){
-        $anios = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
 
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.aprobados.vistaaniosolicitudmaterialaprobados', compact('anios'));
     }

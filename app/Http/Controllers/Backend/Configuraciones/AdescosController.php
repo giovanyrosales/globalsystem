@@ -16,14 +16,14 @@ class AdescosController extends Controller
     // retorna vista de adescos
     public function indexAdescos(){
 
-        return view('Backend.Admin.Configuraciones.adescos.vistaAdescos');
+        return view('backend.admin.configuraciones.adescos.vistaadescos');
     }
 
     // retorna tabla de adescos
     public function tablaAdescos(){
         $lista = Adescos::orderBy('nombre', 'ASC')->get();
 
-        return view('Backend.Admin.Configuraciones.adescos.tablaAdescos', compact('lista'));
+        return view('backend.admin.configuraciones.adescos.tablaadescos', compact('lista'));
     }
 
     // registrar una nueva adesco

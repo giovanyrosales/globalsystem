@@ -21,6 +21,10 @@ class CreateRequisicionUnidadTable extends Migration
             $table->date('fecha');
             $table->text('necesidad')->nullable();
 
+            // CUANDO SE CREA UN REQUERIMIENTO, DEBE REVISARLO PRESUPUESTO PARA QUE PASE A UACI
+            $table->boolean('req_revision');
+
+
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
         });
     }

@@ -91,9 +91,6 @@
 
                         <div class="card-body">
 
-
-
-
                             <div class="row">
                                 <div class="col-md-12">
                                     <div id="tablaDatatableRequisicion">
@@ -315,7 +312,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Solicitud de Materialx</h4>
+                    <h4 class="modal-title">Solicitud de Material</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1403,6 +1400,15 @@
             let id = {{ $idpresubunidad }}; // ID presup_unidad
             window.location.href="{{ url('/admin/p/movicuentaunidad/solicitud/material') }}/" + id;
         }
+
+
+        function vistaPDFRequerimiento(id){
+            // ID DE requisicion_unidad
+
+            window.open("{{ URL::to('admin/p/generador/pdf/requisicion') }}/" + id);
+        }
+
+
 
 
     </script>
