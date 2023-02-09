@@ -18,6 +18,7 @@ use App\Models\P_ProyectosAprobados;
 use App\Models\P_UnidadMedida;
 use App\Models\Rubro;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportesPresupuestoUnidadController extends Controller
@@ -29,6 +30,19 @@ class ReportesPresupuestoUnidadController extends Controller
 
     // retornar PDF con los totales, se envía el ID año
     public function generarTotalesPdfPresupuesto($idanio){
+
+        /*$dato = DB::table('cuenta_unidad AS cn')
+            ->join('p_presup_unidad AS pp', 'cn.id_presup_unidad', '=', 'pp.id')
+            ->join('obj_especifico AS obj', 'cn.id_objespeci', '=', 'obj.id')
+            ->join('cuenta AS cuen', 'obj.id_cuenta', '=', 'cuen.id')
+            ->join('rubro AS rb', 'cuen.id_rubro', '=', 'rb.id')
+            ->select('cn.saldo_inicial', 'pp.id_anio')
+            ->where('rb.id', 5)
+            ->where('pp.id_anio', 2)
+            ->sum('saldo_inicial');
+
+        return [$dato];*/
+
 
         // obtener todos los departamentos, que han creado el presupuesto
         $arrayPresupuestoUni = P_PresupUnidad::where('id_anio', $idanio)
@@ -201,12 +215,14 @@ class ReportesPresupuestoUnidadController extends Controller
                                 break;
                             }
                         }
+                    }
 
-                        foreach ($listadoProyectoAprobados as $lpa){
 
-                            if ($ll->codigo == $lpa->codigoobj){
-                                $sumaObjeto += $lpa->costo;
-                            }
+                    foreach ($listadoProyectoAprobados as $lpa){
+
+                        // codigo de objeto especifico Comparando con
+                        if ($ll->id == $lpa->id_objespeci){
+                            $sumaObjeto += $lpa->costo;
                         }
                     }
 
@@ -233,6 +249,9 @@ class ReportesPresupuestoUnidadController extends Controller
             $resultsBloque[$index]->cuenta = $subSecciones;
             $index++;
         }
+
+
+
 
         $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
@@ -365,6 +384,8 @@ class ReportesPresupuestoUnidadController extends Controller
 
     // retorna PDF con el consolidado, todos los presupuestos ya están aprobados
     public function generarConsolidadoPdfPresupuesto($anio){
+
+
 
         $rubro = Rubro::orderBy('codigo')->get();
 
