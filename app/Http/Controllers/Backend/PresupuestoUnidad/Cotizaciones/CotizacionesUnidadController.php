@@ -917,22 +917,15 @@ class CotizacionesUnidadController extends Controller
             <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_codigopres</td>
           </tr>";
 
-
             }
 
             $tabla .=  "<tr>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'>$$costoTotalEstimado</td>
+            <td colspan='4' style='text-align: center; font-size:12px;padding-top: 1px'><strong>TOTAL</strong></td>
+            <td style='text-align: center; font-size:12px;padding-top: 0px'><strong> $$costoTotalEstimado </strong></td>
             <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
           </tr>";
 
-
-
             $tabla .= "</tbody></table>";
-
 
             $tabla .= "
         <table style='width: 100%; padding-top: 15px; margin-right: 16px; margin-left: 16px'>
@@ -943,18 +936,18 @@ class CotizacionesUnidadController extends Controller
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 3px;'>FIRMA:_____________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 3px;'>FIRMA:____________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 3px;'>FIRMA:___________________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 3px;'>FIRMA:_________________________________</td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 5px;'>NOMBRE:_____________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>NOMBRE:____________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 5px;'>NOMBRE:_________________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>NOMBRE:_________________________________</td>
         </tr>
 
         <tr>
             <td style='text-align: left; font-size:11px; padding-top: 5px;'></td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>JEFE:____________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>JEFE:__________________________________</td>
         </tr>
 
         <tr>
@@ -963,10 +956,10 @@ class CotizacionesUnidadController extends Controller
         </tr>
 
         <tr>
-            <td colspan='2' style='text-align: center; font-size:11px; padding-top: 11px;'>FIRMA:_____________________</td>
+            <td colspan='2' style='text-align: center; font-size:11px; padding-top: 11px;'>FIRMA:_____________________________</td>
         </tr>
          <tr>
-            <td colspan='2' style='text-align: center; font-size:11px; padding-top: 10px;'>NOMBRE:___________________</td>
+            <td colspan='2' style='text-align: center; font-size:11px; padding-top: 10px;'>NOMBRE:___________________________</td>
         </tr>
 
 
@@ -977,23 +970,23 @@ class CotizacionesUnidadController extends Controller
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 3px;'>FIRMA:_____________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 3px;'>FIRMA:____________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 3px;'>FIRMA:____________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 3px;'>FIRMA:____________________________</td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 5px;'>NOMBRE:_____________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>NOMBRE:____________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 5px;'>NOMBRE:_________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>NOMBRE:____________________________</td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 5px;'>FECHA:____________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>FECHA:____________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 5px;'>FECHA:___________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>FECHA:______________________________</td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 5px;'>HORA:____________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>HORA:____________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 5px;'>HORA:____________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 5px;'>HORA:______________________________</td>
         </tr>
 
 
