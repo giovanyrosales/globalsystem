@@ -204,7 +204,7 @@ class OrdenCompraUnidadController extends Controller
     }
 
     public function vistaAñoOrdenesComprasUnidadesAprobadas(){
-        $anios = P_AnioPresupuesto::orderBy('id', 'ASC')->get();
+        $anios = P_AnioPresupuesto::orderBy('id', 'DESC')->get();
 
         return view('backend.admin.presupuestounidad.ordenes.ordenesaprobadas.vistaanioordenesaprobadasunidades', compact('anios'));
     }
@@ -331,7 +331,7 @@ class OrdenCompraUnidadController extends Controller
 
     // seleccion de año para mostrar ordenes de compra denegadas para unidades
     public function vistaAñoOrdenesComprasUnidadesDenegadas(){
-        $anios = P_AnioPresupuesto::orderBy('id', 'ASC')->get();
+        $anios = P_AnioPresupuesto::orderBy('id', 'DESC')->get();
 
         return view('backend.admin.presupuestounidad.ordenes.ordenesdenegadas.vistaanioordenesdenegadasunidades', compact('anios'));
     }
@@ -408,14 +408,7 @@ class OrdenCompraUnidadController extends Controller
             $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $de->id_requi_unidaddetalle)->first();
             $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
 
-            /*if($infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
-                $de->nombrematerial = $infoRequiDetalle->material_descripcion . " - " . $infoUnidad->nombre;
-            }else{
-
-            }*/
-
             $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
-            $de->nombrematerial = $infoRequiDetalle->material_descripcion;
             $de->unidadmedida = $infoUnidad->nombre;
 
             $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();

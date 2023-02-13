@@ -415,6 +415,7 @@ class RequerimientosUnidadController extends Controller
                     $rDetalle->material_descripcion = $request->materialDescriptivo[$i];
                     $rDetalle->estado = 0;
                     $rDetalle->dinero = $infoCatalogo->costo; // lo que vale el material en ese momento
+                    $rDetalle->dinero_fijo = $infoCatalogo->costo; // lo que vale el material en ese momento
                     $rDetalle->cancelado = 0;
                     $rDetalle->save();
 

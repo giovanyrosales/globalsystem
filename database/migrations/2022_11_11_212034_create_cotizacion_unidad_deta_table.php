@@ -24,6 +24,10 @@ class CreateCotizacionUnidadDetaTable extends Migration
             // 0: SIN USO POR EL MOMENTO
             $table->integer('estado');
 
+
+            // LA COTIZACION HECHA POR UACI LLEVA SU PROPIA DESCRIPCION DE LA COTIZACION
+            $table->string('descripcion', 300);
+
             $table->foreign('id_cotizacion_unidad')->references('id')->on('cotizacion_unidad');
             $table->foreign('id_requi_unidaddetalle')->references('id')->on('requisicion_unidad_detalle');
         });

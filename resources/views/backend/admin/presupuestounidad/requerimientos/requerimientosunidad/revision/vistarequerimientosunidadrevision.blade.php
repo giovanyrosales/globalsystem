@@ -151,10 +151,11 @@
                                         <th style="width: 5%">Cantidad</th>
                                         <th style="width: 12%">Descripción Material</th>
                                         <th style="width: 5%">Medida</th>
-                                        <th style="width: 5%">Precio U.</th>
-                                        <th style="width: 5%">Total</th>
+                                        <th style="width: 5%">Precio U. ($)</th>
+                                        <th style="width: 5%">Total ($)</th>
                                         <th style="width: 8%">Cod. Presup</th>
                                     </tr>
+
                                     </thead>
                                     <tbody>
 
@@ -210,62 +211,6 @@
     </script>
 
     <script>
-
-        function recargar(){
-            var ruta = "{{ URL::to('/admin/p/requerimientos/pendiente/unidad/tabla') }}";
-            $('#tablaDatatable').load(ruta);
-        }
-
-        function informacion(id){
-           // id requisicion unidad
-
-            document.getElementById("formulario-cotizar-nuevo").reset();
-            $('#select-proveedor').prop('selectedIndex', 0).change();
-            document.getElementById("mySideToSideSelect").options.length = 0;
-            document.getElementById("mySideToSideSelect_to").options.length = 0;
-
-            openLoading();
-
-            axios.post(url+'/p/requerimientos/listado/cotizar/info', {
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        $('#modalCotizar').modal('show');
-                        // ID: es el id de REQUISICION
-                        $('#idcotizar').val(id);
-                        $('#destino').val(response.data.info.destino);
-                        $('#necesidad').val(response.data.info.necesidad);
-
-                        var fecha = new Date();
-                        document.getElementById('fecha-cotizacion').value = fecha.toJSON().slice(0,10);
-
-                        // ID ES DE: REQUISICION_DETALLE
-                        $.each(response.data.listado, function( key, val ){
-                            $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.material_descripcion+'</option>');
-                        });
-                    }
-                    else {
-                        toastr.error('Error al buscar');
-                    }
-
-                })
-                .catch((error) => {
-                    toastr.error('Error al buscar');
-                    closeLoading();
-                });
-
-        }
-
-
-        function removeOptionsFromSelect(selectElement) {
-            var i, L = selectElement.options.length - 1;
-            for(i = L; i >= 0; i--) {
-                selectElement.remove(i);
-            }
-        }
 
 
         function detalleCotizacion(){
@@ -346,6 +291,7 @@
 
                                 "<td>"+
                                 "<p id='fila"+(i+1)+"' class='form-control' style='max-width: 65px'>"+(i+1)+"</p>"+
+                                "<input type='hidden' name='idfila[]' value='"+infodetalle[i].id+"' class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
@@ -353,7 +299,7 @@
                                 "</td>"+
 
                                 "<td>"+
-                                "<input value='"+infodetalle[i].material_descripcion+"' disabled class='form-control'>"+
+                                "<input name='descripmaterial[]' value='"+infodetalle[i].material_descripcion+"' maxlength='300' class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
@@ -361,57 +307,23 @@
                                 "</td>"+
 
                                 "<td>"+
-                                "<input value='$"+infodetalle[i].pu+"' disabled class='form-control'>"+
+                                "<input name='unidades[]' class='form-control' type='number' onchange='multiplicar(this)'>"+
+                                "</td>"+
+
+
+                                "<td>"+
+                                "<input name='total[]' value='' disabled class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
-                                "<input value='$"+infodetalle[i].multiTotal+"' disabled class='form-control'>"+
+                                "<input  value='"+infodetalle[i].codigo+"' disabled class='form-control'>"+
                                 "</td>"+
 
-                                "<td>"+
-                                "<input value='"+infodetalle[i].codigo+"' disabled class='form-control'>"+
-                                "</td>"+
 
                                 "</tr>";
 
                             $("#matriz-requisicion tbody").append(markup);
                         }
-
-                        // TOTAL (CANTIDAD * PRECIO UNITARIO)
-
-                        var markup = "<tr id=''>"+
-
-                            "<td>"+
-                            "<p class='form-control' style='max-width: 65px'>Total</p>"+
-                            "</td>"+
-
-                            "<td>"+
-                            "<input value='"+response.data.totalCantidad+"' disabled class='form-control'>"+
-                            "</td>"+
-
-                            "<td>"+
-                            "<input value='' disabled class='form-control'>"+
-                            "</td>"+
-
-                            "<td>"+
-                            "<input value='' disabled class='form-control'>"+
-                            "</td>"+
-
-                            "<td>"+
-                            "<input value='' disabled class='form-control'>"+
-                            "</td>"+
-
-                            "<td>"+
-                            "<input value='$"+response.data.totalMulti+"' disabled class='form-control'>"+
-                            "</td>"+
-
-                            "<td>"+
-                            "<input value='' disabled class='form-control'>"+
-                            "</td>"+
-
-                            "</tr>";
-
-                        $("#matriz-requisicion tbody").append(markup);
 
                         $('#modalDetalle').css('overflow-y', 'auto');
                         $('#modalDetalle').modal({backdrop: 'static', keyboard: false})
@@ -443,6 +355,63 @@
             });
         }
 
+
+        function recargar(){
+            var ruta = "{{ URL::to('/admin/p/requerimientos/pendiente/unidad/tabla') }}";
+            $('#tablaDatatable').load(ruta);
+        }
+
+        function informacion(id){
+           // id requisicion unidad
+
+            document.getElementById("formulario-cotizar-nuevo").reset();
+            $('#select-proveedor').prop('selectedIndex', 0).change();
+            document.getElementById("mySideToSideSelect").options.length = 0;
+            document.getElementById("mySideToSideSelect_to").options.length = 0;
+
+            openLoading();
+
+            axios.post(url+'/p/requerimientos/listado/cotizar/info', {
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalCotizar').modal('show');
+                        // ID: es el id de REQUISICION
+                        $('#idcotizar').val(id);
+                        $('#destino').val(response.data.info.destino);
+                        $('#necesidad').val(response.data.info.necesidad);
+
+                        var fecha = new Date();
+                        document.getElementById('fecha-cotizacion').value = fecha.toJSON().slice(0,10);
+
+                        // ID ES DE: REQUISICION_DETALLE
+                        $.each(response.data.listado, function( key, val ){
+                            $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.material_descripcion+'</option>');
+                        });
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
+
+        }
+
+
+        function removeOptionsFromSelect(selectElement) {
+            var i, L = selectElement.options.length - 1;
+            for(i = L; i >= 0; i--) {
+                selectElement.remove(i);
+            }
+        }
+
         function guardarCotizacion(){
 
             var fecha = document.getElementById('fecha-cotizacion').value;
@@ -459,6 +428,70 @@
                 hayLista = false;
                 formData.append('lista[]', $(this).val());
             });
+
+            var unidades = $("input[name='unidades[]']").map(function(){return $(this).val();}).get();
+            var idfila = $("input[name='idfila[]']").map(function(){return $(this).val();}).get();
+
+            var descripmaterial = $("input[name='descripmaterial[]']").map(function(){return $(this).val();}).get();
+
+
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+            for(var a = 0; a < unidades.length; a++){
+
+                var datoUnidades = unidades[a];
+
+                if(datoUnidades == ''){
+                    modalMensaje('Fila #' + a+1, 'Precio Unitario es requerido');
+                    return;
+                }
+
+                if(!datoUnidades.match(reglaNumeroDecimal)) {
+                    modalMensaje('Fila #' + a+1, 'Precio Unitario debe ser número Decimal Positivo. Solo se permite 2 Decimales');
+                    return;
+                }
+
+                if(datoUnidades <= 0){
+                    modalMensaje('Fila #' + a+1, 'Precio Unitario no debe ser negativo o cero');
+                    return;
+                }
+
+                if(datoUnidades > 1000000){
+                    modalMensaje('Fila #' + a+1, 'Precio Unitario máximo 1 millón');
+                    return;
+                }
+            }
+
+
+            for(var d = 0; d < descripmaterial.length; d++){
+
+                var datoDescripcion = descripmaterial[d];
+
+                if(datoDescripcion == ''){
+                    modalMensaje('Fila #' + d+1, 'Descripción Material es requerido');
+                    return;
+                }
+
+                if(datoDescripcion.length > 300){
+                    modalMensaje('Fila #' + d+1, 'Descripción Material máximo 1 millón');
+                    return;
+                }
+            }
+
+
+            for(var z = 0; z < unidades.length; z++){
+
+                // el precio unitario del material a cotizar
+                formData.append('unidades[]', unidades[z]);
+
+                // como tiene mismo tamaño el arreglo, puede recorrer igual size
+                // RequisicionUnidadDetalle
+                formData.append('idfila[]', idfila[z]);
+
+                // como tiene mismo tamaño el arreglo, puede recorrer igual size
+                // la descripcion del material escrito por uaci
+                formData.append('descripmate[]', descripmaterial[z]);
+            }
 
             openLoading();
 
@@ -586,6 +619,71 @@
                     toastr.error('Error al guardar');
                 });
         }
+
+
+        function modalMensaje(titulo, mensaje){
+            Swal.fire({
+                title: titulo,
+                text: mensaje,
+                icon: 'info',
+                showCancelButton: false,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Aceptar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                }
+            });
+        }
+
+
+
+        function multiplicar(e){
+
+            var table = e.parentNode.parentNode; // fila de la tabla
+            var cantidad = table.cells[1].children[0]; // cantidad
+            var precio = table.cells[4].children[0]; // precio
+            var total = table.cells[5].children[0]; // total
+
+            var boolPasa = false;
+
+            // validar que unidades y periodo existan para calcular total
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
+
+            if(precio.value.length > 0) {
+                // validar
+
+                if(!precio.value.match(reglaNumeroDosDecimal)) {
+                    modalMensaje('Error', 'Precio Unitario debe ser número Decimal Positivo. Solo se permite 2 Decimales');
+                    return;
+                }
+
+                if(precio.value <= 0){
+                    modalMensaje('Error', 'Precio Unitario no debe ser negativo o cero');
+                    return;
+                }
+
+                if(precio.value > 1000000){
+                    modalMensaje('Error', 'Precio Unitario máximo 1 millón');
+                    return;
+                }
+
+                boolPasa = true;
+            }
+
+            if(boolPasa){
+
+                var val1 = cantidad.value;
+                var val2 = precio.value;
+                var valTotal = (val1 * val2);
+
+                total.value = '$' + Number(valTotal).toFixed(2);
+            }else{
+                total.value = '';
+            }
+        }
+
+
 
 
     </script>

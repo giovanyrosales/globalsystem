@@ -88,7 +88,7 @@
                                 <tr>
                                     <td><p id="fila{{$dd->conteo}}" class='form-control'>{{$dd->conteo}}</p></td>
                                     <td><input disabled class="form-control" value="{{$dd->cantidad}}"></td>
-                                    <td><input disabled class="form-control" type="text" value="{{$dd->nombrematerial}}"></td>
+                                    <td><input disabled class="form-control" type="text" value="{{$dd->descripcion}}"></td>
                                     <td><input disabled class="form-control" type="text" value="{{$dd->unidadmedida}}"></td>
                                     <td><input disabled class="form-control" value="${{$dd->precio_u }}"></td>
                                     <td><input disabled class="form-control" value="${{$dd->total }}"></td>

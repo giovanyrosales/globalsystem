@@ -123,7 +123,6 @@ class CotizacionesUnidadController extends Controller
             ->get();
 
         $totalCantidad = 0;
-        $totalPrecio = 0;
         $totalMulti = 0;
 
         foreach ($info as $dd){
@@ -131,37 +130,24 @@ class CotizacionesUnidadController extends Controller
             $infoUnidad = P_UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
             $infoCodigo = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
 
-            // ACTUALIZAR PRECIO
-            RequisicionUnidadDetalle::where('id', $dd->id)->update([
-                'dinero' => $infoCatalogo->costo
-            ]);
-
             $dd->nombre = $infoCatalogo->descripcion;
-            $dd->pu = $infoCatalogo->costo;
             $dd->medida = $infoUnidad->nombre;
             $dd->codigo = $infoCodigo->codigo . " - " . $infoCodigo->nombre;
 
-            $multi = $dd->cantidad * $infoCatalogo->costo;
-            $totalMulti = $totalMulti + $multi;
-
-            $dd->multiTotal = number_format((float)$multi, 2, '.', ',');
-
-            $totalCantidad = $totalCantidad + $dd->cantidad;
-            $totalPrecio = $totalPrecio + $infoCatalogo->costo;
         }
 
         $totalCantidad = number_format((float)$totalCantidad, 2, '.', ',');
-        $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
         $totalMulti = number_format((float)$totalMulti, 2, '.', ',');
 
         return ['success' => 2, 'lista' => $info,
             'totalCantidad' => $totalCantidad,
-            'totalPrecio' => $totalPrecio,
+            //'totalPrecio' => $totalPrecio,
             'totalMulti' => $totalMulti];
     }
 
     // guardar cotización para requerimiento de unidad
     public function guardarNuevaCotizacionRequeriUnidad(Request $request){
+
 
         DB::beginTransaction();
 
@@ -194,22 +180,31 @@ class CotizacionesUnidadController extends Controller
             $coti->estado = 0;
             $coti->save();
 
-            // obtener todos los materiales de id requisiciín detalle
-            $arrayRequiDetalle = RequisicionUnidadDetalle::whereIn('id', $request->lista)
-                ->orderBy('id', 'ASC')
-                ->get();
+            // ACTUALIZAR PRECIO DE CATALOGO DE MATERIALES
+            for ($j = 0; $j < count($request->idfila); $j++) {
 
-            foreach ($arrayRequiDetalle as $datainfo){
+                if($inrequiuni = RequisicionUnidadDetalle::where('id', $request->idfila[$j])->first()) {
+
+                    P_Materiales::where('id', $inrequiuni->id_material)->update([
+                        'costo' => $request->unidades[$j], // obtenido del array,
+                    ]);
+                }
+            }
+
+            //foreach ($arrayRequiDetalle as $datainfo){
+            for ($j = 0; $j < count($request->lista); $j++) {
+
+                $infoRequiDetl = RequisicionUnidadDetalle::where('id', $request->lista[$j])->first();
 
                 // MATERIAL A COTIZAR FUE CANCELADO
-                if($datainfo->cancelado == 1){
+                if($infoRequiDetl->cancelado == 1){
                     return ['success' => 4];
                 }
 
-                if(CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $datainfo->id)->first()){
+                if(CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $infoRequiDetl->id)->first()){
 
                     // como ese material puede estar en multiples cotizaciones
-                    $arrayCotiDetalle = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $datainfo->id)
+                    $arrayCotiDetalle = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $infoRequiDetl->id)
                         ->select('id_cotizacion_unidad')
                         ->get();
 
@@ -245,7 +240,7 @@ class CotizacionesUnidadController extends Controller
                 // **** VERIFICACIÓN DE SALDOS PORQUE LA COTIZACIÓN PUEDE CAMBIAR EL COSTO DEL MATERIAL
                 // SE RESERVO X DINERO PERO AQUÍ PUEDE VALER MAS QUE LO RESERVADO
 
-                $infoCatalogo = P_Materiales::where('id', $datainfo->id_material)->first();
+                $infoCatalogo = P_Materiales::where('id', $infoRequiDetl->id_material)->first();
 
                 $infoObjeto = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
                 $infoUnidad = P_UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
@@ -303,11 +298,12 @@ class CotizacionesUnidadController extends Controller
                 // aquí se obtiene el Saldo Restante del código
                 $totalRestanteSaldo = $totalMoviCuenta + ($infoCuentaUnidad->saldo_inicial - $totalRestante);
 
-
                 // verificar cantidad * dinero del material nuevo
-                $saldoMaterial = $datainfo->cantidad * $infoCatalogo->costo;
+                $saldoMaterial = $infoRequiDetl->cantidad * $infoCatalogo->costo;
 
                 // ************* NO SE RESTA EL SALDO RETENIDO. SOLO SE VERIFICA QUE HAYA SALDO RESTANTE.
+
+
 
                 // verificar si alcanza el saldo para guardar la cotización
                 if($this->redondear_dos_decimal($totalRestanteSaldo) < $this->redondear_dos_decimal($saldoMaterial)){
@@ -337,18 +333,19 @@ class CotizacionesUnidadController extends Controller
 
                     $detalle = new CotizacionUnidadDetalle();
                     $detalle->id_cotizacion_unidad = $coti->id;
-                    $detalle->id_requi_unidaddetalle = $datainfo->id;
-                    $detalle->cantidad = $datainfo->cantidad;
+                    $detalle->id_requi_unidaddetalle = $infoRequiDetl->id;
+                    $detalle->cantidad = $infoRequiDetl->cantidad;
                     $detalle->precio_u = $infoCatalogo->costo;
                     $detalle->estado = 0;
+                    $detalle->descripcion = $request->descripmate[$j];
                     $detalle->save();
 
                     // cambiar estado de requisiciones detalle porque ya fueron cotizadas
-                    RequisicionUnidadDetalle::where('id', $datainfo->id)->update([
+                    RequisicionUnidadDetalle::where('id', $infoRequiDetl->id)->update([
                         'estado' => 1,
                     ]);
                 }
-            } // end foreach
+            } // end for
 
             DB::commit();
             return ['success' => 5];
@@ -369,7 +366,7 @@ class CotizacionesUnidadController extends Controller
 
     public function indexAnioCotiUnidadPendiente(){
 
-        $anios = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
 
         return view('backend.admin.presupuestounidad.cotizaciones.pendientes.vistaaniocotiunidadpendiente', compact('anios'));
     }
@@ -507,7 +504,7 @@ class CotizacionesUnidadController extends Controller
     //**** AUTORIZADAS
 
     public function indexAnioCotiUnidadAutorizada(){
-        $anios = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
         return view('backend.admin.presupuestounidad.cotizaciones.procesada.vistaaniocotiunidadprocesada', compact('anios'));
     }
 
@@ -603,7 +600,7 @@ class CotizacionesUnidadController extends Controller
     //**** DENEGADAS
 
     public function indexAnioCotiUnidadDenegadas(){
-        $anios = P_AnioPresupuesto::orderBy('nombre', 'ASC')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
         return view('backend.admin.presupuestounidad.cotizaciones.denegadas.vistaaniocotiunidaddenegadas', compact('anios'));
     }
 
@@ -804,19 +801,19 @@ class CotizacionesUnidadController extends Controller
             $dd->material = $infoMaterial->descripcion;
             $dd->codigopres = $infoObj->codigo;
 
-            $multiFila = $dd->cantidad * $dd->dinero;
+            $multiFila = $dd->cantidad * $dd->dinero_fijo;
 
             $costoTotalEstimado += $multiFila;
 
             $dd->multifila = number_format((float)$multiFila, 2, '.', ',');
-            $dd->dinero = number_format((float)$dd->dinero, 2, '.', ',');
+            $dd->dinero_fijo = number_format((float)$dd->dinero_fijo, 2, '.', ',');
 
 
             $dataArray[] = [
                 'cantidad' => $dd->cantidad,
                 'medida' => $infoMedida->nombre,
                 'descripcion' => $dd->material_descripcion,
-                'precio_u' => $dd->dinero,
+                'precio_u' => $dd->dinero_fijo,
                 'costofila' => $multiFila,
                 'codigopres' => $infoObj->codigo,
             ];
