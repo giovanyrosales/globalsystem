@@ -41,11 +41,6 @@ class CreateRequisicionUnidadDetalleTable extends Migration
             // ayuda para volver a cotizarlo si fue denegado la cotización
             $table->boolean('estado');
 
-
-            // Descripción. Ingresada al crear la cotización
-            $table->string('descripcion', 300);
-
-
             $table->foreign('id_requisicion_unidad')->references('id')->on('requisicion_unidad');
             $table->foreign('id_material')->references('id')->on('p_materiales');
         });
