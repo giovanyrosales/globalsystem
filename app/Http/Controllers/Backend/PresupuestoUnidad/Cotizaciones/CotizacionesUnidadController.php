@@ -830,7 +830,6 @@ class CotizacionesUnidadController extends Controller
             $array_merged[] = array_merge($dataArray);
         }
 
-
         $costoTotalEstimado = number_format((float)$costoTotalEstimado, 2, '.', ',');
 
 

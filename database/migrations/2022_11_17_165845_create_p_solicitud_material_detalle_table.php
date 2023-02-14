@@ -23,41 +23,11 @@ class CreatePSolicitudMaterialDetalleTable extends Migration
             // id presupuesto unidad
             $table->bigInteger('id_presup_unidad')->unsigned();
 
-            // id cuenta unidad que subio dinero
-            $table->bigInteger('id_cuentaunidad_sube')->unsigned();
-
-            // id cuenta unidad que bajo dinero
-            $table->bigInteger('id_cuentaunidad_baja')->unsigned();
-
-
-            // unidades que solicito
-            $table->decimal('unidades', 10, 2);
-
-            // periodo que solicito
-            $table->integer('periodo');
-
-            // Este es el dinero que tenía tabla CUENTA UNIDAD antes de SUBIR DINERO SOLICITADO
-            // COPIAS
-            $table->decimal('copia_saldoini_antes_subir', 10, 2);
-
-            // Este es el dinero que tenía tabla CUENTA UNIDAD antes de BAJAR DINERO SOLICITADO
-            // COPIAS
-            $table->decimal('copia_saldoini_antes_bajar', 10, 2);
-
-            // dinero que subio. seria el precio unitario del material en ese momento
-            $table->decimal('dinero_solicitado', 10, 2);
-
-            // 0: esta cuenta unidad ya existia
-            // 1: la cuenta unidad fue creada
-            $table->boolean('cuenta_creada');
-
             // cuando fue aprobada la solicitud
             $table->dateTime('fechahora');
 
             $table->foreign('id_material')->references('id')->on('p_materiales');
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
-            $table->foreign('id_cuentaunidad_sube')->references('id')->on('cuenta_unidad');
-            $table->foreign('id_cuentaunidad_baja')->references('id')->on('cuenta_unidad');
         });
     }
 

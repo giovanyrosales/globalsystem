@@ -859,8 +859,7 @@ class MovimientosUnidadControlles extends Controller
         foreach ($lista as $dd) {
 
             $infoMaterial = P_Materiales::where('id', $dd->id_material)->first();
-            $infoCuenta = CuentaUnidad::where('id', $dd->id_cuentaunidad)->first();
-            $infoObj = ObjEspecifico::where('id', $infoCuenta->id_objespeci)->first();
+            $infoObj = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
 
             $dd->material = $infoMaterial->descripcion;
             $dd->objnombre = $infoObj->codigo . ' - ' . $infoObj->nombre;
@@ -955,7 +954,7 @@ class MovimientosUnidadControlles extends Controller
             ->join('p_materiales AS m', 'ppu.id_material', '=', 'm.id')
             ->select('m.id_objespecifico')
             ->where('ppu.id_presup_unidad', $request->idpresup)
-            ->whereNotIn('m.id_objespecifico', [$lista->id_objespecifico])
+            //->whereNotIn('m.id_objespecifico', [$lista->id_objespecifico])
             ->groupBy('m.id_objespecifico')
             ->get();
 
@@ -1050,11 +1049,8 @@ class MovimientosUnidadControlles extends Controller
     public function guardarSolicitudMaterialUnidad(Request $request){
 
         $regla = array(
-            'idobj' => 'required', // ID objeto específico
             'idpresup' => 'required',
             'idmaterial' => 'required',
-            'cantidad' => 'required',
-            'periodo' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -1067,90 +1063,20 @@ class MovimientosUnidadControlles extends Controller
 
         try {
 
-            if ($lista = CuentaUnidad::where('id_presup_unidad', $request->idpresup)
-                ->where('id_objespeci', $request->idobj)
-                ->first()) {
+            // guardar ya
+            $deta = new P_SolicitudMaterial();
+            $deta->id_presup_unidad = $request->idpresup;
+            $deta->id_material = $request->idmaterial;
+            $deta->cantidad = 0;
+            $deta->periodo = 0;
+            $deta->fechahora = Carbon::now('America/El_Salvador');
+            $deta->save();
 
-                $totalRestante = 0;
-                $totalRetenido = 0;
+            DB::commit();
+            return ['success' => 1];
 
-                $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $lista->id)
-                    ->where('autorizado', 1) // autorizado por presupuesto
-                    ->sum('dinero');
-
-                $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $lista->id)
-                    ->where('autorizado', 1) // autorizado por presupuesto
-                    ->sum('dinero');
-
-                $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
-
-                // obtener saldos restante
-                $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                    ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.id_cuenta_unidad', $lista->id)
-                    ->where('rd.cancelado', 0)
-                    ->get();
-
-                foreach ($arrayRestante as $dd) {
-                    $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
-                }
-
-                // información de saldos retenidos
-                $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                    ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                    ->where('psr.id_cuenta_unidad', $lista->id)
-                    ->where('rd.cancelado', 0)
-                    ->get();
-
-                foreach ($arrayRetenido as $dd) {
-                    $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-                }
-
-                // aquí se obtiene el Saldo Restante del código
-                $totalRestanteSaldo = $totalMoviCuenta + ($lista->saldo_inicial - $totalRestante);
-
-                // se debe quitar el retenido
-                $totalCalculado = $totalRestanteSaldo - $totalRetenido;
-
-                // obtener dinero
-                $infoMaterial = P_Materiales::where('id', $request->idmaterial)->first();
-
-                // periodo siempre sera mínimo 1
-                $totalMaterial = ($infoMaterial->costo * $request->cantidad) * $request->periodo;
-
-                // ver que haya saldo disponible
-                if($this->redondear_dos_decimal($totalCalculado) < $this->redondear_dos_decimal($totalMaterial)){
-
-                    // saldo insuficiente.
-
-                    $totalMaterial = number_format((float)$totalMaterial, 2, '.', ',');
-                    $totalCalculado = number_format((float)$totalCalculado, 2, '.', ',');
-
-                    return ['success' => 1, 'restante' => $totalCalculado, 'costo' => $totalMaterial];
-                }else{
-
-                    // guardar ya
-                    $deta = new P_SolicitudMaterial();
-                    $deta->id_presup_unidad = $request->idpresup;
-                    $deta->id_material = $request->idmaterial;
-                    $deta->id_cuentaunidad = $lista->id; // cuenta unidad que bajara
-                    $deta->cantidad = $request->cantidad;
-                    $deta->periodo = $request->periodo;
-                    $deta->fechahora = Carbon::now('America/El_Salvador');
-                    $deta->save();
-
-                    DB::commit();
-                    return ['success' => 2];
-                }
-            }else{
-                // cuenta unidad no encontrada
-                return ['success' => 3];
-            }
 
         } catch (\Throwable $e) {
-            Log::info('ee' . $e);
             DB::rollback();
             return ['success' => 99];
         }
@@ -1174,21 +1100,14 @@ class MovimientosUnidadControlles extends Controller
             $dd->departamento = $infoDepar->nombre;
 
             $infoMaterial = P_Materiales::where('id', $dd->id_material)->first();
-            $infoCuenta = CuentaUnidad::where('id', $dd->id_cuentaunidad)->first();
-            $infoObj = ObjEspecifico::where('id', $infoCuenta->id_objespeci)->first();
+            $infoObj = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
+            $infoMedida = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
 
             $dd->material = $infoMaterial->descripcion;
             $dd->objnombre = $infoObj->codigo . ' - ' . $infoObj->nombre;
+            $dd->unidadmedida = $infoMedida->nombre;
 
-            $total = ($dd->cantidad * $infoMaterial->costo) * $dd->periodo;
-
-            $total = "$" . number_format((float)$total, 2, '.', ',');
-
-            $dd->total = $total;
-
-            $costoactual = "$" . number_format((float)$infoMaterial->costo, 2, '.', ',');
-
-            $dd->costoactual = $costoactual;
+            $dd->costoactual = '$' . number_format((float)$infoMaterial->costo, 2, '.', ',');
         }
 
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.solicitudmaterial.revision.tablarevisionsolicitudmaterial', compact('lista'));
@@ -1210,69 +1129,14 @@ class MovimientosUnidadControlles extends Controller
         if($infoSoli = P_SolicitudMaterial::where('id', $request->idsolicitud)->first()){
 
             $infoMaterial = P_Materiales::where('id', $infoSoli->id_material)->first();
-            $infoCuenta = CuentaUnidad::where('id', $infoSoli->id_cuentaunidad)->first();
-            $infoObjeto = ObjEspecifico::where('id', $infoCuenta->id_objespeci)->first();
+            $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
 
             $nommaterial = $infoMaterial->descripcion;
 
             $objeto = $infoObjeto->codigo . ' - ' . $infoObjeto->nombre;
 
-            $totalsolicitado = ($infoSoli->cantidad * $infoMaterial->costo) * $infoSoli->periodo;
-
-            $totalsolicitado = "$" . number_format((float)$totalsolicitado, 2, '.', ',');
-
-            $unitario = '$' . number_format((float)$infoMaterial->costo, 2, '.', ',');
-
-            // *** BUSCAR RESTANTE
-
-            $totalRestante = 0;
-            $totalRetenido = 0;
-
-            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $infoCuenta->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $infoCuenta->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
-
-            // obtener saldos restante
-            $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
-                ->where('pd.id_cuenta_unidad', $infoCuenta->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRestante as $dd) {
-                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
-            }
-
-            // información de saldos retenidos
-            $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('psr.id_cuenta_unidad', $infoCuenta->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRetenido as $dd) {
-                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-            }
-
-            // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + ($infoCuenta->saldo_inicial - $totalRestante);
-
-            // se debe quitar el retenido
-            $totalCalculado = $totalRestanteSaldo - $totalRetenido;
-
-            $totalCalculado = '$' . number_format((float)$totalCalculado, 2, '.', ',');
-
             return ['success' => 1, 'nommaterial' => $nommaterial, 'info' => $infoSoli,
-                'objeto' => $objeto, 'restante' => $totalCalculado, 'totalsolicitado' => $totalsolicitado,
-                'unitario' => $unitario];
+                'objeto' => $objeto];
         }else{
             return ['success' => 2];
         }
@@ -1320,172 +1184,45 @@ class MovimientosUnidadControlles extends Controller
 
             $infoSolicitud = P_SolicitudMaterial::where('id', $request->idsolicitud)->first();
 
+            // guardar material, esperar confirmación por jefe de presupuesto
+            $nuevoMate = new P_PresupUnidadDetalle();
+            $nuevoMate->id_presup_unidad = $infoSolicitud->id_presup_unidad;
+            $nuevoMate->id_material = $infoSolicitud->id_material;
+            $nuevoMate->cantidad = 0;
+            $nuevoMate->precio = 0;
+            $nuevoMate->periodo = 0;
+            $nuevoMate->save();
+
+            // hoy guardar una copia de la aprobacion de ese material
+            $copia = new P_SolicitudMaterialDetalle();
+            $copia->id_presup_unidad = $infoSolicitud->id_presup_unidad;
+            $copia->id_material = $infoSolicitud->id_material;
+            $copia->fechahora = Carbon::now('America/El_Salvador');
+            $copia->save();
+
             $infoMaterial = P_Materiales::where('id', $infoSolicitud->id_material)->first();
-            $infoCuentaDescontar = CuentaUnidad::where('id', $infoSolicitud->id_cuentaunidad)->first();
 
-            $totalsolicitado = ($infoSolicitud->cantidad * $infoMaterial->costo) * $infoSolicitud->periodo;
-
-
-            // *** BUSCAR RESTANTE
-
-            $totalRestante = 0;
-            $totalRetenido = 0;
-
-            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $infoCuentaDescontar->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $infoCuentaDescontar->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
-
-            // obtener saldos restante
-            $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
-                ->where('pd.id_cuenta_unidad', $infoCuentaDescontar->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRestante as $dd) {
-                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
-            }
-
-            // información de saldos retenidos
-            $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('psr.id_cuenta_unidad', $infoCuentaDescontar->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRetenido as $dd) {
-                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-            }
-
-            // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + ($infoCuentaDescontar->saldo_inicial - $totalRestante);
-
-            // se debe quitar el retenido
-            $totalCalculado = $totalRestanteSaldo - $totalRetenido;
-
-            // ver que haya saldo disponible para PODER RESTARSERLO
-            if($this->redondear_dos_decimal($totalCalculado) < $this->redondear_dos_decimal($totalsolicitado)){
-
-                // saldo insuficiente.
-
-                $totalsolicitado = number_format((float)$totalsolicitado, 2, '.', ',');
-                $totalCalculado = number_format((float)$totalCalculado, 2, '.', ',');
-
-                return ['success' => 1, 'restante' => $totalCalculado, 'costo' => $totalsolicitado];
+            // Verificar si este material con el obj especifico, está en CUENTA UNIDAD
+            // si no está, se debera registrar
+            if(CuentaUnidad::where('id_presup_unidad', $infoSolicitud->id_presup_unidad)
+                ->where('id_objespeci', $infoMaterial->id_objespecifico)
+                ->first()){
+                // YA EXISTE EN CUENTA UNIDAD ESTE OBJ ESPECIFICO
             }else{
-                // SI HAY SALDO AL QUE SE VA A DESCONTAR
+                // AGREGAR REGISTRO
 
-                // la cuenta unidad con el obj específico ya existe. así que solo subir saldo inicial
-                if($infoCC = CuentaUnidad::where('id_presup_unidad' , $infoSolicitud->id_presup_unidad)
-                    ->where('id_objespeci', $infoMaterial->id_objespecifico)
-                    ->first()){
-
-                    // suma de dinero
-                    $saldoInicialSubir = $infoCC->saldo_inicial + $totalsolicitado;
-
-                    $totalQuedaraBajar = $infoCuentaDescontar->saldo_inicial - $totalsolicitado;
-
-
-                    // guardar solicitud
-
-                    $deta = new P_SolicitudMaterialDetalle();
-                    $deta->id_material = $infoSolicitud->id_material;
-                    $deta->id_presup_unidad = $infoSolicitud->id_presup_unidad;
-                    $deta->id_cuentaunidad_sube = $infoCC->id;
-                    $deta->id_cuentaunidad_baja = $infoSolicitud->id_cuentaunidad;
-                    $deta->unidades = $infoSolicitud->cantidad;
-                    $deta->periodo = $infoSolicitud->periodo;
-                    $deta->copia_saldoini_antes_subir = $infoCC->saldo_inicial; // lo que había antes de modificarse
-                    $deta->copia_saldoini_antes_bajar = $infoCuentaDescontar->saldo_inicial; // lo que habia en la cuenta inicial antes que bajara
-                    $deta->dinero_solicitado = $totalsolicitado;
-                    $deta->cuenta_creada = 0; // solo para ver si esta cuenta fue creada
-                    $deta->fechahora = Carbon::now('America/El_Salvador');
-                    $deta->save();
-
-                    // actualizar subir saldo
-                    CuentaUnidad::where('id', $infoCC->id)->update([
-                        'saldo_inicial' => $saldoInicialSubir,
-                    ]);
-
-                    // BAJAR SALDO
-                    CuentaUnidad::where('id', $infoCuentaDescontar->id)->update([
-                        'saldo_inicial' => $totalQuedaraBajar,
-                    ]);
-
-                    // guardar material
-                    $nuevoMate = new P_PresupUnidadDetalle();
-                    $nuevoMate->id_presup_unidad = $infoSolicitud->id_presup_unidad;
-                    $nuevoMate->id_material = $infoSolicitud->id_material;
-                    $nuevoMate->cantidad = $infoSolicitud->cantidad;
-                    $nuevoMate->precio = $infoMaterial->costo;
-                    $nuevoMate->periodo = $infoSolicitud->periodo;
-                    $nuevoMate->save();
-
-                    // borrar solicitud
-                    P_SolicitudMaterial::where('id', $request->idsolicitud)->delete();
-
-                    DB::commit();
-                    return ['success' => 2];
-                }else{
-
-                    // guardar nueva cuenta unidad, con el saldo solicitado
-                    $nuevaCuenta = new CuentaUnidad();
-                    $nuevaCuenta->id_presup_unidad = $infoSolicitud->id_presup_unidad;
-                    $nuevaCuenta->id_objespeci = $infoMaterial->id_objespecifico;
-                    $nuevaCuenta->saldo_inicial = $totalsolicitado;
-                    $nuevaCuenta->save();
-
-                    // SOLO OBTENER EL SALDO A BAJAR, YA QUE EL SALDO INICIAL SE COLOCO AL CREAR LA CUENTA UNIDAD
-                    $totalQuedaraBajar = $infoCuentaDescontar->saldo_inicial - $totalsolicitado;
-
-                    // guardar solicitud
-
-                    $deta = new P_SolicitudMaterialDetalle();
-                    $deta->id_material = $infoSolicitud->id_material;
-                    $deta->id_presup_unidad = $infoSolicitud->id_presup_unidad;
-                    $deta->id_cuentaunidad_sube = $nuevaCuenta->id;
-                    $deta->id_cuentaunidad_baja = $infoSolicitud->id_cuentaunidad;
-                    $deta->unidades = $infoSolicitud->cantidad;
-                    $deta->periodo = $infoSolicitud->periodo;
-                    $deta->copia_saldoini_antes_subir = $totalsolicitado; // lo que había antes de modificarse
-                    $deta->copia_saldoini_antes_bajar = $infoCuentaDescontar->saldo_inicial; // lo que había en la cuenta inicial antes que bajara
-                    $deta->dinero_solicitado = $totalsolicitado;
-                    $deta->cuenta_creada = 1;
-                    $deta->fechahora = Carbon::now('America/El_Salvador');
-                    $deta->save();
-
-                    // COMO SE CREO LA CUENTA UNIDAD, ESTA NO TIENE PORQUE SUBIR SU MONTO INICIAL
-
-                    // BAJAR SALDO
-                    CuentaUnidad::where('id', $infoCuentaDescontar->id)->update([
-                        'saldo_inicial' => $totalQuedaraBajar,
-                    ]);
-
-                    // guardar material
-                    $nuevoMate = new P_PresupUnidadDetalle();
-                    $nuevoMate->id_presup_unidad = $infoSolicitud->id_presup_unidad;
-                    $nuevoMate->id_material = $infoSolicitud->id_material;
-                    $nuevoMate->cantidad = $infoSolicitud->cantidad;
-                    $nuevoMate->precio = $infoMaterial->costo;
-                    $nuevoMate->periodo = $infoSolicitud->periodo;
-                    $nuevoMate->save();
-
-                    // borrar solicitud
-                    P_SolicitudMaterial::where('id', $request->idsolicitud)->delete();
-
-                    DB::commit();
-                    return ['success' => 2];
-                }
+                $cuenta = new CuentaUnidad();
+                $cuenta->id_presup_unidad = $infoSolicitud->id_presup_unidad;
+                $cuenta->id_objespeci = $infoMaterial->id_objespecifico;
+                $cuenta->saldo_inicial = 0; // SIEMPRE SERA 0, ya que se agregaron despues de crear presupuesto
+                $cuenta->saldo_inicial_fijo = 0;
+                $cuenta->save();
             }
 
+            P_SolicitudMaterial::where('id', $request->idsolicitud)->delete();
+
+            DB::commit();
+            return ['success' => 1];
         } catch (\Throwable $e) {
             Log::info('ee' . $e);
             DB::rollback();
@@ -1543,22 +1280,20 @@ class MovimientosUnidadControlles extends Controller
 
         $lista = DB::table('p_solicitud_material_detalle AS ps')
             ->join('p_presup_unidad AS pp', 'ps.id_presup_unidad', '=', 'pp.id')
-            ->select('pp.id_anio', 'pp.id AS idpresup', 'ps.id', 'ps.id_material', 'ps.id_cuentaunidad_sube', 'ps.id_cuentaunidad_baja',
-            'ps.unidades', 'ps.periodo', 'ps.copia_saldoini_antes_subir', 'ps.copia_saldoini_antes_bajar',
-            'ps.dinero_solicitado', 'ps.cuenta_creada', 'ps.fechahora')
+            ->select('pp.id_anio', 'ps.fechahora', 'pp.id', 'ps.id_material')
             ->where('pp.id_anio', $idanio)
             ->get();
 
         foreach ($lista as $dd){
 
-            $infoPresup = P_PresupUnidad::where('id', $dd->idpresup)->first();
+            $infoPresup = P_PresupUnidad::where('id', $dd->id )->first();
             $infoMaterial = P_Materiales::where('id', $dd->id_material)->first();
             $infoDepartamento = P_Departamento::where('id', $infoPresup->id_departamento)->first();
+            $infoMedida = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
 
             $dd->material = $infoMaterial->descripcion;
             $dd->departamento = $infoDepartamento->nombre;
-
-            $dd->solicitado = '$' . number_format((float)$dd->dinero_solicitado, 2, '.', ',');
+            $dd->unidadmedida = $infoMedida->nombre;
 
             $dd->fechahora = date("d-m-Y h:i A", strtotime($dd->fechahora));
         }

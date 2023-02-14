@@ -19,7 +19,6 @@ class CreatePSolicitudMaterialTable extends Migration
             $table->id();
             $table->bigInteger('id_presup_unidad')->unsigned();
             $table->bigInteger('id_material')->unsigned();
-            $table->bigInteger('id_cuentaunidad')->unsigned();
 
             $table->decimal('cantidad', 10, 2);
             $table->integer('periodo');
@@ -29,7 +28,6 @@ class CreatePSolicitudMaterialTable extends Migration
 
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
             $table->foreign('id_material')->references('id')->on('p_materiales');
-            $table->foreign('id_cuentaunidad')->references('id')->on('cuenta_unidad');
         });
     }
 

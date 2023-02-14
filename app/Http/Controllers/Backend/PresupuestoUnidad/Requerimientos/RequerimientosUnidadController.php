@@ -328,7 +328,6 @@ class RequerimientosUnidadController extends Controller
                 // obtener el saldo inicial - total de salidas y esto dara cuanto tengo en caja
 
                 // como siempre busco material que estaban en el presupuesto, siempre encontrara
-                // el proyecto ID y el ID de objeto específico
                 $infoCuentaUnidad = CuentaUnidad::where('id_presup_unidad', $request->idpresubuni)
                     ->where('id_objespeci', $infoCatalogo->id_objespecifico)
                     ->first();

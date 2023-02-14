@@ -10,10 +10,7 @@
                                 <th>Fecha</th>
                                 <th>Departamento</th>
                                 <th>Material</th>
-                                <th>Unidades</th>
-                                <th>Periodo</th>
-                                <th>Monto Solicitado</th>
-                                <th>Opciones</th>
+                                <th>Unidad de Medida</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -23,14 +20,7 @@
                                     <td>{{ $dato->fechahora }}</td>
                                     <td>{{ $dato->departamento }}</td>
                                     <td>{{ $dato->material }}</td>
-                                    <td>{{ $dato->unidades }}</td>
-                                    <td>{{ $dato->periodo }}</td>
-                                    <td>{{ $dato->solicitado }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-info" title="Revisar"></i>&nbsp; Revisar
-                                        </button>
-                                    </td>
+                                    <td>{{ $dato->unidadmedida }}</td>
                                 </tr>
                             @endforeach
 

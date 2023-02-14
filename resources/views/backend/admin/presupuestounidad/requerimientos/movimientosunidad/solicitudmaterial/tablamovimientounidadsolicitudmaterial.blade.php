@@ -9,10 +9,7 @@
                             <tr>
                                 <th>Fecha</th>
                                 <th>Material Solicitado</th>
-                                <th>Cantidad</th>
-                                <th>Periodo</th>
-                                <th>Total</th>
-                                <th>Objeto Específico a Descontar</th>
+                                <th>Objeto Específico</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -21,9 +18,6 @@
                                 <tr>
                                     <td>{{ $dato->fechahora }}</td>
                                     <td>{{ $dato->material }}</td>
-                                    <td>{{ $dato->cantidad }}</td>
-                                    <td>{{ $dato->periodo }}</td>
-                                    <td>{{ $dato->total }}</td>
                                     <td>{{ $dato->objnombre }}</td>
                                 </tr>
                             @endforeach

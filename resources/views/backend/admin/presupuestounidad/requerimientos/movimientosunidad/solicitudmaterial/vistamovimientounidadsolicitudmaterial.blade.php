@@ -82,32 +82,6 @@
                                             </tbody>
                                         </table>
 
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Costo Actual del Material</label>
-                                            <input type="text" class="form-control" autocomplete="off" disabled id="costo-actual">
-                                        </div>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Unidades</label>
-                                            <input type="number" class="form-control" autocomplete="off" id="cantidad-material-nuevo">
-                                        </div>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Periodo</label>
-                                            <input type="number" class="form-control" placeholder="Mínimo es 1" autocomplete="off" id="periodo-material-nuevo">
-                                        </div>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Objeto Específico a Descontar</label>
-                                            <select class="form-control" id="select-obj" onchange="buscarSaldoRestante()" disabled>
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Saldo Restante <p style="color: red">(Se resta Saldo Retenido)</p></label>
-                                            <input type="text" class="form-control" disabled id="saldo-restante">
-                                        </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -173,8 +147,7 @@
 
         function agregarSolicitud(){
             document.getElementById("formulario-nuevo-material").reset();
-            document.getElementById("select-obj").options.length = 0;
-            document.getElementById("select-obj").disabled = true;
+
             $('#saldo-restante').val('');
 
             $('#modalNuevoSolicitud').modal('show');
@@ -196,8 +169,7 @@
                 if(texto === ''){
                     // si se limpia el input, setear el atributo id
                     $(e).attr('data-info', 0);
-                    document.getElementById("select-obj").options.length = 0;
-                    document.getElementById("select-obj").disabled = true;
+
                     $('#saldo-restante').val('');
                     $('#costo-actual').val('');
                 }
@@ -228,78 +200,8 @@
             $(txtContenedorGlobal).val(texto);
             $(txtContenedorGlobal).attr('data-info', edrop.id);
 
-            // solicitud llenar select
-
-            openLoading();
-
-            let idpresubuni = {{ $idpresubunidad }};
-
-            var formData = new FormData();
-            formData.append('idmaterial', edrop.id);
-            formData.append('idpresup', idpresubuni);
-
-            axios.post(url+'/p/select/objespecifico/solicitud', formData, {
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-
-                        document.getElementById("select-obj").options.length = 0;
-                        document.getElementById("select-obj").disabled = false;
-
-                        $('#select-obj').append('<option selected value="0">Seleccionar Objeto Específico</option>');
-
-                        $.each(response.data.arrayobj, function( key, val ){
-                            $('#select-obj').append('<option value="' +val.id +'">'+val.codigo + ' - ' + val.nombre+'</option>');
-                        });
-
-                        $('#costo-actual').val(response.data.costoactual);
-
-                    }else{
-                        toastr.error('información no encontrada');
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('información no encontrada');
-                });
         }
 
-        // buscar saldo restante MENOS el saldo retenido
-        function buscarSaldoRestante(){
-            let id = document.getElementById('select-obj').value;
-
-            // compara si es tipo texto o numero
-            if(id == 0){
-                $('#saldo-restante').val('');
-                return;
-            }
-
-            openLoading();
-
-            let idpresubuni = {{ $idpresubunidad }};
-
-            var formData = new FormData();
-            formData.append('idobj', id);
-            formData.append('idpresup', idpresubuni);
-
-            axios.post(url+'/p/select/obj/saldos/solicitud/material', formData, {
-
-            })
-                .then((response) => {
-                    closeLoading();
-                    if(response.data.success === 1){
-
-                        $('#saldo-restante').val(response.data.restante);
-                    }else{
-                        toastr.error('Error al buscar saldo restante');
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Error al buscar saldo restante');
-                });
-        }
 
         function preguntarSolicitud(){
 
@@ -322,13 +224,6 @@
         // guardar nueva solicitud de materiales
         function guardarNuevaSolicitud(){
 
-            var idobj = document.getElementById('select-obj').value;
-
-            if(idobj == 0){
-                toastr.error("Seleccionar objeto específico");
-                return;
-            }
-
             var idmaterial = document.querySelector('#materialnuevosolicitado');
 
             if(idmaterial.dataset.info == 0){
@@ -336,68 +231,13 @@
                 return;
             }
 
-            var cantidad = document.getElementById('cantidad-material-nuevo').value;
-            var periodo = document.getElementById('periodo-material-nuevo').value;
-
-            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
-            var reglaNumeroEntero = /^[0-9]\d*$/;
-
-            // ****
-
-            if(cantidad === ''){
-                toastr.error('Cantidad es requerido');
-                return;
-            }
-
-            if(!cantidad.match(reglaNumeroDosDecimal)) {
-                toastr.error('Cantidad debe ser número Decimal y No Negativos. Solo 2 decimales');
-                return;
-            }
-
-            if(cantidad <= 0){
-                toastr.error('Cantidad no permite números negativos y Ceros');
-                return;
-            }
-
-            if(cantidad > 99000000){
-                toastr.error('Cantidad máximo 99 millones');
-                return;
-            }
-
-            // ****
-
-            if(periodo === ''){
-                toastr.error('Periodo es requerido');
-                return;
-            }
-
-            if(!periodo.match(reglaNumeroEntero)) {
-                toastr.error('Periodo debe ser número Entero y No Negativos');
-                return;
-            }
-
-            if(periodo <= 0){
-                toastr.error('Periodo no permite Cero o negativos');
-                return;
-            }
-
-            if(periodo > 999){
-                toastr.error('Periodo máximo 999 veces de límite');
-                return;
-            }
-
-            // ****
-
             openLoading();
-
             let idpresubuni = {{ $idpresubunidad }};
 
             var formData = new FormData();
-            formData.append('idobj', idobj);
             formData.append('idpresup', idpresubuni);
             formData.append('idmaterial', idmaterial.dataset.info);
-            formData.append('cantidad', cantidad);
-            formData.append('periodo', periodo);
+
 
             axios.post(url+'/p/guardar/solicitud/material', formData, {
 
@@ -405,36 +245,10 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
-
-                        let restante = response.data.restante;
-                        let costo = response.data.costo;
-
-                        Swal.fire({
-                            title: 'Saldo Insuficiente',
-                            html: "La Cuenta a Descontar no tiene suficiente Saldo " + "<br>"
-                                + "Saldo Restante $"+ restante +"<br>"
-                                + "Saldo de Material solicitado $"+ costo +"<br>"
-                            ,
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-
-                    }
-                    else if(response.data.success === 2){
                         $('#modalNuevoSolicitud').modal('hide');
                         toastr.success('Solicitud guardada');
 
                         recargar();
-                    }
-                    else if(response.data.success === 3){
-                       toastr.error('Cuenta unidad no encontrada');
                     }
                     else{
                         toastr.error('Error al guardar solicitud');

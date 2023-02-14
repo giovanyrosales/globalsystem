@@ -71,33 +71,8 @@
                                         </div>
 
                                         <div class="form-group" style="margin-top: 15px">
-                                            <label>Precio Unitario</label>
-                                            <input type="text" class="form-control" disabled autocomplete="off" id="precio-unitario">
-                                        </div>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Unidades</label>
-                                            <input type="text" class="form-control" disabled id="cantidad-material-nuevo">
-                                        </div>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Periodo</label>
-                                            <input type="text" class="form-control" disabled id="periodo-material-nuevo">
-                                        </div>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Total a Solicitar</label>
-                                            <input type="text" class="form-control" disabled id="total-solicitado">
-                                        </div>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Objeto Específico a Descontar</label>
+                                            <label>Objeto Específico</label>
                                             <input type="text" class="form-control" disabled id="objeto-nuevo">
-                                        </div>
-
-                                        <div class="form-group" style="margin-top: 15px">
-                                            <label>Saldo Restante <p style="color: red">(Se resta Saldo Retenido)</p></label>
-                                            <input type="text" class="form-control" disabled id="saldo-restante">
                                         </div>
 
                                     </div>
@@ -115,7 +90,6 @@
             </div>
         </div>
     </div>
-
 
 
 </div>
@@ -167,20 +141,10 @@
                         $('#id-solicitud').val(id);
 
                         let nommaterial = response.data.nommaterial;
-                        let unitario = response.data.unitario;
-                        let cantidad = response.data.info.cantidad;
-                        let periodo = response.data.info.periodo;
                         let objeto = response.data.objeto;
-                        let restante = response.data.restante;
-                        let totalsolicitado = response.data.totalsolicitado;
 
                         $('#material-nuevo').val(nommaterial);
-                        $('#precio-unitario').val(unitario);
-                        $('#cantidad-material-nuevo').val(cantidad);
-                        $('#periodo-material-nuevo').val(periodo);
                         $('#objeto-nuevo').val(objeto);
-                        $('#saldo-restante').val(restante);
-                        $('#total-solicitado').val(totalsolicitado);
 
                         $('#modalNuevoSolicitud').modal('show');
                     }else{
@@ -270,31 +234,7 @@
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1){
-                        // dinero restante insuficiente para RESTARLE LO QUE SE SOLICITA
-
-                        let restante = response.data.restante;
-                        let costo = response.data.costo;
-
-                        Swal.fire({
-                            title: 'Saldo Insuficiente',
-                            html: "La Cuenta a Descontar no tiene suficiente Saldo " + "<br>"
-                                + "Saldo Restante $"+ restante +"<br>"
-                                + "Saldo de Material solicitado $"+ costo +"<br>"
-                            ,
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-
-                    else if(response.data.success === 2) {
+                    if(response.data.success === 1) {
 
                         $('#modalNuevoSolicitud').modal('hide');
                         toastr.success('Aprobado correctamente');
