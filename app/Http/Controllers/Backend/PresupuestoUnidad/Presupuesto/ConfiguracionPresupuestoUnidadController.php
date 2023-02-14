@@ -959,7 +959,6 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         $porciones = explode("-", $request->unidades);
 
-
         // conteo
 
         $conteo = P_PresupUnidad::where('id_anio', $request->idanio)

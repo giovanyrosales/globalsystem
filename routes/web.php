@@ -1049,6 +1049,7 @@ Route::post('/admin/descargos/directos/historial/informacion', [DescargosDirecto
 // generar pdf para que jefe de cada unidad lo pueda visualizar los materiales que ha solicitado en un nuevo requerimiento
 Route::get('/admin/p/generador/pdf/requisicion/{id}', [CotizacionesUnidadController::class,'pdfRequerimientoUnidadMateriales']);
 
+// vista para elegir departamento y generar reporte de movimientos de cuenta
 
 
 

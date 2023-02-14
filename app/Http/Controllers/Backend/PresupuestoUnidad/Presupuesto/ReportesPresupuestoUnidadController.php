@@ -1082,7 +1082,6 @@ class ReportesPresupuestoUnidadController extends Controller
                     $index2++;
                 }
 
-                //$totalvalor += $sumaRubro;
                 $secciones->sumarubro = number_format((float)$sumaRubro, 2, '.', ',');
                 $secciones->sumarubroDecimal = $sumaRubro;
 
@@ -1096,9 +1095,9 @@ class ReportesPresupuestoUnidadController extends Controller
             ini_set("pcre.backtrack_limit", "5000000");
             $logoalcaldia = 'images/logo.png';
 
-            $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
-            //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-            $mpdf->SetTitle('Consolidado Totales');
+            //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+            $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+            $mpdf->SetTitle('Presupuesto Unidad');
 
             // mostrar errores
             $mpdf->showImageErrors = false;
@@ -1131,6 +1130,7 @@ class ReportesPresupuestoUnidadController extends Controller
                 </tr>";
 
             foreach ($rubro as $dataRR){
+
                 if($dataRR->sumarubroDecimal > 0){
 
                     $tabla .= "<tr>
@@ -1144,7 +1144,7 @@ class ReportesPresupuestoUnidadController extends Controller
 
                     foreach ($dataRR->cuenta as $dataCC){
 
-                        if($dataCC->sumaobjetoDecimal > 0){
+                        if($dataCC->sumaobjetoDecimal > 0) {
 
                             // CUENTAS
 
@@ -1157,9 +1157,9 @@ class ReportesPresupuestoUnidadController extends Controller
                             <td style='font-size:11px; text-align: center; font-weight: bold'>$$dataCC->sumaobjetototal</td>
                         </tr>";
 
-                            foreach ($dataCC->objeto as $dataObj){
+                            foreach ($dataCC->objeto as $dataObj) {
 
-                                if($dataObj->sumaobjetoDeci > 0) {
+                                if ($dataObj->sumaobjetoDeci > 0) {
 
                                     $tabla .= "<tr>
                                         <td style='font-size:11px; text-align: center; font-weight: bold'>$dataObj->codigo</td>
@@ -1184,9 +1184,9 @@ class ReportesPresupuestoUnidadController extends Controller
                                         </tr>";
                                     }
 
-                                    foreach ($listadoProyectoAprobados as $lpa){
+                                    foreach ($listadoProyectoAprobados as $lpa) {
 
-                                        if ($dataObj->codigo == $lpa->codigoobj){
+                                        if ($dataObj->codigo == $lpa->codigoobj) {
 
                                             $tabla .= "<tr>
                                             <td style='font-size:11px; text-align: center; font-weight: normal'>$dataObj->codigo</td>
@@ -1196,9 +1196,10 @@ class ReportesPresupuestoUnidadController extends Controller
                                             <td style='font-size:11px; text-align: center; font-weight: normal'></td>
                                             <td style='font-size:11px; text-align: center; font-weight: normal'>$lpa->costoFormat</td>
                                             </tr>";
-
                                         }
                                     }
+
+
                                 }
                             }
                         }
