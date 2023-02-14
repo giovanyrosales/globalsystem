@@ -221,16 +221,19 @@ class ExportarUnaUnidadExcel implements FromCollection, WithHeadings, WithStyles
 
                                 foreach ($dataObj->material as $dataMM){
 
-                                    $dataArray[] = [
-                                        'codigo' => $dataObj->codigo,
-                                        'descripcion' => $dataMM->descripcion,
-                                        'medida' => $dataMM->unimedida,
-                                        'precunitario' => $dataMM->precunitario,
-                                        'cantidad' => $dataMM->cantidadpedi,
-                                        'total' => $dataMM->total,
-                                    ];
+                                    // CON ESTO EVITO QUE SE SALGA EL MATERIAL QUE FUE SOLICITADO, YA QUE ESOS
+                                    // AL AGREGARSE A MI PRESU DE UNIDAD ENTRAN CON CANTIDAD 0
+                                    if($dataMM->cantidadpedi > 0){
+                                        $dataArray[] = [
+                                            'codigo' => $dataObj->codigo,
+                                            'descripcion' => $dataMM->descripcion,
+                                            'medida' => $dataMM->unimedida,
+                                            'precunitario' => $dataMM->precunitario,
+                                            'cantidad' => $dataMM->cantidadpedi,
+                                            'total' => $dataMM->total,
+                                        ];
+                                    }
                                 }
-
 
                                 foreach ($listadoProyectoAprobados as $lpa){
 

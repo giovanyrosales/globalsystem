@@ -385,8 +385,6 @@ class ReportesPresupuestoUnidadController extends Controller
     // retorna PDF con el consolidado, todos los presupuestos ya están aprobados
     public function generarConsolidadoPdfPresupuesto($anio){
 
-
-
         $rubro = Rubro::orderBy('codigo')->get();
 
         $resultsBloque = array();
@@ -403,9 +401,7 @@ class ReportesPresupuestoUnidadController extends Controller
         $arrayPresupUnidad = P_PresupUnidad::where('id_anio', $anio)->get();
         $fechaanio = P_AnioPresupuesto::where('id', $anio)->pluck('nombre')->first();
 
-
         $listadoProyectoAprobados = P_ProyectosAprobados::orderBy('descripcion', 'ASC')->get();
-
 
         foreach ($listadoProyectoAprobados as $dd){
 
@@ -873,14 +869,20 @@ class ReportesPresupuestoUnidadController extends Controller
 
                                 foreach ($dataObj->material as $dataMM){
 
-                                    $tabla .= "<tr>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataObj->codigo</td>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->descripcion</td>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->unimedida</td>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->cantidadpedi</td>
-                                <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->total</td>
-                                </tr>";
-                                }
+                                    // CON ESTO EVITO QUE SE SALGA EL MATERIAL QUE FUE SOLICITADO, YA QUE ESOS
+                                    // AL AGREGARSE A MI PRESU DE UNIDAD ENTRAN CON CANTIDAD 0
+                                    if($dataMM->cantidadpedi > 0){
+
+                                        $tabla .= "<tr>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataObj->codigo</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->descripcion</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->unimedida</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->cantidadpedi</td>
+                                        <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->total</td>
+                                        </tr>";
+                                        }
+
+                                    }
 
                                 foreach ($listadoProyectoAprobados as $lpa){
 
@@ -1174,7 +1176,11 @@ class ReportesPresupuestoUnidadController extends Controller
 
                                     foreach ($dataObj->material as $dataMM) {
 
-                                        $tabla .= "<tr>
+                                        // EVITAR QUE MATERIALES SOLICITADOS CON COSTO $0.00 Y UNIDADES
+                                        // SOLICITADAS 0, SEA VISIBLE.
+                                        // NO APARECEN SI SOLO HAY 1 MATERIAL COSTO $0.00 EN CONTENEDOR DE OBJ ESPECIFICO.
+                                        if($dataMM->cantidadpedi > 0) {
+                                            $tabla .= "<tr>
                                         <td style='font-size:11px; text-align: center; font-weight: normal'>$dataObj->codigo</td>
                                         <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->descripcion</td>
                                         <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->unimedida</td>
@@ -1182,6 +1188,7 @@ class ReportesPresupuestoUnidadController extends Controller
                                         <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->cantidadpedi</td>
                                         <td style='font-size:11px; text-align: center; font-weight: normal'>$dataMM->total</td>
                                         </tr>";
+                                        }
                                     }
 
                                     foreach ($listadoProyectoAprobados as $lpa) {
@@ -1198,7 +1205,6 @@ class ReportesPresupuestoUnidadController extends Controller
                                             </tr>";
                                         }
                                     }
-
 
                                 }
                             }

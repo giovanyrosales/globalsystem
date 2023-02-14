@@ -204,13 +204,13 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
         $sumaGlobalUnidades = number_format((float)($sumaGlobalUnidades), 2, '.', ',');
 
 
-        $filaBold = 0;
+        //$filaBold = 0;
 
 
         foreach ($rubro as $dataRR){
             if($dataRR->sumarubroDecimal > 0){
 
-                $filaBold += 1;
+                //$filaBold += 1;
 
                 $dataArray[] = [
                     'codigo' => $dataRR->codigo,
@@ -225,7 +225,7 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
                     if($dataCC->sumaobjetoDecimal > 0){
 
                         // CUENTAS
-                        $filaBold += 1;
+                        //$filaBold += 1;
 
                         $dataArray[] = [
                             'codigo' => $dataCC->codigo,
@@ -238,7 +238,7 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
                         foreach ($dataCC->objeto as $dataObj){
 
                             if($dataObj->sumaobjetoDeci > 0){
-                                $filaBold += 1;
+                                //$filaBold += 1;
 
                                 $dataArray[] = [
                                     'codigo' => $dataObj->codigo,
@@ -252,13 +252,19 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
 
                                 foreach ($dataObj->material as $dataMM){
 
-                                    $dataArray[] = [
-                                        'codigo' => $dataObj->codigo,
-                                        'descripcion' => $dataMM->descripcion,
-                                        'medida' => $dataMM->unimedida,
-                                        'cantidad' => $dataMM->cantidadpedi,
-                                        'total' => $dataMM->total,
-                                    ];
+
+                                    if($dataMM->cantidadpedi > 0){
+                                        // CON ESTO EVITO QUE SE SALGA EL MATERIAL QUE FUE SOLICITADO, YA QUE ESOS
+                                        // AL AGREGARSE A MI PRESU DE UNIDAD ENTRAN CON CANTIDAD 0
+
+                                        $dataArray[] = [
+                                            'codigo' => $dataObj->codigo,
+                                            'descripcion' => $dataMM->descripcion,
+                                            'medida' => $dataMM->unimedida,
+                                            'cantidad' => $dataMM->cantidadpedi,
+                                            'total' => $dataMM->total,
+                                        ];
+                                    }
                                 }
 
 
