@@ -368,6 +368,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Catálogo de Materiales</h4>
+
+                    <button type="button" style="margin-left: 15px; font-weight: bold; color: white !important;"
+                            class="button button-primary button-3d button-rounded button-pill button-small" onclick="pdfMaterialesPresupuesto()">
+                        <i class="fas fa-file-pdf" title="Documento PDF"></i>&nbsp; PDF
+                    </button>
+
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -436,6 +442,15 @@
             var ruta = "{{ URL::to('/admin/p/requerimientos/tabla') }}/" + idpresup;
             $('#tablaDatatableRequisicion').load(ruta);
         }
+
+
+        // exportar PDF de catalogo de materiales
+        function pdfMaterialesPresupuesto(){
+            let idpresup = {{ $idpresubunidad }};
+
+            window.open("{{ URL::to('admin/p/generador/pdf/catalogomaterial/unidad') }}/" + idpresup);
+        }
+
 
         function modalAgregar(){
             document.getElementById("formulario-nuevo").reset();

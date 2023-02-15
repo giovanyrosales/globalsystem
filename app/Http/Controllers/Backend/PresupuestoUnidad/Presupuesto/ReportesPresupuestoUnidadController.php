@@ -269,7 +269,6 @@ class ReportesPresupuestoUnidadController extends Controller
             </p>
             </div>";
 
-
         $tabla .= "
                 <p class='fecha'><strong>Año: $fechaanio</strong></p>";
 
