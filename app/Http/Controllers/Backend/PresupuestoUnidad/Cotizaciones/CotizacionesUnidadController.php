@@ -20,6 +20,7 @@ use App\Models\RequisicionUnidad;
 use App\Models\RequisicionUnidadDetalle;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -783,12 +784,12 @@ class CotizacionesUnidadController extends Controller
 
         $requiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $id)->get();
 
-        $costoTotalEstimado = 0;
-
         $cantidad = 7;
         $dataArray = array();
         $array_merged = array();
         $vuelta = 0;
+
+        $costoporhoja = 0;
 
         foreach ($requiDetalle as $dd){
             $vuelta += 1;
@@ -803,10 +804,11 @@ class CotizacionesUnidadController extends Controller
 
             $multiFila = $dd->cantidad * $dd->dinero_fijo;
 
-            $costoTotalEstimado += $multiFila;
+            $costoporhoja += $multiFila;
 
-            $dd->multifila = number_format((float)$multiFila, 2, '.', ',');
+            $multifila = number_format((float)$multiFila, 2, '.', ',');
             $dd->dinero_fijo = number_format((float)$dd->dinero_fijo, 2, '.', ',');
+            $costoporhoja = number_format((float)$costoporhoja, 2, '.', ',');
 
 
             $dataArray[] = [
@@ -814,12 +816,16 @@ class CotizacionesUnidadController extends Controller
                 'medida' => $infoMedida->nombre,
                 'descripcion' => $dd->material_descripcion,
                 'precio_u' => $dd->dinero_fijo,
-                'costofila' => $multiFila,
+                'costofila' => $multifila,
                 'codigopres' => $infoObj->codigo,
+                'costoxhoja' => $costoporhoja
             ];
 
             // CANTIDAD POR HOJA
             if($vuelta == $cantidad){
+
+                $costoporhoja = 0;
+
                 $array_merged[] = array_merge($dataArray);
                 $dataArray = array();
                 $vuelta = 0;
@@ -830,8 +836,8 @@ class CotizacionesUnidadController extends Controller
             $array_merged[] = array_merge($dataArray);
         }
 
-        $costoTotalEstimado = number_format((float)$costoTotalEstimado, 2, '.', ',');
-
+        // INFORMACION DEL USUARIO AUTENTIFICADO
+        $nombreUsuario = Auth::user()->nombre;
 
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
         $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
@@ -903,23 +909,28 @@ class CotizacionesUnidadController extends Controller
                 $c_preciou = $item_value['precio_u'];
                 $c_costofila = $item_value['costofila'];
                 $c_codigopres = $item_value['codigopres'];
+                $c_costoxhoja = $item_value['costoxhoja'];
 
-                $tabla .=  "<tr>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_cantidad</td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_medida</td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_descripcion</td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'>$$c_preciou</td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'>$$c_costofila</td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_codigopres</td>
-          </tr>";
+                if(!empty($c_cantidad)){
+                    $tabla .=  "<tr>
+                    <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_cantidad</td>
+                    <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_medida</td>
+                    <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_descripcion</td>
+                    <td style='text-align: center; font-size:12px;padding-top: 0px'>$$c_preciou</td>
+                    <td style='text-align: center; font-size:12px;padding-top: 0px'>$$c_costofila</td>
+                    <td style='text-align: center; font-size:12px;padding-top: 0px'>$c_codigopres</td>
+                  </tr>";
+                }
 
+                // DIFERENCIANDO CUANDO ES ULTIMA VUELTA LOOP
+                if(end($items_value) == $item_value) {
+                    $tabla .=  "<tr>
+                    <td colspan='4' style='text-align: center; font-size:12px;padding-top: 1px'><strong>TOTAL</strong></td>
+                    <td style='text-align: center; font-size:12px;padding-top: 0px'><strong>$$c_costoxhoja </strong></td>
+                    <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
+                  </tr>";
+                }
             }
-
-            $tabla .=  "<tr>
-            <td colspan='4' style='text-align: center; font-size:12px;padding-top: 1px'><strong>TOTAL</strong></td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'><strong> $$costoTotalEstimado </strong></td>
-            <td style='text-align: center; font-size:12px;padding-top: 0px'></td>
-          </tr>";
 
             $tabla .= "</tbody></table>";
 
@@ -932,18 +943,18 @@ class CotizacionesUnidadController extends Controller
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 3px;'>FIRMA:___________________________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 3px;'>FIRMA:_________________________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 10px;'>FIRMA:___________________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 10px;'>FIRMA:_________________________________</td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 5px;'>NOMBRE:_________________________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>NOMBRE:_________________________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 10px;'>NOMBRE: <strong>$nombreUsuario</strong></td>
+            <td style='text-align: right; font-size:11px; padding-top: 10px;'>NOMBRE:_________________________________</td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 5px;'></td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>JEFE:__________________________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 10px;'></td>
+            <td style='text-align: right; font-size:11px; padding-top: 10px;'>JEFE:__________________________________</td>
         </tr>
 
         <tr>
@@ -952,40 +963,36 @@ class CotizacionesUnidadController extends Controller
         </tr>
 
         <tr>
-            <td colspan='2' style='text-align: center; font-size:11px; padding-top: 11px;'>FIRMA:_____________________________</td>
+            <td colspan='2' style='text-align: center; font-size:11px; padding-top: 10px;'>FIRMA:_____________________________</td>
         </tr>
          <tr>
             <td colspan='2' style='text-align: center; font-size:11px; padding-top: 10px;'>NOMBRE:___________________________</td>
         </tr>
 
-
-
         <tr>
-            <td style='text-align: left; font-weight: bold; padding-top: 5px; font-size:11px;'>PRESUPUESTO</td>
-            <td style='text-align: right; font-weight: bold; padding-top: 5px; font-size:11px;'>RECIBE UACI</td>
+            <td style='text-align: left; font-weight: bold; padding-top: 10px; font-size:11px;'>PRESUPUESTO</td>
+            <td style='text-align: right; font-weight: bold; padding-top: 10px; font-size:11px;'>RECIBE UACI</td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 3px;'>FIRMA:____________________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 3px;'>FIRMA:____________________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 10px;'>FIRMA:___________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 10px;'>FIRMA:_______________________________</td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 5px;'>NOMBRE:_________________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>NOMBRE:____________________________</td>
+            <td style='text-align: left; padding-top: 10px; font-size:11px; '>NOMBRE: <strong>Lic. Jesus Calderón</strong></td>
+            <td style='text-align: right; padding-right: 20px; font-size:11px; padding-top: 10px;'>NOMBRE: <strong>Lic. Heidi Chinchilla</strong></td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 5px;'>FECHA:___________________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>FECHA:______________________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 10px;'>FECHA:___________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 10px;'>FECHA:______________________________</td>
         </tr>
 
         <tr>
-            <td style='text-align: left; font-size:11px; padding-top: 5px;'>HORA:____________________________</td>
-            <td style='text-align: right; font-size:11px; padding-top: 5px;'>HORA:______________________________</td>
+            <td style='text-align: left; font-size:11px; padding-top: 10px;'>HORA:_____________________________</td>
+            <td style='text-align: right; font-size:11px; padding-top: 10px;'>HORA:_______________________________</td>
         </tr>
-
-
 
           ";
 
