@@ -1053,10 +1053,13 @@ Route::get('/admin/p/generador/pdf/requisicion/{id}', [CotizacionesUnidadControl
 // generar pdf con el catalogo de materiales de cada unidad. Esto cada unidad puede sacarlo
 Route::get('/admin/p/generador/pdf/catalogomaterial/unidad/{id}', [ReportesUnidadController::class,'pdfCatalogoMaterialesUnidad']);
 
-
-
-
 // vista para elegir departamento y generar reporte de movimientos de cuenta
+Route::get('/admin/p/vista/unidades/movimientosunidad/index', [ReportesUnidadController::class,'indexVistaReporteMovimientoUnidad'])->name('p.generar.reportes.presupuesto..movimientos.unidad');
+
+// generar reporte PDF de movimientos de cuentas de una o varias unidades
+Route::get('/admin/p/reporte/pdf/movimientosunidad/jefepresupuesto/{anio}/{unidad}', [ReportesUnidadController::class,'generarReportePDFMovimientoDeCuentas']);
+
+
 
 
 

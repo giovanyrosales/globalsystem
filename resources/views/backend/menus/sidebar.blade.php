@@ -687,7 +687,7 @@
                         <a href="#" class="nav-link nav-">
                             <i class="far fa-edit"></i>
                             <p>
-                                Revisión Pres. Unidades
+                                Reportes de Unidades
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
@@ -707,7 +707,16 @@
                                 <li class="nav-item">
                                     <a href="{{ route('p.generar.reportes.presupuesto.unidad') }}" target="frameprincipal" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Reportes</p>
+                                        <p>Reporte Totales</p>
+                                    </a>
+                                </li>
+                            @endcan
+
+                            @can('p.generar.reportes.presupuesto.movimientos.unidades')
+                                <li class="nav-item">
+                                    <a href="{{ route('p.generar.reportes.presupuesto..movimientos.unidad') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Reporte Movimientos</p>
                                     </a>
                                 </li>
                             @endcan
