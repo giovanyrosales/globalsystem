@@ -19,6 +19,8 @@ class CreateProveedoresTable extends Migration
             $table->string('telefono', 20)->nullable();
             $table->string('nit',25)->nullable();
             $table->string('nrc',50)->nullable();
+            $table->string('nombre_comercial',100)->nullable();
+            $table->string('dui',20)->nullable();
         });
     }
 

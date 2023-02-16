@@ -89,6 +89,16 @@
                                         <input type="text" maxlength="50" class="form-control" id="nrc-nuevo" autocomplete="off">
                                     </div>
 
+                                    <div class="form-group">
+                                        <label>Nombre Comercial</label>
+                                        <input type="text" maxlength="100" class="form-control" id="comercial-nuevo" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>DUI</label>
+                                        <input type="text" maxlength="20" class="form-control" id="dui-nuevo" autocomplete="off">
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -142,6 +152,15 @@
                                         <input type="text" maxlength="50" class="form-control" id="nrc-editar" autocomplete="off">
                                     </div>
 
+                                    <div class="form-group">
+                                        <label>Nombre Comercial</label>
+                                        <input type="text" maxlength="100" class="form-control" id="comercial-editar" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>DUI</label>
+                                        <input type="text" maxlength="20" class="form-control" id="dui-editar" autocomplete="off">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -196,6 +215,8 @@
             var telefono = document.getElementById('telefono-nuevo').value;
             var nit = document.getElementById('nit-nuevo').value;
             var nrc = document.getElementById('nrc-nuevo').value;
+            var comercial = document.getElementById('comercial-nuevo').value;
+            var dui = document.getElementById('dui-nuevo').value;
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -222,12 +243,24 @@
                 return;
             }
 
+            if(comercial.length > 100){
+                toastr.error('Nombre Comercial máximo 100 caracteres');
+                return;
+            }
+
+            if(dui.length > 20){
+                toastr.error('DUI máximo 20 caracteres');
+                return;
+            }
+
             openLoading();
             var formData = new FormData();
             formData.append('nombre', nombre);
             formData.append('telefono', telefono);
             formData.append('nit', nit);
             formData.append('nrc', nrc);
+            formData.append('comercial', comercial);
+            formData.append('dui', dui);
 
             axios.post(url+'/proveedores/nuevo', formData, {
             })
@@ -264,6 +297,8 @@
                         $('#telefono-editar').val(response.data.lista.telefono);
                         $('#nit-editar').val(response.data.lista.nit);
                         $('#nrc-editar').val(response.data.lista.nrc);
+                        $('#comercial-editar').val(response.data.lista.nombre_comercial);
+                        $('#dui-editar').val(response.data.lista.dui);
 
                     }else{
                         toastr.error('Información no encontrada');
@@ -281,6 +316,8 @@
             var telefono = document.getElementById('telefono-editar').value;
             var nit = document.getElementById('nit-editar').value;
             var nrc = document.getElementById('nrc-editar').value;
+            var comercial = document.getElementById('comercial-editar').value;
+            var dui = document.getElementById('dui-editar').value;
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -307,6 +344,16 @@
                 return;
             }
 
+            if(comercial.length > 100){
+                toastr.error('Nombre Comercial máximo 100 caracteres');
+                return;
+            }
+
+            if(dui.length > 20){
+                toastr.error('DUI máximo 20 caracteres');
+                return;
+            }
+
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
@@ -314,6 +361,8 @@
             formData.append('telefono', telefono);
             formData.append('nit', nit);
             formData.append('nrc', nrc);
+            formData.append('comercial', comercial);
+            formData.append('dui', dui);
 
             axios.post(url+'/proveedores/editar', formData, {
             })
