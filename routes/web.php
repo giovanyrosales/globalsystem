@@ -1061,6 +1061,11 @@ Route::get('/admin/p/reporte/pdf/movimientosunidad/jefepresupuesto/{anio}/{unida
 
 
 
+//REPORTES PARA JEFE UACI
 
+// retorna vista para generar reportes UACI de unidades
+Route::get('/admin/p/reportes/unidad/uaci/index', [ConfiguracionPresupuestoUnidadController::class,'indexReporteUaciUnidad'])->name('p.generar.reportes.uaci.unidad');
+// retornar PDF de plan de compra anual, se envía el ID año
+Route::get('/admin/p/generador/pdf/plan/{anio}', [ReportesPresupuestoUnidadController::class,'generarPlanPdfUaci']);
 
 

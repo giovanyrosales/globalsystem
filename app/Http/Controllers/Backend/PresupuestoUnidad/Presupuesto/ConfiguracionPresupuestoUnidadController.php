@@ -49,6 +49,13 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         return view('backend.admin.presupuestounidad.reportes.vistareportespresupuestounidad', compact('departamentos', 'anios'));
     }
+    // retorna vista para generar reportes en uaci de unidades
+    public function indexReporteUaciUnidad(){
+        $departamentos = P_Departamento::orderBy('nombre')->get();
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
+
+        return view('backend.admin.presupuestounidad.reportes.vistareportesuaciunidad', compact('departamentos', 'anios'));
+    }
 
     // retorna vista para crear nuevo presupuesto de la unidad
     public function indexCrearPresupuestoUnidad(){
