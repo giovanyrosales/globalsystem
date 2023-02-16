@@ -255,7 +255,7 @@ class ReportesPresupuestoUnidadController extends Controller
     
             $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
             //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-            $mpdf->SetTitle('Consolidado Totales');
+            $mpdf->SetTitle('Plan Anual de Compra');
     
             // mostrar errores
             $mpdf->showImageErrors = false;
