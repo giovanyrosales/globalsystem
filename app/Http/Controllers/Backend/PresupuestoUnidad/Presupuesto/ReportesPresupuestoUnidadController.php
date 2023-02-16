@@ -65,8 +65,20 @@ class ReportesPresupuestoUnidadController extends Controller
             $totalColumnaGlobal = 0;
             // COLUMNA TOTAL CANTIDAD
             $totalColumnaCantidad = 0;
-    
-            $materiales = P_Materiales::orderBy('descripcion')->get();
+            
+
+           // $materiales = P_Materiales::orderBy('descripcion')->get();
+
+           $materiales = DB::table('p_materiales AS ma')
+           ->join('obj_especifico AS obj', 'ma.id_objespecifico', '=', 'obj.id')
+           ->join('cuenta AS cuen', 'obj.id_cuenta', '=', 'cuen.id')
+            ->join('rubro AS rb', 'cuen.id_rubro', '=', 'rb.id')
+            ->select('ma.*')
+            ->whereNotIn('cuen.codigo', [612,616,614])
+            ->whereNotIn('rb.codigo', [51,55,56,72])
+            ->get();
+            
+           // return [$materiales];
     
             // recorrer cada material
             foreach ($materiales as $mm) {
@@ -139,7 +151,7 @@ class ReportesPresupuestoUnidadController extends Controller
             $resultsBloque3 = array();
             $index3 = 0;
     
-            $rubro = Rubro::orderBy('codigo')->whereNotIn('codigo', [51])->get();
+            $rubro = Rubro::orderBy('codigo')->whereNotIn('codigo', [51,72,56,55])->get();
     
             $pilaIdMaterial = array();
             foreach ($dataArray as $dd){
@@ -158,6 +170,7 @@ class ReportesPresupuestoUnidadController extends Controller
     
                 $subSecciones = Cuenta::where('id_rubro', $secciones->id)
                     ->orderBy('codigo', 'ASC')
+                    ->whereNotIn('codigo', [612,616])
                     ->get();
     
                 // agregar objetos
@@ -343,13 +356,13 @@ class ReportesPresupuestoUnidadController extends Controller
                 }
             }
     
-            $tabla .= "<tr>
+           $tabla .= "<tr>
                         <td style='font-size:11px; text-align: center; font-weight: normal'></td>
                         <td style='font-size:11px; text-align: center; font-weight: normal'>TOTALES</td>
                         <td style='font-size:11px; text-align: center; font-weight: normal'></td>
                         <td style='font-size:11px; text-align: center; font-weight: normal'>$totalColumnaCantidad</td>
                         <td style='font-size:11px; text-align: center; font-weight: normal'>$$totalColumnaGlobal</td>
-                    </tr>";
+                     </tr>";
     
             $tabla .= "</tbody></table>";
     
