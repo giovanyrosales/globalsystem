@@ -11,6 +11,9 @@
                                 <th style="width: 10%">Teléfono</th>
                                 <th style="width: 10%">NIT</th>
                                 <th style="width: 10%">NRC</th>
+                                <th style="width: 12%">COMERCIAL</th>
+                                <th style="width: 8%">DUI</th>
+
                                 <th style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
@@ -22,6 +25,8 @@
                                     <td>{{ $dato->telefono }}</td>
                                     <td>{{ $dato->nit }}</td>
                                     <td>{{ $dato->nrc }}</td>
+                                    <td>{{ $dato->nombre_comercial }}</td>
+                                    <td>{{ $dato->dui }}</td>
                                     <td>
                                         <button type="button" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
