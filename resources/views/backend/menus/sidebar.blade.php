@@ -719,7 +719,7 @@
                                 </li>
                             @endcan
 
-                            @can('p.generar.reporte.materiales.anual.de.compras')
+                            @can('p.generar.reporte.materiales.anualcompras')
                                 <ul class="nav nav-treeview">
                                     <li class="nav-item">
                                         <a href="{{ route('p.generar.reportes.uaci.unidad') }}" target="frameprincipal" class="nav-link">

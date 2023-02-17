@@ -258,7 +258,7 @@ class RolesSeeder extends Seeder
         Permission::create(['name' => 'sidebar.usuarios.departamentos.asignados', 'description' => 'ver usuarios asignados a una unidad - solo vista'])->syncRoles($rolePresupuesto);
 
 
-        Permission::create(['name' => 'p.generar.reporte.materiales.anual.de.compras', 'description' => 'vista para generar reporte de plan anual de compras'])->syncRoles($roleJefeUaci, $roleUaciUnidad);
+        Permission::create(['name' => 'p.generar.reporte.materiales.anualcompras', 'description' => 'vista para generar reporte de plan anual de compras'])->syncRoles($roleJefeUaci, $roleUaciUnidad);
 
 
 
