@@ -146,17 +146,13 @@
     </script>
 
     <script>
-  
+
 
         function generarPdfPlanAnual(){
             var idanio = document.getElementById('select-anio').value;
             window.open("{{ URL::to('admin/p/generador/pdf/plan') }}/" + idanio);
         }
 
-        function generarExcelTotales(){
-            var fecha = document.getElementById('select-anio').value;
-            window.open("{{ URL::to('admin/p/generador/excel/totales') }}/" + fecha);
-        }
 
     </script>
 

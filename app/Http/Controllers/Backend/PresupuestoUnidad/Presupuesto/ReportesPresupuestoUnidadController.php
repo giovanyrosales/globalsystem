@@ -38,8 +38,15 @@ class ReportesPresupuestoUnidadController extends Controller
                 ->get();
 
             $dataArray = array();
+            $pilaArrayIdPresu = array();
 
-            $listadoProyectoAprobados = P_ProyectosAprobados::orderBy('descripcion', 'ASC')->get();
+            foreach ($arrayPresupuestoUni as $dd){
+                array_push($pilaArrayIdPresu, $dd->id);
+            }
+
+            $listadoProyectoAprobados = P_ProyectosAprobados::whereIn('id_presup_unidad', $pilaArrayIdPresu)
+                ->orderBy('descripcion', 'ASC')
+                ->get();
 
             foreach ($listadoProyectoAprobados as $dd){
 
@@ -66,9 +73,6 @@ class ReportesPresupuestoUnidadController extends Controller
             // COLUMNA TOTAL CANTIDAD
             $totalColumnaCantidad = 0;
 
-
-           // $materiales = P_Materiales::orderBy('descripcion')->get();
-
            $materiales = DB::table('p_materiales AS ma')
            ->join('obj_especifico AS obj', 'ma.id_objespecifico', '=', 'obj.id')
            ->join('cuenta AS cuen', 'obj.id_cuenta', '=', 'cuen.id')
@@ -77,8 +81,6 @@ class ReportesPresupuestoUnidadController extends Controller
             ->whereNotIn('cuen.codigo', [612,616,614])
             ->whereNotIn('rb.codigo', [51,55,56,72])
             ->get();
-
-           // return [$materiales];
 
             // recorrer cada material
             foreach ($materiales as $mm) {
@@ -249,9 +251,6 @@ class ReportesPresupuestoUnidadController extends Controller
                 $resultsBloque[$index]->cuenta = $subSecciones;
                 $index++;
             }
-
-
-
 
             $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
             //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
