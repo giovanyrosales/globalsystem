@@ -720,14 +720,12 @@
                             @endcan
 
                             @can('p.generar.reporte.materiales.anualcompras')
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="{{ route('p.generar.reportes.uaci.unidad') }}" target="frameprincipal" class="nav-link">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            <p>Reporte Plan Anual</p>
-                                        </a>
-                                    </li>
-                                </ul>
+                                <li class="nav-item">
+                                    <a href="{{ route('p.generar.reportes.uaci.unidad') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Reporte Plan Anual</p>
+                                    </a>
+                                </li>
                             @endcan
 
                         </ul>
