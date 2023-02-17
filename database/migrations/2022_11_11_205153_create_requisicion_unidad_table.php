@@ -25,6 +25,12 @@ class CreateRequisicionUnidadTable extends Migration
             $table->boolean('req_revision');
 
 
+            // CAMPOS UTILIZADOS PARA CUANDO ES DENEGADA LA COTIZACION POR EL CONCEJO POR EJEMPLO.
+            // esto lo hace uaci unidad u otro rol
+            $table->boolean('estado_denegado');
+            $table->text('texto_denegado')->nullable();
+
+
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
         });
     }

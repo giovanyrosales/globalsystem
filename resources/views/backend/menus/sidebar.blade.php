@@ -361,25 +361,6 @@
                     </li>
 
                 @endcan
-                <li class="nav-item">
-
-                        <a href="#" class="nav-link nav-">
-                            <i class="far fa-edit"></i>
-                            <p>
-                                Reportes de Unidades
-                                <i class="fas fa-angle-left right"></i>
-                            </p>
-                        </a>
-
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                            <a href="{{ route('p.generar.reportes.uaci.unidad') }}" target="frameprincipal" class="nav-link">
-                                                <i class="far fa-circle nav-icon"></i>
-                                                <p>Reporte Plan Anual</p>
-                                            </a>
-                            </li>
-                        </ul>
-                </li>
 
             <!-- DESCARGOS DIRECTOS -->
                 @can('sidebar.descargos.directos')
@@ -736,6 +717,17 @@
                                         <p>Reporte Movimientos</p>
                                     </a>
                                 </li>
+                            @endcan
+
+                            @can('p.generar.reporte.materiales.anual.de.compras')
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('p.generar.reportes.uaci.unidad') }}" target="frameprincipal" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Reporte Plan Anual</p>
+                                        </a>
+                                    </li>
+                                </ul>
                             @endcan
 
                         </ul>

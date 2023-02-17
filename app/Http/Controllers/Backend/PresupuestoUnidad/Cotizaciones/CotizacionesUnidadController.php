@@ -67,6 +67,19 @@ class CotizacionesUnidadController extends Controller
             $infoDepar = P_Departamento::where('id', $infoPresup->id_departamento)->first();
 
             $ll->departamento = $infoDepar->nombre;
+
+            // Necesito comprobar que no hay ningun material cotizado para poder cancelar
+            $infoRequiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $ll->id)
+                ->where('estado', 1) // al menos 1 ya esta en proceso de cotizado
+                ->where('cancelado', 0) // si ya esta cancelado, no hacer nada
+                ->count();
+
+            // Si se encuentra al menos 1, significa que un material ya tiene una cotización en proceso
+            if($infoRequiDetalle > 0){
+                $ll->puedecancelar = false;
+            }else{
+                $ll->puedecancelar = true;
+            }
         }
 
         return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.tablarequerimientosunidadrevision', compact('listaRequisicion'));

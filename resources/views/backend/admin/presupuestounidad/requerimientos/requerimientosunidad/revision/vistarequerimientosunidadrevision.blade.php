@@ -174,6 +174,45 @@
     </div>
 
 
+    <!-- CANCELAR TODOS EL REQUERIMIENTO PORQUE FUE DENEGADO POR EL CONCEJO -->
+
+
+    <div class="modal fade" id="modalCancelamiento">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Denegar Requerimiento</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <form id="formulario-cancelamiento">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Descripción:</label>
+                                        <input id="id-denegado" type="hidden">
+                                        <textarea rows="5" cols="5" id="texto-cancelamiento" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-caution button-rounded button-pill button-small" onclick="cancelarRequerimiento()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </div>
 
 @extends('backend.menus.footerjs')
@@ -684,6 +723,89 @@
         }
 
 
+
+        // modal para cancelar y dar motivo del cancelamiento
+        function informacionCancelar(id){
+            // ID: requisicion_unidad
+
+            document.getElementById("formulario-cancelamiento").reset();
+
+            $('#id-denegado').val(id);
+
+            $('#modalCancelamiento').modal('show');
+        }
+
+        function cancelarRequerimiento(){
+
+            Swal.fire({
+                title: 'Denegar Requerimiento',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: "No",
+                confirmButtonText: 'Si',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    peticionDenegarRequerimiento();
+                }
+            })
+        }
+
+        // DENEGAR REQUERIMIENTO POR EJEMPLO POR EL CONCEJO
+        function peticionDenegarRequerimiento(){
+
+            var id = document.getElementById('id-denegado').value;
+            var textodenegado = document.getElementById('texto-cancelamiento').value;
+
+            if(textodenegado === ''){
+                toastr.error('Descripción es requerida');
+                return;
+            }
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('txtdenegado', textodenegado);
+
+            axios.post(url+'/p/denegar/completa/requisicion/unidad', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'Requisición en Proceso',
+                            text: "Se encontró que un requerimiento ya esta en Proceso de Cotización o Finalizado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                recargar();
+                            }
+                        })
+
+                    }
+                    else if(response.data.success === 2){
+                        toastr.success('Requisición Denegada correctamente');
+                        $('#modalCancelamiento').modal('hide');
+                        recargar();
+                    }
+                    else {
+
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al denegar');
+                    closeLoading();
+                });
+        }
 
 
     </script>

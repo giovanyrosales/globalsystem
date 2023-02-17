@@ -30,6 +30,12 @@
                                             <i class="fas fa-edit" title="Cotizar"></i>&nbsp; Cotizar
                                         </button>
 
+                                        @if($dato->puedecancelar)
+                                            <button type="button" class="btn btn-danger btn-xs" onclick="informacionCancelar({{ $dato->id }})">
+                                                <i class="fas fa-stop-circle-o" title="Denegar"></i>&nbsp; Denegar
+                                            </button>
+                                        @endif
+
 
                                     </td>
 

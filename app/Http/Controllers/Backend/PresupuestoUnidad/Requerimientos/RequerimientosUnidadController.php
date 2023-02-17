@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\ErrorHandler\Debug;
 
 class RequerimientosUnidadController extends Controller
 {
@@ -671,10 +672,6 @@ class RequerimientosUnidadController extends Controller
 
         // ID REQUISICION DETALLE de unidad
 
-
-        $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $request->id)->first();
-        $infoRequisicion = RequisicionUnidad::where('id', $infoRequiDetalle->requisicion_id)->first();
-
         // verificar que este material no este cotizado con una autorizada.
 
         // obtener todas las cotizaciones id donde esté cotizado
@@ -703,8 +700,8 @@ class RequerimientosUnidadController extends Controller
             }
 
             // ver si existe al menos 1 orden
-            if(OrdenUnidad::whereIn('id_cotizacion_unidad', $pilaCoti)->first()){
-                $conteoOrden = OrdenUnidad::whereIn('id_cotizacion_unidad', $pilaCoti)
+            if(OrdenUnidad::whereIn('id_cotizacion', $pilaCoti)->first()){
+                $conteoOrden = OrdenUnidad::whereIn('id_cotizacion', $pilaCoti)
                     ->where('estado', 0) // APROBADA LA ORDEN
                     ->count();
 
@@ -762,6 +759,45 @@ class RequerimientosUnidadController extends Controller
             return ['success' => 99];
         }
     }
+
+
+    public function denegarRequisicionCompletaUnidad(Request $request){
+
+        // id requisicion_unidad
+
+        DB::beginTransaction();
+
+        try {
+
+            $conteoRequiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)
+                ->where('estado', 1) // YA ESTA EN PROCESO DE COTIZACION
+                ->count();
+
+            if($conteoRequiDetalle > 0){
+                // no se puede porque un material ya tiene proceso de cotización en proceso
+                return ['success' => 1];
+            }else{
+                // todos los materiales no tienen cotizacion pendiente
+                RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)->update([
+                    'cancelado' => 1,
+                ]);
+
+                // guardar registro
+                RequisicionUnidad::where('id', $request->id)->update([
+                    'estado_denegado' => 1,
+                    'texto_denegado' => $request->txtdenegado
+                ]);
+
+                DB::commit();
+                return ['success' => 2];
+            }
+
+        }catch(\Throwable $e){
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
 
 
 }

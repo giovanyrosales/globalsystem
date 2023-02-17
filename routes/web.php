@@ -1060,12 +1060,19 @@ Route::get('/admin/p/vista/unidades/movimientosunidad/index', [ReportesUnidadCon
 Route::get('/admin/p/reporte/pdf/movimientosunidad/jefepresupuesto/{anio}/{unidad}', [ReportesUnidadController::class,'generarReportePDFMovimientoDeCuentas']);
 
 
-
 //REPORTES PARA JEFE UACI
 
 // retorna vista para generar reportes UACI de unidades
 Route::get('/admin/p/reportes/unidad/uaci/index', [ConfiguracionPresupuestoUnidadController::class,'indexReporteUaciUnidad'])->name('p.generar.reportes.uaci.unidad');
 // retornar PDF de plan de compra anual, se envía el ID año
 Route::get('/admin/p/generador/pdf/plan/{anio}', [ReportesPresupuestoUnidadController::class,'generarPlanPdfUaci']);
+
+
+
+// Denegar requisicion, ejemplo cuando el concejo lo deniega
+Route::post('/admin/p/denegar/completa/requisicion/unidad', [RequerimientosUnidadController::class,'denegarRequisicionCompletaUnidad']);
+
+
+
 
 
