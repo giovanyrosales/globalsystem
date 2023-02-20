@@ -315,6 +315,9 @@ class RequerimientosUnidadController extends Controller
             $r->fecha = $request->fecha;
             $r->necesidad = $request->necesidad;
             $r->req_revision = 0; // NECESITA SER REVISADO POR PRESUPUESTO
+            $r->estado_denegado = 0;
+            $r->texto_denegado = null;
+
             $r->save();
 
             for ($i = 0; $i < count($request->cantidad); $i++) {
