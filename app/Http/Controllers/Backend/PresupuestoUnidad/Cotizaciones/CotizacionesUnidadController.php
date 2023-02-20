@@ -1021,6 +1021,63 @@ class CotizacionesUnidadController extends Controller
     }
 
 
+    // vista para ver requerimientos denegados
+    public function indexFechaRequerimientosDenegadosUnidades(){
 
+        $anios = P_AnioPresupuesto::orderBy('id', 'DESC')->get();
+
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientosunidaddenegados', compact('anios'));
+    }
+
+
+    public function indexRequerimientosDenegadosUnidades($idanio){
+
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientos.vistarequerimientosdene', compact('idanio'));
+    }
+
+    public function tablaRequerimientosDenegadosUnidades($idanio){
+
+        $registro = DB::table('p_presup_unidad AS p')
+            ->join('requisicion_unidad AS req', 'req.id_presup_unidad', '=', 'p.id')
+            ->select('req.estado_denegado', 'req.texto_denegado', 'p.id_anio',
+                'req.destino', 'req.fecha', 'req.necesidad', 'req.id AS idrequi', 'p.id_departamento')
+            ->where('req.estado_denegado', 1) // solo denegados
+            ->where('p.id_anio', $idanio)
+            ->get();
+
+        foreach ($registro as $dd){
+            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+            // obtener total de todos los materiales de la requisición
+            $arrayDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $dd->idrequi)->get();
+
+            $infoDepartamento = P_Departamento::where('id', $dd->id_departamento)->first();
+            $dd->departamento = $infoDepartamento->nombre;
+
+            $multi = 0;
+            foreach ($arrayDetalle as $info){
+                $multi += ($info->cantidad * $info->dinero_fijo);
+            }
+
+            $dd->multiplicado = '$' . number_format((float)$multi, 2, '.', ',');
+        }
+
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientos.tablarequerimientosdene', compact('registro'));
+    }
+
+
+    public function indexRequeDeneUnidadesMateriales($idrequi){
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientosdetalle.vistarequerimientosdenemateriales', compact('idrequi'));
+    }
+
+    public function indexRequeDeneUnidadesMaterialesDetalle($idrequi){
+
+        $registro = RequisicionUnidadDetalle::where('id', $idrequi)->get();
+
+        foreach ($registro as $dd){
+            $dd->dinero_fijo = '$' . number_format((float)$dd->dinero_fijo, 2, '.', ',');
+        }
+
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientosdetalle.tablarequerimientosdenemateriales', compact('registro'));
+    }
 
 }

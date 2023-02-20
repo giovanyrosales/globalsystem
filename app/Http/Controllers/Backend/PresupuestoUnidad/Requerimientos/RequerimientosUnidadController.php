@@ -777,10 +777,18 @@ class RequerimientosUnidadController extends Controller
                 // no se puede porque un material ya tiene proceso de cotización en proceso
                 return ['success' => 1];
             }else{
+
+                $registros = RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)
+                    ->select('id')
+                    ->get();
+
                 // todos los materiales no tienen cotizacion pendiente
                 RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)->update([
                     'cancelado' => 1,
                 ]);
+
+                // borrar retenido
+                CuentaUnidadRetenido::whereIn('id_requi_detalle', $registros)->delete();
 
                 // guardar registro
                 RequisicionUnidad::where('id', $request->id)->update([

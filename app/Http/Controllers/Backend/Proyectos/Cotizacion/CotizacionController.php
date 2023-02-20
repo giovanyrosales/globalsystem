@@ -706,5 +706,4 @@ class CotizacionController extends Controller
             'proveedor', 'infoCotiDetalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
     }
 
-
 }

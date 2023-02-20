@@ -1067,12 +1067,18 @@ Route::get('/admin/p/reportes/unidad/uaci/index', [ConfiguracionPresupuestoUnida
 // retornar PDF de plan de compra anual, se envía el ID año
 Route::get('/admin/p/generador/pdf/plan/{anio}', [ReportesPresupuestoUnidadController::class,'generarPlanPdfUaci']);
 
-
-
 // Denegar requisicion, ejemplo cuando el concejo lo deniega
 Route::post('/admin/p/denegar/completa/requisicion/unidad', [RequerimientosUnidadController::class,'denegarRequisicionCompletaUnidad']);
 
-
-
+// seleccionar año para buscar requerimientos detalles
+Route::get('/admin/p/buscarfecha/requerimientos/denegados/unidadindex', [CotizacionesUnidadController::class,'indexFechaRequerimientosDenegadosUnidades'])->name('admin.listar.requerimientos.denegados.index');
+// detalle de requisiciones denegadas
+Route::get('/admin/p/requerimiento/denegados/listado/{idanio}', [CotizacionesUnidadController::class,'indexRequerimientosDenegadosUnidades']);
+// tabla de requisiciones denegadas
+Route::get('/admin/p/requerimiento/denegados/listado/denegados/{idanio}', [CotizacionesUnidadController::class,'tablaRequerimientosDenegadosUnidades']);
+// este seria la vista para ver los materiales detallados
+Route::get('/admin/p/reque/dene/listado/materiales/{idrequi}', [CotizacionesUnidadController::class,'indexRequeDeneUnidadesMateriales']);
+// este seria la tabla para ver los materiales detallados
+Route::get('/admin/p/reque/dene/listado/materiales/tabla/{idrequi}', [CotizacionesUnidadController::class,'indexRequeDeneUnidadesMaterialesDetalle']);
 
 
