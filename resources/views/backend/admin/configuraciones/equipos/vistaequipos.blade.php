@@ -70,17 +70,17 @@
 
                                     <div class="form-group">
                                         <label>Código</label>
-                                        <input type="text" maxlength="150" class="form-control" id="codigo-nuevo" autocomplete="off">
+                                        <input type="text"  class="form-control" id="codigo-nuevo" autocomplete="off">
                                     </div>
 
                                     <div class="form-group" >
                                         <label>Descripción</label>
-                                        <input type="text" maxlength="20" class="form-control" id="descripcion-nuevo" autocomplete="off">
+                                        <input type="text"  class="form-control" id="descripcion-nuevo" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Placa</label>
-                                        <input type="text" maxlength="25" class="form-control" id="placa-nuevo" autocomplete="off">
+                                        <input type="text"  class="form-control" id="placa-nuevo" autocomplete="off">
                                     </div>
 
                                 </div>
@@ -118,17 +118,17 @@
 
                                     <div class="form-group">
                                         <label>Código</label>
-                                        <input type="text" maxlength="150" class="form-control" id="codigo-editar" autocomplete="off">
+                                        <input type="text" class="form-control" id="codigo-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Descripción</label>
-                                        <input type="text" maxlength="20" class="form-control" id="descripcion-editar" autocomplete="off">
+                                        <input type="text" class="form-control" id="descripcion-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Placa</label>
-                                        <input type="text" maxlength="25" class="form-control" id="placa-editar" autocomplete="off">
+                                        <input type="text" class="form-control" id="placa-editar" autocomplete="off">
                                     </div>
 
                                 </div>

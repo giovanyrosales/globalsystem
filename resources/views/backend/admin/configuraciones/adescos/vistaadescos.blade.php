@@ -70,22 +70,22 @@
 
                                     <div class="form-group">
                                         <label>Nombre</label>
-                                        <input type="text" maxlength="150" class="form-control" id="nombre-nuevo" autocomplete="off">
+                                        <input type="text"  class="form-control" id="nombre-nuevo" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Presidente</label>
-                                        <input type="text" maxlength="20" class="form-control" id="presidente-nuevo" autocomplete="off">
+                                        <input type="text"  class="form-control" id="presidente-nuevo" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>DUI</label>
-                                        <input type="text" maxlength="50" class="form-control" id="dui-nuevo" autocomplete="off">
+                                        <input type="text" class="form-control" id="dui-nuevo" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Tel.</label>
-                                        <input type="text" maxlength="25" class="form-control" id="tel-nuevo" autocomplete="off">
+                                        <input type="text" class="form-control" id="tel-nuevo" autocomplete="off">
                                     </div>
 
                                 </div>
@@ -123,22 +123,22 @@
 
                                     <div class="form-group">
                                         <label>Nombre</label>
-                                        <input type="text" maxlength="150" class="form-control" id="nombre-editar" autocomplete="off">
+                                        <input type="text" class="form-control" id="nombre-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Presidente</label>
-                                        <input type="text" maxlength="20" class="form-control" id="presidente-editar" autocomplete="off">
+                                        <input type="text"  class="form-control" id="presidente-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>DUI</label>
-                                        <input type="text" maxlength="25" class="form-control" id="dui-editar" autocomplete="off">
+                                        <input type="text"  class="form-control" id="dui-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Tel.</label>
-                                        <input type="text" maxlength="50" class="form-control" id="tel-editar" autocomplete="off">
+                                        <input type="text" class="form-control" id="tel-editar" autocomplete="off">
                                     </div>
 
                                 </div>
@@ -201,12 +201,12 @@
                 return;
             }
 
-            if(nombre.length > 350){
+            if(nombre.length > 550){
                 toastr.error('Nombre máximo 350 caracteres');
                 return;
             }
 
-            if(presidente.length > 350){
+            if(presidente.length > 550){
                 toastr.error('Presidente máximo 350 caracteres');
                 return;
             }
