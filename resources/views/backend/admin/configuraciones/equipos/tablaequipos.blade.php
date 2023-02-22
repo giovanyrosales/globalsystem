@@ -7,10 +7,10 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Código</th>
-                                <th>Descripción</th>
-                                <th>Placa</th>
-                                <th>Opciones</th>
+                                <th  style="width: 10%">Código</th>
+                                <th  style="width: 60%">Descripción</th>
+                                <th  style="width: 10%">Placa</th>
+                                <th  style="width: 20%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
