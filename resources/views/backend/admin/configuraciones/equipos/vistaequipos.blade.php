@@ -68,17 +68,17 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-                                    <div class="form-group">
+                                    <div class="form-group" width="20%">
                                         <label>Código</label>
                                         <input type="text" maxlength="150" class="form-control" id="codigo-nuevo" autocomplete="off">
                                     </div>
 
-                                    <div class="form-group">
+                                    <div class="form-group" width="60%">
                                         <label>Descripción</label>
                                         <input type="text" maxlength="20" class="form-control" id="descripcion-nuevo" autocomplete="off">
                                     </div>
 
-                                    <div class="form-group">
+                                    <div class="form-group" width="20%">
                                         <label>Placa</label>
                                         <input type="text" maxlength="25" class="form-control" id="placa-nuevo" autocomplete="off">
                                     </div>
