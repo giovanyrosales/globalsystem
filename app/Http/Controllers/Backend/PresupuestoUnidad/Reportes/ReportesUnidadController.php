@@ -163,8 +163,8 @@ class ReportesUnidadController extends Controller
             $data->dinero = '$' . number_format((float)$data->dinero, 2, '.', ',');
         }
 
-        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
         $mpdf->SetTitle('Movimiento de Cuentas');
         $stylesheet = file_get_contents('css/csspresupuesto.css');
 
