@@ -32,7 +32,7 @@
                 <td width="75%" style="text-align:right; ">
                     <br></br>
                     <br></br>
-                    <label style=" font-size: 18px;  text-align:right;">xxxxx</label>
+                    <label style=" font-size: 18px;  text-align:right;">{{ $idorden }}</label>
                 </td>
                 <td width="5%"></td>
             </tr>

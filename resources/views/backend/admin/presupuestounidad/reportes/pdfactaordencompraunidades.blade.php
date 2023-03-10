@@ -26,7 +26,7 @@
         <br></br>
         <td width="20%"><img style="margin-top: -20px; "src="{{ asset('/images/logo.png') }}" width="80px" height="80px"></td>
         <td width="60%" style="text-align:center; ">
-            <label style="font-weight: bold; font-size: 25px;  text-align:center;">ACTA DE RECEPCION DE BIENES, SERVICIOS Y OBAS.</label>
+            <label style="font-weight: bold; font-size: 25px;  text-align:center;">ACTA DE RECEPCIONES DE BIENES, SERVICIOS Y OBRAS.</label>
         </td>
         <td width="20%"></td>
     </tr>
@@ -45,13 +45,13 @@
         <td width="10%"></td>
         <td width="80%" style="text-align:left; ">
             <label style=" font-size: 15px;  text-align:left;">Reunidos en las instalaciones de </label>
-            <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ $proveedor->nombre}}</label>
-            <label style=" font-size: 15px;  text-align:left;">, a las  </label>
-            <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ $hora }}</label>
-            <label style=" font-size: 15px;  text-align:left;">del día  </label>
-            <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ strftime("%d", strtotime($fecha)) }} / {{ strftime("%m", strtotime($fecha)) }} / {{ strftime("%y", strtotime($fecha)) }}</label>
+            <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ $lugar }}</label>
+            <label style=" font-size: 15px;  text-align:left;">, a las  _______________</label>
+            <label style="font-weight: bold; font-size: 15px;  text-align:left;"></label>
+            <label style=" font-size: 15px;  text-align:left;">del día  _______________</label>
+            <label style="font-weight: bold; font-size: 15px;  text-align:left;"></label>
             <label style=" font-size: 15px;  text-align:left;">; con el propósito de hacer entrega formal por parte de </label>
-            <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ $proveedor->nombre}}</label>
+            <label style="font-weight: normal; font-size: 15px;  text-align:left;">{{ $proveedor->nombre}}</label>
             <label style=" font-size: 15px;  text-align:left;">.</label>
         </td>
         <td width="10%"></td>
@@ -63,16 +63,12 @@
         <td width="10%"></td>
         <td width="80%" style="text-align:left; ">
             <label style=" font-size: 15px;  text-align:left;">Todo lo correspondiente a la orden No.</label>
-            <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ $orden->id }}</label>
+            <label style="font-weight: normal; font-size: 15px;  text-align:left;">{{ $orden->id }}</label>
             <label style=" font-size: 15px;  text-align:left;"> y con base a lo solicitado; presente los señores</label>
-            <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ $proveedor->nombre }}</label>
+            <label style="font-weight: normal; font-size: 15px;  text-align:left;">{{ $proveedor->nombre }}</label>
             <label style=" font-size: 15px;  text-align:left;">, por parte del proveedor; </label>
             <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ $administrador->nombre}}.</label>
-            <label style=" font-size: 15px;  text-align:left;"> en calidad  de administrador de contrato del proyecto:</label>
-            <label style="font-weight: bold; font-size: 15px;  text-align:left;">xxx.</label>
-            <label style=" font-size: 15px;  text-align:left;">, de código </label>
-            <label style="font-weight: bold; font-size: 15px;  text-align:left;">xxx</label>
-            <label style=" font-size: 15px;  text-align:left;">.</label>
+            <label style=" font-size: 15px;  text-align:left;"> en calidad de administrador de contrato.</label>
         </td>
         <td width="10%"></td>
     </tr>
@@ -142,4 +138,30 @@
             <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ $administrador->nombre }}</label>
         </td>
     </tr>
+
+    <tr>
+        <td width="10%"></td>
+
+        <td width="40%" style="text-align:right; ">
+            <label style="font-weight: bold; font-size: 15px;  text-align:left;">F. _________________________</label>
+        </td>
+    </tr>
+    <tr>
+        <td width="10%"></td>
+
+        <td width="40%" style="text-align:right; ">
+            <label style=" font-size: 15px;  text-align:left;">Administrador de contrato</label>
+        </td>
+    </tr>
+    <tr>
+        <td width="10%"></td>
+
+        <td width="40%" style="text-align:right; ">
+            <label style="font-weight: bold; font-size: 15px;  text-align:left;">{{ $administrador->nombre }}</label>
+        </td>
+    </tr>
+
+
+
+
 </table>

@@ -7,6 +7,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                <th>Número</th>
                                 <th>Fecha</th>
                                 <th>Departamento</th>
                                 <th>Destino</th>
@@ -20,6 +21,7 @@
 
                             @foreach($registro as $dato)
                                 <tr>
+                                    <td>{{ $dato->idrequi }}</td>
                                     <td>{{ $dato->fecha }}</td>
                                     <td>{{ $dato->departamento }}</td>
                                     <td>{{ $dato->destino }}</td>

@@ -81,9 +81,29 @@
                                         </div>
 
                                     </div>
+
+
+                                    <div class="row">
+
+                                        <div class="form-group col-md-6">
+                                            <div class="form-group">
+                                                <label>Número de Acta (no ingresar palabra acta)</label>
+                                                <input type="text" class="form-control" maxlength="100" id="num_acta">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <div class="form-group">
+                                                <label>Número de Acuerdo (no ingresar palabra acuerdo)</label>
+                                                <input type="text" class="form-control" maxlength="100" id="num_acuerdo">
+                                            </div>
+                                        </div>
+
+                                    </div>
+
                                     <div class="form-group">
                                         <label>Lugar</label>
-                                        <textarea type="textbox" class="form-control" maxlength="10000" id="lugar" rows="3"></textarea>
+                                        <input type="text" class="form-control" maxlength="300" id="lugar">
                                     </div>
                                 </div>
                             </div>
@@ -151,6 +171,9 @@
             var admin = document.getElementById('select-administrador').value;
             var idcoti = document.getElementById('id-coti').value;
 
+            var numacuerdo = document.getElementById('num_acuerdo').value;
+            var numacta = document.getElementById('num_acta').value;
+
             if(admin === ''){
                 toastr.error('Seleccionar Administrador');
                 return;
@@ -161,8 +184,33 @@
                 return;
             }
 
-            if(lugar.length > 10000){
-                toastr.error('Lugar debe tener máximo 10,000 caracteres');
+            if(lugar === ''){
+                toastr.error('El Lugar es requerido');
+                return;
+            }
+
+            if(lugar.length > 300){
+                toastr.error('Lugar debe tener máximo 300 caracteres');
+                return;
+            }
+
+            if(numacuerdo === ''){
+                toastr.error('Número de acuerdo es requerido');
+                return;
+            }
+
+            if(numacuerdo.length > 100){
+                toastr.error('Número de acuerdo debe tener máximo 100 caracteres');
+                return;
+            }
+
+            if(numacta === ''){
+                toastr.error('Número de acuerdo de acta');
+                return;
+            }
+
+            if(numacta.length > 100){
+                toastr.error('Número de acta debe tener máximo 100 caracteres');
                 return;
             }
 
@@ -172,6 +220,8 @@
             formData.append('fecha', fecha);
             formData.append('lugar', lugar);
             formData.append('admin', admin);
+            formData.append('numacta', numacta);
+            formData.append('numacuerdo', numacuerdo);
 
             axios.post(url+'/p/ordencompra/unidad/generar', formData, {
             })
@@ -183,12 +233,12 @@
                         toastr.success('Orden Generada');
                         recargar();
 
-                        // POR DEFECTO SE IRA CON 10 MATERIALES
+                        // POR DEFECTO SE IRA CON 12 MATERIALES
 
                         let id = response.data.id;
 
                         // vista pdf
-                        window.open("{{ URL::to('admin/p/ordencompra/unidad/pdf') }}/" + id + "/" + 10);
+                        window.open("{{ URL::to('admin/p/ordencompra/unidad/pdf') }}/" + id + "/" + 12);
                     }
                     else if(response.data.success === 2) {
                         // La orden de compra con la cotización, no estaba aprobada.

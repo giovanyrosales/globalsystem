@@ -7,6 +7,7 @@
                         <table id="tabla-requisicion" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                <th style="width: 5%">Número</th>
                                 <th style="width: 12%">Departamento</th>
                                 <th style="width: 15%">Destino</th>
                                 <th style="width: 15%">Necesidad</th>
@@ -19,6 +20,7 @@
                             @foreach($listaRequisicion as $dato)
 
                                 <tr>
+                                    <td style="width: 4%">{{ $dato->id }}</td>
                                     <td style="width: 4%">{{ $dato->departamento }}</td>
                                     <td style="width: 10%">{{ $dato->destino }}</td>
                                     <td style="width: 10%">{{ $dato->necesidad }}</td>

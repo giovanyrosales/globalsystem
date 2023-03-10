@@ -17,9 +17,11 @@ use App\Models\P_Departamento;
 use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
 use App\Models\P_UnidadMedida;
+use App\Models\P_UsuarioDepartamento;
 use App\Models\Proveedores;
 use App\Models\RequisicionUnidad;
 use App\Models\RequisicionUnidadDetalle;
+use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -91,6 +93,8 @@ class OrdenCompraUnidadController extends Controller
             $or->lugar = $request->lugar;
             $or->estado = 0;
             $or->fecha_anulada = null;
+            $or->numero_acta = $request->numacta;
+            $or->numero_acuerdo = $request->numacuerdo;
             $or->save();
 
             $detalle = CotizacionUnidadDetalle::where('id_cotizacion_unidad', $request->idcoti)->get();
@@ -194,13 +198,20 @@ class OrdenCompraUnidadController extends Controller
         $mes = $fecha[1];
         $anio = $fecha[2];
 
+
+        $idorden = $orden->id;
+
         $pdf = PDF::loadView('backend.admin.presupuestounidad.reportes.pdfordencompraunidades', compact('orden',
             'cotizacion', 'dia','mes', 'anio','proveedor','array_merged',
-            'administrador', 'total'));
+            'administrador', 'total', 'idorden'));
         //$customPaper = array(0,0,470.61,612.36);
         $customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper($customPaper)->setWarnings(false);
         return $pdf->stream('Orden_Compra.pdf');
+
+
+
+
     }
 
     public function vistaAñoOrdenesComprasUnidadesAprobadas(){
@@ -432,8 +443,6 @@ class OrdenCompraUnidadController extends Controller
 
         $regla = array(
             'idorden' => 'required',
-            'horaacta' => 'required',
-            'fechaacta' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -456,8 +465,6 @@ class OrdenCompraUnidadController extends Controller
         }else{
             $acta = new ActaUnidad();
             $acta->id_ordenunidad = $request->idorden;
-            $acta->fecha_acta = $request->fechaacta;
-            $acta->hora = $request->horaacta;
             $acta->estado = 1; // acta generada
 
             if($acta->save()) {
@@ -476,14 +483,150 @@ class OrdenCompraUnidadController extends Controller
         $cotizacion = CotizacionUnidad::where('id', $orden->id_cotizacion)->first();
         $proveedor =  Proveedores::where('id',  $cotizacion->id_proveedor)->first();
         $administrador = Administradores::where('id',  $orden->id_admin_contrato)->first();
-        $requisicion = RequisicionUnidad::where('id',  $cotizacion->id_requisicion_unidad)->first();
 
-        $fecha = strftime("%d-%B-%Y",strtotime($acta->fecha_acta));
-        $hora = $acta->hora;
+        $infoRequi = RequisicionUnidad::where('id', $cotizacion->id_requisicion_unidad)->first();
+        $infoPresu = P_PresupUnidad::where('id', $infoRequi->id_presup_unidad)->first();
 
-        $pdf = PDF::loadView('backend.admin.presupuestounidad.reportes.pdfactaordencompraunidades', compact('acta','fecha','proveedor','administrador','hora','orden'));
-        $pdf->setPaper('letter', 'portrait')->setWarnings(false);
-        return $pdf->stream('acta_orden_compra.pdf');
+        $infoUsuarioDepa = P_UsuarioDepartamento::where('id_departamento', $infoPresu->id_departamento)->first();
+
+        $infoUsuario = Usuario::where('id', $infoUsuarioDepa->id_usuario)->first();
+
+
+
+
+        $lugar = $orden->lugar;
+
+
+
+
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf->SetTitle('Orden de Compra');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+        $logoalcaldia = 'images/logo2.png';
+
+        $tabla = "
+     <TABLE BORDER>
+	<TR>
+		<TD ROWSPAN=2> <img id='logo' src='$logoalcaldia'> </TD>
+	    	<TD style='padding-left: 20px; font-weight: bold; font-size: 20px'>ACTA DE RECEPCIONES DE BIENES, SERVICIOS Y OBRAS.</TD>
+	</TR>
+	<TR>
+		<TD style='text-align: center; font-size: 18px; font-weight: bold; padding-top: 15px'>Alcaldía Municipal de Metapán.</TD>
+	</TR>
+</TABLE>
+        ";
+
+        $tabla .= "
+        <div style='margin-top: 90px; margin-left: 20px; margin-right: 20px'>
+       <label style='font-size: 15px; text-align:justify;'>Reunidos en las instalaciones de </label>
+            <label style='font-weight: bold; font-size: 15px;  text-align:justify;'>$lugar</label>
+            <label style=' font-size: 15px;  text-align:justify;'>, a las  _______________</label>
+            <label style='font-weight: bold; font-size: 15px;  text-align:justify;'></label>
+            <label style=' font-size: 15px;  text-align:justify;'>del día  _______________</label>
+            <label style=' font-size: 15px;  text-align:justify;'>; con el propósito de hacer entrega formal por parte de </label>
+            <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>$proveedor->nombre</label>
+            <label style=' font-size: 15px;  text-align:justify;'>.</label></div>
+        ";
+
+        $tabla .= " <div style='margin-top: 50px; margin-left: 20px; margin-right: 20px'>
+            <label style=' font-size: 15px;  text-align:justify;'>Todo lo correspondiente a la orden No.</label>
+            <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>$orden->id</label>
+            <label style=' font-size: 15px;  text-align:justify;'> y con base a lo solicitado; presente los señores</label>
+            <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>$proveedor->nombre</label>
+            <label style=' font-size: 15px;  text-align:justify;'>, por parte del proveedor; </label>
+            <label style='font-weight: bold; font-size: 15px;  text-align:justify;'>$administrador->nombre.</label>
+            <label style=' font-size: 15px;  text-align:justify;'> en calidad de administrador de contrato.</label>
+            </div>
+        ";
+
+        $tabla .= "<div style='margin-top: 50px; margin-left: 20px; margin-right: 20px'>
+               <label style='font-size: 15px; text-align:justify;'>Cabe mencionar que dichos bienes, servicios u obras cumple con las especificaciones previamente definidas en el contrato u orden de compra.</label>
+        </div>";
+
+        $tabla .= "<div style='margin-top: 50px; margin-left: 20px; margin-right: 20px'>
+            <label style='font-size: 15px;  text-align:justify;'>Y no habiendo más que hacer constar, firmamos y ratificamos la presente acta.</label>
+        </div>";
+
+
+         $tabla .= "<table width='100%' id='tablaForTranspa' style='margin-top: 90px; margin-left: 20px'>
+            <tbody>
+
+             <tr>
+                    <td width='25%' style='font-weight: normal'>ENTREGA</td>
+                    <td width='25%' style='font-weight: normal'>RECIBE</td>
+             </tr>
+
+                  </tbody></table>
+             ";
+
+
+
+        $tabla .= "<table width='100%' id='tablaForTranspa' style='margin-top: 70px; margin-left: 20px'>
+            <tbody>";
+
+
+
+        $tabla .= "<tr>
+                    <td width='25%' style='font-weight: bold; color: black'>_________________________________</td>
+                    <td width='25%' style='font-weight: bold; color: black'>_________________________________</td>
+                    </tr>";
+
+        $tabla .= "</tbody></table>";
+
+        $tabla .= "<table width='100%' id='tablaForTranspa' style='margin-top: 15px; margin-left: 20px'>
+            <tbody>";
+
+        $tabla .= "<tr>
+                    <td width='25%' style='font-weight: normal; font-size: 14px'>Proveedor: </td>
+                    <td width='25%' style='font-weight: normal; font-size: 14px; '>Administrador de Contrato</td>
+                    </tr>";
+
+        $tabla .= "<tr>
+                    <td width='25%' style='font-size: 12px'>$proveedor->nombre</td>
+                    <td width='25%' style='font-size: 14px; '>$administrador->nombre</td>
+                    </tr>";
+
+        $tabla .= "</tbody></table>";
+
+
+        $tabla .= "<table width='50%' style='margin-top: 70px; margin-left: 360px'>
+            <tbody>";
+
+        $tabla .= "<tr>
+                    <td width='25%' style='font-weight: bold; color: black; padding-left: 20px'>_________________________________</td>
+                    </tr>";
+
+        $tabla .= "<tr>
+                    <td width='25%' style='font-weight: normal; font-size: 14px; padding-left: 90px'>Solicitante</td>
+                    </tr>";
+
+        $tabla .= "<tr>
+                    <td width='25%' style='font-size: 14px; padding-left: 15px'>Nombre: $infoUsuario->nombre</td>
+                    </tr>";
+
+        $tabla .= "</tbody></table>";
+
+
+
+
+
+
+
+        $stylesheet = file_get_contents('css/cssordencompra.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+
+
+
+
+
     }
 
 

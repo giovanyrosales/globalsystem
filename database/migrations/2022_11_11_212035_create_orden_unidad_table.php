@@ -19,7 +19,7 @@ class CreateOrdenUnidadTable extends Migration
             $table->bigInteger('id_admin_contrato')->unsigned();
 
             $table->date('fecha_orden');
-            $table->text('lugar')->nullable();
+            $table->string('lugar', 300);
 
             // 0: defecto
             // 1: orden anulada
@@ -28,6 +28,11 @@ class CreateOrdenUnidadTable extends Migration
 
             // fecha de orden Anulada
             $table->dateTime('fecha_anulada')->nullable();
+
+
+            $table->string('numero_acta', 100);
+            $table->string('numero_acuerdo', 100);
+
 
             $table->foreign('id_cotizacion')->references('id')->on('cotizacion_unidad');
             $table->foreign('id_admin_contrato')->references('id')->on('administradores');

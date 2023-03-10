@@ -334,7 +334,7 @@
                                 "</td>"+
 
                                 "<td>"+
-                                "<input value='"+infodetalle[i].cantidad+"' disabled class='form-control'>"+
+                                "<input name='cantidadfilamate[]' value='"+infodetalle[i].cantidad+"' disabled class='form-control'>"+
                                 "</td>"+
 
                                 "<td>"+
@@ -363,6 +363,43 @@
 
                             $("#matriz-requisicion tbody").append(markup);
                         }
+
+
+                        var marcador = "<tr>"+
+
+                            "<td>"+
+                            "<p class='form-control' style='max-width: 65px'>Total</p>"+
+                            "</td>"+
+
+                            "<td>"+
+                            "<input value='' disabled class='form-control'>"+
+                            "</td>"+
+
+                            "<td>"+
+                            "<input value='' disabled class='form-control'>"+
+                            "</td>"+
+
+                            "<td>"+
+                            "<input value='' disabled class='form-control'>"+
+                            "</td>"+
+
+                            "<td>"+
+                            "<input disabled class='form-control'>"+
+                            "</td>"+
+
+                            "<td>"+
+                            "<input id='finaltotal' value='' disabled class='form-control'>"+
+                            "</td>"+
+
+                            "<td>"+
+                            "<input value='' disabled class='form-control'>"+
+                            "</td>"+
+
+                            "</tr>";
+
+                        $("#matriz-requisicion tbody").append(marcador);
+
+
 
                         $('#modalDetalle').css('overflow-y', 'auto');
                         $('#modalDetalle').modal({backdrop: 'static', keyboard: false})
@@ -440,7 +477,6 @@
                     toastr.error('Error al buscar');
                     closeLoading();
                 });
-
         }
 
 
@@ -556,6 +592,7 @@
                             }
                         })
                     }
+
                     else if(response.data.success === 2){
                         // ESTE MATERIAL QUE VIENE YA ESTA EN MODO ESPERA, ES DECIR,
                         // YA FUE COTIZADO Y ESTA ESPERANDO UNA RESPUESTA DE APROBADA O DENEGADA
@@ -710,6 +747,8 @@
                 boolPasa = true;
             }
 
+            document.getElementById('finaltotal').value = "";
+
             if(boolPasa){
 
                 var val1 = cantidad.value;
@@ -717,12 +756,60 @@
                 var valTotal = (val1 * val2);
 
                 total.value = '$' + Number(valTotal).toFixed(2);
+                mostrarTotalFinal();
             }else{
                 total.value = '';
             }
         }
 
+        function mostrarTotalFinal() {
 
+            var unidades = $("input[name='unidades[]']").map(function () {
+                return $(this).val();
+            }).get();
+            var cantidadfila = $("input[name='cantidadfilamate[]']").map(function () {
+                return $(this).val();
+            }).get();
+
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+            for (var a = 0; a < unidades.length; a++) {
+
+                var datoUni = unidades[a];
+
+                if (datoUni == '') {
+                    return;
+                }
+
+                if (!datoUni.match(reglaNumeroDecimal)) {
+                    return;
+                }
+
+                if (datoUni <= 0) {
+                    return;
+                }
+
+                if (datoUni > 1000000) {
+                    return;
+                }
+            }
+
+            // si pasa validaciones, multiplicar
+
+            var multifila = 0;
+
+            for (var z = 0; z < cantidadfila.length; z++) {
+
+                // COMO TIENEN LAS MISMA FILAS, EXACTAMENTE SE ENCONTRARAN
+                var datoCantidadq = cantidadfila[z];
+                var datoUnidadesq = unidades[z];
+
+                multifila += (datoCantidadq * datoUnidadesq);
+            }
+
+
+            document.getElementById('finaltotal').value = '$' + Number(multifila).toFixed(2);
+        }
 
         // modal para cancelar y dar motivo del cancelamiento
         function informacionCancelar(id){

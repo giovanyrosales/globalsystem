@@ -7,6 +7,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                <th style="width: 10%">Número</th>
                                 <th style="width: 15%">Departamento</th>
                                 <th style="width: 35%">Destino</th>
                                 <th style="width: 10%">Fecha Coti.</th>
@@ -19,6 +20,7 @@
 
                             @foreach($lista as $dato)
                                 <tr>
+                                    <td>{{ $dato->id }}</td>
                                     <td>{{ $dato->departamento }}</td>
                                     <td>{{ $dato->destino }}</td>
                                     <td>{{ $dato->fecha }}</td>

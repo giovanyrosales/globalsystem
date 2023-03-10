@@ -254,29 +254,11 @@
         }
 
         function abrirModalActa(id){
-            $('#modalGenerarActa').modal('show');
-            $('#idacta').val(id); // id orden
-        }
-
-        function enviarModalGenerarActa(){
-            var idorden = document.getElementById('idacta').value;
-            var horaacta = document.getElementById('horaacta').value;
-            var fechaacta = document.getElementById('fechaacta').value;
-
-            if(horaacta === ''){
-                toastr.error('Hora para Acta es requerido');
-                return;
-            }
-
-            if(fechaacta === ''){
-                toastr.error('Fecha para Acta es requerida');
-                return;
-            }
+            //$('#modalGenerarActa').modal('show');
+            //$('#idacta').val(id); // id orden
 
             let formData = new FormData();
-            formData.append('idorden', idorden);
-            formData.append('horaacta', horaacta);
-            formData.append('fechaacta', fechaacta);
+            formData.append('idorden', id);
 
             axios.post(url+'/p/ordenes/unidad/generar/acta', formData, {
             })
@@ -311,9 +293,28 @@
                     }
                 })
                 .catch((error) => {
-                   closeLoading();
+                    closeLoading();
                     toastr.error('Error al guardar Acta');
                 });
+        }
+
+        // NO SE UTILIZA YA
+        function enviarModalGenerarActa(){
+            var idorden = document.getElementById('idacta').value;
+            var horaacta = document.getElementById('horaacta').value;
+            var fechaacta = document.getElementById('fechaacta').value;
+
+            if(horaacta === ''){
+                toastr.error('Hora para Acta es requerido');
+                return;
+            }
+
+            if(fechaacta === ''){
+                toastr.error('Fecha para Acta es requerida');
+                return;
+            }
+
+
         }
 
         function imprimirActa(actaid){
@@ -322,10 +323,12 @@
 
         function Imprimir(id){
             // PREGUNTAR CUANDO MATERIALES QUIERE POR HOJA
-            $('#id-pagina').val(id);
-            $('#modalHoja').modal('show');
+            //$('#id-pagina').val(id);
+            //$('#modalHoja').modal('show');
+            window.open("{{ URL::to('admin/p/ordencompra/unidad/pdf') }}/" + id + "/" + 12);
         }
 
+        // YA NO UTILIZADO
         function generarImpresion(){
 
             var id = document.getElementById('id-pagina').value;

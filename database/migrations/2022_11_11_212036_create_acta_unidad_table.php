@@ -17,14 +17,10 @@ class CreateActaUnidadTable extends Migration
             $table->id();
             $table->bigInteger('id_ordenunidad')->unsigned();
 
-            $table->date('fecha_acta');
-            $table->string('hora');
-
             // 0: defecto
             // 1: acta generada
 
             $table->integer('estado');
-
             $table->foreign('id_ordenunidad')->references('id')->on('orden_unidad');
         });
     }
