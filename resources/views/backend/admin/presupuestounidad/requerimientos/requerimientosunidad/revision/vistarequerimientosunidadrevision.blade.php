@@ -272,7 +272,11 @@
             var formData = new FormData();
             var hayLista = true;
 
+            var maximaCantidad = 10;
+            var contador = 0;
+
             $("#mySideToSideSelect_to option").each(function(){
+                contador++;
                 hayLista = false;
                 let dato = $(this).val();
                 formData.append('lista[]', dato);
@@ -294,6 +298,24 @@
                 });
                 return;
             }
+
+            if(contador > maximaCantidad){
+                    Swal.fire({
+                        title: 'Límite superado',
+                        text: "Solo puede Cotizar 10 items",
+                        icon: 'warning',
+                        showCancelButton: false,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Aceptar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                        }
+                    });
+                    return;
+            }
+
 
             openLoading();
 
