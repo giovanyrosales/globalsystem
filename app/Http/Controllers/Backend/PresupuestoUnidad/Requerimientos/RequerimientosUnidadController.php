@@ -308,6 +308,9 @@ class RequerimientosUnidadController extends Controller
                 }
             }
 
+            // obtener usuario
+            $user = Auth::user();
+
             // primero se crea, y después verificamos
             $r = new RequisicionUnidad();
             $r->id_presup_unidad = $request->idpresubuni;
@@ -317,6 +320,7 @@ class RequerimientosUnidadController extends Controller
             $r->req_revision = 0; // NECESITA SER REVISADO POR PRESUPUESTO
             $r->estado_denegado = 0;
             $r->texto_denegado = null;
+            $r->solicitante = $user->nombre;
 
             $r->save();
 

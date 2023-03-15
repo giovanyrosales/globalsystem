@@ -23,7 +23,7 @@
     }
 </style>
 
-    @foreach ($array_merged as $items => $items_value)
+
 
         <table  class="table-head"  border="0" style="margin-top: 35px;">
             <tr>
@@ -39,33 +39,30 @@
         </table>
 
         <br><br><br>
-        <table class="table-body" border="0" cellspacing=0 style="margin-top: -35px;">
+        <table class="table-body" border="0" cellspacing=0 style="margin-top: -48px;">
             <tr>
-                <td  style=" width: 13%; text-align:right; ">
-                    <label style=" vertical-align:middle; text-align:right;"></label>
-                </td>
-                <td  style=" width: 5%; text-align:center; ">
-                    <label style=" vertical-align:middle;   font-size:14px;  text-align:center;">{{ $dia  }}</label>
+
+                <td  style=" width: 20%; text-align:right; ">
+                    <label style=" vertical-align:middle;
+                      font-size:12px;  text-align:right; padding-right: 28px">{{ $dia  }}</label>
                 </td>
                 <td style=" text-align:center; ">
-                    <label style="vertical-align:middle;   font-size:14px;">{{ $mes }}</label>
+                    <label style="vertical-align:middle;   font-size:12px;">{{ $mes }}</label>
                 </td>
-                <td style="width: 7%; text-align:right; ">
-                    <label style=" vertical-align:middle;   font-size:14px;">{{  $anio }}</label>
+                <td style="width: 25%; text-align:right; ">
+                    <label style=" vertical-align:middle; padding-right: 15px;   font-size:12px;">{{  $anio }}</label>
                 </td>
-                <td style="width: 6%; text-align:right; ">
-                    <label style=" vertical-align:middle;"></label>
-                </td>
+
             </tr>
         </table>
 
-        <table class="table-body" border="0" cellspacing=0  style="margin-top:10px">
+        <table class="table-body" border="0" cellspacing=0  style="margin-top:0px">
             <tr>
                 <td  style=" width: 10.42%; text-align:right; ">
                     <label style=" vertical-align:middle; text-align:right;"></label>
                 </td>
                 <td  style=" width: 53.75%; text-align:left; ">
-                    <label style=" vertical-align:middle; text-align:left;   font-size:14px;">{{ $proveedor->nombre }}</label>
+                    <label style=" vertical-align:middle; text-align:left;   font-size:11px;">{{ $proveedor->nombre }}</label>
                 </td>
                 <td  style=" width: 18.8%; text-align:right; ">
                     <label style="vertical-align:middle; text-align:right;"></label>
@@ -77,36 +74,33 @@
             </tr>
         </table>
 
-        <br></br>
-        <br></br>
+        <br>
+        <br>
 
+    <table class="table-body" border="0" cellspacing=0  style="margin-right:22px;" width="100%">
+        @foreach ($dataArray as $info)
 
-    <table class="table-body" border="0" cellspacing=0  style="margin-left:25px" >
-        @foreach ($items_value as $item => $item_value)
             <tr style=" height: 30px" >
-                <td  style=" width: 8.9%; text-align:center; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:14px;">{{ $item_value['cantidad'] }}</label>
+                <td  style=" width: 7%; text-align:left; ">
+                    <label style="  vertical-align:middle; text-align:left;   font-size:11px;">{{ $info['cantidad'] }}</label>
                 </td>
                 <td  style=" width: 48.1%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left; margin-left: 5%;   font-size:14px;">{{ $item_value['nombre'] }} </label>
+                    <label style="  vertical-align:middle; text-align:left;
+                     padding-left: 15px;
+                     margin-left: 5%;   font-size:11px;">{{ $info['nombre'] }} </label>
                 </td>
-                <td  style=" width: 11.6%; text-align:center; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:14px;">{{ $item_value['cod_presup'] }}</label>
+                <td  style=" width: 11.6%; text-align:center;">
+                    <label style="  vertical-align:middle; text-align:center;
+                    padding-left: 20px; margin-left: 20px;
+                    font-size:11px;">{{ $info['cod_presup'] }}</label>
                 </td>
-                <td  style=" width: 1.6%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left;   font-size:14px;"></label>
+
+                <td  style=" width: 16%; text-align:right; ">
+                    <label style="  vertical-align:middle; text-align:right;   font-size:11px;">${{ $info['precio_u'] }}</label>
                 </td>
-                <td  style=" width: 10%; text-align:right; ">
-                    <label style="  vertical-align:middle; text-align:right;   font-size:14px;">${{ $item_value['precio_u'] }}</label>
-                </td>
-                <td  style=" width: 1%; text-align:right; ">
-                    <label style="  vertical-align:middle; text-align:right;"></label>
-                </td>
-                <td  style=" width: 1.6%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left;   font-size:14px;"></label>
-                </td>
+
                 <td  style=" width: 11.2%; text-align:right; ">
-                    <label style="  vertical-align:middle; text-align:right;   font-size:14px;">${{ $item_value['multi'] }}</label>
+                    <label style="  vertical-align:middle; text-align:right;   font-size:11px;">${{ $info['multi'] }}</label>
                 </td>
                 <td  style=" width: 7%; text-align:right; ">
                     <label style="  vertical-align:middle; text-align:right;" ></label>
@@ -114,97 +108,86 @@
             </tr>
         @endforeach
 
+
         </table>
 
-     <table class="table-body" border="0" cellspacing=0 style="position: absolute; float: bottom">
-        <tr style=" height: 30px" >
-            <td  style=" width: 8.9%; text-align:center; ">
-                <label style="  vertical-align:middle; text-align:center;   font-size:14px;"></label>
-            </td>
-            <td  style=" width: 54.1%; text-align:left; ">
-                <label style="  vertical-align:middle; text-align:left; margin-left: 5%;   font-size:14px;"> </label>
-            </td>
-            <td  style=" width: 5.6%; text-align:center; ">
-                <label style="  vertical-align:middle; text-align:center;   font-size:14px;"></label>
-            </td>
-            <td  style=" width: 1.6%; text-align:left; ">
-                <label style="  vertical-align:middle; text-align:left;   font-size:14px;"></label>
-            </td>
-            <td  style=" width: 9%; text-align:right; ">
-                <label style="  vertical-align:middle; text-align:right;   font-size:14px;"></label>
-            </td>
-            <td  style=" width: 1%; text-align:right; ">
-                <label style="  vertical-align:middle; text-align:right;"></label>
-            </td>
-            <td  style=" width: 1.6%; text-align:left; ">
-                <label style="  vertical-align:middle; text-align:left;   font-size:14px;"></label>
-            </td>
-            <td  style=" width: 12.2%; text-align:right; ">
-                <label style=" font-weight: bold;vertical-align:middle; text-align:right;   font-size:14px;"></label>
-            </td>
-            <td  style=" width: 6%; text-align:right; ">
-                <label style="  vertical-align:middle; text-align:right;"></label>
-            </td>
-        </tr>
-    </table>
 
-    <div style="bottom: 0;
-    position: absolute;">
-        <table class="table-body" border="0" cellspacing=0 style="margin-top:20px; " >
+    <div style="bottom: 40px;  position: absolute; width: 100%" >
+
+        <table class="table-body" border="0" >
             <tr style=" height: 30px; " >
-                <td  style=" width: 11%; text-align:center; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:14px;"></label>
+
+            <tr>
+                <td  style=" width: 20%; text-align:left; ">
+                    <label style="  vertical-align:middle; text-align:center;   font-size:11px;">NIT: {{ $proveedor->nit }}</label>
                 </td>
-                <td  style=" width: 52%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left;   font-size:14px;"></label>
+            </tr>
+            <tr>
+                <td  style=" width: 20%; text-align:left; ">
+                    <label style="  vertical-align:middle; text-align:center;   font-size:11px;">Códigos: {{ $arraycodigos }}</label>
                 </td>
-                <td  style=" width: 25%; text-align:right; ">
-                    <label style="  vertical-align:middle; text-align:right; margin-left: 5%;   font-size:14px;">${{  $total}} </label>
+            </tr>
+            <tr>
+                <td  style=" width: 20%; text-align:left; ">
+                    <label style="  vertical-align:middle; text-align:center;   font-size:11px;">Solic.: {{ $nombreSolicitante }}</label>
                 </td>
-                <td  style=" width: 6%; text-align:center; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:14px;"></label>
+            </tr>
+            <tr>
+                <td  style=" width: 20%; text-align:left; ">
+                    <label style="  vertical-align:middle; text-align:center;   font-size:11px;">{{ $acta_acuerdo }}</label>
+                </td>
+            </tr>
+
+            </tr>
+        </table>
+
+
+        <table border="0" width="100%" style="margin-bottom: 12px">
+            <tr style=" height: 30px; ">
+
+                <td  style=" width: 25%; text-align:right;">
+                    <label style=" font-size:13px; margin-right: 15px;">${{  $total}} </label>
                 </td>
             </tr>
         </table>
 
-        <table class="table-body" border="0" cellspacing=0 style="margin-top:20px" >
+
+        <table class="table-body" border="0" cellspacing=0 style="margin-bottom: 10px">
             <tr style=" height: 30px; " >
-                <td  style=" width: 11%; text-align:center; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:14px;"></label>
+                <td  style=" width: 60%; text-align:left; ">
+                    <label style="  vertical-align:middle; text-align:left; font-size:11px;">{{$administrador->nombre}}</label>
                 </td>
-                <td  style=" width: 52%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left;   font-size:14px;">{{$administrador->nombre}}</label>
-                </td>
-                <td  style=" width: 31%; text-align:right; ">
-                    <label style="  vertical-align:middle; text-align:right; margin-left: 5%;   font-size:14px;">wwwwwwwwww</label>
-                </td>
-                <td  style=" width: 6%; text-align:center; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:14px;"></label>
+                <td  style=" width: 40%; ">
+                    <label style="  vertical-align:middle; float: right; text-align:right; margin-left: 5%;  margin-right: 15px; font-size:14px;">Fondos Propios</label>
                 </td>
             </tr>
+
         </table>
 
-        <table class="table-body" border="0" cellspacing=0 >
+
+
+        <table class="table-body" border="0" cellspacing=0 style="margin-left: 15px;">
+
+
             <tr style=" height: 30px; " >
-                <td  style=" width: 100%; text-align:center; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:14px;">aaaaaaaaa</label>
+                <td  style=" width: 60%; text-align:left; ">
+                    <label style="  vertical-align:middle; text-align:left;   font-size:11px;">{{ $destino  }}</label>
+                </td>
+                <td  style=" width: 40%; ">
                 </td>
             </tr>
+
+            <tr style=" height: 30px; " >
+                <td  style=" width: 60%; text-align:left; ">
+                    <label style="  vertical-align:middle; text-align:left;   font-size:11px;">{{ $destinounidad  }}</label>
+                </td>
+                <td  style=" width: 40%; ">
+                </td>
+            </tr>
+
         </table>
 
-        <table class="table-body" border="0" cellspacing=0  >
-            <tr style=" height: 30px; " >
-                <td  style=" width: 100%; text-align:center; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:14px;">xxxxx</label>
-                </td>
-            </tr>
-        </table>
+
     </div>
 
 
-        @if(!$loop->last)
-            <div class="page_break"></div>
-        @endif
-
-
-    @endforeach

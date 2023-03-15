@@ -30,6 +30,9 @@ class CreateRequisicionUnidadTable extends Migration
             $table->boolean('estado_denegado');
             $table->text('texto_denegado')->nullable();
 
+            // nombre de usuario quien solicito
+            $table->string('solicitante', 100);
+
 
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
         });
