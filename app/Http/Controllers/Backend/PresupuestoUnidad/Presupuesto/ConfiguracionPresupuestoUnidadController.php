@@ -859,22 +859,11 @@ class ConfiguracionPresupuestoUnidadController extends Controller
 
         if(P_PresupUnidad::where('id', $request->idpresupuesto)->first()){
 
-            // verificar cuando se pone en modo aprobado
-            if($request->idestado == 3){
-
-                $conteo = P_PresupUnidadDetalle::where('id_presup_unidad', $request->idpresupuesto)->count();
-
-                if($conteo == 0){
-                    // no hay ninguna fila registrada
-                    return ['success' => 1];
-                }
-            }
-
             P_PresupUnidad::where('id', $request->idpresupuesto)->update([
                 'id_estado' => $request->idestado
             ]);
 
-            return ['success' => 2];
+            return ['success' => 1];
         }else{
             return ['success' => 99];
         }

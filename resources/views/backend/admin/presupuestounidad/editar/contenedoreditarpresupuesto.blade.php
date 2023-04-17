@@ -791,6 +791,8 @@
         })
             .then((response) => {
 
+                console.log(response);
+
                 if(response.data.success === 1){
                     Swal.fire({
                         title: 'Información',
