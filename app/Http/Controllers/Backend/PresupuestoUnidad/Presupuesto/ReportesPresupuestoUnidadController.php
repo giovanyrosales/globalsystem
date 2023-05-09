@@ -961,7 +961,6 @@ class ReportesPresupuestoUnidadController extends Controller
         // filtrado por x departamento y x año
         $arrayPresupUnidad = P_PresupUnidad::where('id_anio', $anio)
             ->whereIn('id_departamento', $porciones)
-            ->where('id_estado', 3) // SOLO APROBADOS
             ->orderBy('id', 'ASC')
             ->get();
 
