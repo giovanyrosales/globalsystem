@@ -156,7 +156,7 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
                             ->where('id_material', $subLista->id)->get();
 
                         $resul2 = 0;
-
+                        $cantidadPedida = 0;
                         foreach ($dataArrayPresu as $infoData){
 
                             // PERIODO SERA COMO MÍNIMO 1
@@ -167,9 +167,10 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
 
                             $sumaGlobalUnidades += $resultado;
 
-                            $subLista->cantidadpedi = $infoData->cantidad  * $infoData->periodo;
+                            $cantidadPedida += $infoData->cantidad  * $infoData->periodo;
 
                         }
+                        $subLista->cantidadpedi = $cantidadPedida;
                         $subLista->total = number_format((float)$resul2, 2, '.', ',');
                     }
 

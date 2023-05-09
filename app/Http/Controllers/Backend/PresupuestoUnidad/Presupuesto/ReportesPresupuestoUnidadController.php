@@ -1087,7 +1087,7 @@ class ReportesPresupuestoUnidadController extends Controller
 
 
                         $resul2 = 0;
-
+                        $sumaPedida = 0;
                         foreach ($dataArrayPresu as $infoData){
 
                             // PERIODO SIEMPRE SERA MÍNIMO 1
@@ -1098,9 +1098,10 @@ class ReportesPresupuestoUnidadController extends Controller
 
                             $sumaGlobalUnidades += $resultado;
 
-                            $subLista->cantidadpedi = $infoData->cantidad  * $infoData->periodo;
+                            $sumaPedida += $infoData->cantidad  * $infoData->periodo;
                         }
 
+                        $subLista->cantidadpedi = $sumaPedida;
                         $subLista->total = '$' . number_format((float)$resul2, 2, '.', ',');
                     }
 
