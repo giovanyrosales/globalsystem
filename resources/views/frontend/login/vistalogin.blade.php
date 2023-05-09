@@ -137,7 +137,7 @@
 
         // /globalsystem/admin/login
 
-        axios.post('/admin/login', formData, {
+        axios.post('/globalsystem/admin/login', formData, {
         })
             .then((response) => {
                 closeLoading();
