@@ -155,19 +155,22 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
                         $dataArrayPresu = P_PresupUnidadDetalle::whereIn('id', $pilaArrayPresuUni)
                             ->where('id_material', $subLista->id)->get();
 
+                        $resul2 = 0;
+
                         foreach ($dataArrayPresu as $infoData){
 
                             // PERIODO SERA COMO MÍNIMO 1
-                            $resultado = ($infoData->cantidad * $infoData->precio) * $infoData->periodo;
+                            $resul2 += ($infoData->cantidad * $infoData->precio) * $infoData->periodo;
 
+                            $resultado = ($infoData->cantidad * $infoData->precio) * $infoData->periodo;
                             $sumaObjeto += $resultado;
 
                             $sumaGlobalUnidades += $resultado;
 
                             $subLista->cantidadpedi = $infoData->cantidad  * $infoData->periodo;
 
-                            $subLista->total = '$' . number_format((float)$resultado, 2, '.', ',');
                         }
+                        $subLista->total = number_format((float)$resul2, 2, '.', ',');
                     }
 
                     foreach ($listadoProyectoAprobados as $lpa){
