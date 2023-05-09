@@ -178,7 +178,7 @@ class ExportarPorUnidadesExcel implements FromCollection, WithHeadings, WithStyl
                     }
 
                     $sumaObjetoTotal += $sumaObjeto;
-                    $ll->sumaobjeto = number_format((float)$sumaObjeto, 2, '.', ',');
+                    $ll->sumaobjeto = $sumaObjeto;
                     $ll->sumaobjetoDeci = $sumaObjeto;
 
                     $resultsBloque3[$index3]->material = $subSecciones3;
