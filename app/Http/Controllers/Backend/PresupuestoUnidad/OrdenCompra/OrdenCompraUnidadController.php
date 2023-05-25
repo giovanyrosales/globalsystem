@@ -243,8 +243,8 @@ class OrdenCompraUnidadController extends Controller
             'administrador', 'total', 'idorden', 'arraycodigos', 'nombreSolicitante', 'acta_acuerdo',
                 'destino', 'destinounidad'));
         //$customPaper = array(0,0,470.61,612.36);
-        $customPaper = array(0,0,470.61,612.36);
-        $pdf->setPaper($customPaper)->setWarnings(false);
+        //$customPaper = array(0,0,470.61,612.36);
+        $pdf->setPaper('Letter', 'portrait')->setWarnings(false);
         return $pdf->stream('Orden_Compra.pdf');
 
 

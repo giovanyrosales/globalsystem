@@ -23,171 +23,175 @@
     }
 </style>
 
-
-
         <table  class="table-head"  border="0" style="margin-top: 35px;">
             <tr>
-                <br><br>
-                <td width="20%"></td>
-                <td width="75%" style="text-align:right; ">
-                    <br></br>
-                    <br></br>
-                    <label style=" font-size: 18px;  text-align:right;">{{ $idorden }}</label>
+                <td width="50%">
+                    <label style=" font-size: 15px; ">ALCALDÍA MUNICIPAL DE METAPÁN </label>
                 </td>
-                <td width="5%"></td>
+                <td width="50%" >
+                <center><label style=" font-size: 16px; "><b>ORDEN DE COMPRA</b></label></center>
+                </td>
             </tr>
         </table>
-
-        <br><br><br>
-        <table class="table-body" border="0" cellspacing=0 style="margin-top: -48px;">
+        <table  class="table-head"  border="0" style="margin-top: 10px;">
             <tr>
-
-                <td  style=" width: 20%; text-align:right; ">
-                    <label style=" vertical-align:middle;
-                      font-size:12px;  text-align:right; padding-right: 28px">{{ $dia  }}</label>
+                <td width="40%" style="text-align:left; ">
+                  Avenida Benjamin Estrada Valiente<br>
+                  1ra Calle Pte. Bo. San Pedro<br>
+                  Ciudad de Metapán<br>
+                  Departamento de Santa Ana<br>
+                  correo: ucpmetapan@gmail.com<br>
+                  Tel.: 2402-7609 
                 </td>
-                <td style=" text-align:center; ">
-                    <label style="vertical-align:middle;   font-size:12px;">{{ $mes }}</label>
+                <td width="20%"><center>
+                <img style="margin-top: -20px; "src="{{ asset('/images/logo.png') }}" width="70px" height="70px"></center>
                 </td>
-                <td style="width: 25%; text-align:right; ">
-                    <label style=" vertical-align:middle; padding-right: 15px;   font-size:12px;">{{  $anio }}</label>
+                <td width="40%" style="text-align:left; ">
+                   No. {{ $idorden }}<br>
+                   Fecha: {{ $dia." ".$mes." ".$anio }}<br>
+                   Ref. [CPS-001/23AMM]
                 </td>
-
             </tr>
         </table>
-
-        <table class="table-body" border="0" cellspacing=0  style="margin-top:0px">
+        <table  class="table-head"  border="0" style="margin-top: 15px;">
             <tr>
-                <td  style=" width: 10.42%; text-align:right; ">
-                    <label style=" vertical-align:middle; text-align:right;"></label>
+                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">PROVEEDOR </label></center></td>
+                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">CONTRATANTE </label></center></td>
+            </tr>
+            <tr>
+                <td width="50%" style="text-align:left; ">
+                  {{ $proveedor->nombre }}<br>
+                  Dirección:<br>
+                  Correo:<br>
+                  Tel.:<br>
+                  NIT/DUI: {{ $proveedor->nit }}<br>
+                  NRC:
                 </td>
-                <td  style=" width: 53.75%; text-align:left; ">
-                    <label style=" vertical-align:middle; text-align:left;   font-size:11px;">{{ $proveedor->nombre }}</label>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                  Sr. Israel Peraza Guerra<br>
+                  Alcalde Municipal de Metapán<br>
+                  Representante Legal y Administrativo<br>
+                  Periodo May/2021-Abr/2024<br>
+                  DUI: 04407747-3<br>
+                  NIT: 0207-310372-101-0
                 </td>
-                <td  style=" width: 18.8%; text-align:right; ">
-                    <label style="vertical-align:middle; text-align:right;"></label>
-                </td>
-                <td  style=" width: 33%; text-align:left; ">
-                    <label style=" vertical-align:middle; text-align:left; font-size: 14px;">{{ $proveedor->nit }}</label>
-                </td>
-
             </tr>
         </table>
-
+        <table  class="table-head"  border="1" style="margin-top: 15px; border-collapse: collapse;">
+            <tr>
+                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Solicitado por</label></center></td>
+                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Unidad</label></center></td>
+            </tr>
+            <tr>
+                <td width="50%" style="text-align:left; ">
+                  Nombre: {{ $nombreSolicitante }}
+                </td>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                  Nombre Unidad
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="text-align:left; ">
+                  Cargo:
+                </td>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                  Cod. Proyecto
+                </td>
+            </tr>
+        </table>
+        
+        <table  class="table-head"  border="1" style="margin-top: 15px; border-collapse: collapse;" width="100%">
+            @foreach ($dataArray as $info)
+                <tr>
+                    <td bgcolor="#66ff99"><center><label style=" font-size: 13px; ">Código </label></center></td>
+                    <td bgcolor="#66ff99"><center><label style=" font-size: 13px; ">Descripción </label></center></td>
+                    <td bgcolor="#66ff99"><center><label style=" font-size: 13px; ">Cantidad </label></center></td>
+                    <td bgcolor="#66ff99"><center><label style=" font-size: 13px; ">Precio U. </label></center></td>
+                    <td bgcolor="#66ff99"><center><label style=" font-size: 13px; ">Totales </label></center></td>
+                </tr>
+                <tr>
+                    <td width="15%" style="text-align:center; ">{{ $info['cod_presup'] }}</td>
+                    <td width="45%" style="text-align:center; ">{{ $info['nombre'] }}</td>
+                    <td width="10%" style="text-align:center; ">{{ $info['cantidad']}}</td>
+                    <td width="15%" style="text-align:center; ">${{ $info['precio_u'] }}</td>
+                    <td width="15%" style="text-align:center; ">${{ $info['multi'] }}</td>
+                </tr>
+            @endforeach
+        </table><br>
+        <label style=" font-size: 15px; "><u>Instrucciones</u> </label>
+        <table  class="table-head"  border="1" style="margin-top: 15px; border-collapse: collapse;">
+            <tr>
+                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Dirección de Entrega</label></center></td>
+                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Forma de pago</label></center></td>
+                <td bgcolor="#66ff99" style="text-align:right;"><label style=" font-size: 15px; ">Total: ${{  $total}} </label></td>
+            </tr>
+            <tr>
+                <td width="50%" style="text-align:left; ">
+                  Dirección entrega
+                </td>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                  Forma de pago
+                </td>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                  DOLARES 00/100
+                </td>
+            </tr>
+        </table>
+        <table  class="table-head"  border="1" style="border-collapse: collapse;"> >
+            <tr>
+                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Plazo de entrega</label></center></td>
+                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Garantía a Presentar</label></center></td>
+                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Administrador ODC</label></center></td>
+            </tr>
+            <tr>
+                <td width="50%" style="text-align:left; ">
+                  Plazo de entrega
+                </td>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                  Garantía a Presentar
+                </td>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                {{$administrador->nombre}}
+                </td>
+            </tr>
+        </table>
         <br>
-        <br>
-
-    <table class="table-body" border="0" cellspacing=0  style="margin-right:22px;" width="100%">
-        @foreach ($dataArray as $info)
-
-            <tr style=" height: 30px" >
-                <td  style=" width: 7%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left;   font-size:11px;">{{ $info['cantidad'] }}</label>
-                </td>
-                <td  style=" width: 48.1%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left;
-                     padding-left: 15px;
-                     margin-left: 5%;   font-size:11px;">{{ $info['nombre'] }} </label>
-                </td>
-                <td  style=" width: 11.6%; text-align:center;">
-                    <label style="  vertical-align:middle; text-align:center;
-                    padding-left: 20px; margin-left: 20px;
-                    font-size:11px;">{{ $info['cod_presup'] }}</label>
-                </td>
-
-                <td  style=" width: 16%; text-align:right; ">
-                    <label style="  vertical-align:middle; text-align:right;   font-size:11px;">${{ $info['precio_u'] }}</label>
-                </td>
-
-                <td  style=" width: 11.2%; text-align:right; ">
-                    <label style="  vertical-align:middle; text-align:right;   font-size:11px;">${{ $info['multi'] }}</label>
-                </td>
-                <td  style=" width: 7%; text-align:right; ">
-                    <label style="  vertical-align:middle; text-align:right;" ></label>
-                </td>
-            </tr>
-        @endforeach
 
 
-        </table>
+    <div style="bottom: 40px;  position: absolute; width: 100%" >  
 
-
-    <div style="bottom: 40px;  position: absolute; width: 100%" >
-
-        <table class="table-body" border="0" >
-            <tr style=" height: 30px; " >
-
+    <table  class="table-head"  border="0" >
             <tr>
-                <td  style=" width: 20%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:11px;">NIT: {{ $proveedor->nit }}</label>
+                <td style="text-align:left;"><label style=" font-size: 15px; ">F._________________</label></td>
+                <td style="text-align:left;"><label style=" font-size: 15px; ">F._________________</label></td>
+                <td style="text-align:left;"><label style=" font-size: 15px; ">F._________________</label></td>
+            </tr>
+            <tr>
+                <td width="50%" style="text-align:left; ">
+                  Nombre:
+                </td>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                  Nombre:
+                </td>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                 Sr. Israel Peraza Guerra
                 </td>
             </tr>
             <tr>
-                <td  style=" width: 20%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:11px;">Códigos: {{ $arraycodigos }}</label>
+                <td width="50%" style="text-align:left; ">
+                  Cargo:
                 </td>
-            </tr>
-            <tr>
-                <td  style=" width: 20%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:11px;">Solic.: {{ $nombreSolicitante }}</label>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                  Cargo:
                 </td>
-            </tr>
-            <tr>
-                <td  style=" width: 20%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:center;   font-size:11px;">{{ $acta_acuerdo }}</label>
-                </td>
-            </tr>
-
-            </tr>
-        </table>
-
-
-        <table border="0" width="100%" style="margin-bottom: 12px">
-            <tr style=" height: 30px; ">
-
-                <td  style=" width: 25%; text-align:right;">
-                    <label style=" font-size:13px; margin-right: 15px;">${{  $total}} </label>
+                <td width="50%" style="text-align:left; padding-left: 10px; ">
+                 Alcalde Municipal de Metapán
                 </td>
             </tr>
         </table>
+      
 
-
-        <table class="table-body" border="0" cellspacing=0 style="margin-bottom: 10px">
-            <tr style=" height: 30px; " >
-                <td  style=" width: 60%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left; font-size:11px;">{{$administrador->nombre}}</label>
-                </td>
-                <td  style=" width: 40%; ">
-                    <label style="  vertical-align:middle; float: right; text-align:right; margin-left: 5%;  margin-right: 15px; font-size:14px;">Fondos Propios</label>
-                </td>
-            </tr>
-
-        </table>
-
-
-
-        <table class="table-body" border="0" cellspacing=0 style="margin-left: 15px;">
-
-
-            <tr style=" height: 30px; " >
-                <td  style=" width: 60%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left;   font-size:11px;">{{ $destino  }}</label>
-                </td>
-                <td  style=" width: 40%; ">
-                </td>
-            </tr>
-
-            <tr style=" height: 30px; " >
-                <td  style=" width: 60%; text-align:left; ">
-                    <label style="  vertical-align:middle; text-align:left;   font-size:11px;">{{ $destinounidad  }}</label>
-                </td>
-                <td  style=" width: 40%; ">
-                </td>
-            </tr>
-
-        </table>
-
-
+        <label style=" font-size: 15px; ">{{ $destinounidad." ".$destino." ".$arraycodigos." ".$acta_acuerdo }}</label>
     </div>
 
 
