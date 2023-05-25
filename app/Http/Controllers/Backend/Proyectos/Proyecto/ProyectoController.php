@@ -1692,7 +1692,7 @@ class ProyectoController extends Controller
     public function verificarPartidaManoObra(Request $request){
 
         // TIPO PARTIDA 3: Mano de obra (Por Administración)
-        if(Partida::where('proyecto_id', $request->id)->where('id_tipopartida', 3)->first()){
+        if(Partida::where('proyecto_id', $request->id)->where('id_tipopartida', 2)->first()){
             return ['success' => 1];
         }
         return ['success' => 2];
