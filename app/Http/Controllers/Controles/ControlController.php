@@ -59,6 +59,12 @@ class ControlController extends Controller
          else  if($user->hasRole('secretaria')){
              $ruta = 'admin.estadisticas.index';
          }
+
+         // CONSOLIDADOR ROSMERY
+         else  if($user->hasRole('consolidador')){
+             $ruta = 'admin.estadisticas.index';
+         }
+
         else{
             // no tiene ningun permiso de vista, redirigir a pantalla sin permisos
             $ruta = 'no.permisos.index';

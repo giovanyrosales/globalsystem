@@ -15,21 +15,24 @@ class GestionSeeder extends Seeder
     public function run()
     {
         AreaGestion::create([
-            'id_linea' => '1',
-            'codigo' => '01',
-            'nombre' => 'Dirección y Administración Municipal'
+            'codigo' => '1',
+            'nombre' => 'Conducción Administrativa'
         ]);
 
         AreaGestion::create([
-            'id_linea' => '8',
-            'codigo' => '01',
-            'nombre' => 'Inversión para el Desarrollo Económico y Social'
+            'codigo' => '3',
+            'nombre' => 'Desarrollo Social'
         ]);
 
         AreaGestion::create([
-            'id_linea' => '10',
-            'codigo' => '02',
-            'nombre' => 'Inversión para el Desarrollo Económico y Social'
+            'codigo' => '4',
+            'nombre' => 'Apoyo al Desarrollo Económico'
         ]);
+
+        AreaGestion::create([
+            'codigo' => '5',
+            'nombre' => 'Deuda Pública'
+        ]);
+
     }
 }

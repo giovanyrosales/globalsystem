@@ -15,93 +15,111 @@ class LineaTrabajoSeeder extends Seeder
     public function run()
     {
         LineaTrabajo::create([
+            'id_areagestion' => 1,
             'codigo' => '0101',
             'nombre' => 'Dirección y Administración Municipal'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 1,
             'codigo' => '0102',
-            'nombre' => 'Administración Financiera y Tributaria'
+            'nombre' => 'Dirección y Administración Municipal - 120 25%'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 1,
             'codigo' => '0103',
-            'nombre' => 'Unidades Administrativas de Apoyo'
+            'nombre' => 'Dirección y Administración Municipal - 120 1.5%'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 1,
             'codigo' => '0201',
             'nombre' => 'Aseo Público'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 1,
             'codigo' => '0202',
             'nombre' => 'Servicios Jurídicos'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 1,
             'codigo' => '0203',
             'nombre' => 'Servicios Municipales Diversos'
         ]);
 
         LineaTrabajo::create([
-            'codigo' => '0301',
-            'nombre' => 'Proyectos Sociales Fondos Propios'
+            'id_areagestion' => 2,
+            'codigo' => '0309',
+            'nombre' => 'Inversión para el Desarrollo Económico y Social - FODES 120 75%'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 2,
             'codigo' => '0301',
             'nombre' => 'Inversión para el Desarrollo Económico y Social – Fondos Propios'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 2,
             'codigo' => '0302',
-            'nombre' => 'Proyectos Sociales FODES'
+            'nombre' => 'Inversión para el Desarrollo Económico y Social - FODES 75%'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 2,
             'codigo' => '0302',
-            'nombre' => 'Inversión para el Desarrollo Económico y Social - Fondo General (Fodes 75%)'
+            'nombre' => 'Inversión para el Desarrollo Económico y Social - FODES 2%'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 2,
             'codigo' => '0303',
             'nombre' => 'Inversión Fideicomiso Arturo'
         ]);
 
         LineaTrabajo::create([
-            'codigo' => '0304',
-            'nombre' => 'PLANTA DE TRATAMIENTO DE AGUAS RESIDUALES'
+            'id_areagestion' => 2,
+            'codigo' => '0306',
+            'nombre' => 'Inversión para el Desarrollo Económico y Social - Préstamos Internos'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 2,
             'codigo' => '0304',
             'nombre' => 'Proyecto PTARM – Prestamos Internos'
         ]);
 
         LineaTrabajo::create([
-            'codigo' => '0305',
+            'id_areagestion' => 2,
+            'codigo' => '5107',
+            'nombre' => 'Programas de Apoyo Social Diversos'
+        ]);
+
+        LineaTrabajo::create([
+            'id_areagestion' => 2,
+            'codigo' => '0310',
+            'nombre' => 'Inversión para el Desarrollo Económico y Social - FODES 120 2%'
+        ]);
+
+        LineaTrabajo::create([
+            'id_areagestion' => 2,
+            'codigo' => '0308',
             'nombre' => 'Proyectos Mancomunados'
         ]);
 
         LineaTrabajo::create([
-            'codigo' => '0306',
-            'nombre' => 'INVERSION PARA EL DESARROLLO SOCIAL Y ECONOMICO-PRESTAMOS INTERNOS'
-        ]);
-
-        LineaTrabajo::create([
-            'codigo' => '0401',
-            'nombre' => 'Proyectos PFGL'
-        ]);
-
-        LineaTrabajo::create([
+            'id_areagestion' => 4,
             'codigo' => '0501',
-            'nombre' => 'Amortización de la Deuda Pública Municipal'
+            'nombre' => 'Amortización de la Deuda Pública Municipal - Fondos Propios'
         ]);
 
         LineaTrabajo::create([
+            'id_areagestion' => 4,
             'codigo' => '0501',
-            'nombre' => 'Amortización de la Deuda Pública Municipal – Fondo General (Fodes 75%)'
+            'nombre' => 'Amortización de la Deuda Pública Municipal – FODES 75%'
         ]);
     }
 }

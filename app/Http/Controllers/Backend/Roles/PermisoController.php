@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend\Roles;
 
 use App\Http\Controllers\Controller;
 use App\Models\P_Departamento;
+use App\Models\P_PresupUnidad;
 use App\Models\P_UsuarioDepartamento;
 use App\Models\Usuario;
 use App\Models\UsuarioFormulador;
@@ -348,6 +349,35 @@ class PermisoController extends Controller
             return ['success' => 2];
         }
     }
+
+
+
+
+    //*********************************************
+
+
+    public function indexVistaConsolidador(){
+
+        $unidades = P_Departamento::orderBy('nombre')->get();
+
+        // ENVIAR USUARIOS ASIGNADOS DE TIPO CONSOLIDADOR PARA REGISTRAR EN TABLA NUEVA
+
+        $usuarios = Usuario::whereIn('id', [])->orderBy('nombre')->get();
+
+
+        return view('backend.admin.rolesypermisos.usuarioconsolidador.vistaconsolidador', compact('unidades'));
+    }
+
+
+
+    public function tablaVistaConsolidador(){
+
+        return "alsas";
+
+        return view('backend.admin.rolesypermisos.usuarioconsolidador.tablaconsolidador', compact('unidades'));
+    }
+
+
 
 
 

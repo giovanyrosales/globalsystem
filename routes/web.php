@@ -42,6 +42,7 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\MovimientoUnidad\MovimientosU
 use App\Http\Controllers\Backend\PresupuestoUnidad\Cotizaciones\CotizacionesUnidadController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\OrdenCompra\OrdenCompraUnidadController;
 use App\Http\Controllers\Backend\DescargosDirectos\DescargosDirectosController;
+use App\Http\Controllers\Backend\Configuracion\Consolidador\ConsolidadorController;
 
 
 // --- LOGIN ---
@@ -85,6 +86,17 @@ Route::get('/admin/usuario/departamento/tabla', [PermisoController::class,'tabla
 Route::post('/admin/p/usuario/departamento/nuevo', [PermisoController::class, 'nuevoUsuarioDepartamento']);
 Route::post('/admin/p/usuario/departamento/informacion', [PermisoController::class, 'informacionUsuarioDepartamento']);
 Route::post('/admin/p/usuario/departamento/editar', [PermisoController::class, 'editarUsuarioDepartamento']);
+
+
+// --- USUARIO CONSOLIDADOR ---
+Route::get('/admin/usuario/consolidador/index', [PermisoController::class,'indexVistaConsolidador'])->name('admin.usuario.consolidador.index');
+Route::get('/admin/usuario/consolidador/tabla', [PermisoController::class,'tablaVistaConsolidador']);
+
+
+
+
+
+
 
 // Para que jefe de presupuesto pueda ver los usuarios asignados a las unidades
 Route::get('/admin/usuario/departamento-vista/index', [PermisoController::class,'indexUsuarioDepartamentoVista'])->name('admin.usuario.departamento.vista.index');
@@ -1080,5 +1092,28 @@ Route::get('/admin/p/requerimiento/denegados/listado/denegados/{idanio}', [Cotiz
 Route::get('/admin/p/reque/dene/listado/materiales/{idrequi}', [CotizacionesUnidadController::class,'indexRequeDeneUnidadesMateriales']);
 // este seria la tabla para ver los materiales detallados
 Route::get('/admin/p/reque/dene/listado/materiales/tabla/{idrequi}', [CotizacionesUnidadController::class,'indexRequeDeneUnidadesMaterialesDetalle']);
+
+
+
+
+
+//**********   CONSOLIDADOR *************
+//Route::get('/admin/p/buscarfecha/requerimientos/denegados/unidadindex', [ConsolidadorController::class,'indexConsolii'])->name('admin.listar.requerimientos.denegados.index');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
