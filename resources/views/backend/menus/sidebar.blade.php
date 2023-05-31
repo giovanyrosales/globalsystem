@@ -51,6 +51,13 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="{{ route('admin.usuario.consolidador.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Usuario Consolidador</p>
+                            </a>
+                        </li>
+
                     </ul>
                  </li>
                 @endcan

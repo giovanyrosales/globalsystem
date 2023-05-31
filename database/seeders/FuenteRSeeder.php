@@ -16,62 +16,82 @@ class FuenteRSeeder extends Seeder
     {
         FuenteRecursos::create([
             'id_fuentef' => '5',
+            'id_p_anio' => null,
             'codigo' => '000',
-            'nombre' => 'DONACIONES'
+            'nombre' => 'DONACIONES',
+            'activo' => 1
         ]);
 
         FuenteRecursos::create([
             'id_fuentef' => '1',
+            'id_p_anio' => null,
             'codigo' => '110',
-            'nombre' => 'FODES 25%'
+            'nombre' => 'FODES 25%',
+            'activo' => 1
         ]);
 
         FuenteRecursos::create([
             'id_fuentef' => '1',
+            'id_p_anio' => null,
             'codigo' => '111',
-            'nombre' => 'FODES 75%'
+            'nombre' => 'FODES 75%',
+            'activo' => 1
         ]);
 
         FuenteRecursos::create([
             'id_fuentef' => '1',
+            'id_p_anio' => null,
             'codigo' => '112',
-            'nombre' => 'FISDL'
+            'nombre' => 'FISDL',
+            'activo' => 1
         ]);
 
         FuenteRecursos::create([
             'id_fuentef' => '1',
+            'id_p_anio' => null,
             'codigo' => '118',
-            'nombre' => 'FONAES'
+            'nombre' => 'FONAES',
+            'activo' => 1
         ]);
 
         FuenteRecursos::create([
             'id_fuentef' => '1',
+            'id_p_anio' => null,
             'codigo' => '000',
-            'nombre' => 'FONDO GENERAL'
+            'nombre' => 'FONDO GENERAL',
+            'activo' => 1
         ]);
 
         FuenteRecursos::create([
             'id_fuentef' => '1',
+            'id_p_anio' => null,
             'codigo' => '120',
-            'nombre' => 'FODES - LIBRE DISPONIBILIDAD'
+            'nombre' => 'FODES - LIBRE DISPONIBILIDAD',
+            'activo' => 1
         ]);
 
         FuenteRecursos::create([
             'id_fuentef' => '2',
+            'id_p_anio' => null,
             'codigo' => '000',
-            'nombre' => 'FONDOS PROPIOS'
+            'nombre' => 'FONDOS PROPIOS',
+            'activo' => 1
         ]);
 
         FuenteRecursos::create([
             'id_fuentef' => '3',
+            'id_p_anio' => null,
             'codigo' => '000',
-            'nombre' => 'PRESTAMOS EXTERNOS'
+            'nombre' => 'PRESTAMOS EXTERNOS',
+            'activo' => 1
         ]);
 
         FuenteRecursos::create([
             'id_fuentef' => '4',
+            'id_p_anio' => null,
             'codigo' => '000',
-            'nombre' => 'PRESTAMOS INTERNOS'
+            'nombre' => 'PRESTAMOS INTERNOS',
+             'activo' => 1
         ]);
 
     }

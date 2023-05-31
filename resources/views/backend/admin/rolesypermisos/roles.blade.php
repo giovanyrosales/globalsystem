@@ -69,7 +69,7 @@
 
                                     <div class="form-group">
                                         <label>Nombre</label>
-                                        <input type="text" maxlength="30" class="form-control" id="nombre-nuevo" placeholder="Nombre">
+                                        <input type="text" maxlength="30" autocomplete="off" class="form-control" id="nombre-nuevo" placeholder="Nombre">
                                     </div>
 
                                 </div>
