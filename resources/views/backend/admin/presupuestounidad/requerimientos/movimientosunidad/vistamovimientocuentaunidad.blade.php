@@ -117,7 +117,6 @@
 
                                         <div class="form-group col-md-6">
                                             <label style="font-weight: bold">Saldo Restante:</label>
-                                            <p style="color: red">Se resta también el Saldo Retenido</p>
                                             <input type="text" disabled class="form-control" id="restante">
                                         </div>
 
@@ -209,6 +208,7 @@
         }
 
         function informacionAgregar(id){
+
             // id de cuenta unidad
             openLoading();
             document.getElementById("formulario-nuevo").reset();
@@ -325,9 +325,11 @@
 
                     if(response.data.success === 1){
 
+                        var saldoActual = response.data.saldoactual;
+
                         Swal.fire({
                             title: 'Movimiento Denegado',
-                            text: "Se denegó el Permiso para crear un movimiento de Cuenta",
+                            text: "El saldo es insuficiente para realizar movimiento. Saldo Actual " + saldoActual,
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -339,38 +341,9 @@
                                 location.reload();
                             }
                         })
-
                     }
+
                     else if(response.data.success === 2){
-
-                        let objeto = response.data.objeto;
-                        let restante = response.data.restante;
-                        let retenido = response.data.retenido;
-                        let arestar = response.data.dinero;
-                        let calculado = response.data.calculado;
-
-                        Swal.fire({
-                            title: 'Movimiento Inválido',
-                            html: "La Cuenta a Modificar con el Código " + objeto +"<br>"
-                                + "Tiene Saldo Insuficiente "+"<br>"
-                                + "Saldo Restante $"+ restante +"<br>"
-                                + "Saldo Retenido $"+ retenido +"<br>"
-                                + "Saldo a Restar $"+ arestar +"<br>"
-                                + "La cuenta quedara cón "+ calculado+"<br>"
-                            ,
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-
-                    else if(response.data.success === 3){
                         $('#modalAgregar').modal('hide');
                         recargar();
 
@@ -390,25 +363,6 @@
                         })
                     }
 
-                    else if(response.data.success === 4){
-
-                        let mensaje = response.data.mensaje;
-
-                        Swal.fire({
-                            title: 'Estado Proyecto',
-                            html: mensaje,
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-
-                    }
                     else {
                         toastr.error('Error al registrar');
                     }

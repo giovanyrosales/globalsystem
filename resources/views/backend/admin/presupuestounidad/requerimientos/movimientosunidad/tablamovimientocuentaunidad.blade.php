@@ -11,7 +11,6 @@
                                 <th>Obj Específico</th>
                                 <th>Saldo Inicial</th>
                                 <th>Saldo Restante</th>
-                                <th>Saldo Retenido</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -21,13 +20,13 @@
                                 <tr>
                                     <td>{{ $dato->codigo }}</td>
                                     <td>{{ $dato->nombre }}</td>
-                                    <td>${{ $dato->saldo_inicial }}</td>
-                                    <td style="font-weight: bold">${{ $dato->saldo_restante }}</td>
-                                    <td>${{ $dato->total_retenido }}</td>
+                                    <td>${{ $dato->saldo_inicial_fijo }}</td>
+                                    <td style="font-weight: bold">${{ $dato->saldo_inicial }}</td>
 
                                     <td>
                                         <!-- solo jefe de unidad puede hacer un movimiento, si esta autorizado -->
                                         @can('boton.agregar.movimiento.cuenta.unidad')
+                                            <!-- permiso para realizar un movimiento de cuenta, dado por jefe presupuesto -->
                                             @if($dato->permiso == 1)
                                                 <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacionAgregar({{ $dato->id }})">
                                                     <i class="fas fa-plus-square" title="Aumentar"></i>&nbsp; Aumentar

@@ -62,8 +62,8 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Año</label>
-                                        <input type="number" maxlength="4" autocomplete="off" class="form-control" id="nombre">
+                                        <label>Año (4 dígitos)</label>
+                                        <input type="number" maxlength="4" autocomplete="off" class="form-control" id="Año">
                                     </div>
 
                                 </div>
@@ -96,7 +96,7 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Año</label>
+                                        <label>Año (4 dígitos)</label>
                                         <input type="hidden" id="id-editar">
                                         <input type="number" autocomplete="off" maxlength="4" class="form-control" id="nombre-editar">
                                     </div>

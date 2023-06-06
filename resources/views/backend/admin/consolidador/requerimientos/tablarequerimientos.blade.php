@@ -7,29 +7,21 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Departamento</th>
-                                <th>Destino</th>
-                                <th>Necesidad</th>
+                                <th>Fecha Requisición</th>
+                                <th>Unidad</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($data as $dato)
+                            @foreach($arrayRequisicionPendiente as $dato)
                                 <tr>
                                     <td>{{ $dato->fecha }}</td>
                                     <td>{{ $dato->departamento }}</td>
-                                    <td>{{ $dato->destino }}</td>
-                                    <td>{{ $dato->necesidad }}</td>
 
                                     <td>
-                                        <button type="button" style="font-weight: bold; color: white !important;" class="btn btn-info btn-xs" onclick="informacionMaterial({{ $dato->id }})">
-                                            <i class="fas fa-list-alt" title="Materiales"></i>&nbsp; Materiales
-                                        </button>
-
-                                        <button type="button" style="font-weight: bold; color: white !important;" class="btn btn-success btn-xs" onclick="informacionAprobar({{ $dato->id }})">
-                                            <i class="fas fa-check" title="Aprobar"></i>&nbsp; Aprobar
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="detalleRequisicion({{ $dato->id }})">
+                                            <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
                                         </button>
                                     </td>
                                 </tr>
@@ -80,6 +72,7 @@
                     "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
                     "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
+
             },
             "responsive": true, "lengthChange": true, "autoWidth": false,
         });

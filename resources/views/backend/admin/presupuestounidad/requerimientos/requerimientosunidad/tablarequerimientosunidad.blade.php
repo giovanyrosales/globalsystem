@@ -24,18 +24,10 @@
 
                                         @can('boton.editar.requisicion.unidad')
                                             <button type="button" class="btn btn-info btn-xs" onclick="vistaEditarRequisicion({{ $dato }})">
-                                                <i class="fas fa-pen-alt" title="{{ $dato->estado }}"></i> {{ $dato->estado }}
+                                                <i class="fas fa-pen-alt" title="Información"></i> Información
                                             </button>
                                         @endcan
 
-                                        @can('boton.borrar.requisicion.unidad')
-                                        <!-- solo se borrara si no hay ningún material cotizado -->
-                                            @if($dato->haycotizacion)
-                                                <button type="button" class="btn btn-danger btn-xs" onclick="modalBorrarRequisicion({{ $dato->id }})">
-                                                    <i class="fas fa-trash-alt" title="Borrar"></i>&nbsp; Borrar
-                                                </button>
-                                            @endif
-                                        @endcan
 
                                         <button type="button" class="btn btn-success btn-xs" onclick="vistaPDFRequerimiento({{ $dato->id }})">
                                             <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF

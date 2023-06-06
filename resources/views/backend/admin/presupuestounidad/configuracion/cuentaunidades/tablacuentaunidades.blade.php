@@ -11,6 +11,7 @@
                                 <th style="width: 15%">Departamento</th>
                                 <th style="width: 15%">Objeto Específico</th>
                                 <th style="width: 10%">Saldo Inicial</th>
+                                <th style="width: 10%">Saldo Restante</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -20,7 +21,8 @@
                                     <td>{{ $dato->anio }}</td>
                                     <td>{{ $dato->departamento }}</td>
                                     <td>{{ $dato->objeto }}</td>
-                                    <td>{{ $dato->monto }}</td>
+                                    <td>{{ $dato->montofijo }}</td>
+                                    <td>{{ $dato->montorestante }}</td>
                                 </tr>
 
                                 @if($loop->last)
