@@ -37,7 +37,8 @@ class AdministradoresController extends Controller
     {
 
         $regla = array(
-            'nombre' => 'required'
+            'nombre' => 'required',
+            'cargo' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -49,6 +50,7 @@ class AdministradoresController extends Controller
         $dato = new Administradores();
         $dato->nombre = $request->nombre;
         $dato->telefono = $request->telefono;
+        $dato->cargo = $request->cargo;
 
         if ($dato->save()) {
             return ['success' => 1];
@@ -98,7 +100,7 @@ class AdministradoresController extends Controller
             Administradores::where('id', $request->id)->update([
                 'nombre' => $request->nombre,
                 'telefono' => $request->telefono,
-
+                'cargo' => $request->cargo
             ]);
 
             return ['success' => 1];

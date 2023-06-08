@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateAdministradoresTable extends Migration
 {
     /**
-     * Run the migrations.
+     * ADMINISTRADORES DE CONTRATO Y EVALUADORES
      *
      * @return void
      */
@@ -17,6 +17,7 @@ class CreateAdministradoresTable extends Migration
             $table->id();
             $table->string('nombre', 100);
             $table->string('telefono', 20)->nullable();
+            $table->string('cargo', 100);
         });
     }
 

@@ -21,10 +21,6 @@ class CreateCotizacionUnidadDetaTable extends Migration
             $table->decimal('cantidad', 10, 2);
             $table->decimal('precio_u', 10, 2);
 
-            // 0: SIN USO POR EL MOMENTO
-            $table->integer('estado');
-
-
             // LA COTIZACION HECHA POR UACI LLEVA SU PROPIA DESCRIPCION DE LA COTIZACION
             $table->string('descripcion', 300);
 

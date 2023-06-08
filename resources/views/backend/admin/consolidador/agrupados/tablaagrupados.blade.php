@@ -7,23 +7,51 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 10%;">Nombre</th>
-                                <th style="width: 10%;">Teléfono</th>
-                                <th style="width: 10%;">Cargo</th>
-                                <th style="width: 8%;">Opciones</th>
+                                <th>Fecha Agrupado</th>
+                                <th>Descripción</th>
+                                <th>Administrador</th>
+                                <th>Evaluador</th>
+                                <th>Estado</th>
+                                <th>Nota Cancelado</th>
+                                <th>Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($lista as $dato)
+                            @foreach($listado as $dato)
                                 <tr>
-                                    <td>{{ $dato->nombre }}</td>
-                                    <td>{{ $dato->telefono }}</td>
-                                    <td>{{ $dato->cargo }}</td>
+                                    <td>{{ $dato->fecha }}</td>
+                                    <td>{{ $dato->descripcion }}</td>
+                                    <td>{{ $dato->nomadmin }}</td>
+                                    <td>{{ $dato->nomevaluador }}</td>
+
+                                    @if($dato->estado == 1)
+                                        <td><span class="badge bg-danger">CANCELADO</span></td>
+                                    @else
+                                        <td>{{ $dato->textoestado }}</td>
+                                    @endif
+
+                                    <td>{{ $dato->nota_cancelado }}</td>
+
                                     <td>
-                                        <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacionPdf({{ $dato->id }})">
+                                            <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
                                         </button>
+
+                                        @if($dato->btnborrar == 1)
+                                        <br><br>
+                                        <button type="button" class="btn btn-danger btn-xs" onclick="informacionBorrar({{ $dato->id }})">
+                                            <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar
+                                        </button>
+                                        @endif
+
+                                        @if($dato->documento != null)
+                                            <br><br>
+                                            <button type="button" class="btn btn-warning btn-xs" onclick="informacionActa({{ $dato->id }})">
+                                                <i class="fas fa-file-pdf" title="Acta"></i>&nbsp; Acta
+                                            </button>
+                                        @endif
+
                                     </td>
                                 </tr>
                             @endforeach

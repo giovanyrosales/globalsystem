@@ -7,16 +7,17 @@ use Illuminate\Support\Facades\Schema;
 class CreateCotizacionUnidadTable extends Migration
 {
     /**
-     * Run the migrations.
+     * COTIZACION POR UCP, DE TODOS EL AGRUPADO
      *
      * @return void
      */
+
     public function up()
     {
         Schema::create('cotizacion_unidad', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_proveedor')->unsigned();
-            $table->bigInteger('id_requisicion_unidad')->unsigned();
+            $table->bigInteger('id_agrupado')->unsigned();
 
             // fecha se creo la cotizacion
             $table->date('fecha');
@@ -30,7 +31,7 @@ class CreateCotizacionUnidadTable extends Migration
             $table->integer('estado');
 
             $table->foreign('id_proveedor')->references('id')->on('proveedores');
-            $table->foreign('id_requisicion_unidad')->references('id')->on('requisicion_unidad');
+            $table->foreign('id_agrupado')->references('id')->on('requisicion_agrupada');
         });
     }
 

@@ -34,24 +34,6 @@
         </div>
     </section>
 
-    <section class="content">
-        <div class="container-fluid">
-            <div class="card card-success">
-                <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div id="tablaDatatable">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
 
 
     <div class="modal fade" id="modalDetalle">
@@ -82,6 +64,24 @@
 
 
 
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Listado</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="tablaDatatable">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
 
     <div class="modal fade" id="modalAgregar">
@@ -99,24 +99,55 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-                                    <div class="col-md-5">
+                                    <div class="row">
 
-                                        <div class="form-group">
-                                            <label>Fecha de cotización:</label>
-                                            <input type="date" id="fecha-agrupados" class="form-control">
+                                        <div class="col-md-6">
+
+                                            <div class="form-group">
+                                                <label>Fecha:</label>
+                                                <input type="date" id="fecha-agrupados" class="form-control">
+                                            </div>
+
+
                                         </div>
 
+                                        <div class="col-md-6">
+
+                                            <label>Descripción</label>
+                                            <input type="text" maxlength="800" id="descripcion-agrupados" placeholder="Descripción (Opcional)" class="form-control">
+                                        </div>
 
                                     </div>
 
-                                    <div class="col-md-5">
 
-                                        <label>Descripción</label>
+                                    <div class="row">
 
-                                        <input type="text" maxlength="800" id="descripcion-agrupados" placeholder="Descripción (Opcional)" class="form-control">
+                                        <div class="form-group col-md-6">
 
+                                            <label>Administrador</label>
+                                            <select class="custom-select" id="select-administrador">
+                                                @foreach($adminContrato as $dd)
+                                                    <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
+                                                @endforeach
+                                            </select>
+
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+
+                                            <label>Evaluador Técnico</label>
+                                            <select class="custom-select" id="select-evaluador">
+                                                @foreach($adminContrato as $dd)
+                                                    <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
 
+
+                                    <br><br>
+
+                                    <hr>
 
                                     <div class="row">
                                         <div class="col-md-12">
@@ -149,7 +180,6 @@
                                     </div>
 
 
-
                                 </div>
                             </div>
                         </div>
@@ -162,8 +192,6 @@
             </div>
         </div>
     </div>
-
-
 
 
 
@@ -192,6 +220,7 @@
             var ruta = "{{ url('/admin/consolidador/requerimientos/pendientes/tabla') }}/" + id;
             $('#tablaDatatable').load(ruta);
 
+
             $('#mySideToSideSelect').multiselect();
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -218,14 +247,12 @@
         }
 
 
-
-
-
         function modalAgrupar(){
 
             var idanio = {{ $idanio }};
             document.getElementById("mySideToSideSelect").options.length = 0;
             document.getElementById("mySideToSideSelect_to").options.length = 0;
+            document.getElementById("formulario-nuevo").reset();
 
             openLoading();
 
@@ -236,8 +263,13 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        toastr.success('bien');
-                        document.getElementById("formulario-nuevo").reset();
+
+                        console.log(response)
+
+                        $.each(response.data.detalle, function( key, val ){
+                            $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.texto+'</option>');
+                        });
+
                         $('#modalAgregar').modal('show');
                     }else{
                         toastr.error('mal');
@@ -255,6 +287,138 @@
             for(i = L; i >= 0; i--) {
                 selectElement.remove(i);
             }
+        }
+
+        function verificar(){
+            Swal.fire({
+                title: 'Guardar Agrupación',
+                text: "",
+                icon: 'info',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    guardarRegistro();
+                }
+            })
+        }
+
+
+        function guardarRegistro(){
+
+            var fecha = document.getElementById('fecha-agrupados').value;
+            var descripcion = document.getElementById('descripcion-agrupados').value;
+
+            var administrador = document.getElementById('select-administrador').value;
+            var evaluador = document.getElementById('select-evaluador').value;
+
+
+            if(fecha === ''){
+                toastr.error('Fecha es requerida');
+                return;
+            }
+
+            if(descripcion.length > 800){
+                toastr.error('Descripción máximo 800 caracteres');
+                return;
+            }
+
+
+            if(administrador === ''){
+                toastr.error('Administrador es requerido');
+                return;
+            }
+
+            if(evaluador === ''){
+                toastr.error('Evaluador es requerida');
+                return;
+            }
+
+
+            var formData = new FormData();
+            formData.append('fecha', fecha);
+            formData.append('descripcion', descripcion);
+            formData.append('administrador', administrador);
+            formData.append('evaluador', evaluador);
+
+            var noHayElemento = true;
+
+            // AQUI VAN ID REQUISICION UNIDAD DETALLE
+            $("#mySideToSideSelect_to option").each(function(){
+                noHayElemento = false;
+                formData.append('lista[]', $(this).val());
+            });
+
+            if(noHayElemento){
+
+                Swal.fire({
+                    title: 'Error',
+                    text: "Se deben agregar al Contenedor de la Derecha para ser Agrupados los Materiales",
+                    icon: 'info',
+                    showCancelButton: false,
+                    allowOutsideClick: false,
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'Aceptar',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                    }
+                })
+
+                return;
+            }
+
+
+
+            openLoading();
+
+            axios.post(url+'/consolidador/registar/agrupados', formData,{
+
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        // UN MATERIAL YA ESTA AGRUPADO O CANCELADO
+
+                        Swal.fire({
+                            title: 'Error',
+                            text: "Se detecto un Material que ya fue Agrupado o Cancelado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Recargar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+
+                    else if(response.data.success === 2){
+
+                        // AGRUPADOS CORRECTAMENTE
+
+                        $('#modalAgregar').modal('hide');
+                        toastr.success('Agrupados correctamente');
+                        recargar();
+
+                    }
+                    else{
+                        toastr.error('Error al guardar');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Error al guardar');
+                });
+
         }
 
 

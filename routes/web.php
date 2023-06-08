@@ -1106,9 +1106,17 @@ Route::post('/admin/consolidatos/listado/ordenado/paraselect', [ConsolidadorCont
 
 // informacion para mostrar detalle de una requisicion en el modal
 Route::get('/admin/consolidador/info/requisicion/detalle/{idrequi}', [ConsolidadorController::class,'informacionDetalleRequisicion']);
+Route::post('/admin/consolidador/registar/agrupados', [ConsolidadorController::class,'registrarAgrupados']);
 
+// VER LISTA DE YA AGRUPADOS
+Route::get('/admin/consolidador/listado/agrupados', [ConsolidadorController::class,'indexListaAgrupados'])->name('requerimientos.consolidador.agrupados');
+Route::get('/admin/consolidador/listado/agrupados/tabla', [ConsolidadorController::class,'tablaListaAgrupados']);
 
+// generar PDF de los materiales agrupados
+Route::get('/admin/consolidador/generar/pdf/{idagrupado}', [ConsolidadorController::class,'generarPdfAgrupado']);
 
+// borrar agrupacion
+Route::post('/admin/consolidador/borrar/agrupado', [ConsolidadorController::class,'borrarAgrupado']);
 
 
 
