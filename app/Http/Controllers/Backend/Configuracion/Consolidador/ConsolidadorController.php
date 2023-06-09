@@ -249,7 +249,6 @@ class ConsolidadorController extends Controller
             $dato->fecha = $request->fecha;
             $dato->id_contrato = $request->administrador;
             $dato->id_evaluador = $request->evaluador;
-            $dato->fecha = $request->fecha;
             $dato->nombreodestino = $request->nombreodestino;
             $dato->justificacion = $request->justificacion;
             $dato->entrega = $request->entrega;
