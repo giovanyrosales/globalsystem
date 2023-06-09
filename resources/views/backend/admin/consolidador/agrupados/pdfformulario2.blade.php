@@ -89,7 +89,7 @@
             <td style="text-align:center; width: 5%; border: 1px solid black; border-collapse: collapse;"></td>
             <td style="text-align:center; width: 10%; border: 1px solid black; border-collapse: collapse;">{{$detalles->codigo}}</td>
             <td style="text-align:center; width: 10%; border: 1px solid black; border-collapse: collapse;">{{$detalles->cantidad}}</td>
-            <td style="text-align:center; width: 10%; border: 1px solid black; border-collapse: collapse;"></td>
+            <td style="text-align:center; width: 10%; border: 1px solid black; border-collapse: collapse;">{{$detalles->unidadmedida}}</td>
             <td style="text-align:center; width: 30%; border: 1px solid black; border-collapse: collapse;">{{$detalles->descripcion}}</td>
             <td style="text-align:center; width: 35%; border: 1px solid black; border-collapse: collapse;">{{$detalles->especificacion}}</td>
         </tr>
@@ -141,7 +141,7 @@
 </table><br>
 
 
-<div style="bottom: 20px;  position: absolute; width: 100%" >
+<div style="bottom: 60px;  position: absolute; width: 100%" >
 
     <table  class="table-head"  border="0" >
         <tr>

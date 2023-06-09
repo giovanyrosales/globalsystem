@@ -11,11 +11,13 @@ use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
 use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
+use App\Models\P_UnidadMedida;
 use App\Models\Requisicion;
 use App\Models\RequisicionAgrupada;
 use App\Models\RequisicionAgrupadaDetalle;
 use App\Models\RequisicionUnidad;
 use App\Models\RequisicionUnidadDetalle;
+use App\Models\UnidadMedida;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -360,10 +362,12 @@ class ConsolidadorController extends Controller
 
             $infoMaterial = P_Materiales::where('id',$infoRequiUnidadDetalle->id_material)->first();
             $infoCodigo = ObjEspecifico::where('id',$infoMaterial->id_objespecifico)->first();
+            $infoUnidadM = P_UnidadMedida::where('id',$infoMaterial->id_unidadmedida)->first();
             $info->cantidad = $infoRequiUnidadDetalle->cantidad;
             $info->descripcion = $infoMaterial->descripcion;
             $info->especificacion = $infoRequiUnidadDetalle->material_descripcion;
             $info->codigo = $infoCodigo->codigo;
+            $info->unidadmedida = $infoUnidadM->nombre;
         }
 
 
