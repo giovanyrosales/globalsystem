@@ -7,39 +7,25 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 8%">Año</th>
-                                <th style="width: 15%">Departamento</th>
-                                <th style="width: 15%">Objeto Específico</th>
-                                <th style="width: 10%">Saldo Inicial</th>
-                                <th style="width: 10%">Saldo Restante</th>
+                                <th>Fecha Requisición</th>
+                                <th>Unidad</th>
+                                <th>Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($listado as $dato)
+                            @foreach($arrayRequisicionPendiente as $dato)
                                 <tr>
-                                    <td>{{ $dato->anio }}</td>
+                                    <td>{{ $dato->fecha }}</td>
                                     <td>{{ $dato->departamento }}</td>
-                                    <td>{{ $dato->objeto }}</td>
-                                    <td>{{ $dato->montofijo }}</td>
-                                    <td>{{ $dato->montorestante }}</td>
+
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="detalleRequisicion({{ $dato->id }})">
+                                            <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
+                                        </button>
+                                    </td>
                                 </tr>
-
-                                @if($loop->last)
-                                    <script>
-                                        setTimeout(function () {
-                                            closeLoading();
-                                        }, 1000);
-                                    </script>
-                                @endif
-
                             @endforeach
-
-                            <script>
-                                setTimeout(function () {
-                                    closeLoading();
-                                }, 1000);
-                            </script>
 
                             </tbody>
                         </table>

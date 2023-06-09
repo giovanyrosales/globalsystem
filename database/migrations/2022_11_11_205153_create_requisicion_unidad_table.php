@@ -21,18 +21,8 @@ class CreateRequisicionUnidadTable extends Migration
             $table->date('fecha');
             $table->text('necesidad')->nullable();
 
-            // CUANDO SE CREA UN REQUERIMIENTO, DEBE REVISARLO PRESUPUESTO PARA QUE PASE A UACI
-            $table->boolean('req_revision');
-
-
-            // CAMPOS UTILIZADOS PARA CUANDO ES DENEGADA LA COTIZACION POR EL CONCEJO POR EJEMPLO.
-            // esto lo hace uaci unidad u otro rol
-            $table->boolean('estado_denegado');
-            $table->text('texto_denegado')->nullable();
-
             // nombre de usuario quien solicito
             $table->string('solicitante', 100);
-
 
             $table->foreign('id_presup_unidad')->references('id')->on('p_presup_unidad');
         });

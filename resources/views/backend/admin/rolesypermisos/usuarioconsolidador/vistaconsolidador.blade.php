@@ -63,9 +63,23 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Unidades:</label>
-                                        <select class="form-control" id="select-usuario-nuevo">
+                                        <label>Departamentos:</label>
+                                        <select class="form-control" id="select-departamento">
                                             @foreach($unidades as $sel)
+                                                <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Usuarios:</label>
+                                        <select class="form-control" id="select-usuario">
+                                            @foreach($usuarios as $sel)
                                                 <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
                                             @endforeach
                                         </select>
@@ -128,47 +142,19 @@
         }
 
         function modalAgregar(){
-            $('#select-usuario-nuevo').prop('selectedIndex', 0).change();
+            //$('#select-depa').prop('selectedIndex', 0).change();
             $('#modalAgregar').modal('show');
         }
 
         function verificarGuardar(){
-            Swal.fire({
-                title: 'Guardar Registro?',
-                text: "",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Si'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    nuevo();
-                }
-            })
-        }
 
-        function verificarEditar(){
-            Swal.fire({
-                title: 'Actualizar Registro?',
-                text: "",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Si'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    editar();
-                }
-            })
-        }
+            var departamento = document.getElementById('select-departamento').value;
+            var usuario = document.getElementById('select-usuario').value;
 
-        function nuevo(){
-
-            var usuario = document.getElementById('select-usuario-nuevo').value;
+            if(departamento === ''){
+                toastr.error('Departamento es requerido');
+                return;
+            }
 
             if(usuario === ''){
                 toastr.error('Usuario es requerido');
@@ -177,16 +163,17 @@
 
             openLoading();
             var formData = new FormData();
+            formData.append('departamento', departamento);
             formData.append('usuario', usuario);
 
-            axios.post(url+'/usuario/formulador/nuevo', formData, {
+            axios.post(url+'/registrar/usuario/consolidador', formData, {
             })
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
                         Swal.fire({
-                            title: 'Usuario Repetido',
-                            text: "El usuario ya esta registrado",
+                            title: 'Departamento Repetido',
+                            text: "ya esta registrado",
                             icon: 'info',
                             showCancelButton: false,
                             confirmButtonColor: '#28a745',
@@ -212,6 +199,9 @@
                 });
         }
 
+
+
+
         function informacionBorrar(id){
 
             Swal.fire({
@@ -233,13 +223,12 @@
         function borrar(id){
 
             openLoading();
-            axios.post(url+'/usuario/formulador/borrar',{
+            axios.post(url+'/borrar/usuario/consolidador',{
                 'id': id
             })
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
-
                         toastr.success('Borrado correctamente');
                         recargar();
                     }else{
@@ -251,7 +240,6 @@
                     toastr.error('Error al borrar');
                 });
         }
-
 
 
 

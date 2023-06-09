@@ -18,7 +18,11 @@ class CreateCuentaUnidadTable extends Migration
             $table->bigInteger('id_presup_unidad')->unsigned();
             $table->bigInteger('id_objespeci')->unsigned(); // objeto específico
 
-            // este puede ser modificado en algún momento
+            // ESTE ES EL SALDO DE LA CUENTA, PUEDE SER MODIFICADO
+            // EJEMPLO EN MOVIMIENTOS DE CUENTA SE BAJARA O SUBIRA DIRECTAMENTE EL
+            // SALDO, en la tabla movicuenta_unidad cuando se apruebe por jefe de presupuesto
+            // se bajara directamente aqui el saldo, ya no se hara calculado.
+
             $table->decimal('saldo_inicial', 10,2); // PUEDE CAMBIAR
 
             // NO CAMBIA NUNCA, ES FIJO

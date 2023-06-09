@@ -91,6 +91,8 @@ Route::post('/admin/p/usuario/departamento/editar', [PermisoController::class, '
 // --- USUARIO CONSOLIDADOR ---
 Route::get('/admin/usuario/consolidador/index', [PermisoController::class,'indexVistaConsolidador'])->name('admin.usuario.consolidador.index');
 Route::get('/admin/usuario/consolidador/tabla', [PermisoController::class,'tablaVistaConsolidador']);
+Route::post('/admin/registrar/usuario/consolidador', [PermisoController::class, 'registrarUsuarioConsolidador']);
+Route::post('/admin/borrar/usuario/consolidador', [PermisoController::class, 'borrarUsuarioConsolidador']);
 
 
 
@@ -102,11 +104,8 @@ Route::get('/admin/usuario/consolidador/tabla', [PermisoController::class,'tabla
 Route::get('/admin/usuario/departamento-vista/index', [PermisoController::class,'indexUsuarioDepartamentoVista'])->name('admin.usuario.departamento.vista.index');
 Route::get('/admin/usuario/departamento-vista/tabla', [PermisoController::class,'tablaUsuarioDepartamentoVista']);
 
-// Para que jefe de presupuesto apruebe un requerimiento. esto da tiempo para que revise se hay dinero
-Route::get('/admin/presupuesto/verrequerimientos/pendientes', [CotizacionesUnidadController::class,'verRequerimientosPendientes'])->name('admin.requerimientos.esperar.validad.presupuesto');
-Route::get('/admin/presupuesto/verrequerimientos/pendientes/tabla', [CotizacionesUnidadController::class,'verRequerimientosPendientesTabla']);
-Route::post('/admin/presupuesto/verrequerimientos/pendientes/info', [CotizacionesUnidadController::class,'inforRequerimientosPendientesTabla']);
-Route::post('/admin/presupuesto/verrequerimientos/pendientes/aprobar', [CotizacionesUnidadController::class,'aprobarRequerimientosPendientes']);
+
+
 
 
 
@@ -895,8 +894,6 @@ Route::post('/admin/p/requisicion/unidad/editar', [RequerimientosUnidadControlle
 
 // cancelar material de requisicion unidad detalle
 Route::post('/admin/p/requisicion/unidad/material/cancelar', [RequerimientosUnidadController::class, 'cancelarMaterialRequisicionUnidad']);
-// borrar fila de requisicion unidad detalle
-Route::post('/admin/p/requisicion/unidad/material/borrarfila', [RequerimientosUnidadController::class, 'borrarMaterialRequisicionFilaUnidad']);
 
 
 // * LISTADO DE REQUERIMIENTOS UACI UNIDAD
@@ -1098,13 +1095,28 @@ Route::get('/admin/p/reque/dene/listado/materiales/tabla/{idrequi}', [Cotizacion
 
 
 //**********   CONSOLIDADOR *************
-//Route::get('/admin/p/buscarfecha/requerimientos/denegados/unidadindex', [ConsolidadorController::class,'indexConsolii'])->name('admin.listar.requerimientos.denegados.index');
+Route::get('/admin/consolidador/requerimientos/pendientes', [ConsolidadorController::class,'indexRequerimientosPendientes'])->name('requerimientos.pendientes.consolidadoras');
+
+Route::get('/admin/consolidador/requerimientos/pendientes/vista/{idanio}', [ConsolidadorController::class,'vistaRequerimientosPendientes']);
+Route::get('/admin/consolidador/requerimientos/pendientes/tabla/{idanio}', [ConsolidadorController::class,'tablaRequerimientosPendientes']);
+
+// se obtiene listado para meter al select de materiales ya agrupados
+Route::post('/admin/consolidatos/listado/ordenado/paraselect', [ConsolidadorController::class,'listadoAgrupadosParaSelect']);
 
 
+// informacion para mostrar detalle de una requisicion en el modal
+Route::get('/admin/consolidador/info/requisicion/detalle/{idrequi}', [ConsolidadorController::class,'informacionDetalleRequisicion']);
+Route::post('/admin/consolidador/registar/agrupados', [ConsolidadorController::class,'registrarAgrupados']);
 
+// VER LISTA DE YA AGRUPADOS
+Route::get('/admin/consolidador/listado/agrupados', [ConsolidadorController::class,'indexListaAgrupados'])->name('requerimientos.consolidador.agrupados');
+Route::get('/admin/consolidador/listado/agrupados/tabla', [ConsolidadorController::class,'tablaListaAgrupados']);
 
+// generar PDF de los materiales agrupados
+Route::get('/admin/consolidador/generar/pdf/{idagrupado}', [ConsolidadorController::class,'generarPdfAgrupado']);
 
-
+// borrar agrupacion
+Route::post('/admin/consolidador/borrar/agrupado', [ConsolidadorController::class,'borrarAgrupado']);
 
 
 

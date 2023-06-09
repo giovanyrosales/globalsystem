@@ -69,62 +69,17 @@ class MovimientosUnidadControlles extends Controller
         $presupuesto = DB::table('cuenta_unidad AS cu')
             ->join('obj_especifico AS obj', 'cu.id_objespeci', '=', 'obj.id')
             ->select('obj.nombre', 'obj.id AS idcodigo', 'cu.id_presup_unidad',
-                'obj.codigo', 'cu.id', 'cu.saldo_inicial')
+                'obj.codigo', 'cu.id', 'cu.saldo_inicial', 'cu.saldo_inicial_fijo')
             ->where('cu.id_presup_unidad', $idpresup)
             ->get();
 
-        foreach ($presupuesto as $pp) {
+        foreach ($presupuesto as $info) {
 
-            // CÁLCULOS
+            // UTILIZADO PARA MOSTRAR O NO EL BOTON (AUMENTAR)
+            $info->permiso = $permiso;
 
-            $totalRestante = 0;
-            $totalRetenido = 0;
-
-            // movimiento de cuentas SUBE
-            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $pp->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            // movimiento de cuentas BAJA
-            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $pp->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
-
-            // obtener todas las salidas de material
-            $arrayRestante = DB::table('cuentaunidad_restante AS cr')
-                ->join('requisicion_unidad_detalle AS rud', 'cr.id_requi_detalle', '=', 'rud.id')
-                ->select('rud.cantidad', 'rud.dinero')
-                ->where('cr.id_cuenta_unidad', $pp->id)
-                ->where('rud.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRestante as $dd) {
-                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
-            }
-
-            // información de saldos retenidos
-            $arrayRetenido = DB::table('cuentaunidad_retenido AS cr')
-                ->join('requisicion_unidad_detalle AS rud', 'cr.id_requi_detalle', '=', 'rud.id')
-                ->select('rud.cantidad', 'rud.dinero', 'rud.cancelado')
-                ->where('cr.id_cuenta_unidad', $pp->id)
-                ->where('rud.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRetenido as $dd) {
-                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-            }
-
-            // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + ($pp->saldo_inicial - $totalRestante);
-
-            // usado para ver puedo hacer un movimiento de cuenta unidad
-            $pp->permiso = $permiso;
-
-            $pp->saldo_inicial = number_format((float)$pp->saldo_inicial, 2, '.', ',');
-            $pp->saldo_restante = number_format((float)$totalRestanteSaldo, 2, '.', ',');
-            $pp->total_retenido = number_format((float)$totalRetenido, 2, '.', ',');
+            $info->saldo_inicial = number_format((float)$info->saldo_inicial, 2, '.', ',');
+            $info->saldo_inicial_fijo = number_format((float)$info->saldo_inicial_fijo, 2, '.', ',');
         }
 
         return view('backend.admin.presupuestounidad.requerimientos.movimientosunidad.tablamovimientocuentaunidad', compact('presupuesto'));
@@ -159,48 +114,7 @@ class MovimientosUnidadControlles extends Controller
 
             // CÁLCULOS
 
-            $totalRestante = 0;
-            $totalRetenido = 0;
-
-            // movimiento de cuentas (sube y baja)
-            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $lista->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $lista->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
-
-            // obtener todas las salidas de material
-            $arrayRestante = DB::table('cuentaunidad_restante AS cr')
-                ->join('requisicion_unidad_detalle AS rd', 'cr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
-                ->where('cr.id_cuenta_unidad', $lista->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRestante as $dd){
-                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
-            }
-
-            // obtener todas las salidas de material
-            $arrayRetenido = DB::table('cuentaunidad_retenido AS cr')
-                ->join('requisicion_unidad_detalle AS rd', 'cr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
-                ->where('cr.id_cuenta_unidad', $lista->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRetenido as $dd) {
-                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-            }
-
-            // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + ($lista->saldo_inicial - $totalRestante);
-
-            $totalRestanteSaldo = "$" . number_format((float)$totalRestanteSaldo, 2, '.', ',');
+            $totalRestanteSaldo = "$" . number_format((float)$lista->saldo_inicial, 2, '.', ',');
 
             return ['success' => 1, 'info' => $lista,
                 'objeto' => $infoObjeto, 'cuenta' => $cuenta,
@@ -225,53 +139,7 @@ class MovimientosUnidadControlles extends Controller
 
         if ($lista = CuentaUnidad::where('id', $request->id)->first()) {
 
-
-            // CÁLCULOS
-
-            $totalRestante = 0;
-            $totalRetenido = 0;
-
-            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $lista->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $lista->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
-
-            // obtener saldos restante
-            $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
-                ->where('pd.id_cuenta_unidad', $lista->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRestante as $dd) {
-                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
-            }
-
-            // información de saldos retenidos
-            $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('psr.id_cuenta_unidad', $lista->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRetenido as $dd) {
-                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-            }
-
-            // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + ($lista->saldo_inicial - $totalRestante);
-
-            // se debe quitar el retenido
-            $totalCalculado = $totalRestanteSaldo - $totalRetenido;
-
-            $totalCalculado = "$" . number_format((float)$totalCalculado, 2, '.', ',');
+            $totalCalculado = "$" . number_format((float)$lista->saldo_inicial, 2, '.', ',');
 
             return ['success' => 1, 'restante' => $totalCalculado];
         } else {
@@ -282,80 +150,29 @@ class MovimientosUnidadControlles extends Controller
     // registrar un nuevo movimiento de cuenta unidad por jefe de unidad
     public function nuevaMoviCuentaUnidad(Request $request){
 
+        // REQUEST
+
+        // idcuentaunidad     id de cuenta unidad que subira
+        // saldomodificar     dinero
+        // selectcuenta       id cuenta unidad a descontar
+        // fecha
+
         DB::beginTransaction();
 
         try {
 
-            // VERIFICAR MIS SALDOS RESTANTE Y VERIFICAR QUE NO QUEDE MENOR A 0
+            // SOLO SE TOMA EN CONSIDERACION LA CUENTA UNIDAD QUE BAJARA
+            $infoCuentaBajara = CuentaUnidad::where('id', $request->selectcuenta)->first();
 
-            $infoCuentaProy = CuentaUnidad::where('id', $request->selectcuenta)->first(); // y este va a disminuir
+            $resta = $infoCuentaBajara->saldo_inicial = $request->saldomodificar;
 
-            $infoObjetoEspe = ObjEspecifico::where('id', $infoCuentaProy->id_objespeci)->first();
-            $txtObjetoEspec = $infoObjetoEspe->codigo . " - " . $infoObjetoEspe->nombre;
+            // DINERO NO ALCALZA PARA BAJARLE
+            if($resta < 0){
 
-            // PROCESO DE CÁLCULOS
+                $saldoActual = '$' . number_format((float)$infoCuentaBajara->saldo_inicial, 2, '.', ',');
 
-            $totalRestante = 0;
-            $totalRetenido = 0;
-
-            // movimiento de cuentas (sube y baja)
-            $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $request->selectcuenta)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $request->selectcuenta)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            // variable para guardar movimiento de cuenta calculada
-            $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
-
-            // obtener todas las salidas de material
-            $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('pd.id_cuenta_unidad', $infoCuentaProy->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRestante as $dd) {
-                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
+                return ['success' => 1, 'saldoactual' => $saldoActual];
             }
-
-            // obtener saldos retenidos
-            $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('psr.id_cuenta_unidad', $infoCuentaProy->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRetenido as $dd) {
-                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-            }
-
-            // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + ($infoCuentaProy->saldo_inicial - $totalRestante);
-
-            $totalCalculado = ($totalRestanteSaldo - $request->saldomodificar) - $totalRetenido;
-
-            // al final no debe quedar menor a 0, para poder guardar el movimiento de cuenta.
-            if ($this->redondear_dos_decimal($totalCalculado) < 0) {
-                // saldo insuficiente para hacer este movimiento, ya que queda NEGATIVO
-
-                // pasar a positivo
-                $totalCalculado = abs($totalCalculado);
-                $totalCalculado = "-$" . number_format((float)$totalCalculado, 2, '.', ',');
-
-                $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
-                $totalRetenido = number_format((float)$totalRetenido, 2, '.', ',');
-                $dinero = number_format((float)$request->saldomodificar, 2, '.', ',');
-
-                return ['success' => 2, 'objeto' => $txtObjetoEspec, 'restante' => $totalRestanteSaldo,
-                    'retenido' => $totalRetenido, 'dinero' => $dinero, 'calculado' => $totalCalculado];
-            }
-
-            // Guardar
 
             $co = new MoviCuentaUnidad();
             $co->id_cuentaunidad_sube = $request->idcuentaunidad;
@@ -377,7 +194,7 @@ class MovimientosUnidadControlles extends Controller
             ]);
 
             DB::commit();
-            return ['success' => 3];
+            return ['success' => 2];
 
         } catch (\Throwable $e) {
             Log::info('ee' . $e);
@@ -507,50 +324,7 @@ class MovimientosUnidadControlles extends Controller
             // CÁLCULOS
 
             $infoCuentaUnidad = CuentaUnidad::where('id', $infoMovi->id_cuentaunidad_baja)->first();
-
-            $totalRestante = 0;
-            $totalRetenido = 0;
-
-            // movimiento de cuentas (sube y baja)
-            $infoMoviCuentaProySube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $infoCuentaUnidadSube->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $infoMoviCuentaProyBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $infoCuentaUnidadBaja->id)
-                ->where('autorizado', 1) // autorizado por presupuesto
-                ->sum('dinero');
-
-            $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
-
-            // obtener todas las salidas de material
-            $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero')
-                ->where('pd.id_cuenta_unidad', $infoCuentaUnidad->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRestante as $dd){
-                $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
-            }
-
-
-            // información de saldos retenidos
-            $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                ->where('psr.id_cuenta_unidad', $infoCuentaUnidad->id)
-                ->where('rd.cancelado', 0)
-                ->get();
-
-            foreach ($arrayRetenido as $dd){
-                $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-            }
-
-            // aquí se obtiene el Saldo Restante del código
-            $totalRestanteSaldo = $totalMoviCuenta + ($infoCuentaUnidad->saldo_inicial - $totalRestante);
-
-            $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
+            $totalRestanteSaldo = number_format((float)$infoCuentaUnidad->saldo_inicial, 2, '.', ',');
 
             return ['success' => 1, 'info' => $infoMovi, 'cuentaaumenta' => $cuentaaumenta,
                 'cuentabaja' => $cuentabaja, 'objetosube' => $objetoaumenta, 'objetobaja' => $objetobaja,
@@ -599,81 +373,23 @@ class MovimientosUnidadControlles extends Controller
 
             if ($infoMovimiento = MoviCuentaUnidad::where('id', $request->id)->first()) {
 
-                // movimiento ya estaba autorizado
+               // EVITAR QUE SE AUTORIZE DE NUEVO
                 if ($infoMovimiento->autorizado == 1) {
                     return ['success' => 1];
                 }
 
                 // INFO DE LA CUENTA QUE VA A BAJAR
-                $infoCuentaUnidad = CuentaUnidad::where('id', $infoMovimiento->id_cuentaunidad_baja)->first(); // y este va a disminuir
+                $infoCuentaBajara = CuentaUnidad::where('id', $infoMovimiento->id_cuentaunidad_baja)->first();
 
-                $infoObjetoEspe = ObjEspecifico::where('id', $infoCuentaUnidad->id_objespeci)->first();
-                $txtObjetoEspec = $infoObjetoEspe->codigo . " - " . $infoObjetoEspe->nombre;
+                $resta = $infoCuentaBajara->saldo_inicial - $infoMovimiento->dinero;
 
-                // CÁLCULOS
+                // DINERO NO ALCALZA PARA BAJARLE
+                if($resta < 0){
 
-                $totalRestante = 0;
-                $totalRetenido = 0;
-
-                // se está haciendo cálculos únicamente con la cuenta que BAJARA, la que subirá no se hace ningún cálculo
-
-                // SOLO CALCULOS CON LA CUENTA QUE BAJA
-                $infoMoviCuentaUnidadSube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $infoMovimiento->id_cuentaunidad_baja)
-                    ->where('autorizado', 1) // autorizado por presupuesto
-                    ->sum('dinero');
-
-                $infoMoviCuentaUnidadBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $infoMovimiento->id_cuentaunidad_baja)
-                    ->where('autorizado', 1) // autorizado por presupuesto
-                    ->sum('dinero');
-
-                // variable para guardar movimiento de cuenta calculada
-                $totalMoviCuenta = $infoMoviCuentaUnidadSube - $infoMoviCuentaUnidadBaja;
-
-                // obtener saldo restante
-                $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                    ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                    ->where('pd.id_cuenta_unidad', $infoCuentaUnidad->id)
-                    ->where('rd.cancelado', 0)
-                    ->get();
-
-                foreach ($arrayRestante as $dd) {
-                    $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
+                    $saldoActual = '$' . number_format((float)$infoCuentaBajara->saldo_inicial, 2, '.', ',');
+                    return ['success' => 2, 'saldoactual' => $saldoActual];
                 }
 
-                // obtener saldos retenidos
-                $arrayRetenido = DB::table('cuentaunidad_retenido AS psr')
-                    ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                    ->where('psr.id_cuenta_unidad', $infoCuentaUnidad->id)
-                    ->where('rd.cancelado', 0)
-                    ->get();
-
-                foreach ($arrayRetenido as $dd) {
-                    $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-                }
-
-                // aquí se obtiene el Saldo Restante del código
-                $totalRestanteSaldo = $totalMoviCuenta + ($infoCuentaUnidad->saldo_inicial - $totalRestante);
-
-                // HOY RESTAR LO QUE SE QUIERE QUITAR AL OBJETO ESPECÍFICO Y TAMBIEN QUE NO HAYA SALDO RETENIDO
-                $totalCalculado = ($totalRestanteSaldo - $infoMovimiento->dinero) - $totalRetenido;
-
-                if ($this->redondear_dos_decimal($totalCalculado) < 0) {
-                    // saldo insuficiente para hacer este movimiento, ya que queda NEGATIVO
-
-                    // pasar a positivo
-                    $totalCalculado = abs($totalCalculado);
-                    $totalCalculado = '-$' . number_format((float)$totalCalculado, 2, '.', ',');
-                    $totalRestanteSaldo = number_format((float)$totalRestanteSaldo, 2, '.', ',');
-                    $totalRetenido = number_format((float)$totalRetenido, 2, '.', ',');
-                    $dinero = number_format((float)$infoMovimiento->dinero, 2, '.', ',');
-
-                    return ['success' => 2, 'objeto' => $txtObjetoEspec, 'restante' => $totalRestanteSaldo,
-                        'retenido' => $totalRetenido, 'dinero' => $dinero, 'calculado' => $totalCalculado];
-                }
-
-                // PASADO VALIDACIÓN, SE PUEDE GUARDAR
 
                 if ($request->hasFile('documento')) {
                     $cadena = Str::random(15);
@@ -695,6 +411,11 @@ class MovimientosUnidadControlles extends Controller
                             'autorizado' => 1
                         ]);
 
+                        // DESCONTAR DINERO A LA CUENTA UNIDAD
+                        CuentaUnidad::where('id', $infoCuentaBajara->id)->update([
+                            'saldo_inicial' => $resta,
+                        ]);
+
                         DB::commit();
                         return ['success' => 3];
                     } else {
@@ -704,6 +425,11 @@ class MovimientosUnidadControlles extends Controller
 
                     MoviCuentaUnidad::where('id', $request->id)->update([
                         'autorizado' => 1
+                    ]);
+
+                    // DESCONTAR DINERO A LA CUENTA UNIDAD
+                    CuentaUnidad::where('id', $infoCuentaBajara->id)->update([
+                        'saldo_inicial' => $resta,
                     ]);
 
                     DB::commit();

@@ -149,7 +149,6 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Saldo Restante Actualmente</label>
-                                            <p style="color: red">Se resta también Saldo Retenido</p>
                                             <input type="text" disabled placeholder="0.00" class="form-control" id="saldo-restante-actual">
                                         </div>
                                     </div>
@@ -421,7 +420,7 @@
             })
                 .then((response) => {
                     closeLoading();
-                    $('#modalAgregar').modal('hide');
+
 
                     // el movimiento no se encontrado o fue borrado
                     if(response.data.success === 1){
@@ -432,33 +431,24 @@
                             text: "El Movimiento de Cuenta ya estaba autorizado",
                             icon: 'info',
                             showCancelButton: false,
+                            allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
                             confirmButtonText: 'Aceptar'
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                $('#modalAgregar').modal('hide');
                             }
                         })
                     }
 
                     else if(response.data.success === 2) {
 
-                        let objeto = response.data.objeto;
-                        let restante = response.data.restante;
-                        let retenido = response.data.retenido;
-                        let arestar = response.data.dinero;
-                        let calculado = response.data.calculado;
+                        let resta = response.data.saldoactual;
 
                         Swal.fire({
-                            title: 'Movimiento Inválido',
-                            html: "La Cuenta a Modificar con el Código " + objeto +"<br>"
-                                + "Tiene Saldo Insuficiente "+"<br>"
-                                + "Saldo Restante $"+ restante +"<br>"
-                                + "Saldo Retenido $"+ retenido +"<br>"
-                                + "Saldo a Restar $"+ arestar +"<br>"
-                                + "La cuenta quedara cón "+ calculado+"<br>"
-                            ,
+                            title: 'Movimiento Denegado',
+                            text: "La Cuenta Unidad cuenta con Saldo Disponible de: " + resta,
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -466,11 +456,13 @@
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-
+                                $('#modalAgregar').modal('hide');
+                                recargar();
                             }
                         })
                     }
                     else if(response.data.success === 3){
+                        $('#modalAgregar').modal('hide');
                         toastr.success('Movimiento Autorizado');
                         recargar();
                     }

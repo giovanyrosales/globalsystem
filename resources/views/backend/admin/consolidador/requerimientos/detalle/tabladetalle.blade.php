@@ -70,7 +70,7 @@
 <div id="header">
     <div class="content">
         <p id="titulo">ALCALDÍA MUNICIPAL DE METAPÁN <br>
-            Saldo de Cuenta<br>
+            Materiales Solicitados<br>
     </div>
 </div>
 
@@ -81,17 +81,19 @@
     <tr>
         <td width="10%" style="font-weight: bold">Código</td>
         <td width="30%" style="font-weight: bold">Objeto</td>
-        <td width="20%" style="font-weight: bold">Saldo Inicial</td>
-        <td width="20%" style="font-weight: bold">Saldo Restante</td>
+        <td width="20%" style="font-weight: bold">Material</td>
+        <td width="20%" style="font-weight: bold">Descripción</td>
+        <td width="8%" style="font-weight: bold">Cantidad</td>
     </tr>
 
-    @foreach($presupuesto as $dd)
+    @foreach($arrayDetalle as $dd)
 
         <tr>
             <td width="10%" style="font-weight: bold">{{ $dd->codigo }}</td>
-            <td width="30%" style="font-weight: bold">{{ $dd->nombre }}</td>
-            <td width="20%" style="font-weight: bold">{{ $dd->saldo_inicial_fijo }}</td>
-            <td width="20%" style="font-weight: bold">{{ $dd->saldo_inicial }}</td>
+            <td width="30%" style="font-weight: bold">{{ $dd->nombreobj }}</td>
+            <td width="20%" style="font-weight: bold">{{ $dd->nombrematerial }}</td>
+            <td width="20%" style="font-weight: bold">{{ $dd->material_descripcion }}</td>
+            <td width="8%" style="font-weight: bold">{{ $dd->cantidad }}</td>
         </tr>
 
     @endforeach
@@ -103,7 +105,6 @@
 
 <br>
 <br>
-<!-- partida de mano de obra -->
 <div class="modal-footer justify-content-between">
     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
 </div>

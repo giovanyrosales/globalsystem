@@ -21,14 +21,14 @@
             <div class="col-sm-6">
                 <button type="button" onclick="modalAgregar()" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-3d button-rounded button-pill button-small">
                     <i class="fas fa-pencil-alt"></i>
-                    Nuevo Administradores de Contrato
+                    Registrar
                 </button>
             </div>
 
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Administrador</li>
-                    <li class="breadcrumb-item active">Listado de Administradores</li>
+                    <li class="breadcrumb-item">Administrador o Evaluador</li>
+                    <li class="breadcrumb-item active">Listado</li>
                 </ol>
             </div>
         </div>
@@ -56,7 +56,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nuevo Administrador de contrato</h4>
+                    <h4 class="modal-title">Nuevo Administrador de contrato o Evaluador</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -75,6 +75,11 @@
                                     <div class="form-group">
                                         <label>Teléfono</label>
                                         <input type="text" maxlength="20" class="form-control" id="telefono-nuevo" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Cargo</label>
+                                        <input type="text" maxlength="100" class="form-control" id="cargo-nuevo" autocomplete="off">
                                     </div>
 
                                 </div>
@@ -118,6 +123,11 @@
                                     <div class="form-group">
                                         <label>Teléfono</label>
                                         <input type="text" maxlength="20" class="form-control" id="telefono-editar" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Cargo</label>
+                                        <input type="text" maxlength="100" class="form-control" id="cargo-editar" autocomplete="off">
                                     </div>
 
                                 </div>
@@ -171,6 +181,7 @@
         function nuevo(){
             var nombre = document.getElementById('nombre-nuevo').value;
             var telefono = document.getElementById('telefono-nuevo').value;
+            var cargo = document.getElementById('cargo-nuevo').value;
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -187,11 +198,22 @@
                 return;
             }
 
+            if(cargo === ''){
+                toastr.error('Cargo es requerido');
+                return;
+            }
+
+            if(cargo.length > 100){
+                toastr.error('Cargo máximo 100 caracteres');
+                return;
+            }
+
 
             openLoading();
             var formData = new FormData();
             formData.append('nombre', nombre);
             formData.append('telefono', telefono);
+            formData.append('cargo', cargo);
 
             axios.post(url+'/administradores/nuevo', formData, {
             })
@@ -226,6 +248,7 @@
                         $('#id-editar').val(response.data.lista.id);
                         $('#nombre-editar').val(response.data.lista.nombre);
                         $('#telefono-editar').val(response.data.lista.telefono);
+                        $('#cargo-editar').val(response.data.lista.cargo);
 
                     }else{
                         toastr.error('Información no encontrada');
@@ -241,14 +264,15 @@
             var id = document.getElementById('id-editar').value;
             var nombre = document.getElementById('nombre-editar').value;
             var telefono = document.getElementById('telefono-editar').value;
+            var cargo = document.getElementById('cargo-editar').value;
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
                 return;
             }
 
-            if(nombre.length > 150){
-                toastr.error('Nombre máximo 150 caracteres');
+            if(nombre.length > 100){
+                toastr.error('Nombre máximo 100 caracteres');
                 return;
             }
 
@@ -257,11 +281,22 @@
                 return;
             }
 
+            if(cargo === ''){
+                toastr.error('Cargo es requerido');
+                return;
+            }
+
+            if(cargo.length > 100){
+                toastr.error('Cargo máximo 100 caracteres');
+                return;
+            }
+
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
             formData.append('nombre', nombre);
             formData.append('telefono', telefono);
+            formData.append('cargo', cargo);
 
             axios.post(url+'/administradores/editar', formData, {
             })

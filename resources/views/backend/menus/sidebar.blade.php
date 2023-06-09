@@ -74,16 +74,6 @@
                     </li>
                 @endcan
 
-                <!-- Para que jefe de presupuesto pueda aprobar los requerimientos. MIRA DE TODOS LOS AÑOS -->
-                @can('sidebar.requerimientos.pendientes.presupuesto')
-
-                    <li class="nav-item">
-                        <a href="{{ route('admin.requerimientos.esperar.validad.presupuesto') }}" target="frameprincipal" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
-                            <p>Requerimientos Pendiente</p>
-                        </a>
-                    </li>
-                @endcan
 
 
                 <!-- ESTADISTICAS -->
@@ -797,8 +787,40 @@
                     </li>
                 @endcan
 
+
+
+                <!-- VISTA PARA USUARIOS CONSOLIDADORES -->
+
+                @can('sidebar.usuarios.consolidadores')
+
+
+                    <li class="nav-item">
+                        <a href="{{ route('requerimientos.pendientes.consolidadoras') }}" target="frameprincipal" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Requerimientos</p>
+                        </a>
+                    </li>
+
+
+                    <li class="nav-item">
+                        <a href="{{ route('requerimientos.consolidador.agrupados') }}" target="frameprincipal" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Agrupados</p>
+                        </a>
+                    </li>
+
+
+                @endcan
+
+
+
+
+
+
+
             </ul>
         </nav>
+
 
     </div>
 </aside>

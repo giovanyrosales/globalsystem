@@ -46,7 +46,6 @@ class CotizacionesUnidadController extends Controller
             ->select('r.id')
             ->where('d.estado', 0)
             ->where('d.cancelado', 0)
-            ->where('r.req_revision', 1) // SOLO APROBADAS POR JEFE PRESUPUESTO
             ->groupBy('r.id')
             ->get();
 
@@ -717,72 +716,8 @@ class CotizacionesUnidadController extends Controller
             'proveedor', 'infoCotiDetalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
     }
 
-    // PRIMERO PASA POR JEFE DE PRESUPUESTO PARA QUE REVISE SI HAY DINERO
-    public function verRequerimientosPendientes(){
-        return view('backend.admin.presupuestounidad.requerimientos.pendientesaprobar.vistapendientesjefepresupuesto');
-    }
-
-    // TABLA DE REVISIÓN
-    public function verRequerimientosPendientesTabla(){
-
-        // SOLO NO APROBADAS POR JEFE PRESUPUESTO
-        $data = RequisicionUnidad::where('req_revision', 0)->get();
-
-        foreach ($data as $dd){
-
-            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
-
-            $infoPresu = P_PresupUnidad::where('id', $dd->id_presup_unidad)->first();
-            $infoAnio = P_AnioPresupuesto::where('id', $infoPresu->id_anio)->first();
-            $infoDepa = P_Departamento::where('id', $infoPresu->id_departamento)->first();
-
-            $dd->aniopre = $infoAnio->nombre;
-            $dd->departamento = $infoDepa->nombre;
-        }
-
-        return view('backend.admin.presupuestounidad.requerimientos.pendientesaprobar.tablapendientesjefepresupuesto', compact('data'));
-    }
-
-    public function inforRequerimientosPendientesTabla(Request $request){
-
-        if(RequisicionUnidad::where('id', $request->id)->first()){
-
-            $lista = RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)->get();
-            $total = 0;
-
-            foreach ($lista as $dd){
-
-                $total += $dd->cantidad * $dd->dinero;
-
-                $infoMa = P_Materiales::where('id', $dd->id_material)->first();
-                $dd->matedescripcion = $infoMa->descripcion;
-
-                $infoObj = ObjEspecifico::where('id', $infoMa->id_objespecifico)->first();
-                $dd->objcodigo = $infoObj->codigo;
-            }
-
-            $total = number_format((float)$total, 2, '.', ',');
-
-            return ['success' => 1, 'lista' => $lista, 'total' => $total];
-        }else{
-            return ['success' => 2];
-        }
-    }
 
 
-    public function aprobarRequerimientosPendientes(Request $request){
-
-        if(RequisicionUnidad::where('id', $request->id)->first()){
-
-            RequisicionUnidad::where('id', $request->id)->update([
-                'req_revision' => 1, //APROBADA POR JEFE PRESUPUESTO
-            ]);
-
-            return ['success' => 1];
-        }else{
-            return ['success' => 2];
-        }
-    }
 
     public function pdfRequerimientoUnidadMateriales($id){
 

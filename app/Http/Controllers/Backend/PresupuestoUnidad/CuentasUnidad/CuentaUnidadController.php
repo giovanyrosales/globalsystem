@@ -62,7 +62,10 @@ class CuentaUnidadController extends Controller
             $dd->anio = $infoAnio->nombre;
 
             // SALDO DE CUENTA UNIDAD FIJO, NUNCA CAMBIARA
-            $dd->monto = "$" . number_format((float)$dd->saldo_inicial_fijo, 2, '.', ',');
+            $dd->montofijo = "$" . number_format((float)$dd->saldo_inicial_fijo, 2, '.', ',');
+
+
+            $dd->montorestante = "$" . number_format((float)$dd->saldo_inicial, 2, '.', ',');
         }
 
         return view('backend.admin.presupuestounidad.configuracion.cuentaunidades.tablacuentaunidades', compact('listado'));

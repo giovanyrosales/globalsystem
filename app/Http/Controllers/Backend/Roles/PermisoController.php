@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\Roles;
 
 use App\Http\Controllers\Controller;
+use App\Models\ConsolidadoresUnidades;
 use App\Models\P_Departamento;
 use App\Models\P_PresupUnidad;
 use App\Models\P_UsuarioDepartamento;
@@ -362,21 +363,92 @@ class PermisoController extends Controller
 
         // ENVIAR USUARIOS ASIGNADOS DE TIPO CONSOLIDADOR PARA REGISTRAR EN TABLA NUEVA
 
-        $usuarios = Usuario::whereIn('id', [])->orderBy('nombre')->get();
+        // ID DE USUARIOS
+        // 59- rosmery
+        // 60- marlene
+        // 61- ruby
+        // 62- karen
+        // 63- leiny
 
+        $usuarios = Usuario::whereIn('id', [59, 60, 61, 62, 63])->orderBy('nombre')->get();
 
-        return view('backend.admin.rolesypermisos.usuarioconsolidador.vistaconsolidador', compact('unidades'));
+        return view('backend.admin.rolesypermisos.usuarioconsolidador.vistaconsolidador', compact('unidades', 'usuarios'));
     }
 
+
+    // ROSMA -> requerimientos de ucp, presupuesto, recursos humanos, tesorieria, contabilidad
+    // activo fijo, proveduria y bodega (nueva), servicios generales, catastro, promocion social,
+    // unidad de la mujer, unidad de la niñez, unidad de formacion tecnica y vocacional,
+    // unidad de la juventud, unidad de asistencia agropecuaria, unidad de clinica de salud,
+    //uniad de cultura y turismo, unidad de deportes
+    //
+
+    // listado de requerimientos (bot.
+    //on detalle para ver que pidio nomas)
+
+    //
 
 
     public function tablaVistaConsolidador(){
 
-        return "alsas";
+        $listado = ConsolidadoresUnidades::orderBy('id')->get();
 
-        return view('backend.admin.rolesypermisos.usuarioconsolidador.tablaconsolidador', compact('unidades'));
+        foreach ($listado as $info){
+
+            $infoUsuario = Usuario::where('id', $info->id_usuario)->first();
+            $infoDepartamento = P_Departamento::where('id', $info->id_departamento)->first();
+
+            $info->nombreusuario = $infoUsuario->nombre;
+            $info->usuario = $infoUsuario->usuario;
+
+            $info->nombredepar = $infoDepartamento->nombre;
+        }
+
+        return view('backend.admin.rolesypermisos.usuarioconsolidador.tablaconsolidador', compact('listado'));
     }
 
+
+    public function registrarUsuarioConsolidador(Request $request){
+
+        $regla = array(
+            'usuario' => 'required',
+            'departamento' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        // NO DEPARTAMENTOS REPETIDOS
+        if(ConsolidadoresUnidades::where('id_departamento', $request->departamento)->first()){
+            return ['success' => 1];
+        }
+
+        $dato = new ConsolidadoresUnidades();
+        $dato->id_usuario = $request->usuario;
+        $dato->id_departamento = $request->departamento;
+        $dato->save();
+
+        return ['success' => 2];
+    }
+
+
+    public function borrarUsuarioConsolidador(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(ConsolidadoresUnidades::where('id', $request->id)->first()){
+            ConsolidadoresUnidades::where('id', $request->id)->delete();
+        }
+
+        return ['success' => 1];
+    }
 
 
 

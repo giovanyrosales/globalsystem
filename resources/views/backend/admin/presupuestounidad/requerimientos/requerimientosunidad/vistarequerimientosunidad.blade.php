@@ -651,7 +651,7 @@
 
             Swal.fire({
                 title: 'Guardar Requisición',
-                text: "Se Reservara Monto en Saldo Retenido",
+                text: "",
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -803,26 +803,14 @@
 
                         let fila = response.data.fila;
                         let obj = response.data.obj; // codigo especifico
-                        let restanteFormat = response.data.restanteFormat;
-                        let retenidoFormat = response.data.retenidoFormat;
-                        let retenido = response.data.retenido;
-                        let solicita = response.data.solicita;
+                        let saldoCodigo = response.data.saldoactual;
+                        let solicita = response.data.solicita; // multiplicado (cantidad * monto)
 
                         colorRojoTablaRequisicion(fila);
 
-                        var texto = '';
-
-                        // en true, mostramos el saldo Retenido
-                        if(retenido > 0){
-                            texto = "Fila #" + (fila+1) + ", el objeto específico: " + obj + "<br>" +
-                                "Tiene Saldo Restante $" + restanteFormat + "<br>" +
-                                "Saldo Retenido $" + retenidoFormat + "<br>" +
-                                " Y se esta solicitando $" + solicita;
-                        }else{
-                            texto = "Fila #" + (fila+1) + ", el objeto específico: " + obj + "<br>" +
-                                "Tiene Saldo Restante $" + restanteFormat + "<br>" +
-                                " Y se esta solicitando $" + solicita + "<br>";
-                        }
+                        var texto = "Fila #" + (fila+1) + ", el objeto específico: " + obj + "<br>" +
+                                "Tiene Saldo Restante " + saldoCodigo + "<br>" +
+                                " Y se esta solicitando " + solicita;
 
                         Swal.fire({
                             title: 'Cantidad No Disponible',
@@ -844,25 +832,7 @@
                         recargarRequisicion();
                         limpiarRequisicion(response.data.contador);
                     }
-                    else if(response.data.success === 3){
-                        // no hay permiso para crear requisiciones
 
-                        Swal.fire({
-                            title: 'Permiso Denegado',
-                            text: "Para el Presente Año no es permitido realizar modificaciones",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                               location.reload();
-                            }
-                        })
-
-                    }
                     else{
                         toastr.error('Error al crear requisición');
                     }
@@ -926,22 +896,23 @@
                         $('#destino-requisicion-editar').val(response.data.info.destino);
                         $('#necesidad-requisicion-editar').val(response.data.info.necesidad);
 
-                        let nopuedoEditar = response.data.btneditar;
+                        let puedoEditar = response.data.btneditar;
 
-                        if(nopuedoEditar){
-                            // ocultar botón
-                            document.getElementById("botonGuardarRequiDetalle").style.display = "none";
-
-                            document.getElementById("fecha-requisicion-editar").disabled = true;
-                            document.getElementById("destino-requisicion-editar").disabled = true;
-                            document.getElementById("necesidad-requisicion-editar").disabled = true;
-                        }else{
+                        // CON UN SOLO MATERIAL QUE ESTE AGRUPADO, YA NO PODRA CAMBIAR DESCRIPCION NI NADA
+                        if(puedoEditar === 1){
                             // mostrar botón
                             document.getElementById("botonGuardarRequiDetalle").style.display = "block";
 
                             document.getElementById("fecha-requisicion-editar").disabled = false;
                             document.getElementById("destino-requisicion-editar").disabled = false;
                             document.getElementById("necesidad-requisicion-editar").disabled = false;
+                        }else{
+                            // ocultar botón
+                            document.getElementById("botonGuardarRequiDetalle").style.display = "none";
+
+                            document.getElementById("fecha-requisicion-editar").disabled = true;
+                            document.getElementById("destino-requisicion-editar").disabled = true;
+                            document.getElementById("necesidad-requisicion-editar").disabled = true;
                         }
 
                         var infodetalle = response.data.detalle;
@@ -974,49 +945,27 @@
                                 "<input class='form-control' disabled value='"+infodetalle[i].material_descripcion+"' style='width:100%' type='text'>"+
                                 "</td>";
 
-                            // si hay cotización
-                            if(infodetalle[i].haycoti){
 
-                                // cotizacion aprobada, no se puede borrar
-                                if(infodetalle[i].cotizado === 1){
-                                    markup += "<td>" +
-                                        "<span class='badge bg-success'>Material Aprobado</span>"+
-                                        "</td>"+
-                                        "</tr>";
 
-                                    // cotizacion denegada, puede CANCELAR
-                                }else if(infodetalle[i].cotizado === 2){
+                            if(infodetalle[i].cancelado === 1){
 
-                                    if(infodetalle[i].cancelado === 0){
-                                        markup += "<td>"+
-                                            "<button type='button' class='btn btn-block btn-danger' onclick='cancelarFilaRequiEditar(this)'>Cancelar</button>"+
-                                            "</td>"+
-
-                                            "</tr>";
-                                    }else { // cuando material esta cancelado
-                                        markup += "<td>"+
-                                            "<span class='badge bg-danger'>Material Cancelado</span>"+
-                                            "</tr>";
-                                    }
-
-                                }
-
+                                markup += "<td>"+
+                                    "<span class='badge bg-danger'>Material Cancelado</span>"+
+                                    "</tr>";
                             }else{
 
-                                if(nopuedoEditar){
+                                if(infodetalle[i].agrupado === 1){
                                     markup += "<td>"+
-                                        "<button type='button' class='btn btn-block btn-danger' onclick='modalBorrarFilaRequiEditar(this)'>Borrar</button>"+
-                                        "</td>"+
 
                                         "</tr>";
                                 }else{
-                                    // no tiene cotizacion, asi que puede BORRAR
                                     markup += "<td>"+
-                                        "<button type='button' class='btn btn-block btn-danger' onclick='borrarFilaRequiEditar(this)'>Borrar</button>"+
+                                        "<button type='button' class='btn btn-block btn-danger' onclick='cancelarFilaRequiEditar(this)'>Cancelar</button>"+
                                         "</td>"+
 
                                         "</tr>";
                                 }
+
                             }
 
                             // cotizacion aprobada, no puede borrar
@@ -1045,14 +994,14 @@
 
             Swal.fire({
                 title: 'Cancelar Material',
-                text: "Si el material no puede ser Cotizado. Se cancelara y se libera el saldo Retenido",
+                text: "Se devolvera el Monto ($) a su código",
                 icon: 'info',
                 showCancelButton: true,
                 allowOutsideClick: false,
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#d33',
-                cancelButtonText: 'Salir',
-                confirmButtonText: 'Cancelar'
+                cancelButtonText: 'No',
+                confirmButtonText: 'Si'
             }).then((result) => {
                 if (result.isConfirmed) {
                     cancelarMaterialCotizado(id);
@@ -1060,73 +1009,9 @@
             })
         }
 
-        // borrar material requi detalle, aquí se hace especificamente a un material Fila
-        // porque el boton guardar desparece porque otros materiales ya tiene cotización
-        function modalBorrarFilaRequiEditar(e){
-            // ID REQUI_DETALLE
-            var id = $(e).closest('tr').attr('id');
 
-            Swal.fire({
-                title: 'Borrar Material',
-                text: "Este material no tiene Cotización aun. Se puede eliminar",
-                icon: 'info',
-                showCancelButton: true,
-                allowOutsideClick: false,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Borrar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    borrarRequiDetalleFila(id);
-                }
-            })
-        }
 
-        // solo elimina una fila
-        function borrarRequiDetalleFila(id){
-            openLoading();
-
-            axios.post(url+'/p/requisicion/unidad/material/borrarfila', {
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    // el material ya tiene una cotización
-                    if(response.data.success === 1) {
-
-                        Swal.fire({
-                            title: "Cotización Encontrada",
-                            text: "No se puede Borrar el Material. Se encontro una cotización en Proceso",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $('#modalEditarRequisicion').modal('hide');
-                                recargarRequisicion();
-                            }
-                        })
-
-                    }else if(response.data.success === 2){
-                        toastr.success('Borrado correctamente');
-                        $('#modalEditarRequisicion').modal('hide');
-                        recargarRequisicion();
-                    }
-                    else{
-                        toastr.error('Error al borrar');
-                    }
-                })
-                .catch((error) => {
-                    toastr.error('Error al borrar');
-                    closeLoading();
-                });
-        }
-
+        // CANCELAR MATERIAL SINO HA SIDO AGRUPADO Y SE DEVOLVERA EL DINERO A SU CODIGO
         function cancelarMaterialCotizado(id){
             openLoading();
 
@@ -1138,23 +1023,12 @@
 
                     if(response.data.success === 1) {
 
-                        // si es 1, la coti fue aprobada, sino se esta esperando que sea
-                        // aprobada o denegada
-                        let tipo = response.data.tipo;
 
-                        var mensaje = '';
-                        var titulo = '';
-                        if(tipo > 0){
-                            titulo = "Cotización Aprobada";
-                            mensaje = "El material fue aprobado. No se puede cancelar";
-                        }else{
-                            titulo = "Material en Espera";
-                            mensaje = "El material esta esperando que su cotización sea Aprobado o Denegada. No se puede Cancelar por el momento.";
-                        }
+                        // NO SE PUEDE CANCELAR PORQUE MATERIAL YA HA SIDO AGRUPADO
 
                         Swal.fire({
-                            title: titulo,
-                            text: mensaje,
+                            title: "Denegado",
+                            text: "No se puede cancelar porque el material ya ha sido Agrupado por Consolidador",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -1169,6 +1043,9 @@
                         })
 
                     }else if(response.data.success === 2){
+
+                        // SE CANCELO Y SE DEVOLVIO EL DINERO A SU CODIGO
+
                         toastr.success('Cancelado correctamente');
                         $('#modalEditarRequisicion').modal('hide');
                         recargarRequisicion();
@@ -1245,32 +1122,6 @@
                     closeLoading();
 
                     if(response.data.success === 1) {
-
-                        let nombre = response.data.nombre;
-
-                        Swal.fire({
-                            title: 'Material Ya Cotizado',
-                            text: "El material " + nombre + " Ya fue cotizado. Recargar Tabla",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Recargar'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $('#modalEditarRequisicion').modal('hide');
-                                recargarRequisicion();
-                            }
-                        })
-
-                    }else if(response.data.success === 2){
-                        toastr.success('Actualizado correctamente');
-                        recargarRequisicion();
-                        $('#modalEditarRequisicion').modal('hide');
-                    }
-                    else if(response.data.success === 3){
-
                         Swal.fire({
                             title: 'Permiso Denegado',
                             text: "Para el Presente Año no es permitido realizar modificaciones",
@@ -1285,6 +1136,39 @@
                                 location.reload();
                             }
                         })
+
+
+
+
+
+                    }else if(response.data.success === 2){
+
+                        // ACTUALIZADO
+
+                        Swal.fire({
+                            title: 'NO ACTUALIZADO',
+                            text: "Un Material ya se encuentra Agrupado por el Consolidador",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Recargar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#modalEditarRequisicion').modal('hide');
+                                recargarRequisicion();
+                            }
+                        })
+                    }
+                    else if(response.data.success === 3){
+
+
+                        toastr.success('Actualizado correctamente');
+                        recargarRequisicion();
+                        $('#modalEditarRequisicion').modal('hide');
+
+
                     }
 
                     else{

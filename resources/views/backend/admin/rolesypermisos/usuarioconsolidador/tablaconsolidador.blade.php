@@ -7,18 +7,21 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 15%">Unidad Asignada</th>
-                                <th style="width: 12%">Opciones</th>
+                                <th style="width: 15%">Nombre</th>
+                                <th style="width: 15%">Usuario</th>
+                                <th style="width: 15%">Departamento</th>
+                                <th style="width: 8%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($listado as $dato)
                                 <tr>
-                                    <td>{{ $dato->nombre }}</td>
+                                    <td>{{ $dato->nombreusuario }}</td>
+                                    <td>{{ $dato->usuario }}</td>
+                                    <td>{{ $dato->nombredepar }}</td>
                                     <td>
-
-                                        <button type="button" style="font-weight: bold" class="button button-caution button-pill button-small" onclick="informacionBorrar({{ $dato->id }})">
+                                        <button type="button" class="btn btn-danger btn-xs" onclick="informacionBorrar({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Borrar"></i>&nbsp; Borrar
                                         </button>
                                     </td>

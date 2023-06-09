@@ -22,26 +22,25 @@ class CreateRequisicionUnidadDetalleTable extends Migration
 
             // Esto sera modificado cuando UACI haga la cotizacion, es decir lo que
             // se va a descontar al final de generar orden de compra
+
+            // al cotizar se sumara todos los materiales del mismo codigo y no debera superar
+            // limite de presupuesto.
             $table->decimal('dinero', 10, 2);
 
             // para los historicos de la cotizacion que se hizo, esto no debe cambiar
-
             $table->decimal('dinero_fijo', 10, 2);
 
-            // CUANDO UN MATERIAL YA FUE COTIZADO, Y FUE CANCELADA, Y YA NO SE VOLVERA A COTIZAR.
-            // poner a estado 1: material cancelado
 
+            // CUANDO SE AGRUPE POR CONSOLIDADOR SE ACTIVA, Y SI UCP DENIEGA LA COTIZACION
+            // SE TENDRA QUE VOLVER AGRUPAR
+            $table->boolean('agrupado');
+
+            // EL JEFE DE UNIDAD PUEDE CANCELAR, UNICAMENTE SINO ESTA AGRUPADO
+            // AL CANCELAR SE SUMARA EL DINERO DIRECTAMENTE AL CODIGO
             $table->boolean('cancelado');
 
             // una descripción mas descriptiva del material
             $table->string('material_descripcion', 300);
-
-            //0: defecto
-            //1: material cotizado
-            // ayuda para volver a cotizarlo si fue denegado la cotización
-            $table->boolean('estado');
-
-
 
             $table->foreign('id_requisicion_unidad')->references('id')->on('requisicion_unidad');
             $table->foreign('id_material')->references('id')->on('p_materiales');

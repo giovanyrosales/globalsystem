@@ -30,7 +30,7 @@ class ControlController extends Controller
 
         //PRESUPUESTO
         else  if($user->hasRole('presupuesto')){
-            $ruta = 'admin.estadisticas.index';
+            $ruta = 'admin.usuario.departamento.vista.index';
         }
 
         //INGENIERIA
@@ -60,9 +60,9 @@ class ControlController extends Controller
              $ruta = 'admin.estadisticas.index';
          }
 
-         // CONSOLIDADOR ROSMERY
+         // CONSOLIDADOR
          else  if($user->hasRole('consolidador')){
-             $ruta = 'admin.estadisticas.index';
+             $ruta = 'requerimientos.pendientes.consolidadoras';
          }
 
         else{

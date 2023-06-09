@@ -9,6 +9,7 @@
                             <tr>
                                 <th style="width: 10%;">Nombre</th>
                                 <th style="width: 10%;">Teléfono</th>
+                                <th style="width: 10%;">Cargo</th>
                                 <th style="width: 8%;">Opciones</th>
                             </tr>
                             </thead>
@@ -18,7 +19,7 @@
                                 <tr>
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->telefono }}</td>
-
+                                    <td>{{ $dato->cargo }}</td>
                                     <td>
                                         <button type="button" style="font-weight: bold; color: white !important;" class="button button-primary button-rounded button-pill button-small" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
