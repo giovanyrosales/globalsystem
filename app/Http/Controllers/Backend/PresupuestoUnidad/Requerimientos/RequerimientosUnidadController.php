@@ -18,6 +18,8 @@ use App\Models\P_PresupUnidad;
 use App\Models\P_PresupUnidadDetalle;
 use App\Models\P_UnidadMedida;
 use App\Models\P_UsuarioDepartamento;
+use App\Models\RequisicionAgrupada;
+use App\Models\RequisicionAgrupadaDetalle;
 use App\Models\RequisicionUnidad;
 use App\Models\RequisicionUnidadDetalle;
 use Illuminate\Http\Request;
@@ -571,51 +573,189 @@ class RequerimientosUnidadController extends Controller
 
 
 
+    // DENEGAR UN AGRUPADO COMPLETAMENTE
+    public function denegarAgrupadoPorUCP(Request $request){
 
-    public function denegarRequisicionCompletaUnidad(Request $request){
+        $regla = array(
+            'id' => 'required', // id requisicion_agrupada
+            'nota' => 'required'
+        );
 
-        // id requisicion_unidad
+        $validator = Validator::make($request->all(), $regla);
 
-        DB::beginTransaction();
+        if ($validator->fails()) {
+            return ['success' => 0];
+        }
 
-        try {
 
-            $conteoRequiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)
-                ->where('estado', 1) // YA ESTA EN PROCESO DE COTIZACION
-                ->count();
 
-            if($conteoRequiDetalle > 0){
-                // no se puede porque un material ya tiene proceso de cotización en proceso
-                return ['success' => 1];
-            }else{
+        // VERIFICAR SI SE PUEDE DENEGAR, SI 1 MATERIAL DEL AGRUPADO ESTA COTIZADO,
+        // YA NO SE PODRA CANCELAR
 
-                $registros = RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)
-                    ->select('id')
-                    ->get();
+        $infoAgrupado = RequisicionAgrupada::where('id', $request->id)->first();
 
-                // todos los materiales no tienen cotizacion pendiente
-                RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)->update([
-                    'cancelado' => 1,
-                ]);
+        if ($infoAgrupado->estado == 1) {
+            // YA ESTE DENEGADO ESTE AGRUPADO
+            return ['success' => 1];
+        }
 
-                // borrar retenido
-                CuentaUnidadRetenido::whereIn('id_requi_detalle', $registros)->delete();
+        // BUSCAR QUE UN MATERIAL DE ESTE AGRUPADO ESTE EN UNA COTIZACION, SI LO ESTA, YA NO PODRA CANCELAR
+        // TODOS EL AGRUPADO
 
-                // guardar registro
-                RequisicionUnidad::where('id', $request->id)->update([
-                    'estado_denegado' => 1,
-                    'texto_denegado' => $request->txtdenegado
-                ]);
+        $arrayAgrupadoDetalle = RequisicionAgrupadaDetalle::where('id_requi_agrupada', $infoAgrupado->id)->get();
 
-                DB::commit();
+        foreach ($arrayAgrupadoDetalle as $dato){
+
+            if(CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $dato->id)->first()){
+
+                // UN MATERIAL YA ESTA COTIZADO DE ESTE AGRUPADO, YA NO SE PUEDE DENEGAR
                 return ['success' => 2];
             }
+        }
 
-        }catch(\Throwable $e){
-            DB::rollback();
-            return ['success' => 99];
+
+        if ($request->hasFile('documento')) {
+
+            $cadena = Str::random(15);
+            $tiempo = microtime();
+            $union = $cadena . $tiempo;
+            $nombre = str_replace(' ', '_', $union);
+
+            $extension = '.' . $request->documento->getClientOriginalExtension();
+            $nomDocumento = $nombre . strtolower($extension);
+            $avatar = $request->file('documento');
+            $archivo = Storage::disk('archivos')->put($nomDocumento, \File::get($avatar));
+
+            if ($archivo) {
+
+
+                DB::beginTransaction();
+
+                try {
+
+                    // SOLO HACERLO 1 SOLA VEZ
+                    if ($infoAgrupado->estado == 0) {
+
+                        // ACTUALIZAR DATOS
+
+                        RequisicionAgrupada::where('id', $infoAgrupado->id)->update([
+                            'estado' => 1,
+                            'nota_cancelado' => $request->nota,
+                            'documento' => $nomDocumento
+                        ]);
+
+
+                        // DEVOLVER DINERO
+
+                        foreach ($arrayAgrupadoDetalle as $info) {
+
+                            $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $info->id_requi_unidad_detalle)->first();
+                            $infoRequiUnidad = RequisicionUnidad::where('id', $infoRequiDetalle->id_requisicion_unidad)->first();
+                            $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
+
+                            // obtener la cuenta unidad
+                            $infoCuenta = CuentaUnidad::where('id_presup_unidad', $infoRequiUnidad->id_presup_unidad)
+                                ->where('id_objespeci', $infoMaterial->id_objespecifico)
+                                ->first();
+
+                            $suma = $infoCuenta->saldo_inicial + ($infoRequiDetalle->dinero_fijo * $infoRequiDetalle->cantidad);
+
+                            RequisicionUnidadDetalle::where('id', $infoRequiDetalle->id)->update([
+                                'cancelado' => 1
+                            ]);
+
+                            CuentaUnidad::where('id', $infoCuenta->id)->update([
+                                'saldo_inicial' => $suma,
+                            ]);
+                        }
+
+                        // TODOS CORRECTO
+                        DB::commit();
+                        return ['success' => 3];
+                    }
+
+                    // solo decir que ya estuvo
+                    return ['success' => 3];
+
+                } catch (\Throwable $e) {
+                    Log::info('ee ' . $e);
+                    DB::rollback();
+                    return ['success' => 99];
+                }
+
+
+
+            } else {
+
+                return ['success' => 99]; // error
+            }
+        }
+        else{
+            // NO LLEVA DOCUMENTO
+
+            DB::beginTransaction();
+
+            try {
+
+                // SOLO HACERLO 1 SOLA VEZ
+                if ($infoAgrupado->estado == 0) {
+
+
+                    // REGISTRAR
+
+                    RequisicionAgrupada::where('id', $infoAgrupado->id)->update([
+                        'estado' => 1,
+                        'nota_cancelado' => $request->nota,
+                    ]);
+
+
+
+                    // DEVOLVER DINERO
+
+                    foreach ($arrayAgrupadoDetalle as $info) {
+
+                        $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $info->id_requi_unidad_detalle)->first();
+                        $infoRequiUnidad = RequisicionUnidad::where('id', $infoRequiDetalle->id_requisicion_unidad)->first();
+                        $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
+
+                        // obtener la cuenta unidad
+                        $infoCuenta = CuentaUnidad::where('id_presup_unidad', $infoRequiUnidad->id_presup_unidad)
+                            ->where('id_objespeci', $infoMaterial->id_objespecifico)
+                            ->first();
+
+                        $suma = $infoCuenta->saldo_inicial + ($infoRequiDetalle->dinero_fijo * $infoRequiDetalle->cantidad);
+
+                        RequisicionUnidadDetalle::where('id', $infoRequiDetalle->id)->update([
+                            'cancelado' => 1
+                        ]);
+
+
+                        CuentaUnidad::where('id', $infoCuenta->id)->update([
+                            'saldo_inicial' => $suma,
+                        ]);
+                    }
+
+                    // TODOS CORRECTO
+                    DB::commit();
+                    return ['success' => 3];
+                }
+
+                // solo decir que ya estuvo
+                return ['success' => 3];
+
+            } catch (\Throwable $e) {
+                Log::info('ee ' . $e);
+                DB::rollback();
+                return ['success' => 99];
+            }
+
         }
     }
+
+
+
+
+
 
 
 

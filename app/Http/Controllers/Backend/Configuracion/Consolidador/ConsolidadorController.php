@@ -245,8 +245,11 @@ class ConsolidadorController extends Controller
             // REGISTRAR AGRUPADO
 
             $dato = new RequisicionAgrupada();
+            $dato->id_anio = $request->anio;
+            $dato->fecha = $request->fecha;
             $dato->id_contrato = $request->administrador;
             $dato->id_evaluador = $request->evaluador;
+<<<<<<< HEAD
             $dato->fecha = $request->fecha;
             $dato->nombreodestino = $request->nombreodestino;
             $dato->justificacion = $request->justificacion;
@@ -257,6 +260,11 @@ class ConsolidadorController extends Controller
             $dato->otros = $request->otros;
             $dato->estado = 0;
 
+=======
+            $dato->estado = 0;
+            $dato->nota_cancelado = null;
+            $dato->documento = null;
+>>>>>>> 8d1df13691b28a8a9d9086c656cc70aaf6654f96
             $dato->save();
 
             $infoRequiDetalle = RequisicionUnidadDetalle::whereIn('id', $request->lista)

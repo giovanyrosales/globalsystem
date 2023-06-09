@@ -21,7 +21,10 @@ class CreateRequisicionAgrupadaDetalleTable extends Migration
             // referenciando al material agrupado
             $table->bigInteger('id_requi_unidad_detalle')->unsigned();
 
+            // 0: defecto
+            // 1: cotizado
 
+            $table->boolean('cotizado');
 
 
             $table->foreign('id_requi_agrupada')->references('id')->on('requisicion_agrupada');

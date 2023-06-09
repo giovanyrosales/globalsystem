@@ -249,27 +249,29 @@
                         <a href="#" class="nav-link nav-">
                             <i class="far fa-edit"></i>
                             <p>
-                                Reque. de Unidad
+                                Reque. de Agrupados
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
 
                         <ul class="nav nav-treeview">
 
-                            @can('sidebar.requerimientosunidad.listar')
-                                <li class="nav-item">
-                                    <a href="{{ route('admin.listar.requerimientos.unidad.pendientes') }}" target="frameprincipal" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Listar Requerimientos</p>
-                                    </a>
-                                </li>
-                            @endcan
+
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.fecha.de.agrupapos.ucp') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listar Agrupados</p>
+                                </a>
+                            </li>
+
+
 
                             @can('sidebar.requerimientos.listar.denegados')
                                 <li class="nav-item">
                                     <a href="{{ route('admin.listar.requerimientos.denegados.index') }}" target="frameprincipal" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Reque. Denegados</p>
+                                        <p>Agrupados Denegados</p>
                                     </a>
                                 </li>
                             @endcan

@@ -401,8 +401,10 @@
                 return;
             }
 
+            var idanio = {{ $idanio }};
 
             var formData = new FormData();
+            formData.append('anio', idanio)
             formData.append('fecha', fecha);
             formData.append('nombreodestino', nombreodestino);
             formData.append('justificacion', justificacion);

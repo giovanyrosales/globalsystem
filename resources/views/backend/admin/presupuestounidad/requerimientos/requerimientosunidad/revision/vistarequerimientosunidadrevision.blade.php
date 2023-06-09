@@ -20,7 +20,7 @@
 
     <section class="content-header">
         <div class="col-sm-11">
-            <h4>Requisiciones de Unidad Pendientes</h4>
+            <h4>Requisiciones de Agrupados Pendientes</h4>
         </div>
     </section>
 
@@ -28,7 +28,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado Pendientes</h3>
+                    <h3 class="card-title">Listado Agrupados</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -60,16 +60,22 @@
 
                             <div class="row">
                                 <div class="col-md-5">
+
                                     <div class="form-group">
+                                        <!-- NOMBRE DESTINO DEL AGRUPADO -->
+
                                         <label>Destino</label>
                                         <input type="text" class="form-control" id="destino" disabled>
-                                        <!-- ES EL ID DE REQUISICION -->
-                                        <input id="idcotizar" type="hidden" class="form-control">
+                                        <input id="idagrupado" type="hidden" class="form-control">
                                     </div>
+
                                     <div class="form-group">
-                                        <label>Necesidad</label>
-                                        <textarea class="form-control" id="necesidad" rows="3" disabled></textarea>
+                                        <!-- JUSTIFICACION DEL AGRUPADO -->
+
+                                        <label>Justificación</label>
+                                        <textarea class="form-control" id="justificacion" disabled></textarea>
                                     </div>
+
                                 </div>
 
                                 <div class="col-md-5">
@@ -131,6 +137,11 @@
     </div>
 
 
+
+
+
+    <!-- ?????  -->
+
     <div class="modal fade" id="modalDetalle" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -174,6 +185,11 @@
     </div>
 
 
+
+
+
+
+
     <!-- CANCELAR TODOS EL REQUERIMIENTO PORQUE FUE DENEGADO POR EL CONCEJO -->
 
 
@@ -181,7 +197,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Denegar Requerimiento</h4>
+                    <h4 class="modal-title">Denegar Agrupado</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -192,10 +208,19 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12">
+
+
+
+                                    <div class="form-group">
+                                        <label>Documento (Opcional)</label>
+                                        <input type="file" id="documento-denegado" class="form-control" accept="image/jpeg, image/jpg, image/png, .pdf"/>
+                                    </div>
+
+
                                     <div class="form-group">
                                         <label>Descripción:</label>
                                         <input id="id-denegado" type="hidden">
-                                        <textarea rows="5" cols="5" id="texto-cancelamiento" class="form-control"></textarea>
+                                        <input type="text" maxlength="800" id="texto-cancelamiento" class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -205,7 +230,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-caution button-rounded button-pill button-small" onclick="cancelarRequerimiento()">Cancelar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-caution button-rounded button-pill button-small" onclick="cancelarRequerimiento()">Denegar</button>
                 </div>
             </div>
         </div>
@@ -231,7 +256,8 @@
     <script type="text/javascript">
         $(document).ready(function(){
 
-            var ruta = "{{ URL::to('/admin/p/requerimientos/pendiente/unidad/tabla') }}";
+            var idanio = {{ $idanio }};
+            var ruta = "{{ URL::to('/admin/p/requerimientos/pendiente/unidad/tabla') }}/" + idanio;
             $('#tablaDatatable').load(ruta);
 
             $('#mySideToSideSelect').multiselect();
@@ -250,6 +276,69 @@
     </script>
 
     <script>
+
+        function recargar(){
+            var idanio = {{ $idanio }};
+            var ruta = "{{ URL::to('/admin/p/requerimientos/pendiente/unidad/tabla') }}/" + idanio;
+            $('#tablaDatatable').load(ruta);
+        }
+
+
+
+
+        function informacionCotizar(id){
+            // id agrupado
+
+            document.getElementById("formulario-cotizar-nuevo").reset();
+            $('#select-proveedor').prop('selectedIndex', 0).change();
+            document.getElementById("mySideToSideSelect").options.length = 0;
+            document.getElementById("mySideToSideSelect_to").options.length = 0;
+
+            openLoading();
+
+            axios.post(url+'/p/requerimientos/listado/cotizar/info', {
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalCotizar').modal('show');
+
+                        $('#idagrupado').val(id);
+
+                        $('#destino').val(response.data.info.destino);
+                        $('#justificacion').val(response.data.info.justificacion);
+
+                        var fecha = new Date();
+                        document.getElementById('fecha-cotizacion').value = fecha.toJSON().slice(0,10);
+
+
+                        // LLENAR ARRAY PARA COTIZAR
+                        // el id es de requisicion_unidad_detalle
+                        $.each(response.data.listado, function( key, val ){
+                            $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.materialformat+'</option>');
+                        });
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
+        }
+
+
+        function removeOptionsFromSelect(selectElement) {
+            var i, L = selectElement.options.length - 1;
+            for(i = L; i >= 0; i--) {
+                selectElement.remove(i);
+            }
+        }
+
 
 
         function detalleCotizacion(){
@@ -300,22 +389,21 @@
             }
 
             if(contador > maximaCantidad){
-                    Swal.fire({
-                        title: 'Límite superado',
-                        text: "Solo puede Cotizar 10 items",
-                        icon: 'warning',
-                        showCancelButton: false,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Aceptar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Límite superado',
+                    text: "Solo puede Cotizar 10 items",
+                    icon: 'warning',
+                    showCancelButton: false,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Aceptar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
 
-                        }
-                    });
-                    return;
+                    }
+                });
+                return;
             }
-
 
             openLoading();
 
@@ -325,24 +413,7 @@
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1) {
-
-                        Swal.fire({
-                            title: 'Material Borrado',
-                            text: "Un Material a Cotizar o el Requerimiento fue borrado por el Administrador.",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Recargar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2){
+                    if(response.data.success === 1){
 
                         var infodetalle = response.data.lista;
 
@@ -454,60 +525,7 @@
         }
 
 
-        function recargar(){
-            var ruta = "{{ URL::to('/admin/p/requerimientos/pendiente/unidad/tabla') }}";
-            $('#tablaDatatable').load(ruta);
-        }
 
-        function informacion(id){
-           // id requisicion unidad
-
-            document.getElementById("formulario-cotizar-nuevo").reset();
-            $('#select-proveedor').prop('selectedIndex', 0).change();
-            document.getElementById("mySideToSideSelect").options.length = 0;
-            document.getElementById("mySideToSideSelect_to").options.length = 0;
-
-            openLoading();
-
-            axios.post(url+'/p/requerimientos/listado/cotizar/info', {
-                'id': id
-            })
-                .then((response) => {
-                    closeLoading();
-
-                    if(response.data.success === 1){
-                        $('#modalCotizar').modal('show');
-                        // ID: es el id de REQUISICION
-                        $('#idcotizar').val(id);
-                        $('#destino').val(response.data.info.destino);
-                        $('#necesidad').val(response.data.info.necesidad);
-
-                        var fecha = new Date();
-                        document.getElementById('fecha-cotizacion').value = fecha.toJSON().slice(0,10);
-
-                        // ID ES DE: REQUISICION_DETALLE
-                        $.each(response.data.listado, function( key, val ){
-                            $('#mySideToSideSelect').append('<option value='+val.id+'>'+val.material_descripcion+'</option>');
-                        });
-                    }
-                    else {
-                        toastr.error('Error al buscar');
-                    }
-
-                })
-                .catch((error) => {
-                    toastr.error('Error al buscar');
-                    closeLoading();
-                });
-        }
-
-
-        function removeOptionsFromSelect(selectElement) {
-            var i, L = selectElement.options.length - 1;
-            for(i = L; i >= 0; i--) {
-                selectElement.remove(i);
-            }
-        }
 
         function guardarCotizacion(){
 
@@ -517,8 +535,10 @@
             var formData = new FormData();
             formData.append('fecha', fecha);
             formData.append('proveedor', proveedor);
-            // ES EL ID DE REQUISICION
-            formData.append('idrequisicion', $('#idcotizar').val());
+
+            // ES EL ID DE REQUISICION_AGRUPADA
+            formData.append('idagrupado', $('#idagrupado').val());
+
 
             // EN LA LISTA VA EL ID: REQUISICION_DETALLE
             $("#mySideToSideSelect_to option").each(function(){
@@ -526,13 +546,14 @@
                 formData.append('lista[]', $(this).val());
             });
 
+
             var unidades = $("input[name='unidades[]']").map(function(){return $(this).val();}).get();
             var idfila = $("input[name='idfila[]']").map(function(){return $(this).val();}).get();
 
             var descripmaterial = $("input[name='descripmaterial[]']").map(function(){return $(this).val();}).get();
 
 
-            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+            var reglaNumeroDosDecimal = /^([0-9]+\.?[0-9]{0,2})$/;
 
             for(var a = 0; a < unidades.length; a++){
 
@@ -543,7 +564,7 @@
                     return;
                 }
 
-                if(!datoUnidades.match(reglaNumeroDecimal)) {
+                if(!datoUnidades.match(reglaNumeroDosDecimal)) {
                     modalMensaje('Fila #' + a+1, 'Precio Unitario debe ser número Decimal Positivo. Solo se permite 2 Decimales');
                     return;
                 }
@@ -833,21 +854,30 @@
             document.getElementById('finaltotal').value = '$' + Number(multifila).toFixed(2);
         }
 
+
+
+
+
+
+
+
+
+        // PARA DENEGAR EL AGRUPADO
+
+
         // modal para cancelar y dar motivo del cancelamiento
         function informacionCancelar(id){
             // ID: requisicion_unidad
 
             document.getElementById("formulario-cancelamiento").reset();
-
             $('#id-denegado').val(id);
-
             $('#modalCancelamiento').modal('show');
         }
 
         function cancelarRequerimiento(){
 
             Swal.fire({
-                title: 'Denegar Requerimiento',
+                title: 'Denegar Agrupado',
                 text: "",
                 icon: 'info',
                 showCancelButton: true,
@@ -867,33 +897,54 @@
         function peticionDenegarRequerimiento(){
 
             var id = document.getElementById('id-denegado').value;
+            var documento = document.getElementById('documento-denegado');
             var textodenegado = document.getElementById('texto-cancelamiento').value;
+
+
+
+            if(documento.files && documento.files[0]){ // si trae doc
+                if (!documento.files[0].type.match('image/jpeg|image/jpeg|image/png|pdf')){
+                    toastr.error('formato para Documento permitido: .png .jpg .jpeg .pdf');
+                    return;
+                }
+            }
 
             if(textodenegado === ''){
                 toastr.error('Descripción es requerida');
                 return;
             }
 
+            if(textodenegado.length > 800){
+                toastr.error('Descripción máximo 800 caracteres');
+                return;
+            }
+
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
-            formData.append('txtdenegado', textodenegado);
+            formData.append('nota', textodenegado);
+            formData.append('documento', documento.files[0]);
 
-            axios.post(url+'/p/denegar/completa/requisicion/unidad', formData, {
+            axios.post(url+'/p/denegar/completa/requisicion/agrupada', formData, {
             })
                 .then((response) => {
                     closeLoading();
+
+                    console.log(response);
+
                     if(response.data.success === 1){
 
+                        // YA ESTABA DENEGADA EL AGRUPADO
+
                         Swal.fire({
-                            title: 'Requisición en Proceso',
-                            text: "Se encontró que un requerimiento ya esta en Proceso de Cotización o Finalizado",
+                            title: "Error",
+                            text: "El Agrupado ya estaba Denegado",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
+                            confirmButtonText: 'Recargar',
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 recargar();
@@ -901,13 +952,35 @@
                         })
 
                     }
-                    else if(response.data.success === 2){
+                    else if(response.data.success === 2) {
+
+                        // UN MATERIAL YA ESTA COTIZADO, NO SE PUEDE DENEGAR YA
+
+                        Swal.fire({
+                            title: "Error",
+                            text: "Un Material se Encontro que ya esta Cotizado",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Recargar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                recargar();
+                            }
+                        })
+                    }
+
+                    else if(response.data.success === 3){
+
                         toastr.success('Requisición Denegada correctamente');
                         $('#modalCancelamiento').modal('hide');
                         recargar();
                     }
                     else {
-
+                        toastr.error('Error al denegar');
+                        closeLoading();
                     }
                 })
                 .catch((error) => {
