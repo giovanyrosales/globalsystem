@@ -16,6 +16,8 @@ use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
 use App\Models\P_UnidadMedida;
 use App\Models\Proveedores;
+use App\Models\RequisicionAgrupada;
+use App\Models\RequisicionAgrupadaDetalle;
 use App\Models\RequisicionUnidad;
 use App\Models\RequisicionUnidadDetalle;
 use Carbon\Carbon;
@@ -32,111 +34,83 @@ class CotizacionesUnidadController extends Controller
         $this->middleware('auth');
     }
 
-    public function indexListarRequerimientosPendienteUnidad(){
+    public function indexListaAgrupadoAnios(){
+
+        $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
+
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.elegirfecha', compact('anios'));
+    }
+
+    public function indexListarRequerimientosPendienteUnidad($idanio){
 
         $proveedores = Proveedores::orderBy('nombre', 'ASC')->get();
 
-        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.vistarequerimientosunidadrevision', compact('proveedores'));
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.vistarequerimientosunidadrevision', compact('proveedores', 'idanio'));
     }
 
-    public function indexTablaListarRequerimientosPendienteUnidad(){
+    // AQUI SE MOSTRARA LISTA DE AGRUPADOS QUE TIENEN MATERIALES QUE NO HAN SIDO COTIZADOS AUN
+    public function indexTablaListarRequerimientosPendienteUnidad($idanio){
 
-        $data = DB::table('requisicion_unidad AS r')
-            ->join('requisicion_unidad_detalle AS d', 'd.id_requisicion_unidad', '=', 'r.id')
-            ->select('r.id')
-            ->where('d.estado', 0)
-            ->where('d.cancelado', 0)
-            ->groupBy('r.id')
+
+        // DEL AÑO ELEGIDO
+        // NO CANCELADOS
+
+        $listado = RequisicionAgrupada::where('estado', 0)
+            ->where('id_anio', $idanio)
+            ->orderBy('fecha', 'ASC')
             ->get();
 
-        $pilaIdRequisicion = array();
-
-        foreach ($data as $dd){
-            array_push($pilaIdRequisicion, $dd->id);
+        foreach ($listado as $info){
+            $info->fecha = date("d-m-Y", strtotime($info->fecha));
         }
 
-        $listaRequisicion = RequisicionUnidad::whereIn('id', $pilaIdRequisicion)
-            ->orderBy('fecha', 'DESC')
-            ->get();
-
-        foreach ($listaRequisicion as $ll){
-            $ll->fecha = date("d-m-Y", strtotime($ll->fecha));
-
-            $infoPresup = P_PresupUnidad::where('id', $ll->id_presup_unidad)->first();
-            $infoDepar = P_Departamento::where('id', $infoPresup->id_departamento)->first();
-
-            $ll->departamento = $infoDepar->nombre;
-
-            // Necesito comprobar que no hay ningun material cotizado para poder cancelar
-            $infoRequiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $ll->id)
-                ->where('estado', 1) // al menos 1 ya esta en proceso de cotizado
-                ->where('cancelado', 0) // si ya esta cancelado, no hacer nada
-                ->count();
-
-            // Si se encuentra al menos 1, significa que un material ya tiene una cotización en proceso
-            if($infoRequiDetalle > 0){
-                $ll->puedecancelar = false;
-            }else{
-                $ll->puedecancelar = true;
-            }
-        }
-
-        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.tablarequerimientosunidadrevision', compact('listaRequisicion'));
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.tablarequerimientosunidadrevision', compact('listado'));
     }
 
-    // informacion de requisición para hacer la cotizacion
+    // informacion del agrupado para hacer la cotizacion
     public function informacionRequerimientoCotizarInfo(Request $request){
 
         $regla = array(
-            'id' => 'required',
+            'id' => 'required', // id requisicion_agrupada
         );
 
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()){ return ['success' => 0];}
 
-        if($info = RequisicionUnidad::where('id', $request->id)->first()){
 
-            $listado = RequisicionUnidadDetalle::where('id_requisicion_unidad', $request->id)
-                ->where('estado', 0)
-                ->where('cancelado', 0)
+        if($infoRequiAgrupada = RequisicionAgrupada::where('id', $request->id)->first()){
+
+            // obtener todos sus materiales del agrupado
+
+            $listado = DB::table('requisicion_agrupada_detalle AS rad')
+                ->join('requisicion_unidad_detalle AS ru', 'rad.id_requi_unidad_detalle', '=', 'ru.id')
+                ->join('p_materiales AS mate', 'ru.id_material', '=', 'mate.id')
+                ->join('obj_especifico AS obj', 'mate.id_objespecifico', '=', 'obj.id')
+                ->select('ru.id', 'obj.codigo', 'rad.id_requi_agrupada', 'mate.descripcion')
+                ->where('rad.id_requi_agrupada', $infoRequiAgrupada->id)
+                ->orderBy('obj.codigo', 'ASC')
                 ->get();
 
-            foreach ($listado as $l){
-                $data = P_Materiales::where('id', $l->id_material)->first();
-                $data2 = P_UnidadMedida::where('id', $data->id_unidadmedida)->first();
+            foreach ($listado as $dato){
 
-                $l->nombre = $data->descripcion;
-                $l->medida = $data2->nombre;
+                $texto = "(" . $dato->codigo . ") " . $dato->descripcion;
+                $dato->materialformat = $texto;
             }
 
-            return ['success' => 1, 'info' => $info, 'listado' => $listado];
+            return ['success' => 1, 'info' => $infoRequiAgrupada, 'listado' => $listado];
         }else{
             return ['success' => 2];
         }
     }
 
 
-    // se envía los ID requi_detalle de proyectos para verificar y retornar información de lo que se cotizara
+    // ABRE MODAL PARA ESCRIBIR EL NUEVO PRECIO DEL MATERIAL Y SE COTIZARA
     public function verificarRequerimientoUnidadAcotizar(Request $request){
-
-        // La lista de ID que llega son de requisicion_detalle
-
-        // VERIFICAR QUE EXISTAN TODOS LOS MATERIALES A COTIZAR EN REQUISICIÓN DETALLE
-        for ($i = 0; $i < count($request->lista); $i++) {
-
-            // SI NO LA ENCUENTRA, EL ADMINISTRADOR BORRO EL MATERIAL A COTIZAR
-            if(!RequisicionUnidadDetalle::where('id', $request->lista[$i])->first()){
-                return ['success' => 1];
-            }
-        }
 
         $info = RequisicionUnidadDetalle::whereIn('id', $request->lista)
             ->orderBy('id', 'ASC')
             ->get();
-
-        $totalCantidad = 0;
-        $totalMulti = 0;
 
         foreach ($info as $dd){
             $infoCatalogo = P_Materiales::where('id', $dd->id_material)->first();
@@ -146,43 +120,75 @@ class CotizacionesUnidadController extends Controller
             $dd->nombre = $infoCatalogo->descripcion;
             $dd->medida = $infoUnidad->nombre;
             $dd->codigo = $infoCodigo->codigo . " - " . $infoCodigo->nombre;
-
         }
 
-        $totalCantidad = number_format((float)$totalCantidad, 2, '.', ',');
-        $totalMulti = number_format((float)$totalMulti, 2, '.', ',');
 
-        return ['success' => 2, 'lista' => $info,
-            'totalCantidad' => $totalCantidad,
-            //'totalPrecio' => $totalPrecio,
-            'totalMulti' => $totalMulti];
+        return ['success' => 1, 'lista' => $info];
     }
 
-    // guardar cotización para requerimiento de unidad
+
+
+    // GUARDAR LA COTIZACION
     public function guardarNuevaCotizacionRequeriUnidad(Request $request){
+
+        $regla = array(
+            'fecha' => 'required',
+            'proveedor' => 'required',
+            'idagrupado' => 'required'
+        );
+
+        // ARRAY
+        // lista[]
+        // unidades[]
+        // idfila[]
+        // descripmate[]
+
+
+
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
 
 
         DB::beginTransaction();
 
         try {
 
-            $infoRequisicion = RequisicionUnidad::where('id', $request->idrequisicion)->first();
-            $infoPresuUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            $infoAnio = P_AnioPresupuesto::where('id', $infoPresuUni->id_anio)->first();
+            $infoRequiAgrupado = RequisicionAgrupada::where('id', $request->idagrupado)->first();
 
-            if($infoAnio->permiso == 0){
-                // sin permiso
-                return ['success' => 6];
+            // CANCELADO POR UCP
+            if($infoRequiAgrupado->estado== 1){
+                return ['success' => 1];
             }
 
-            // VERIFICAR QUE EXISTAN TODOS LOS MATERIALES A COTIZAR EN REQUISICIÓN DETALLE
-            for ($i = 0; $i < count($request->lista); $i++) {
+            // VERIFICAR QUE ESTOS MATERIAL A COTIZAR NO ESTEN COTIZADOS, NINGUNO
 
-                // SI NO LA ENCUENTRA, EL ADMINISTRADOR BORRO EL MATERIAL A COTIZAR
-                if(!RequisicionUnidadDetalle::where('id', $request->lista[$i])->first()){
-                    return ['success' => 1];
+            for ($i = 0; $i < count($request->lista); $i++) {
+                if($infoRequiUniDetalle = RequisicionUnidadDetalle::where('id', $request->lista[$i])->first()){
+
+                    // ESTE MATERIAL ESTA CANCELADO
+                    if($infoRequiUniDetalle->cancelado == 1){
+                        return ['success' => 2];
+                    }
+
+                    // AUNQUE EL MATERIAL SOLO PUEDE ESTAR EN 1 SOLO AGRUPADO, PERO POR PRECAUCION, SE
+                    // UTILIZARA GET PARA BUSCAR SI ESTA COTIZADO
+                    if($dato = RequisicionAgrupadaDetalle::where('id_requi_unidad_detalle', $infoRequiUniDetalle->id)->get()){
+
+                        if($dato->cotizado == 1){
+                            return ['success' => 3];
+                        }
+                    }
                 }
             }
+
+
+
+            // VERIFICAR QUE ALCANZE EL DINERO, CUANDO SE COTIZE
+
+            return "retorno";
+
 
             // crear cotizacion
             $coti = new CotizacionUnidad();

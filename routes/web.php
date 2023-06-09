@@ -896,18 +896,39 @@ Route::post('/admin/p/requisicion/unidad/editar', [RequerimientosUnidadControlle
 Route::post('/admin/p/requisicion/unidad/material/cancelar', [RequerimientosUnidadController::class, 'cancelarMaterialRequisicionUnidad']);
 
 
-// * LISTADO DE REQUERIMIENTOS UACI UNIDAD
+
+
+
+
+
+
+// ***** LISTADO DE AGRUPADOS PARA UCP   *****
+
+// seleccionar fecha para ver los agrupados de esa fecha
+Route::get('/admin/p/requerimientos/fecha/agrupados', [CotizacionesUnidadController::class,'indexListaAgrupadoAnios'])->name('admin.fecha.de.agrupapos.ucp');
+
+
 
 // retorna vista de requerimientos pendientes unidad
-Route::get('/admin/p/requerimientos/pendiente/unidad/index', [CotizacionesUnidadController::class,'indexListarRequerimientosPendienteUnidad'])->name('admin.listar.requerimientos.unidad.pendientes');
+Route::get('/admin/p/requerimientos/pendiente/unidad/index/{idanio}', [CotizacionesUnidadController::class,'indexListarRequerimientosPendienteUnidad']);
 // retorna tabla de requerimientos pendientes para unidad
-Route::get('/admin/p/requerimientos/pendiente/unidad/tabla', [CotizacionesUnidadController::class,'indexTablaListarRequerimientosPendienteUnidad']);
+Route::get('/admin/p/requerimientos/pendiente/unidad/tabla/{idanio}', [CotizacionesUnidadController::class,'indexTablaListarRequerimientosPendienteUnidad']);
+
+// Denegar requisicion, ejemplo cuando el concejo lo deniega
+Route::post('/admin/p/denegar/completa/requisicion/agrupada', [RequerimientosUnidadController::class,'denegarAgrupadoPorUCP']);
+
+
+// CREAR LA COTIZACION
 // información de requisición para hacer la cotizacion
 Route::post('/admin/p/requerimientos/listado/cotizar/info', [CotizacionesUnidadController::class, 'informacionRequerimientoCotizarInfo']);
 // se envía los ID requi_detalle de proyectos para verificar y retornar información de lo que se cotizara
 Route::post('/admin/p/requerimientos/unidad/verificar', [CotizacionesUnidadController::class, 'verificarRequerimientoUnidadAcotizar']);
 // guardar cotización para requerimiento de unidad
 Route::post('/admin/p/requerimientos/cotizacion/unidad/guardar', [CotizacionesUnidadController::class, 'guardarNuevaCotizacionRequeriUnidad']);
+
+
+
+
 
 // * COTIZACIONES PARA UNIDAD
 
@@ -1076,8 +1097,6 @@ Route::get('/admin/p/reportes/unidad/uaci/index', [ConfiguracionPresupuestoUnida
 // retornar PDF de plan de compra anual, se envía el ID año
 Route::get('/admin/p/generador/pdf/plan/{anio}', [ReportesPresupuestoUnidadController::class,'generarPlanPdfUaci']);
 
-// Denegar requisicion, ejemplo cuando el concejo lo deniega
-Route::post('/admin/p/denegar/completa/requisicion/unidad', [RequerimientosUnidadController::class,'denegarRequisicionCompletaUnidad']);
 
 // seleccionar año para buscar requerimientos detalles
 Route::get('/admin/p/buscarfecha/requerimientos/denegados/unidadindex', [CotizacionesUnidadController::class,'indexFechaRequerimientosDenegadosUnidades'])->name('admin.listar.requerimientos.denegados.index');

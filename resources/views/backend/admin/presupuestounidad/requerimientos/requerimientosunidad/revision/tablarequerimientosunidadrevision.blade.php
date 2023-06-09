@@ -7,36 +7,30 @@
                         <table id="tabla-requisicion" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 5%">Número</th>
-                                <th style="width: 12%">Departamento</th>
-                                <th style="width: 15%">Destino</th>
-                                <th style="width: 15%">Necesidad</th>
-                                <th style="width: 12%">Fecha Requisición</th>
+                                <th style="width: 12%">Fecha Agrupado</th>
+                                <th style="width: 15%">xx</th>
+                                <th style="width: 15%">xx</th>
                                 <th style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($listaRequisicion as $dato)
+                            @foreach($listado as $dato)
 
                                 <tr>
-                                    <td style="width: 4%">{{ $dato->id }}</td>
-                                    <td style="width: 4%">{{ $dato->departamento }}</td>
-                                    <td style="width: 10%">{{ $dato->destino }}</td>
-                                    <td style="width: 10%">{{ $dato->necesidad }}</td>
-                                    <td style="width: 10%">{{ $dato->fecha }}</td>
+                                    <td style="width: 4%">{{ $dato->fecha }}</td>
+                                    <td style="width: 10%">xx</td>
+                                    <td style="width: 10%">xx</td>
 
                                     <td>
 
-                                        <button type="button" class="btn btn-warning btn-xs" onclick="informacion({{ $dato->id }})">
+                                        <button type="button" class="btn btn-warning btn-xs" onclick="informacionCotizar({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Cotizar"></i>&nbsp; Cotizar
                                         </button>
 
-                                        @if($dato->puedecancelar)
-                                            <button type="button" class="btn btn-danger btn-xs" onclick="informacionCancelar({{ $dato->id }})">
-                                                <i class="fas fa-stop-circle-o" title="Denegar"></i>&nbsp; Denegar
-                                            </button>
-                                        @endif
+                                        <button type="button" class="btn btn-danger btn-xs" onclick="informacionCancelar({{ $dato->id }})">
+                                            <i class="fas fa-stop-circle-o" title="Denegar"></i>&nbsp; Denegar
+                                        </button>
 
 
                                     </td>

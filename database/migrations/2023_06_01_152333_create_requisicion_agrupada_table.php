@@ -22,23 +22,25 @@ class CreateRequisicionAgrupadaTable extends Migration
             // PARA EL EVALUADOR TECNICO
             $table->bigInteger('id_evaluador')->unsigned();
 
+            // AÑO DEL REQUERIMIENTO QUE VIENE DEL SELECT DEL CONSOLIDADOR AL BUSCAR REQUERIMIENTOS
+            $table->bigInteger('id_anio')->unsigned();
 
             $table->date('fecha');
-            $table->string('descripcion', 800)->nullable();
 
 
             // CUANDO UCP LO VA A DENEGAR TODOS COMPLETAMENTE
+            // 0 - estado defecto
             // 1- denegado por ucp
             $table->boolean('estado');
 
-            $table->string('nota_cancelado', 800);
+            $table->string('nota_cancelado', 800)->nullable();
             $table->string('documento', 100)->nullable();
 
 
 
             $table->foreign('id_contrato')->references('id')->on('administradores');
             $table->foreign('id_evaluador')->references('id')->on('administradores');
-
+            $table->foreign('id_anio')->references('id')->on('p_anio_presupuesto');
         });
     }
 

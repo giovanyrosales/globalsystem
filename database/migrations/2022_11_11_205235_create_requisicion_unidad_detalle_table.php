@@ -11,9 +11,11 @@ class CreateRequisicionUnidadDetalleTable extends Migration
      *
      * @return void
      */
-    public function up()
-    {
+
+    public function up(){
+
         Schema::create('requisicion_unidad_detalle', function (Blueprint $table) {
+
             $table->id();
             $table->bigInteger('id_requisicion_unidad')->unsigned();
             $table->bigInteger('id_material')->unsigned();
@@ -35,8 +37,7 @@ class CreateRequisicionUnidadDetalleTable extends Migration
             // SE TENDRA QUE VOLVER AGRUPAR
             $table->boolean('agrupado');
 
-            // EL JEFE DE UNIDAD PUEDE CANCELAR, UNICAMENTE SINO ESTA AGRUPADO
-            // AL CANCELAR SE SUMARA EL DINERO DIRECTAMENTE AL CODIGO
+            // 1: CANCELADO EL AGRUPADO POR UACI UNIDAD, Y SE SETEA ESTE CAMPO
             $table->boolean('cancelado');
 
             // una descripción mas descriptiva del material
