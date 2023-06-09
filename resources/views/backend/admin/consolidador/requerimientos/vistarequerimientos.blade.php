@@ -26,7 +26,7 @@
                 <button type="button" style="font-weight: bold; margin-top: 15px; background-color: #28a745; color: white !important;"
                         onclick="modalAgrupar()" class="button button-3d button-rounded button-pill button-small">
                     <i class="fas fa-plus"></i>
-                    Agrugar
+                    Agrupar
                 </button>
 
             </div>
@@ -113,8 +113,65 @@
 
                                         <div class="col-md-6">
 
-                                            <label>Descripción</label>
-                                            <input type="text" maxlength="800" id="descripcion-agrupados" placeholder="Descripción (Opcional)" class="form-control">
+                                            <label>Nombre o Destino:</label>
+                                            <input type="text" maxlength="800" id="nombreodestino-agrupados" placeholder="Nombre o Destino del Proyecto" class="form-control">
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-md-6">
+
+                                            <div class="form-group">
+                                                <label>Justificación:</label>
+                                                <input type="text" maxlength="800" id="justificacion-agrupados" placeholder="Justificación " class="form-control">
+                                            </div>
+
+
+                                        </div>
+
+                                        <div class="col-md-6">
+
+                                            <label>Forma de Entrega (Parcial o Total):</label>
+                                            <input type="text" maxlength="350" id="entrega-agrupados" placeholder="Forma de Entrega" class="form-control">
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-md-6">
+
+                                            <div class="form-group">
+                                                <label>Plazo de Entrega:</label>
+                                                <input type="text" maxlength="350" id="plazo-agrupados" placeholder="Plazo o tiempo de entrega" class="form-control">
+                                            </div>
+
+
+                                        </div>
+
+                                        <div class="col-md-6">
+
+                                            <label>Lugar de Entrega</label>
+                                            <input type="text" maxlength="350" id="lugar-agrupados" placeholder="Lugar de entrega" class="form-control">
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-md-6">
+
+                                            <div class="form-group">
+                                                <label>Forma de Contratación (Contrato u Orden):</label>
+                                                <input type="text" maxlength="350" id="forma-agrupados" placeholder="Forma de Pago" class="form-control">
+                                            </div>
+
+
+                                        </div>
+
+                                        <div class="col-md-6">
+
+                                            <label>Otras Condiciones Especificar (Opcional):</label>
+                                            <input type="text" maxlength="350" id="otros-agrupados" placeholder="Otras Condiciones (Opcional)" class="form-control">
                                         </div>
 
                                     </div>
@@ -311,7 +368,13 @@
         function guardarRegistro(){
 
             var fecha = document.getElementById('fecha-agrupados').value;
-            var descripcion = document.getElementById('descripcion-agrupados').value;
+            var nombreodestino = document.getElementById('nombreodestino-agrupados').value;
+            var justificacion = document.getElementById('justificacion-agrupados').value;
+            var entrega = document.getElementById('entrega-agrupados').value;
+            var plazo = document.getElementById('plazo-agrupados').value;
+            var lugar = document.getElementById('lugar-agrupados').value;
+            var forma = document.getElementById('forma-agrupados').value;
+            var otros = document.getElementById('otros-agrupados').value;
 
             var administrador = document.getElementById('select-administrador').value;
             var evaluador = document.getElementById('select-evaluador').value;
@@ -322,8 +385,8 @@
                 return;
             }
 
-            if(descripcion.length > 800){
-                toastr.error('Descripción máximo 800 caracteres');
+            if(justificacion.length > 800){
+                toastr.error('Justificación máximo 800 caracteres');
                 return;
             }
 
@@ -341,7 +404,14 @@
 
             var formData = new FormData();
             formData.append('fecha', fecha);
-            formData.append('descripcion', descripcion);
+            formData.append('nombreodestino', nombreodestino);
+            formData.append('justificacion', justificacion);
+            formData.append('entrega', entrega);
+            formData.append('plazo', plazo);
+            formData.append('lugar', lugar);
+            formData.append('forma', forma);
+            formData.append('otros', otros);
+
             formData.append('administrador', administrador);
             formData.append('evaluador', evaluador);
 

@@ -16,6 +16,7 @@ use App\Models\RequisicionAgrupada;
 use App\Models\RequisicionAgrupadaDetalle;
 use App\Models\RequisicionUnidad;
 use App\Models\RequisicionUnidadDetalle;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -247,7 +248,15 @@ class ConsolidadorController extends Controller
             $dato->id_contrato = $request->administrador;
             $dato->id_evaluador = $request->evaluador;
             $dato->fecha = $request->fecha;
-            $dato->descripcion = $request->descripcion;
+            $dato->nombreodestino = $request->nombreodestino;
+            $dato->justificacion = $request->justificacion;
+            $dato->entrega = $request->entrega;
+            $dato->plazo = $request->plazo;
+            $dato->lugar = $request->lugar;
+            $dato->forma = $request->forma;
+            $dato->otros = $request->otros;
+            $dato->estado = 0;
+
             $dato->save();
 
             $infoRequiDetalle = RequisicionUnidadDetalle::whereIn('id', $request->lista)
@@ -268,6 +277,7 @@ class ConsolidadorController extends Controller
                 $ingreso = new RequisicionAgrupadaDetalle();
                 $ingreso->id_requi_agrupada = $dato->id;
                 $ingreso->id_requi_unidad_detalle = $info->id;
+                $ingreso->cotizado = 0;
                 $ingreso->save();
 
                 RequisicionUnidadDetalle::where('id', $info->id)->update([
@@ -337,35 +347,48 @@ class ConsolidadorController extends Controller
 
     public function generarPdfAgrupado($idagrupado){
 
-
+        $pilaIdDep = array();
         $infoRequiAgrupado = RequisicionAgrupada::where('id', $idagrupado)->first();
+        $arrayReqADetalle = RequisicionAgrupadaDetalle::where('id_requi_agrupada',$idagrupado)->get();
+        foreach ($arrayReqADetalle as $info){
+            $infoRequiUnidadDetalle = RequisicionUnidadDetalle::where('id',$info->id_requi_unidad_detalle)->first();
+            $infoRequiUnidad = RequisicionUnidad::where('id',$infoRequiUnidadDetalle->id_requisicion_unidad)->first();
+            $infoPresuUnidad = P_PresupUnidad::where('id', $infoRequiUnidad->id_presup_unidad)->first();
+            array_push($pilaIdDep, $infoPresuUnidad->id_departamento);
 
+            $infoMaterial = P_Materiales::where('id',$infoRequiUnidadDetalle->id_material)->first();
+            $infoCodigo = ObjEspecifico::where('id',$infoMaterial->id_objespecifico)->first();
+            $info->cantidad = $infoRequiUnidadDetalle->cantidad;
+            $info->descripcion = $infoMaterial->descripcion;
+            $info->especificacion = $infoRequiUnidadDetalle->material_descripcion;
+            $info->codigo = $infoCodigo->codigo;
+        }
+
+
+        $arraydepto = P_Departamento::whereIn('id', $pilaIdDep)->get();
+        $nombresDep = '';
+        foreach($arraydepto as $info){
+            if($arraydepto->last() == $info){
+                $nombresDep = $nombresDep.$info->nombre;
+            }else {
+                $nombresDep = $nombresDep.$info->nombre . ", ";
+            }
+
+        }
+        $datosadmin = Administradores::where('id',$infoRequiAgrupado->id_contrato)->first();
+        $datoseva = Administradores::where('id',$infoRequiAgrupado->id_evaluador)->first();
+        $nombreadmin = $datosadmin->nombre;
+        $nombreeva = $datoseva->nombre;
+        $cargoadmin = $datosadmin->cargo;
+        $cargoeva = $datoseva->cargo;
         $fecha = date("d-m-Y", strtotime($infoRequiAgrupado->fecha));
 
-        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
-        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-        $mpdf->SetTitle('Agrupado');
-
-        // mostrar errores
-        $mpdf->showImageErrors = false;
-
-        $logoalcaldia = 'images/logo2.png';
-
-        $tabla = "<div class='content'>
-            <img id='logo' src='$logoalcaldia'>
-            <p id='titulo'>ALCALDÍA MUNICIPAL DE METAPÁN <br>
-            Fecha: $fecha <br></p>
-            </div>";
-
-
-        $stylesheet = file_get_contents('css/csspresupuesto.css');
-        $mpdf->WriteHTML($stylesheet,1);
-
-        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
-        $mpdf->WriteHTML($tabla,2);
-
-
-        $mpdf->Output();
+        $pdf = PDF::loadView('backend.admin.consolidador.agrupados.pdfformulario2', compact('infoRequiAgrupado',
+            'fecha', 'nombresDep', 'nombreadmin', 'nombreeva', 'cargoadmin', 'cargoeva', 'arrayReqADetalle'));
+        //$customPaper = array(0,0,470.61,612.36);
+        //$customPaper = array(0,0,470.61,612.36);
+        $pdf->setPaper('Letter', 'portrait')->setWarnings(false);
+        return $pdf->stream('Formulario_2.pdf');
     }
 
 

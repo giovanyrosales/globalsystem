@@ -22,16 +22,22 @@ class CreateRequisicionAgrupadaTable extends Migration
             // PARA EL EVALUADOR TECNICO
             $table->bigInteger('id_evaluador')->unsigned();
 
-
+            //DATOS GENERALES DEL REQ AGRUPADO
             $table->date('fecha');
-            $table->string('descripcion', 800)->nullable();
+            $table->string('nombreodestino', 800)->nullable();
+            $table->string('justificacion', 800)->nullable();
+            $table->string('entrega', 350)->nullable();
+            $table->string('plazo', 350)->nullable();
+            $table->string('lugar', 350)->nullable();
+            $table->string('forma', 350)->nullable();
+            $table->string('otros', 350)->nullable();
 
 
             // CUANDO UCP LO VA A DENEGAR TODOS COMPLETAMENTE
             // 1- denegado por ucp
             $table->boolean('estado');
 
-            $table->string('nota_cancelado', 800);
+            $table->string('nota_cancelado', 800)->nullable();
             $table->string('documento', 100)->nullable();
 
 
