@@ -17,6 +17,7 @@ use App\Models\P_PresupUnidad;
 use App\Models\P_UnidadMedida;
 use App\Models\P_UsuarioDepartamento;
 use App\Models\Proveedores;
+use App\Models\RequisicionAgrupada;
 use App\Models\RequisicionUnidad;
 use App\Models\RequisicionUnidadDetalle;
 use App\Models\Usuario;
@@ -108,15 +109,16 @@ class OrdenCompraUnidadController extends Controller
 
         $cotizacion = CotizacionUnidad::where('id', $orden->id_cotizacion)->first();
         $proveedor =  Proveedores::where('id',  $cotizacion->id_proveedor)->first();
-        $administrador = Administradores::where('id',  $orden->id_admin_contrato)->first();
+        //$administrador = Administradores::where('id',  $orden->id_admin_contrato)->first();
         $det_cotizacion = CotizacionUnidadDetalle::where('id_cotizacion_unidad',  $orden->id_cotizacion)->get();
 
-        $infoRequisiUnidad = RequisicionUnidad::where('id', $cotizacion->id_requisicion_unidad)->first();
+        $infoAgrupada = RequisicionAgrupada::where('id', $cotizacion->id_agrupado)->first();
 
-        $nombreSolicitante = $infoRequisiUnidad->solicitante;
+        //$infoRequisiUnidad = RequisicionUnidad::where('id', $infoAgrupada->id_requisicion_unidad)->first();
 
-        $destino = $infoRequisiUnidad->destino;
-        $destinounidad = $orden->lugar;
+
+        $destino = $infoAgrupada->nombreodestino;
+        //$destinounidad = $orden->lugar;
 
 
         $total = 0;
@@ -209,8 +211,8 @@ class OrdenCompraUnidadController extends Controller
 
         $pdf = PDF::loadView('backend.admin.presupuestounidad.reportes.pdfordencompraunidades', compact('orden',
             'cotizacion', 'dia','mes', 'anio','proveedor','dataArray',
-            'administrador', 'total', 'idorden', 'arraycodigos', 'nombreSolicitante', 'acta_acuerdo',
-                'destino', 'destinounidad'));
+             'total', 'idorden', 'arraycodigos',  'acta_acuerdo',
+                'destino'));
         //$customPaper = array(0,0,470.61,612.36);
         //$customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper('Letter', 'portrait')->setWarnings(false);

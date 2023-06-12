@@ -49,7 +49,7 @@
                 <td width="40%" style="text-align:left; ">
                    No. {{ $idorden }}<br>
                    Fecha: {{ $dia." ".$mes." ".$anio }}<br>
-                   Ref. [CPS-001/23AMM]
+                   Ref.
                 </td>
             </tr>
         </table>
@@ -61,8 +61,8 @@
             <tr>
                 <td width="50%" style="text-align:left; ">
                   {{ $proveedor->nombre }}<br>
-                  Dirección: $proveedor->direccion<br>
-                  Correo: $proveedor->correo<br>
+                  Dirección: {{ $proveedor->direccion }}<br>
+                  Correo: {{ $proveedor->correo }}<br>
                   Tel.: {{ $proveedor->telefono }}<br>
                   NIT/DUI: {{ $proveedor->nit }}<br>
                   NRC: {{ $proveedor->nrc }}
@@ -84,7 +84,7 @@
             </tr>
             <tr>
                 <td width="50%" style="text-align:left; ">
-                  Nombre: {{ $nombreSolicitante }}
+                  Nombre: xxxx
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
                   Nombre Unidad:
@@ -151,7 +151,7 @@
                   Garantía a Presentar
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
-                {{$administrador->nombre}}
+                xxx
                 </td>
             </tr>
         </table>
@@ -191,7 +191,7 @@
         </table>
 
 
-        <label style=" font-size: 15px; ">{{ $destinounidad." ".$destino." ".$arraycodigos." ".$acta_acuerdo }}</label>
+
     </div>
 
 
