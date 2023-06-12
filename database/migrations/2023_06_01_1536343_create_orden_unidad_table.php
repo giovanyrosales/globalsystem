@@ -16,7 +16,6 @@ class CreateOrdenUnidadTable extends Migration
         Schema::create('orden_unidad', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_cotizacion')->unsigned();
-            $table->bigInteger('id_admin_contrato')->unsigned();
 
             $table->date('fecha_orden');
             $table->string('lugar', 300);

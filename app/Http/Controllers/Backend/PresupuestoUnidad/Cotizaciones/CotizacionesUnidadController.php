@@ -346,12 +346,13 @@ class CotizacionesUnidadController extends Controller{
     // retorna tabla con las cotizaciones pendientes
     public function indexCotizacionesUnidadesPendienteTabla($idanio){
 
+
+
         $lista = DB::table('cotizacion_unidad AS cu')
-            ->join('requisicion_unidad AS ru', 'cu.id_requisicion_unidad', '=', 'ru.id')
-            ->join('p_presup_unidad AS pu', 'ru.id_presup_unidad', '=', 'pu.id')
-            ->select('cu.id', 'cu.estado', 'cu.id_proveedor', 'cu.id_requisicion_unidad', 'cu.fecha', 'pu.id_anio')
+            ->join('requisicion_agrupada AS ra', 'cu.id_agrupado', '=', 'ra.id')
+            ->select('cu.id', 'ra.id_anio', 'cu.estado', 'cu.id_proveedor',  'cu.fecha')
+            ->where('ra.id_anio', $idanio)
             ->where('cu.estado', 0)
-            ->where('pu.id_anio', $idanio)
             ->orderBy('cu.id', 'ASC')
             ->get();
 
@@ -360,14 +361,14 @@ class CotizacionesUnidadController extends Controller{
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
 
             $infoProveedor = Proveedores::where('id', $dd->id_proveedor)->first();
-            $infoRequisicion = RequisicionUnidad::where('id', $dd->id_requisicion_unidad)->first();
-            $infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            $infoDepar = P_Departamento::where('id', $infoPresupUni->id_departamento)->first();
+            //$infoRequisicion = RequisicionUnidad::where('id', )->first();
+            //$infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
+            //$infoDepar = P_Departamento::where('id', $infoPresupUni->id_departamento)->first();
 
             $dd->proveedor = $infoProveedor->nombre;
-            $dd->necesidad = $infoRequisicion->necesidad;
-            $dd->destino = $infoRequisicion->destino;
-            $dd->departamento = $infoDepar->nombre;
+            //$dd->necesidad = $infoRequisicion->necesidad;
+            //$dd->destino = $infoRequisicion->destino;
+            //$dd->departamento = $infoDepar->nombre;
         }
 
         return view('backend.admin.presupuestounidad.cotizaciones.pendientes.tablacotizacionpendienteunidad', compact('lista'));
@@ -376,11 +377,13 @@ class CotizacionesUnidadController extends Controller{
     // ver detalle de una cotización para unidades
     public function indexCotizacionUnidadDetalle($id){ // id de cotizacion unidad
 
+
         // destino, necesidad, proveedor, fecha cotizacion
         $cotizacion = CotizacionUnidad::where('id', $id)->first();
-        $infoRequisicion = RequisicionUnidad::where('id', $cotizacion->id_requisicion_unidad)->first();
-        $infoProveedor = Proveedores::where('id', $cotizacion->id_proveedor)->first();
 
+        $infoAgrupado = RequisicionAgrupada::where('id', $cotizacion->id_agrupado)->first();
+
+        $infoProveedor = Proveedores::where('id', $cotizacion->id_proveedor)->first();
         $proveedor = $infoProveedor->nombre;
 
         $infoCotiDetalle = CotizacionUnidadDetalle::where('id_cotizacion_unidad', $id)->get();
@@ -421,7 +424,7 @@ class CotizacionesUnidadController extends Controller{
         $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
         $totalTotal = number_format((float)$totalTotal, 2, '.', ',');
 
-        return view('backend.admin.presupuestounidad.cotizaciones.individual.vistacotizacionindividualunidad', compact('id', 'infoRequisicion',
+        return view('backend.admin.presupuestounidad.cotizaciones.individual.vistacotizacionindividualunidad', compact('id', 'infoAgrupado',
             'proveedor', 'infoCotiDetalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal', 'cotizacion'));
     }
 
@@ -432,26 +435,7 @@ class CotizacionesUnidadController extends Controller{
 
         try {
 
-            $infoCotizacion = CotizacionUnidad::where('id', $request->id)->first();
-            $infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
-            $infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            $infoAnio = P_AnioPresupuesto::where('id', $infoPresupUni->id_anio)->first();
-
-            if($infoAnio->permiso == 0){
-                // sin permiso
-                return ['success' => 1];
-            }
-
-            // sacar año
-            $infoAnio = DB::table('cotizacion_unidad AS cu')
-                ->join('requisicion_unidad AS ru', 'cu.id_requisicion_unidad', '=', 'ru.id')
-                ->join('p_presup_unidad AS pu', 'ru.id_presup_unidad', '=', 'pu.id')
-                ->select('cu.id', 'pu.id_anio')
-                ->where('cu.id', $request->id)
-                ->first();
-
-            if(CotizacionUnidad::where('id', $request->id)
-                ->where('estado', 0)->first()){
+            if(CotizacionUnidad::where('id', $request->id)->where('estado', 0)->first()){
                 CotizacionUnidad::where('id', $request->id)->update([
                     'estado' => 1,
                     'fecha_estado' => Carbon::now('America/El_Salvador')
@@ -459,8 +443,9 @@ class CotizacionesUnidadController extends Controller{
             }
 
             DB::commit();
-            return ['success' => 2, 'idanio' => $infoAnio->id_anio];
+            return ['success' => 1];
         }catch(\Throwable $e){
+            Log::info('ee ' . $e);
             DB::rollback();
             return ['success' => 99];
         }
@@ -486,11 +471,10 @@ class CotizacionesUnidadController extends Controller{
 
         // autorizadas
         $lista = DB::table('cotizacion_unidad AS cu')
-            ->join('requisicion_unidad AS ru', 'cu.id_requisicion_unidad', '=', 'ru.id')
-            ->join('p_presup_unidad AS pu', 'ru.id_presup_unidad', '=', 'pu.id')
-            ->select('cu.id', 'cu.estado', 'cu.id_proveedor', 'cu.id_requisicion_unidad', 'cu.fecha', 'pu.id_anio')
+            ->join('requisicion_agrupada AS ra', 'cu.id_agrupado', '=', 'ra.id')
+            ->select('cu.id', 'cu.estado', 'cu.id_proveedor', 'cu.fecha', 'ra.id_anio')
             ->where('cu.estado', 1)
-            ->where('pu.id_anio', $idanio)
+            ->where('ra.id_anio', $idanio)
             ->orderBy('cu.fecha', 'DESC') // la ultima cotizacion quiero primero
             ->get();
 
@@ -499,14 +483,14 @@ class CotizacionesUnidadController extends Controller{
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
 
             $infoProveedor = Proveedores::where('id', $dd->id_proveedor)->first();
-            $infoRequisicion = RequisicionUnidad::where('id', $dd->id_requisicion_unidad)->first();
-            $infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            $infoDepar = P_Departamento::where('id', $infoPresupUni->id_departamento)->first();
+            //$infoRequisicion = RequisicionUnidad::where('id', $dd->id_requisicion_unidad)->first();
+           // $infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
+            //$infoDepar = P_Departamento::where('id', $infoPresupUni->id_departamento)->first();
 
             $dd->proveedor = $infoProveedor->nombre;
-            $dd->necesidad = $infoRequisicion->necesidad;
-            $dd->destino = $infoRequisicion->destino;
-            $dd->departamento = $infoDepar->nombre;
+            //$dd->necesidad = $infoRequisicion->necesidad;
+            //$dd->destino = $infoRequisicion->destino;
+            //$dd->departamento = $infoDepar->nombre;
 
             if(OrdenUnidad::where('id_cotizacion', $dd->id)->first()){
                 $dd->bloqueo = true;
@@ -926,9 +910,9 @@ class CotizacionesUnidadController extends Controller{
     public function tablaRequerimientosDenegadosUnidades($idanio){
 
 
-        return "fff";
 
-        $registro = DB::table('p_presup_unidad AS p')
+
+        $listado = DB::table('p_presup_unidad AS p')
             ->join('requisicion_unidad AS req', 'req.id_presup_unidad', '=', 'p.id')
             ->select('req.estado_denegado', 'req.texto_denegado', 'p.id_anio',
                 'req.destino', 'req.fecha', 'req.necesidad', 'req.id AS idrequi', 'p.id_departamento')

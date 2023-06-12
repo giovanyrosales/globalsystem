@@ -64,29 +64,24 @@ class OrdenCompraUnidadController extends Controller
             return ['success' => 1, 'id' => $info->id];
         }
 
-        if($infocoti = CotizacionUnidad::where('id', $request->idcoti)->first()){
+       /* if($infocoti = CotizacionUnidad::where('id', $request->idcoti)->first()){
             if($infocoti->estado != 1){
                 // por seguridad solo queremos cotizaciones aprobadas
                 return ['success' => 2];
             }
-        }
+        }*/
 
         DB::beginTransaction();
         try {
 
             $infoCoti = CotizacionUnidad::where('id', $request->idcoti)->first();
-            $infoRequi = RequisicionUnidad::where('id', $infoCoti->id_requisicion_unidad)->first();
-            $infoPresupUni = P_PresupUnidad::where('id', $infoRequi->id_presup_unidad)->first();
-            $infoAnio = P_AnioPresupuesto::where('id', $infoPresupUni->id_anio)->first();
 
-            if($infoAnio->permiso == 0){
-                // sin permiso
-                return ['success' => 3];
-            }
+            //$infoRequi = RequisicionUnidad::where('id', $infoCoti->id_requisicion_unidad)->first();
+            //$infoPresupUni = P_PresupUnidad::where('id', $infoRequi->id_presup_unidad)->first();
+
 
             $or = new OrdenUnidad();
-            $or->id_admin_contrato = $request->admin;
-            $or->id_cotizacion = $request->idcoti;
+            $or->id_cotizacion = $infoCoti->id;
             $or->fecha_orden = $request->fecha;
             $or->lugar = $request->lugar;
             $or->estado = 0;
@@ -95,32 +90,9 @@ class OrdenCompraUnidadController extends Controller
             $or->numero_acuerdo = $request->numacuerdo;
             $or->save();
 
-            $detalle = CotizacionUnidadDetalle::where('id_cotizacion_unidad', $request->idcoti)->get();
-
-            foreach ($detalle as $dd){
-
-                $infoRequiDeta = RequisicionUnidadDetalle::where('id', $dd->id_requi_unidaddetalle)->first();
-                $infoMaterial = P_Materiales::where('id', $infoRequiDeta->id_material)->first();
-
-                $infoCuenta = CuentaUnidad::where('id_presup_unidad', $infoPresupUni->id)
-                    ->where('id_objespeci', $infoMaterial->id_objespecifico)
-                    ->first();
-
-                $cuenta = new CuentaUnidadRestante();
-                $cuenta->id_cuenta_unidad = $infoCuenta->id;
-                $cuenta->id_requi_detalle = $infoRequiDeta->id;
-                $cuenta->id_ordenunidad = $or->id;
-                $cuenta->save();
-
-                // BORRAR MATERIAL RETENIDO, pero si es anulada, volvera a retenido
-
-                CuentaUnidadRetenido::where('id_cuenta_unidad', $infoCuenta->id)
-                    ->where('id_requi_detalle', $infoRequiDeta->id)
-                    ->delete();
-            }
 
             DB::commit();
-            return ['success' => 1, 'id' => $or->id];
+            return ['success' => 2, 'id' => $or->id];
 
         }catch(\Throwable $e){
             Log::info('error: ' . $e);
@@ -216,7 +188,6 @@ class OrdenCompraUnidadController extends Controller
             }
         }
 
-
         $total = number_format((float)$total, 2, '.', ',');
 
         //$fecha = strftime("%d-%B-%Y", strtotime($orden->fechaorden));
@@ -244,258 +215,10 @@ class OrdenCompraUnidadController extends Controller
         //$customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper('Letter', 'portrait')->setWarnings(false);
         return $pdf->stream('Orden_Compra.pdf');
-
-
-        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
-        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-        $mpdf->SetTitle('Orden de Compra');
-        // mostrar errores
-        $mpdf->showImageErrors = false;
-
-
-        foreach ($array_merged as $items => $items_value){
-
-
-            $tabla = "
-            <table width='92%'>
-              <tr>
-                <td>
-                 <th align='right'><p style='font-size: 15px;'>$idorden</p></th>
-                </td>
-              </tr>
-            </table>
-
-            <table width='92%' >
-              <tr>
-                <td>
-                 <th style='font-size: 15px' align='left' width='130px'> <p>$dia</p></th>
-                 <th style='font-size: 15px; padding-right: 65px' align='right' width='200px'> <p>$mes</p></th>
-                 <th style='font-size: 15px' align='right' width='200px'> <p>$anio</p></th>
-                </td>
-
-              </tr>
-            </table>
-
-            <table width='40%' style='margin-left: 145px'>
-              <tr>
-                <td style='font-size: 15px' align='left' width='130px'> <p>$proveedor->nombre</p>
-                </td>
-
-              </tr>
-            </table>
-
-                    ";
-            $tabla .= "
-
-
-                <table class='table-body' width='83%' border='0' cellspacing=0  style='margin-left:125px; margin-top: 25px' >
-            ";
-
-            foreach ($items_value as $item => $item_value){
-
-                $_cantidad = $item_value['cantidad'];
-                $_nombre = $item_value['nombre'];
-                $_codpres = $item_value['cod_presup'];
-                $_precio = '$' . $item_value['precio_u'];
-                $_multi = '$' . $item_value['multi'];
-
-                $tabla .= "
-
-
-                 <tr style=' height: 30px' >
-                <td  style=' width: 8.9%; text-align:center; '>
-                    <label style='  vertical-align:middle; text-align:center;   font-size:14px;'>$_cantidad</label>
-                </td>
-                <td  style=' width: 53%; text-align:left; '>
-                    <label style='  vertical-align:middle; text-align:left; margin-left: 5%;   font-size:14px;'>$_nombre</label>
-                </td>
-                <td  style=' width: 11.6%; text-align:center; '>
-                    <label style='  vertical-align:middle; text-align:center;   font-size:14px;'>$_codpres</label>
-                </td>
-                <td  style=' width: 1.6%; text-align:left; '>
-                    <label style='  vertical-align:middle; text-align:left;   font-size:14px;'></label>
-                </td>
-                <td  style=' width: 12%; text-align:right; '>
-                    <label style='  vertical-align:middle; text-align:right;   font-size:14px;'>$_precio</label>
-                </td>
-                <td  style=' width: 1%; text-align:right; '>
-                    <label style='  vertical-align:middle; text-align:right;'></label>
-                </td>
-                <td  style=' width: 2.5%; text-align:left; '>
-                    <label style='  vertical-align:middle; text-align:left;   font-size:14px;'></label>
-                </td>
-                <td  style=' width: 18%; text-align:right; '>
-                    <label style='  vertical-align:middle; text-align:right;   font-size:14px;'>$_multi</label>
-                </td>
-
-            </tr>
-
-
-                    ";
-            }
-
-
-
-
-
-
-
-
-
-
-            $tabla .= "
-
-            </table>
-
-             ";
-
-
-            $tabla .= "
-
-
-             <table class='table-body' border='0' cellspacing=0 style='position: absolute; float: bottom'>
-        <tr style=' height: 30px' >
-            <td  style=' width: 8.9%; text-align:center; '>
-                <label style='  vertical-align:middle; text-align:center;   font-size:14px;'></label>
-            </td>
-            <td  style=' width: 54.1%; text-align:left; '>
-                <label style='  vertical-align:middle; text-align:left; margin-left: 5%;   font-size:14px;'> </label>
-            </td>
-            <td  style=' width: 5.6%; text-align:center; '>
-                <label style='  vertical-align:middle; text-align:center;   font-size:14px;'></label>
-            </td>
-            <td  style=' width: 1.6%; text-align:left; '>
-                <label style='  vertical-align:middle; text-align:left;   font-size:14px;'></label>
-            </td>
-            <td  style=' width: 9%; text-align:right; '>
-                <label style='  vertical-align:middle; text-align:right;   font-size:14px;'></label>
-            </td>
-            <td  style=' width: 1%; text-align:right; '>
-                <label style='  vertical-align:middle; text-align:right;'></label>
-            </td>
-            <td  style=' width: 1.6%; text-align:left; '>
-                <label style='  vertical-align:middle; text-align:left;   font-size:14px;'></label>
-            </td>
-            <td  style=' width: 12.2%; text-align:right; '>
-                <label style=' font-weight: bold;vertical-align:middle; text-align:right;   font-size:14px;'></label>
-            </td>
-            <td  style=' width: 6%; text-align:right; '>
-                <label style='  vertical-align:middle; text-align:right;'></label>
-            </td>
-        </tr>
-    </table>
-
-    <div style='bottom: 0;  position: absolute;'>
-        <table class='table-body' border='0' cellspacing=0 style='margin-top:20px; ' >
-            <tr style=' height: 30px; ' >
-                <td  style=' width: 11%; text-align:center; '>
-                    <label style='  vertical-align:middle; text-align:center;   font-size:14px;'></label>
-                </td>
-                <td  style=' width: 52%; text-align:left; '>
-                    <label style='  vertical-align:middle; text-align:left;   font-size:14px;'></label>
-                </td>
-                <td  style=' width: 25%; text-align:right; '>
-                    <label style='  vertical-align:middle; text-align:right; margin-left: 5%;   font-size:14px;'>$total</label>
-                </td>
-                <td  style=' width: 6%; text-align:center; '>
-                    <label style='  vertical-align:middle; text-align:center;   font-size:14px;'></label>
-                </td>
-            </tr>
-        </table>
-
-        <table class='table-body' border='1' cellspacing=0 style='margin-top:20px'>
-            <tr style=' height: 30px; ' >
-
-                <td  style=' width: 60%; text-align:left; '>
-                    <label style='  vertical-align:middle; text-align:left;   font-size:14px;'>$administrador->nombre</label>
-                </td>
-
-                <td  style=' width: 40%; '>
-                    <label style='  vertical-align:middle; text-align:right; margin-left: 5%;   font-size:14px;'>Fondos Propios</label>
-                </td>
-
-            </tr>
-        </table>
-
-        <table class='table-body' border='0' cellspacing=0 >
-            <tr style=' height: 30px; ' >
-                <td  style=' width: 100%; text-align:center; '>
-                    <label style='  vertical-align:middle; text-align:center;   font-size:14px;'>aaaaaaaaa</label>
-                </td>
-            </tr>
-        </table>
-
-        <table class='table-body' border='0' cellspacing=0  >
-            <tr style=' height: 30px; ' >
-                <td  style=' width: 100%; text-align:center; '>
-                    <label style='  vertical-align:middle; text-align:center;   font-size:14px;'>xxxxx</label>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-
-            ";
-
-
-            $tabla .= "
-
-
-            <table width='68%' border='1' style='margin-left: 75px; margin-top: 40px'>
-              <tr>
-                <td style='font-size: 13px' align='left' width='130px'> <p>NIT: $proveedor->nit</p> ";
-
-
-
-            $tabla .= "
-                </td>
-
-              </tr>
-            </table>
-
-
-            ";
-
-
-
-            if(end($items_value) == $item_value) {
-                $mpdf->AddPage(); // Agrega una nueva página
-                $mpdf->WriteHTML($tabla,2);
-
-            }
-
-
-
-
-
-
-
-        }
-
-
-
-
-
-        $stylesheet = file_get_contents('css/cssordencompra.css');
-        $mpdf->WriteHTML($stylesheet,1);
-        $mpdf->Output();
-
-
-
-
-
-        /*$pdf = PDF::loadView('backend.admin.presupuestounidad.reportes.pdfordencompraunidades', compact('orden',
-            'cotizacion', 'dia','mes', 'anio','proveedor','array_merged',
-            'administrador', 'total', 'idorden'));
-        //$customPaper = array(0,0,470.61,612.36);
-        $customPaper = array(0,0,470.61,612.36);
-        $pdf->setPaper($customPaper)->setWarnings(false);
-        return $pdf->stream('Orden_Compra.pdf');*/
-
-
-
-
     }
+
+
+
 
     public function vistaAñoOrdenesComprasUnidadesAprobadas(){
         $anios = P_AnioPresupuesto::orderBy('id', 'DESC')->get();
@@ -513,24 +236,25 @@ class OrdenCompraUnidadController extends Controller
     // retorna tabla con las ordenes de compras
     public function tablaOrdenesComprasAprobadasUnidades($idanio){
 
+
+
         $lista = DB::table('orden_unidad AS or')
             ->join('cotizacion_unidad AS cu', 'or.id_cotizacion', '=', 'cu.id')
-            ->join('requisicion_unidad AS requ', 'cu.id_requisicion_unidad', '=', 'requ.id')
-            ->join('p_presup_unidad AS presu', 'requ.id_presup_unidad', '=', 'presu.id')
-            ->select('presu.id_anio', 'or.estado', 'or.fecha_orden', 'or.id_cotizacion', 'or.id')
-            ->where('presu.id_anio', $idanio)
+            ->join('requisicion_agrupada AS ra', 'cu.id_agrupado', '=', 'ra.id')
+            ->select('or.estado', 'or.fecha_orden', 'or.id_cotizacion', 'or.id')
+            ->where('ra.id_anio', $idanio)
             ->where('or.estado', 0) // solo aprobadas
             ->orderBy('or.fecha_orden')
             ->get();
 
         foreach($lista as $val){
             $infoCotizacion = CotizacionUnidad::where('id', $val->id_cotizacion)->first();
-            $infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
-            $infoProveedor = Proveedores::where('id', $infoCotizacion->id_proveedor)->first();
-            $infoPresup = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            $infoDepar = P_Departamento::where('id', $infoPresup->id_departamento)->first();
+            //$infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
+            //$infoProveedor = Proveedores::where('id', $infoCotizacion->id_proveedor)->first();
+            //$infoPresup = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
+            //$infoDepar = P_Departamento::where('id', $infoPresup->id_departamento)->first();
 
-            $val->departamento = $infoDepar->nombre;
+            //$val->departamento = $infoDepar->nombre;
 
             if($infoacta = ActaUnidad::where('id_ordenunidad', $val->id)->first()){
                 $val->actaid = $infoacta->id;
@@ -538,8 +262,8 @@ class OrdenCompraUnidadController extends Controller
                 $val->actaid = 0;
             }
 
-            $val->requidestino = $infoRequisicion->destino;
-            $val->nomproveedor = $infoProveedor->nombre;
+           // $val->requidestino = $infoRequisicion->destino;
+           // $val->nomproveedor = $infoProveedor->nombre;
         }
 
         return view('backend.admin.presupuestounidad.ordenes.ordenesaprobadas.tablaordenesunidadcompraaprobada', compact('lista'));

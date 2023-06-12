@@ -47,11 +47,11 @@
 
                             <div class="form-group">
                                 <label>Destino</label>
-                                <input type="text" value="{{ $infoRequisicion->destino }}" class="form-control" disabled>
+                                <input type="text" value="{{ $infoAgrupado->nombreodestino }}" class="form-control" disabled>
                             </div>
                             <div class="form-group">
                                 <label>Necesidad</label>
-                                <textarea class="form-control" rows="3" disabled>{{ $infoRequisicion->necesidad }}</textarea>
+                                <textarea class="form-control" rows="3" disabled>{{ $infoAgrupado->justificacion }}</textarea>
                             </div>
                         </div>
 
@@ -166,6 +166,10 @@
 
     <script>
 
+        function recargar(){
+
+        }
+
         function autorizarCotizacion(){
             Swal.fire({
                 title: 'Autorizar Cotización',
@@ -211,25 +215,8 @@
             })
                 .then((response) => {
                     closeLoading();
-                    if(response.data.success === 1){
 
-                        Swal.fire({
-                            title: 'Permiso Denegado',
-                            text: "Para el Presente Año no es permitido realizar modificaciones",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-
-                    }
-                    else if(response.data.success === 2) {
+                    if(response.data.success === 1) {
 
                         let idanio = response.data.idanio;
 
@@ -244,7 +231,7 @@
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href="{{ url('/admin/p/cotizacion/unidad/autorizadas/index') }}/" + idanio;
+
                             }
                         })
                     }

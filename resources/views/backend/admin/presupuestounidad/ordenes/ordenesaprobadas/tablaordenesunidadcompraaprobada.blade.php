@@ -20,11 +20,11 @@
                             @foreach($lista as $dato)
 
                                 <tr>
-                                    <td>{{ $dato->departamento }}</td>
+                                    <td></td>
                                     <td>{{ $dato->id }}</td>
-                                    <td>{{ $dato->requidestino }}</td>
+                                    <td></td>
                                     <td>{{ $dato->id_cotizacion }}</td>
-                                    <td>{{ $dato->nomproveedor }}</td>
+                                    <td></td>
                                     <td>
                                         <!-- acta a un no generada Y SOLO JEFE UACI PUEDE ANULAR ORDEN DE COMPRA-->
                                         @if($dato->actaid == 0)

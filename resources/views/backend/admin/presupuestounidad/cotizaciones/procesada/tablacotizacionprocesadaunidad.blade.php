@@ -22,10 +22,10 @@
                             @foreach($lista as $dato)
                                 <tr>
                                     <td>{{ $dato->id }}</td>
-                                    <td>{{ $dato->departamento }}</td>
-                                    <td>{{ $dato->destino }}</td>
+                                    <td></td>
+                                    <td></td>
                                     <td>{{ $dato->fecha }}</td>
-                                    <td>{{ $dato->necesidad }}</td>
+                                    <td></td>
                                     <td>{{ $dato->proveedor }}</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="verProcesadas({{ $dato->id }})">

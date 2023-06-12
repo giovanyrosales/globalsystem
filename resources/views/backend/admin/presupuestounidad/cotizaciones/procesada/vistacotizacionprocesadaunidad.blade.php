@@ -229,25 +229,19 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        $('#modalGenerarOrden').modal('hide');
-                        toastr.success('Orden Generada');
-                        recargar();
 
-                        // POR DEFECTO SE IRA CON 12 MATERIALES
+                        // ESTA REPETIDO YA
 
-                        let id = response.data.id;
+                        toastr.error('Orden esta repetido');
 
-                        // vista pdf
-                        window.open("{{ URL::to('admin/p/ordencompra/unidad/pdf') }}/" + id + "/" + 12);
                     }
                     else if(response.data.success === 2) {
-                        // La orden de compra con la cotización, no estaba aprobada.
-                        // solo por seguridad.
+                       // GENERADO CORRECTAMENTE
 
                         Swal.fire({
-                            title: 'Cotización Pendiente',
-                            text: "Esta cotización no esta aprobada",
-                            icon: 'info',
+                            title: 'Generado Correctamente',
+                            text: "",
+                            icon: 'success',
                             showCancelButton: false,
                             allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
@@ -259,24 +253,7 @@
                             }
                         })
                     }
-                    else if(response.data.success === 3) {
 
-                        Swal.fire({
-                            title: 'Permiso Denegado',
-                            text: "Para el Presente Año no es permitido realizar modificaciones",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-
-                    }
                     else {
                         toastr.error('Error al crear orden');
                     }

@@ -936,7 +936,7 @@ Route::get('/admin/p/cotizacion/unidad/pendiente/anio', [CotizacionesUnidadContr
 
 // retorna vista con las cotizaciones pendientes
 Route::get('/admin/p/cotizacion/unidad/pendiente/index/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesPendiente']);
-// retorna tabla con las cotizaciones pendientes
+// COTIZACIONES PENDIENTE UCP
 Route::get('/admin/p/cotizacion/unidad/pendiente/tabla/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesPendienteTabla']);
 // ver detalle de una cotización para unidades
 Route::get('/admin/p/cotizacion/unidad/vistadetalle/{id}', [CotizacionesUnidadController::class,'indexCotizacionUnidadDetalle']);
