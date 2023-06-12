@@ -140,7 +140,6 @@
 
 
 
-    <!-- ?????  -->
 
     <div class="modal fade" id="modalDetalle" tabindex="-1">
         <div class="modal-dialog modal-xl">
@@ -364,6 +363,7 @@
             var maximaCantidad = 10;
             var contador = 0;
 
+            // INFORMACION DE LOS QUE VAN A COTIZARCE
             $("#mySideToSideSelect_to option").each(function(){
                 contador++;
                 hayLista = false;
@@ -415,6 +415,7 @@
 
                     if(response.data.success === 1){
 
+                        // array requisicon unidad detalle
                         var infodetalle = response.data.lista;
 
                         for (var i = 0; i < infodetalle.length; i++) {
@@ -540,10 +541,9 @@
             formData.append('idagrupado', $('#idagrupado').val());
 
 
-            // EN LA LISTA VA EL ID: REQUISICION_DETALLE
+            // EN LA LISTA VA EL ID: REQUISICION UNIDAD DETALLE
             $("#mySideToSideSelect_to option").each(function(){
                 hayLista = false;
-                formData.append('lista[]', $(this).val());
             });
 
 
@@ -602,11 +602,9 @@
                 // el precio unitario del material a cotizar
                 formData.append('unidades[]', unidades[z]);
 
-                // como tiene mismo tamaño el arreglo, puede recorrer igual size
-                // RequisicionUnidadDetalle
+                // id de requisicion unidad detalle
                 formData.append('idfila[]', idfila[z]);
 
-                // como tiene mismo tamaño el arreglo, puede recorrer igual size
                 // la descripcion del material escrito por uaci
                 formData.append('descripmate[]', descripmaterial[z]);
             }
@@ -621,9 +619,11 @@
 
                     if(response.data.success === 1){
 
+                        // EL AGRUPADO ESTA CANCELADO
+
                         Swal.fire({
-                            title: 'Material Fue Borrado',
-                            text: "El Administrador elimino el Material a Cotizar",
+                            title: 'Error',
+                            text: "Esta Cotización ya fue Cancelada por UCP",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -637,12 +637,12 @@
                     }
 
                     else if(response.data.success === 2){
-                        // ESTE MATERIAL QUE VIENE YA ESTA EN MODO ESPERA, ES DECIR,
-                        // YA FUE COTIZADO Y ESTA ESPERANDO UNA RESPUESTA DE APROBADA O DENEGADA
+
+                        // UN MATERIAL A COTIZAR ESTA CANCELADO
 
                         Swal.fire({
-                            title: 'Material Con Cotización',
-                            text: "Un Material ya tiene una Cotización en Espera o ya fue Aprobada. Recargar para visualizar.",
+                            title: 'Error',
+                            text: "Un Material fue Cancelado y no se puede cotizar",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -654,26 +654,62 @@
                             }
                         })
                     }
+
                     else if(response.data.success === 3){
 
-                        // en esta validaciones no se toma en cuenta el saldo retenido, porque eso
-                        // se verifica al hacer una requisición. aquí solo se tomara en cuenta
-                        // si hay saldo restante.
+                        // UN MATERIAL YA ESTA COTIZADO
 
-                        let nombre = response.data.material.nombre;
-                        let unidad = response.data.unidad;
-                        let costo = response.data.costo;
-                        let codigo = response.data.obj;
-                        let disponible = response.data.disponibleFormat;
-                        let totalactual = response.data.totalactual;
+                        Swal.fire({
+                            title: 'Error',
+                            text: "Se detecto que un Material ya tiene una Cotización",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Recargar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+
+                    else if(response.data.success === 4){
+
+                        // ERROR NO SE DETECTO EL MATERIAL
+
+                        Swal.fire({
+                            title: 'Error',
+                            text: "No se detecto un Material",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'Recargar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+
+
+
+                    }
+
+                    else if(response.data.success === 5){
+
+                        // NO ALCANCA EL DINERO
+
+                        let fila = response.data.fila;
+                        let material = response.data.material;
+                        let objcodigo = response.data.objcodigo;
+                        let disponibleFormat = response.data.disponibleFormat;
 
                         Swal.fire({
                             title: 'Saldo Insuficiente',
-                            html: "El material " + nombre + " - " + unidad + ", Solicita $" + costo + ". Pero el Código " + codigo + "<br>"
-                                + "El Saldo actual actual. " + "<br>"
-                                + "Saldo Restante $" + disponible + "<br>"
-                                + "Saldo Restante para Compras $" + totalactual + "<br>"
-                                + "Recomendación: Realizar Movimiento de Cuenta"+ "<br>"
+                            html: "En la Fila " + fila + " - " + ", El material: " + material + "<br>"
+                                + "De código. " + objcodigo + "<br>"
+                                + "El saldo actual es: " + disponibleFormat + "<br>"
                             ,
                             icon: 'info',
                             showCancelButton: false,
@@ -687,11 +723,25 @@
                         })
                     }
 
-                    else if(response.data.success === 4){
-                        // MATERIAL A COTIZAR ESTA CANCELADO
+                    else if(response.data.success === 10){
+
+                        // COTIZACION GUARDADA
+
+                        toastr.success('Guardado correctamente');
+                        $('#modalCotizar').modal('hide');
+                        $('#modalDetalle').modal('hide');
+                        recargar();
+                    }
+
+
+                    else if(response.data.success === 11){
+
+                        // SE DETECTO QUE UN MATERIAL TIENE UNA COTIZACION
+                        // YA SEA APROBADA O ESPERANDO RESOLUCION
+
                         Swal.fire({
-                            title: 'Material Cancelado',
-                            text: "El Administrador cancelo un material.",
+                            title: 'Error',
+                            text: "Se detecto que un Material ya tiene una Cotización en Proceso",
                             icon: 'info',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -702,33 +752,10 @@
                                 location.reload();
                             }
                         })
+
                     }
 
-                    else if(response.data.success === 5){
-                        $('#modalCotizar').modal('hide');
-                        $('#modalDetalle').modal('hide');
 
-                        recargar();
-
-                        toastr.success('Cotización Guardada');
-                    }
-                    else if(response.data.success === 6) {
-
-                        Swal.fire({
-                            title: 'Permiso Denegado',
-                            text: "Para el Presente Año no es permitido realizar modificaciones",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-                    }
                     else{
                         toastr.error('Error al guardar');
                     }

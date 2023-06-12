@@ -16,14 +16,16 @@ class CreateRequisicionAgrupadaTable extends Migration
         Schema::create('requisicion_agrupada', function (Blueprint $table) {
             $table->id();
 
+            $table->bigInteger('id_anio')->unsigned();
+
+
             // PARA EL ADMINISTRADOR DE CONTRATO
             $table->bigInteger('id_contrato')->unsigned();
 
             // PARA EL EVALUADOR TECNICO
             $table->bigInteger('id_evaluador')->unsigned();
 
-<<<<<<< HEAD
-            //DATOS GENERALES DEL REQ AGRUPADO
+
             $table->date('fecha');
             $table->string('nombreodestino', 800)->nullable();
             $table->string('justificacion', 800)->nullable();
@@ -32,12 +34,6 @@ class CreateRequisicionAgrupadaTable extends Migration
             $table->string('lugar', 350)->nullable();
             $table->string('forma', 350)->nullable();
             $table->string('otros', 350)->nullable();
-=======
-            // AÑO DEL REQUERIMIENTO QUE VIENE DEL SELECT DEL CONSOLIDADOR AL BUSCAR REQUERIMIENTOS
-            $table->bigInteger('id_anio')->unsigned();
-
-            $table->date('fecha');
->>>>>>> 8d1df13691b28a8a9d9086c656cc70aaf6654f96
 
 
             // CUANDO UCP LO VA A DENEGAR TODOS COMPLETAMENTE
@@ -47,7 +43,6 @@ class CreateRequisicionAgrupadaTable extends Migration
 
             $table->string('nota_cancelado', 800)->nullable();
             $table->string('documento', 100)->nullable();
-
 
 
             $table->foreign('id_contrato')->references('id')->on('administradores');

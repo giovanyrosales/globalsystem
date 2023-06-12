@@ -27,13 +27,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
-class CotizacionesUnidadController extends Controller
-{
+class CotizacionesUnidadController extends Controller{
+
+
+    // COTIZACIONES PARA UNIDADES
 
     public function __construct(){
         $this->middleware('auth');
     }
 
+
+    // SELECCIONA EL ANIO PARA BUSCAR UN AGRUPADO
     public function indexListaAgrupadoAnios(){
 
         $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
@@ -41,12 +45,15 @@ class CotizacionesUnidadController extends Controller
         return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.elegirfecha', compact('anios'));
     }
 
+
+    // MUESTRA VISTA PARA CARGAR LA TABLA Y PASAR EL ANIO
     public function indexListarRequerimientosPendienteUnidad($idanio){
 
         $proveedores = Proveedores::orderBy('nombre', 'ASC')->get();
 
         return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.vistarequerimientosunidadrevision', compact('proveedores', 'idanio'));
     }
+
 
     // AQUI SE MOSTRARA LISTA DE AGRUPADOS QUE TIENEN MATERIALES QUE NO HAN SIDO COTIZADOS AUN
     public function indexTablaListarRequerimientosPendienteUnidad($idanio){
@@ -64,8 +71,12 @@ class CotizacionesUnidadController extends Controller
             $info->fecha = date("d-m-Y", strtotime($info->fecha));
         }
 
+
         return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.tablarequerimientosunidadrevision', compact('listado'));
     }
+
+
+
 
     // informacion del agrupado para hacer la cotizacion
     public function informacionRequerimientoCotizarInfo(Request $request){
@@ -138,10 +149,9 @@ class CotizacionesUnidadController extends Controller
         );
 
         // ARRAY
-        // lista[]
-        // unidades[]
+        // unidades[]   precio unitario a cotizar
         // idfila[]
-        // descripmate[]
+        // descripmate[]  la descripcion escrito por uaci
 
 
 
@@ -164,8 +174,10 @@ class CotizacionesUnidadController extends Controller
 
             // VERIFICAR QUE ESTOS MATERIAL A COTIZAR NO ESTEN COTIZADOS, NINGUNO
 
-            for ($i = 0; $i < count($request->lista); $i++) {
-                if($infoRequiUniDetalle = RequisicionUnidadDetalle::where('id', $request->lista[$i])->first()){
+            // VERIFICAR QUE ALCANCE DINERO
+
+            for ($i = 0; $i < count($request->idfila); $i++) {
+                if($infoRequiUniDetalle = RequisicionUnidadDetalle::where('id', $request->idfila[$i])->first()){
 
                     // ESTE MATERIAL ESTA CANCELADO
                     if($infoRequiUniDetalle->cancelado == 1){
@@ -174,202 +186,127 @@ class CotizacionesUnidadController extends Controller
 
                     // AUNQUE EL MATERIAL SOLO PUEDE ESTAR EN 1 SOLO AGRUPADO, PERO POR PRECAUCION, SE
                     // UTILIZARA GET PARA BUSCAR SI ESTA COTIZADO
-                    if($dato = RequisicionAgrupadaDetalle::where('id_requi_unidad_detalle', $infoRequiUniDetalle->id)->get()){
+                    $arrayRequiAgrupadoDetalle = RequisicionAgrupadaDetalle::where('id_requi_unidad_detalle', $infoRequiUniDetalle->id)->get();
 
-                        if($dato->cotizado == 1){
+                    foreach ($arrayRequiAgrupadoDetalle as $dato) {
+                        if ($dato->cotizado == 1) {
                             return ['success' => 3];
                         }
                     }
+
+
+                    $infoRequisicion = RequisicionUnidad::where('id', $infoRequiUniDetalle->id_requisicion_unidad)->first();
+
+                    $infoMaterial = P_Materiales::where('id', $infoRequiUniDetalle->id_material)->first();
+
+                    $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
+
+                    $infoCuentaUnidad = CuentaUnidad::where('id_presup_unidad', $infoRequisicion->id_presup_unidad)
+                        ->where('id_objespeci', $infoMaterial->id_objespecifico)
+                        ->first();
+
+
+
+
+                    // VERIFICAR QUE ESTE MATERIAL SI ESTA COTIZADO YA, NO ESTE ESPERANDO UNA RESPUESTA,
+                    // SOLO DEJARA PASAR SI NO ESTA DENEGADA LA COTIZACION COMPLETA
+
+                    $arrayCotiDeta = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $infoRequiUniDetalle->id)->get();
+
+                    foreach ($arrayCotiDeta as $dato){
+
+                        $cotizacionPr = CotizacionUnidad::where('id', $dato->id_cotizacion_unidad)->first();
+
+                        if($cotizacionPr->estado != 2){
+                            // es decir, que esta en defecto, o esta aprobada por jefe uaci
+                            DB::rollback();
+                            return ['success' => 11];
+                        }
+
+                    }
+
+
+                    // RECORDAR QUE EL MATERIAL YA TIENE UNA DESCONTADA DE $$ CUANTO SE HIZO LA REQUISICION,
+                    // SE DEBE DE DEVOLVER ESE MISMO MONTO PARA REALIZAR EL CALCULO CORRECTO, A LA
+                    // NUEVA RESTA QUE SE HARA. SE DEBERA RESETEAR AL SALDO INICIAL FIJO
+
+                    $suma = $infoCuentaUnidad->saldo_inicial + ($infoRequiUniDetalle->dinero * $infoRequiUniDetalle->cantidad);
+
+                    // DEBO MULTIPLICAR LA CANTIDAD QUE SE PIDE X EL PRECIO QUE VIENE DE LA COTIZACION
+                    $multiplicar = $infoRequiUniDetalle->cantidad * $request->unidades[$i];
+
+                    $resta = $suma - $multiplicar;
+
+                    // DINERO NO ALCALZA PARA BAJARLE
+                    if($this->redondear_dos_decimal($resta) < 0){
+
+                        $disponibleFormat = number_format((float)$infoCuentaUnidad->saldo_inicial, 2, '.', ',');
+
+                        DB::rollback();
+
+                        return ['success' => 5, 'fila' => ($i + 1),
+                            'material' => $infoMaterial->descripcion,
+                            'objcodigo' => $infoObjeto->codigo,
+                            'disponibleFormat' => $disponibleFormat, // este el saldo que tiene disponible ese codigo
+                        ];
+                    }else{
+
+                        // IR DESCONTANDO EN CADA ENTRADA
+
+                        CuentaUnidad::where('id', $infoCuentaUnidad->id)->update([
+                            'saldo_inicial' => $resta,
+                        ]);
+
+
+                        RequisicionUnidadDetalle::where('id', $infoRequiUniDetalle->id)->update([
+                            'dinero' => $request->unidades[$i],
+                        ]);
+
+                    }
+
+                }else{
+
+                    DB::rollback();
+
+                    // ID MATERIAL NO ENCONTRADO
+                    return ['success' => 4];
                 }
             }
 
 
 
-            // VERIFICAR QUE ALCANZE EL DINERO, CUANDO SE COTIZE
-
-            return "retorno";
+            // PASO TODAS LAS VALIDACIONES
 
 
             // crear cotizacion
             $coti = new CotizacionUnidad();
+            $coti->id_agrupado = $request->idagrupado;
             $coti->id_proveedor = $request->proveedor;
-            $coti->id_requisicion_unidad = $request->idrequisicion;
             $coti->fecha = $request->fecha;
             $coti->fecha_estado = null;
             $coti->estado = 0;
             $coti->save();
 
-            // ACTUALIZAR PRECIO DE CATALOGO DE MATERIALES
-            for ($j = 0; $j < count($request->idfila); $j++) {
 
-                if($inrequiuni = RequisicionUnidadDetalle::where('id', $request->idfila[$j])->first()) {
+            for ($i = 0; $i < count($request->idfila); $i++) {
+                $infoRequiUniDetalle = RequisicionUnidadDetalle::where('id', $request->idfila[$i])->first();
 
-                    P_Materiales::where('id', $inrequiuni->id_material)->update([
-                        'costo' => $request->unidades[$j], // obtenido del array,
-                    ]);
-                }
+                $cotiDetalle = new CotizacionUnidadDetalle();
+                $cotiDetalle->id_cotizacion_unidad = $coti->id;
+                $cotiDetalle->id_requi_unidaddetalle = $request->idfila[$i];
+                $cotiDetalle->cantidad = $infoRequiUniDetalle->cantidad;
+                $cotiDetalle->precio_u = $request->unidades[$i];
+                $cotiDetalle->descripcion = $request->descripmate[$i];
+                $cotiDetalle->save();
+
+
             }
 
-            //foreach ($arrayRequiDetalle as $datainfo){
-            for ($j = 0; $j < count($request->lista); $j++) {
-
-                $infoRequiDetl = RequisicionUnidadDetalle::where('id', $request->lista[$j])->first();
-
-                // MATERIAL A COTIZAR FUE CANCELADO
-                if($infoRequiDetl->cancelado == 1){
-                    return ['success' => 4];
-                }
-
-                if(CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $infoRequiDetl->id)->first()){
-
-                    // como ese material puede estar en multiples cotizaciones
-                    $arrayCotiDetalle = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $infoRequiDetl->id)
-                        ->select('id_cotizacion_unidad')
-                        ->get();
-
-                    // Por cada ID material de reui detalle, ya obtuve todos los ID
-                    // de cotización. Para comprobar si está denegada o aprobada
-
-                    // solo estado default
-                    $arrayCotiConteo = CotizacionUnidad::whereIn('id', $arrayCotiDetalle)
-                        ->whereIn('estado', [0]) // estado default
-                        ->count();
-
-                    // ESTE MATERIAL QUE VIENE YA ESTA EN MODO ESPERA, ES DECIR,
-                    // YA FUE COTIZADO Y ESTA ESPERANDO UNA RESPUESTA DE APROBADA O DENEGADA
-                    if($arrayCotiConteo > 0){
-                        return ['success' => 2];
-                    }
-
-                    // solo estado default
-                    $arrayCotiConteoAprobada = CotizacionUnidad::whereIn('id', $arrayCotiDetalle)
-                        ->whereIn('estado', [1]) // estado aprobadas
-                        ->get();
-
-                    foreach ($arrayCotiConteoAprobada as $dd){
-                        // Toda contenedor de la cotización
-                        // conocer si la orden no está denegada para retornar
-                        if(!OrdenUnidad::where('id_cotizacion', $dd->id)
-                            ->where('estado', 1)->first()){
-                            return ['success' => 2];
-                        }
-                    }
-                }
-
-                // **** VERIFICACIÓN DE SALDOS PORQUE LA COTIZACIÓN PUEDE CAMBIAR EL COSTO DEL MATERIAL
-                // SE RESERVO X DINERO PERO AQUÍ PUEDE VALER MAS QUE LO RESERVADO
-
-                $infoCatalogo = P_Materiales::where('id', $infoRequiDetl->id_material)->first();
-
-                $infoObjeto = ObjEspecifico::where('id', $infoCatalogo->id_objespecifico)->first();
-                $infoUnidad = P_UnidadMedida::where('id', $infoCatalogo->id_unidadmedida)->first();
-
-                $txtObjeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
-
-                // como siempre busco material que estaban en el presupuesto, siempre encontrara
-                // cuenta unidad y el ID de objeto específico
-                $infoCuentaUnidad = CuentaUnidad::where('id_presup_unidad', $infoRequisicion->id_presup_unidad)
-                    ->where('id_objespeci', $infoCatalogo->id_objespecifico)
-                    ->first();
-
-
-                // CÁLCULOS
-
-                $totalRestante = 0;
-                $totalRetenido = 0;
-
-                // movimiento de cuentas (sube y baja)
-                $infoMoviCuentaProySube = MoviCuentaUnidad::where('id_cuentaunidad_sube', $infoCuentaUnidad->id)
-                    ->where('autorizado', 1) // autorizado por presupuesto
-                    ->sum('dinero');
-
-                $infoMoviCuentaProyBaja = MoviCuentaUnidad::where('id_cuentaunidad_baja', $infoCuentaUnidad->id)
-                    ->where('autorizado', 1) // autorizado por presupuesto
-                    ->sum('dinero');
-
-                $totalMoviCuenta = $infoMoviCuentaProySube - $infoMoviCuentaProyBaja;
-
-                // obtener lo guardado de ordenes de compra, para obtener su restante
-                $arrayRestante = DB::table('cuentaunidad_restante AS pd')
-                    ->join('requisicion_unidad_detalle AS rd', 'pd.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero')
-                    ->where('pd.id_cuenta_unidad', $infoCuentaUnidad->id)
-                    ->where('rd.cancelado', 0)
-                    ->get();
-
-                foreach ($arrayRestante as $dd){
-                    $totalRestante = $totalRestante + ($dd->cantidad * $dd->dinero);
-                }
-
-                // información de saldos retenidos
-                $infoSaldoRetenido = DB::table('cuentaunidad_retenido AS psr')
-                    ->join('requisicion_unidad_detalle AS rd', 'psr.id_requi_detalle', '=', 'rd.id')
-                    ->select('rd.cantidad', 'rd.dinero', 'rd.cancelado')
-                    ->where('psr.id_cuenta_unidad', $infoCuentaUnidad->id)
-                    ->where('rd.cancelado', 0)
-                    ->get();
-
-                foreach ($infoSaldoRetenido as $dd){
-                    $totalRetenido = $totalRetenido + ($dd->cantidad * $dd->dinero);
-                }
-
-
-                // aquí se obtiene el Saldo Restante del código
-                $totalRestanteSaldo = $totalMoviCuenta + ($infoCuentaUnidad->saldo_inicial - $totalRestante);
-
-                // verificar cantidad * dinero del material nuevo
-                $saldoMaterial = $infoRequiDetl->cantidad * $infoCatalogo->costo;
-
-                // ************* NO SE RESTA EL SALDO RETENIDO. SOLO SE VERIFICA QUE HAYA SALDO RESTANTE.
-
-
-
-                // verificar si alcanza el saldo para guardar la cotización
-                if($this->redondear_dos_decimal($totalRestanteSaldo) < $this->redondear_dos_decimal($saldoMaterial)){
-                    // retornar que no alcanza el saldo
-
-                    // SALDO RESTANTE Y SALDO RETENIDO FORMATEADOS
-                    $saldoRestanteFormat = number_format((float)$totalRestanteSaldo, 2, '.', ',');
-                    $saldoRetenidoFormat = number_format((float)$totalRetenido, 2, '.', ',');
-
-                    $saldoMaterial = number_format((float)$saldoMaterial, 2, '.', ',');
-
-                    // disponible - retenido
-                    // PASAR A NUMERO POSITIVO
-                    $totalActualFormat = abs($totalRestanteSaldo - $totalRetenido);
-                    $totalActualFormat = number_format((float)$totalActualFormat, 2, '.', ',');
-
-                    return ['success' => 3, 'fila' => $i,
-                        'obj' => $txtObjeto,
-                        'disponibleFormat' => $saldoRestanteFormat, // esto va formateado
-                        'retenidoFormat' => $saldoRetenidoFormat, // esto va formateado
-                        'material' => $infoCatalogo,
-                        'unidad' => $infoUnidad->medida,
-                        'costo' => $saldoMaterial,
-                        'totalactual' => $totalActualFormat
-                    ];
-                }else {
-
-                    $detalle = new CotizacionUnidadDetalle();
-                    $detalle->id_cotizacion_unidad = $coti->id;
-                    $detalle->id_requi_unidaddetalle = $infoRequiDetl->id;
-                    $detalle->cantidad = $infoRequiDetl->cantidad;
-                    $detalle->precio_u = $infoCatalogo->costo;
-                    $detalle->estado = 0;
-                    $detalle->descripcion = $request->descripmate[$j];
-                    $detalle->save();
-
-                    // cambiar estado de requisiciones detalle porque ya fueron cotizadas
-                    RequisicionUnidadDetalle::where('id', $infoRequiDetl->id)->update([
-                        'estado' => 1,
-                    ]);
-                }
-            } // end for
 
             DB::commit();
-            return ['success' => 5];
+            return ['success' => 10];
         }catch(\Throwable $e){
-            Log::info('ee' . $e);
+            Log::info('error' . $e);
             DB::rollback();
             return ['success' => 99];
         }

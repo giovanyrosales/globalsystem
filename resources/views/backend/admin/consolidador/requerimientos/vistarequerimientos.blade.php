@@ -113,7 +113,7 @@
 
                                         <div class="col-md-6">
 
-                                            <label>Nombre o Destino:</label>
+                                            <label>Nombre o Destino (Opcional):</label>
                                             <input type="text" maxlength="800" id="nombreodestino-agrupados" placeholder="Nombre o Destino del Proyecto" class="form-control">
                                         </div>
 
@@ -368,13 +368,13 @@
         function guardarRegistro(){
 
             var fecha = document.getElementById('fecha-agrupados').value;
-            var nombreodestino = document.getElementById('nombreodestino-agrupados').value;
-            var justificacion = document.getElementById('justificacion-agrupados').value;
-            var entrega = document.getElementById('entrega-agrupados').value;
-            var plazo = document.getElementById('plazo-agrupados').value;
-            var lugar = document.getElementById('lugar-agrupados').value;
-            var forma = document.getElementById('forma-agrupados').value;
-            var otros = document.getElementById('otros-agrupados').value;
+            var nombreodestino = document.getElementById('nombreodestino-agrupados').value; // NULL
+            var justificacion = document.getElementById('justificacion-agrupados').value; // NULL
+            var entrega = document.getElementById('entrega-agrupados').value; // NULL
+            var plazo = document.getElementById('plazo-agrupados').value; // NULL
+            var lugar = document.getElementById('lugar-agrupados').value; // NULL
+            var forma = document.getElementById('forma-agrupados').value; // NULL
+            var otros = document.getElementById('otros-agrupados').value; // NULL
 
             var administrador = document.getElementById('select-administrador').value;
             var evaluador = document.getElementById('select-evaluador').value;
@@ -384,12 +384,6 @@
                 toastr.error('Fecha es requerida');
                 return;
             }
-
-            if(justificacion.length > 800){
-                toastr.error('Justificación máximo 800 caracteres');
-                return;
-            }
-
 
             if(administrador === ''){
                 toastr.error('Administrador es requerido');
