@@ -8,11 +8,11 @@
                             <thead>
                             <tr>
                                 <th>Fecha Agrupado</th>
-                                <th>Descripción</th>
+                                <th>Destino</th>
+                                <th>Justificación</th>
                                 <th>Administrador</th>
                                 <th>Evaluador</th>
-                                <th>Estado</th>
-                                <th>Nota Cancelado</th>
+
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -21,17 +21,10 @@
                             @foreach($listado as $dato)
                                 <tr>
                                     <td>{{ $dato->fecha }}</td>
-                                    <td>{{ $dato->descripcion }}</td>
+                                    <td>{{ $dato->nombreodestino }}</td>
+                                    <td>{{ $dato->justificacion }}</td>
                                     <td>{{ $dato->nomadmin }}</td>
                                     <td>{{ $dato->nomevaluador }}</td>
-
-                                    @if($dato->estado == 1)
-                                        <td><span class="badge bg-danger">CANCELADO</span></td>
-                                    @else
-                                        <td>{{ $dato->textoestado }}</td>
-                                    @endif
-
-                                    <td>{{ $dato->nota_cancelado }}</td>
 
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacionPdf({{ $dato->id }})">

@@ -24,6 +24,8 @@ class ReportesUnidadController extends Controller
     // generar pdf con el catalogo de materiales de cada unidad. Esto cada unidad puede sacarlo
     public function pdfCatalogoMaterialesUnidad($idpresup){
 
+
+
         $infoPresuUni = P_PresupUnidad::where('id', $idpresup)->first();
         $infoAnio = P_AnioPresupuesto::where('id', $infoPresuUni->id_anio)->first();
         $infoDepa = P_Departamento::where('id', $infoPresuUni->id_departamento)->first();

@@ -168,7 +168,7 @@ class ConsolidadorController extends Controller
 
             foreach ($arrayRequiDetalle as $info){
 
-                if($info->agrupado == 0 || $info->cancelado == 0){
+                if($info->agrupado == 0 && $info->cancelado == 0){
 
                     // METER A LA LISTA, TODOS LOS ID DE REQUISICION UNIDAD DETALLE
                     array_push($pilaIdPendiente, $info->id);
@@ -329,20 +329,12 @@ class ConsolidadorController extends Controller
             // PARA MOSTRAR BOTON DE BORRAR SINO HAY NINGUNA COTIZACION
 
             $btnBorrar = 1;
-            $textoestado = "";
+
 
             if (CotizacionUnidad::where('id_agrupado', $info->id)->first()) {
                 $btnBorrar = 0;
-
-                // MOSTRAR ESTADOS, SOLO 2.
-                // - CANCELADO
-                // - COTIZACIONES INICIADAS
-                $textoestado = "Cotización Iniciadas";
             }
-
-
             $info->btnborrar = $btnBorrar;
-            $info->textoestado = $textoestado;
         }
 
 
@@ -385,9 +377,11 @@ class ConsolidadorController extends Controller
         }
         $datosadmin = Administradores::where('id',$infoRequiAgrupado->id_contrato)->first();
         $datoseva = Administradores::where('id',$infoRequiAgrupado->id_evaluador)->first();
+
         $nombreadmin = $datosadmin->nombre;
-        $nombreeva = $datoseva->nombre;
         $cargoadmin = $datosadmin->cargo;
+
+        $nombreeva = $datoseva->nombre;
         $cargoeva = $datoseva->cargo;
         $fecha = date("d-m-Y", strtotime($infoRequiAgrupado->fecha));
 

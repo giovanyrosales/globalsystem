@@ -135,9 +135,9 @@ class OrdenCompraUnidadController extends Controller
             $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
 
             if(strlen($infoMaterial->descripcion) >= 25){
-                $subcadena = substr($infoRequiDetalle->material_descripcion, 0, 25);
+                $subcadena = substr($dd->descripcion, 0, 25);
             }else{
-                $subcadena = $infoRequiDetalle->material_descripcion;
+                $subcadena = $dd->descripcion;
             }
 
             $multi = $dd->cantidad * $dd->precio_u;
