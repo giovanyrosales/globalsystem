@@ -8,8 +8,8 @@
                             <thead>
                             <tr>
                                 <th style="width: 12%">Fecha Agrupado</th>
-                                <th style="width: 15%">xx</th>
-                                <th style="width: 15%">xx</th>
+                                <th style="width: 15%">Nombre o Destino</th>
+                                <th style="width: 15%">Justificación</th>
                                 <th style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
@@ -19,8 +19,8 @@
 
                                 <tr>
                                     <td style="width: 4%">{{ $dato->fecha }}</td>
-                                    <td style="width: 10%">xx</td>
-                                    <td style="width: 10%">xx</td>
+                                    <td style="width: 10%">{{ $dato->nombreodestino }}</td>
+                                    <td style="width: 10%">{{ $dato->justificacion }}</td>
 
                                     <td>
 
@@ -31,7 +31,6 @@
                                         <button type="button" class="btn btn-danger btn-xs" onclick="informacionCancelar({{ $dato->id }})">
                                             <i class="fas fa-stop-circle-o" title="Denegar"></i>&nbsp; Denegar
                                         </button>
-
 
                                     </td>
 

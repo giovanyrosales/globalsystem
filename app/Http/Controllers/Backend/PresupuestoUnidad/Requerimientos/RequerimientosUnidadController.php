@@ -588,7 +588,6 @@ class RequerimientosUnidadController extends Controller
         }
 
 
-
         // VERIFICAR SI SE PUEDE DENEGAR, SI 1 MATERIAL DEL AGRUPADO ESTA COTIZADO,
         // YA NO SE PODRA CANCELAR
 
@@ -606,9 +605,12 @@ class RequerimientosUnidadController extends Controller
 
         foreach ($arrayAgrupadoDetalle as $dato){
 
-            if(CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $dato->id)->first()){
 
-                // UN MATERIAL YA ESTA COTIZADO DE ESTE AGRUPADO, YA NO SE PUEDE DENEGAR
+            // TAN SOLO QUE HAYA UNA COTIZACION YA NO SE PUEDE DENEGAR, YA QUE PARA CANCELAR
+            // SE DEBE DENEGAR TODOS EL AGRUPADO
+            if(CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $dato->id_requi_unidad_detalle)->first()){
+
+                // UN MATERIAL YA ESTA COTIZADO (APROBADO O NO) DE ESTE AGRUPADO, YA NO SE PUEDE DENEGAR
                 return ['success' => 2];
             }
         }

@@ -42,6 +42,7 @@
 
                                         <button type="button" style="margin-left: 15px;font-weight: bold; background-color: #28a745; color: white !important;"
                                                 onclick="verificar()" class="button button-3d button-rounded button-pill button-small">Buscar</button>
+
                                     </div>
 
                                 </div>

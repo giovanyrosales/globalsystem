@@ -908,7 +908,6 @@ Route::post('/admin/p/requisicion/unidad/material/cancelar', [RequerimientosUnid
 Route::get('/admin/p/requerimientos/fecha/agrupados', [CotizacionesUnidadController::class,'indexListaAgrupadoAnios'])->name('admin.fecha.de.agrupapos.ucp');
 
 
-
 // retorna vista de requerimientos pendientes unidad
 Route::get('/admin/p/requerimientos/pendiente/unidad/index/{idanio}', [CotizacionesUnidadController::class,'indexListarRequerimientosPendienteUnidad']);
 // retorna tabla de requerimientos pendientes para unidad
@@ -921,7 +920,7 @@ Route::post('/admin/p/denegar/completa/requisicion/agrupada', [RequerimientosUni
 // CREAR LA COTIZACION
 // información de requisición para hacer la cotizacion
 Route::post('/admin/p/requerimientos/listado/cotizar/info', [CotizacionesUnidadController::class, 'informacionRequerimientoCotizarInfo']);
-// se envía los ID requi_detalle de proyectos para verificar y retornar información de lo que se cotizara
+// se envía los ID requi_detalle para verificar y retornar información de lo que se cotizara
 Route::post('/admin/p/requerimientos/unidad/verificar', [CotizacionesUnidadController::class, 'verificarRequerimientoUnidadAcotizar']);
 // guardar cotización para requerimiento de unidad
 Route::post('/admin/p/requerimientos/cotizacion/unidad/guardar', [CotizacionesUnidadController::class, 'guardarNuevaCotizacionRequeriUnidad']);
@@ -1098,12 +1097,16 @@ Route::get('/admin/p/reportes/unidad/uaci/index', [ConfiguracionPresupuestoUnida
 Route::get('/admin/p/generador/pdf/plan/{anio}', [ReportesPresupuestoUnidadController::class,'generarPlanPdfUaci']);
 
 
-// seleccionar año para buscar requerimientos detalles
+
+// UCP
+
+// SELECCIONAR AÑO PARA VER AGRUPADOS DENEGADOS
 Route::get('/admin/p/buscarfecha/requerimientos/denegados/unidadindex', [CotizacionesUnidadController::class,'indexFechaRequerimientosDenegadosUnidades'])->name('admin.listar.requerimientos.denegados.index');
-// detalle de requisiciones denegadas
+// VISTA DE AGRUPADOS DENEGADOS
 Route::get('/admin/p/requerimiento/denegados/listado/{idanio}', [CotizacionesUnidadController::class,'indexRequerimientosDenegadosUnidades']);
-// tabla de requisiciones denegadas
+// TABLA DE AGRUPADOS DENEGADOS
 Route::get('/admin/p/requerimiento/denegados/listado/denegados/{idanio}', [CotizacionesUnidadController::class,'tablaRequerimientosDenegadosUnidades']);
+
 // este seria la vista para ver los materiales detallados
 Route::get('/admin/p/reque/dene/listado/materiales/{idrequi}', [CotizacionesUnidadController::class,'indexRequeDeneUnidadesMateriales']);
 // este seria la tabla para ver los materiales detallados

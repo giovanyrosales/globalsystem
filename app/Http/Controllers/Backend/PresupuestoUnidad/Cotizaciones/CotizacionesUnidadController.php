@@ -60,16 +60,25 @@ class CotizacionesUnidadController extends Controller{
 
 
         // DEL AÑO ELEGIDO
-        // NO CANCELADOS
 
-        $listado = RequisicionAgrupada::where('estado', 0)
-            ->where('id_anio', $idanio)
-            ->orderBy('fecha', 'ASC')
-            ->get();
+        // OBTENER LISTADO DE REQUISICION AGRUPADA DETALLE DONDE COTIZADO SEA 0
 
-        foreach ($listado as $info){
-            $info->fecha = date("d-m-Y", strtotime($info->fecha));
+        $arrayAgruDetalle = RequisicionAgrupadaDetalle::where('cotizado', 0)->get();
+
+        $pilaPadre = array();
+
+        foreach ($arrayAgruDetalle as $dato){
+
+            $infoPadre = RequisicionAgrupada::where('id', $dato->id_requi_agrupada)->first();
+
+            // NO ESTA DENEGADA POR UCP
+            if($infoPadre->estado == 0){
+                // SE DEBE INGRESAR EL PADRE
+                array_push($pilaPadre, $dato->id_requi_agrupada);
+            }
         }
+
+        $listado = RequisicionAgrupada::where('id', $pilaPadre)->get();
 
 
         return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.tablarequerimientosunidadrevision', compact('listado'));
@@ -262,6 +271,9 @@ class CotizacionesUnidadController extends Controller{
                             'dinero' => $request->unidades[$i],
                         ]);
 
+                        RequisicionAgrupadaDetalle::where('id_requi_unidad_detalle', $infoRequiUniDetalle->id)->update([
+                            'cotizado' => 1,
+                        ]);
                     }
 
                 }else{
@@ -298,8 +310,6 @@ class CotizacionesUnidadController extends Controller{
                 $cotiDetalle->precio_u = $request->unidades[$i];
                 $cotiDetalle->descripcion = $request->descripmate[$i];
                 $cotiDetalle->save();
-
-
             }
 
 
@@ -914,6 +924,9 @@ class CotizacionesUnidadController extends Controller{
     }
 
     public function tablaRequerimientosDenegadosUnidades($idanio){
+
+
+        return "fff";
 
         $registro = DB::table('p_presup_unidad AS p')
             ->join('requisicion_unidad AS req', 'req.id_presup_unidad', '=', 'p.id')

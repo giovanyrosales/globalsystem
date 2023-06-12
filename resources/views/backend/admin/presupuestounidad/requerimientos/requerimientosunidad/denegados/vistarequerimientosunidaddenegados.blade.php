@@ -6,6 +6,7 @@
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
+    <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
 @stop
 
 
@@ -23,35 +24,28 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="callout callout-info">
-                        <h5><i class="fas fa-info"></i> Requerimientos Denegados por Año</h5>
+                        <h5><i class="fas fa-info"></i> Requerimientos Denegados</h5>
                         <div class="card">
                             <form class="form-horizontal">
                                 <div class="card-body">
-
                                     <div class="form-group row">
-                                        <div class="col-sm-9">
-                                            <div class="info-box shadow">
-                                                <div class="info-box-content">
 
-
-                                                    <label>Fecha</label>
-                                                    <select class="form-control" id="select-anio-unidad"  style="width: 35%">
-                                                        @foreach($anios as $item)
-                                                            <option value="{{$item->id}}">{{$item->nombre}}</option>
-                                                        @endforeach
-                                                    </select>
-
-                                                    <button type="button" style="font-weight: bold; font-size: 14px; color: white !important; margin-top: 35px; width: 15%; padding: 10px" class="btn btn-success btn-xs" onclick="informacionBuscar()">
-                                                        <i class="fas fa-search" title="Buscar"></i>&nbsp; Buscar
-                                                    </button>
-
-                                                </div>
-                                            </div>
+                                        <label style="margin: 8px; margin-left: 20px">Año</label>
+                                        <div style="margin-left: 6px" class="col-sm-2">
+                                            <select class="form-control" id="select-anio">
+                                                @foreach($anios as $item)
+                                                    <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
+
+                                        <button type="button" style="margin-left: 15px;font-weight: bold; background-color: #28a745; color: white !important;"
+                                                onclick="informacion()" class="button button-3d button-rounded button-pill button-small">Buscar</button>
+
                                     </div>
 
-
                                 </div>
+
                             </form>
                         </div>
                     </div>
@@ -94,9 +88,9 @@
 
     <script>
 
-        function informacionBuscar(){
+        function informacion(){
 
-            var idanio = document.getElementById('select-anio-unidad').value;
+            var idanio = document.getElementById('select-anio').value;
 
             if(idanio === ''){
                 toastr.error('Año es requerido');

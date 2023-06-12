@@ -284,7 +284,6 @@
 
 
 
-
         function informacionCotizar(id){
             // id agrupado
 
@@ -957,11 +956,11 @@
                 .then((response) => {
                     closeLoading();
 
-                    console.log(response);
 
                     if(response.data.success === 1){
 
                         // YA ESTABA DENEGADA EL AGRUPADO
+                        $('#modalCancelamiento').modal('hide');
 
                         Swal.fire({
                             title: "Error",
@@ -982,6 +981,7 @@
                     else if(response.data.success === 2) {
 
                         // UN MATERIAL YA ESTA COTIZADO, NO SE PUEDE DENEGAR YA
+                        $('#modalCancelamiento').modal('hide');
 
                         Swal.fire({
                             title: "Error",
