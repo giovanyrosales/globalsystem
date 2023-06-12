@@ -24,6 +24,8 @@ class CreateRequisicionAgrupadaTable extends Migration
 
             // PARA EL EVALUADOR TECNICO
             $table->bigInteger('id_evaluador')->unsigned();
+            // PARA El usuario que creo el requerimiento agrupado
+            $table->bigInteger('id_usuario')->unsigned();
 
 
             $table->date('fecha');
@@ -48,6 +50,7 @@ class CreateRequisicionAgrupadaTable extends Migration
             $table->foreign('id_contrato')->references('id')->on('administradores');
             $table->foreign('id_evaluador')->references('id')->on('administradores');
             $table->foreign('id_anio')->references('id')->on('p_anio_presupuesto');
+            $table->foreign('id_usuario')->references('id')->on('usuario');
         });
     }
 

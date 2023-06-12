@@ -233,6 +233,7 @@ class ConsolidadorController extends Controller
             'administrador' => 'required',
             'evaluador' => 'required'
         );
+        $id = $request->user()->id;
 
         $validar = Validator::make($request->all(), $regla);
 
@@ -251,6 +252,7 @@ class ConsolidadorController extends Controller
             $dato->fecha = $request->fecha;
             $dato->id_contrato = $request->administrador;
             $dato->id_evaluador = $request->evaluador;
+            $dato->id_usuario = $id;
             $dato->nombreodestino = $request->nombreodestino;
             $dato->justificacion = $request->justificacion;
             $dato->entrega = $request->entrega;

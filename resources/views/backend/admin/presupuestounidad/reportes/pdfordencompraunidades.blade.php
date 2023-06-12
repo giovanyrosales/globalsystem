@@ -61,8 +61,8 @@
             <tr>
                 <td width="50%" style="text-align:left; ">
                   {{ $proveedor->nombre }}<br>
-                  Dirección:<br>
-                  Correo:<br>
+                  Dirección: $proveedor->direccion<br>
+                  Correo: $proveedor->correo<br>
                   Tel.: {{ $proveedor->telefono }}<br>
                   NIT/DUI: {{ $proveedor->nit }}<br>
                   NRC: {{ $proveedor->nrc }}
@@ -87,7 +87,7 @@
                   Nombre: {{ $nombreSolicitante }}
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
-                  Nombre Unidad
+                  Nombre Unidad:
                 </td>
             </tr>
             <tr>
@@ -95,7 +95,7 @@
                   Cargo:
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
-                  Cod. Proyecto
+                  Cod. Proyecto:
                 </td>
             </tr>
         </table>
@@ -127,10 +127,10 @@
             </tr>
             <tr>
                 <td width="50%" style="text-align:left; ">
-                  Dirección entrega
+                  Dirección entrega:
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
-                  Forma de pago
+                  Forma de pago:
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
                   DOLARES 00/100
@@ -139,9 +139,9 @@
         </table>
         <table  class="table-head"  border="1" style="border-collapse: collapse;"> >
             <tr>
-                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Plazo de entrega</label></center></td>
-                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Garantía a Presentar</label></center></td>
-                <td bgcolor="#66ff99"><center><label style=" font-size: 15px; ">Administrador ODC</label></center></td>
+                <td style="text-align: center; background-color: #66ff99;"><label style=" font-size: 15px; ">Plazo de entrega</label></td>
+                <td style="text-align: center; background-color: #66ff99;"><label style=" font-size: 15px; ">Garantía a Presentar</label></td>
+                <td style="text-align: center; background-color: #66ff99;"><label style=" font-size: 15px; ">Administrador ODC</label></td>
             </tr>
             <tr>
                 <td width="50%" style="text-align:left; ">
