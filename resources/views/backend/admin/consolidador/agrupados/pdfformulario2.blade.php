@@ -12,10 +12,10 @@
         width: 100%;
     }
     .table-head td{
-        font-family:Arial, sans-serif; font-size:14px;
+        font-family:Arial, sans-serif; font-size:12px;
     }
     .table-body td{
-        font-family:Arial, sans-serif; font-size:14px;
+        font-family:Arial, sans-serif; font-size:12px;
     }
 
     .page_break {
@@ -26,7 +26,7 @@
 <table  class="table-head"  border="0" style="margin-top: 35px;">
     <tr>
         <td style="width: 40%; text-align: center;">
-            <img style="margin-top: -20px; "src="{{ asset('/images/logo.png') }}" width="90px" height="90px">
+            <img style="margin-top: -20px; "src="{{ asset('/images/logo.png') }}" width="85px" height="85px">
         </td>
         <td style="width: 60%; text-align: left;">
             <label style=" font-size: 15px; ">ALCALDÍA MUNICIPAL DE METAPÁN </label><br>
@@ -141,20 +141,20 @@
 </table><br>
 
 
-<div style="bottom: 60px;  position: absolute; width: 100%" >
+<div style="bottom: 10px;  position: absolute; width: 100%" >
 
     <table  class="table-head"  border="0" >
         <tr>
-            <td width="50%" style="text-align:left; ">
-                UNIDAD CONSOLIDADORA<br><br>
+            <td width="50%" style="text-align:center; ">
+                UNIDAD CONSOLIDADORA<br>
             </td>
-            <td width="50%" style="text-align:left; padding-left: 10px; ">
-                AUTORIZA<br><br>
+            <td width="50%" style="text-align:center; padding-left: 10px; ">
+                AUTORIZA<br>
             </td>
         </tr>
         <tr>
-            <td style="text-align:left;"><label style=" font-size: 15px; ">F._________________</label></td>
-            <td style="text-align:left;"><label style=" font-size: 15px; ">F._________________</label></td>
+            <td style="text-align:left;"><label style=" font-size: 14px; padding-top: 15px;">F._________________</label></td>
+            <td style="text-align:left;"><label style=" font-size: 14px; padding-top: 15px;">F._________________</label></td>
 
         </tr>
         <tr>
@@ -176,16 +176,16 @@
     </table><br>
     <table  class="table-head"  border="0" >
         <tr>
-            <td width="50%" style="text-align:left; ">
-                REVISADOR POR:<br><br>
+            <td width="50%" style="text-align:center; ">
+                REVISADOR POR:<br>
             </td>
-            <td width="50%" style="text-align:left; padding-left: 10px; ">
-                RECIBE UCP<br><br>
+            <td width="50%" style="text-align:center; padding-left: 10px; ">
+                RECIBE UCP<br>
             </td>
         </tr>
         <tr>
-            <td style="text-align:left;"><label style=" font-size: 15px; ">F._________________</label></td>
-            <td style="text-align:left;"><label style=" font-size: 15px; ">F._________________</label></td>
+            <td style="text-align:left;"><label style=" font-size: 14px; padding-top: 15px;">F._________________</label></td>
+            <td style="text-align:left;"><label style=" font-size: 14px; padding-top: 15px;">F._________________</label></td>
 
         </tr>
         <tr>
