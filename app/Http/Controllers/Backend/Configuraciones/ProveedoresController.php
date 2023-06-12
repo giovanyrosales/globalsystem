@@ -65,6 +65,8 @@ class ProveedoresController extends Controller
         $dato->nrc = $request->nrc;
         $dato->nombre_comercial = $request->comercial;
         $dato->dui = $request->dui;
+        $dato->correo = $request->correo;
+        $dato->direccion = $request->direccion;
 
         if($dato->save()){
             return ['success' => 1];
@@ -112,6 +114,8 @@ class ProveedoresController extends Controller
                 'nrc' => $request->nrc,
                 'nombre_comercial' => $request->comercial,
                 'dui' => $request->dui,
+                'correo' => $request->correo,
+                'direccion' => $request->direccion
             ]);
 
             return ['success' => 1];

@@ -21,6 +21,8 @@ class CreateProveedoresTable extends Migration
             $table->string('nrc',50)->nullable();
             $table->string('nombre_comercial',100)->nullable();
             $table->string('dui',20)->nullable();
+            $table->string('correo',120)->nullable();
+            $table->string('direccion',350)->nullable();
         });
     }
 

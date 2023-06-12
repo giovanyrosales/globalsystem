@@ -90,13 +90,21 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Nombre Comercial</label>
+                                        <label>Nombre Comercial:</label>
                                         <input type="text" maxlength="100" class="form-control" id="comercial-nuevo" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
-                                        <label>DUI</label>
+                                        <label>DUI:</label>
                                         <input type="text" maxlength="20" class="form-control" id="dui-nuevo" autocomplete="off">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Correo:</label>
+                                        <input type="text" maxlength="20" class="form-control" id="correo-nuevo" autocomplete="off">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Dirección:</label>
+                                        <input type="text" maxlength="20" class="form-control" id="direccion-nuevo" autocomplete="off">
                                     </div>
 
                                 </div>
@@ -161,6 +169,14 @@
                                         <label>DUI</label>
                                         <input type="text" maxlength="20" class="form-control" id="dui-editar" autocomplete="off">
                                     </div>
+                                    <div class="form-group">
+                                        <label>Correo:</label>
+                                        <input type="text" maxlength="20" class="form-control" id="correo-editar" autocomplete="off">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Dirección:</label>
+                                        <input type="text" maxlength="20" class="form-control" id="direccion-editar" autocomplete="off">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -217,6 +233,8 @@
             var nrc = document.getElementById('nrc-nuevo').value;
             var comercial = document.getElementById('comercial-nuevo').value;
             var dui = document.getElementById('dui-nuevo').value;
+            var correo = document.getElementById('correo-nuevo').value;
+            var direccion = document.getElementById('direccion-nuevo').value;
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -261,6 +279,8 @@
             formData.append('nrc', nrc);
             formData.append('comercial', comercial);
             formData.append('dui', dui);
+            formData.append('correo', correo);
+            formData.append('direccion', direccion);
 
             axios.post(url+'/proveedores/nuevo', formData, {
             })
@@ -299,6 +319,8 @@
                         $('#nrc-editar').val(response.data.lista.nrc);
                         $('#comercial-editar').val(response.data.lista.nombre_comercial);
                         $('#dui-editar').val(response.data.lista.dui);
+                        $('#correo-editar').val(response.data.lista.correo);
+                        $('#direccion-editar').val(response.data.lista.direccion);
 
                     }else{
                         toastr.error('Información no encontrada');
@@ -318,6 +340,9 @@
             var nrc = document.getElementById('nrc-editar').value;
             var comercial = document.getElementById('comercial-editar').value;
             var dui = document.getElementById('dui-editar').value;
+            var correo = document.getElementById('correo-editar').value;
+            var direccion = document.getElementById('direccion-editar').value;
+
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -363,6 +388,8 @@
             formData.append('nrc', nrc);
             formData.append('comercial', comercial);
             formData.append('dui', dui);
+            formData.append('correo', correo);
+            formData.append('direccion', direccion);
 
             axios.post(url+'/proveedores/editar', formData, {
             })

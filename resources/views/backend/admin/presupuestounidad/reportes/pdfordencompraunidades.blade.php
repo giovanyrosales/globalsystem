@@ -41,7 +41,7 @@
                   Ciudad de Metapán<br>
                   Departamento de Santa Ana<br>
                   correo: ucpmetapan@gmail.com<br>
-                  Tel.: 2402-7609 
+                  Tel.: 2402-7609
                 </td>
                 <td width="20%"><center>
                 <img style="margin-top: -20px; "src="{{ asset('/images/logo.png') }}" width="70px" height="70px"></center>
@@ -63,9 +63,9 @@
                   {{ $proveedor->nombre }}<br>
                   Dirección:<br>
                   Correo:<br>
-                  Tel.:<br>
+                  Tel.: {{ $proveedor->telefono }}<br>
                   NIT/DUI: {{ $proveedor->nit }}<br>
-                  NRC:
+                  NRC: {{ $proveedor->nrc }}
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
                   Sr. Israel Peraza Guerra<br>
@@ -99,7 +99,7 @@
                 </td>
             </tr>
         </table>
-        
+
         <table  class="table-head"  border="1" style="margin-top: 15px; border-collapse: collapse;" width="100%">
             @foreach ($dataArray as $info)
                 <tr>
@@ -158,7 +158,7 @@
         <br>
 
 
-    <div style="bottom: 40px;  position: absolute; width: 100%" >  
+    <div style="bottom: 40px;  position: absolute; width: 100%" >
 
     <table  class="table-head"  border="0" >
             <tr>
@@ -189,7 +189,7 @@
                 </td>
             </tr>
         </table>
-      
+
 
         <label style=" font-size: 15px; ">{{ $destinounidad." ".$destino." ".$arraycodigos." ".$acta_acuerdo }}</label>
     </div>
