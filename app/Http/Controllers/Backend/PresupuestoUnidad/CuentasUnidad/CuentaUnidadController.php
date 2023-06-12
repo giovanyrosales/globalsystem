@@ -244,6 +244,9 @@ class CuentaUnidadController extends Controller
                     ->where('pu.id_anio',  $request->idanio)
                     ->where('pu.id_departamento', $request->iddepartamento)
                     ->first()){
+
+                    Log::info('anio ' . $request->idanio);
+                    Log::info('depa ' . $request->iddepartamento);
                     return ['success' => 3];
                 }
 

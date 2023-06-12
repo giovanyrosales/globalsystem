@@ -302,7 +302,7 @@
             openLoading();
             var formData = new FormData();
             formData.append('idanio', anio);
-            formData.append('iddepartamento', anio);
+            formData.append('iddepartamento', departamento);
 
             axios.post(url+'/p/registrar/cuentas/unidad/manual', formData, {
             })
