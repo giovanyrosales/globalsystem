@@ -77,7 +77,7 @@
                                         <div class="col-md-6">
 
                                             <label>Nombre o Destino (Opcional):</label>
-                                            <input type="text" maxlength="800" id="nombreodestino-agrupados" placeholder="Nombre o Destino del Proyecto" class="form-control">
+                                            <input type="text" maxlength="800" autocomplete="off" id="nombreodestino-agrupados" placeholder="Nombre o Destino del Proyecto" class="form-control">
                                         </div>
 
                                     </div>
@@ -87,7 +87,7 @@
 
                                             <div class="form-group">
                                                 <label>Justificación:</label>
-                                                <input type="text" maxlength="800" id="justificacion-agrupados" placeholder="Justificación " class="form-control">
+                                                <input type="text" maxlength="800" autocomplete="off" id="justificacion-agrupados" placeholder="Justificación " class="form-control">
                                             </div>
 
 
@@ -96,7 +96,7 @@
                                         <div class="col-md-6">
 
                                             <label>Forma de Entrega (Parcial o Total):</label>
-                                            <input type="text" maxlength="350" id="entrega-agrupados" placeholder="Forma de Entrega" class="form-control">
+                                            <input type="text" maxlength="350" autocomplete="off" id="entrega-agrupados" placeholder="Forma de Entrega" class="form-control">
                                         </div>
 
                                     </div>
@@ -106,7 +106,7 @@
 
                                             <div class="form-group">
                                                 <label>Plazo de Entrega:</label>
-                                                <input type="text" maxlength="350" id="plazo-agrupados" placeholder="Plazo o tiempo de entrega" class="form-control">
+                                                <input type="text" maxlength="350" autocomplete="off" id="plazo-agrupados" placeholder="Plazo o tiempo de entrega" class="form-control">
                                             </div>
 
 
@@ -115,7 +115,7 @@
                                         <div class="col-md-6">
 
                                             <label>Lugar de Entrega</label>
-                                            <input type="text" maxlength="350" id="lugar-agrupados" placeholder="Lugar de entrega" class="form-control">
+                                            <input type="text" maxlength="350" autocomplete="off" id="lugar-agrupados" placeholder="Lugar de entrega" class="form-control">
                                         </div>
 
                                     </div>
@@ -125,7 +125,7 @@
 
                                             <div class="form-group">
                                                 <label>Forma de Contratación (Contrato u Orden):</label>
-                                                <input type="text" maxlength="350" id="forma-agrupados" placeholder="Forma de Pago" class="form-control">
+                                                <input type="text" maxlength="350" autocomplete="off" id="forma-agrupados" placeholder="Forma de Pago" class="form-control">
                                             </div>
 
 
@@ -134,7 +134,7 @@
                                         <div class="col-md-6">
 
                                             <label>Otras Condiciones Especificar (Opcional):</label>
-                                            <input type="text" maxlength="350" id="otros-agrupados" placeholder="Otras Condiciones (Opcional)" class="form-control">
+                                            <input type="text" maxlength="350" autocomplete="off" id="otros-agrupados" placeholder="Otras Condiciones (Opcional)" class="form-control">
                                         </div>
 
                                     </div>

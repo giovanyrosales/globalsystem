@@ -7,33 +7,39 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Número</th>
+                                <th># Agrupado</th>
                                 <th>Fecha</th>
-                                <th>Departamento</th>
                                 <th>Destino</th>
+                                <th>Justificación</th>
                                 <th>Necesidad</th>
-                                <th>Total</th>
-                                <th>Descripción</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($registro as $dato)
+                            @foreach($arrayRequiAgrupada as $dato)
                                 <tr>
-                                    <td>{{ $dato->idrequi }}</td>
+                                    <td>{{ $dato->id }}</td>
                                     <td>{{ $dato->fecha }}</td>
-                                    <td>{{ $dato->departamento }}</td>
-                                    <td>{{ $dato->destino }}</td>
-                                    <td>{{ $dato->necesidad }}</td>
-                                    <td>{{ $dato->multiplicado }}</td>
-                                    <td>{{ $dato->texto_denegado }}</td>
+                                    <td>{{ $dato->nombreodestino }}</td>
+                                    <td>{{ $dato->justificacion }}</td>
+                                    <td>{{ $dato->nota_cancelado }}</td>
 
                                     <td>
-                                        <button type="button" style="font-weight: bold; color: white !important;" class="btn btn-info btn-xs" onclick="verMaterial({{ $dato->idrequi }})">
+                                        <button type="button" style="font-weight: bold; color: white !important;" class="btn btn-info btn-xs" onclick="verMaterial({{ $dato->id }})">
                                             <i class="fas fa-list-alt" title="Materiales"></i>&nbsp; Materiales
                                         </button>
+
+                                        @if($dato->documento != null)
+                                            <br><br>
+                                            <a href="{{ url('/admin/p/cotizacion/descargar/acta/'.$dato->id) }}">
+                                                <button class="btn btn-success btn-xs"><i class="fa fa-download"></i> Acta</button>
+                                            </a>
+
+                                        @endif
+
                                     </td>
+
                                 </tr>
                             @endforeach
 

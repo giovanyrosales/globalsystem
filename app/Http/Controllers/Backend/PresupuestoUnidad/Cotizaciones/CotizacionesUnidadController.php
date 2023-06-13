@@ -597,6 +597,20 @@ class CotizacionesUnidadController extends Controller{
         return view('backend.admin.presupuestounidad.cotizaciones.denegadas.tablacotizaciondenegadaunidad', compact('lista'));
     }
 
+
+    public function descargarActaCotizacionDenegada($idagrupado){
+
+        $url = RequisicionAgrupada::where('id', $idagrupado)->pluck('documento')->first();
+
+        $pathToFile = "storage/archivos/".$url;
+
+        $extension = pathinfo(($pathToFile), PATHINFO_EXTENSION);
+
+        $nombre = "Doc." . $extension;
+
+        return response()->download($pathToFile, $nombre);
+    }
+
     public function vistaDetalleCotizacionUnidad($id){
         // id de cotizacion
 
@@ -912,34 +926,15 @@ class CotizacionesUnidadController extends Controller{
 
     public function tablaRequerimientosDenegadosUnidades($idanio){
 
-
-        return "dwe";
-
-        $listado = DB::table('p_presup_unidad AS p')
-            ->join('requisicion_unidad AS req', 'req.id_presup_unidad', '=', 'p.id')
-            ->select('req.estado_denegado', 'req.texto_denegado', 'p.id_anio',
-                'req.destino', 'req.fecha', 'req.necesidad', 'req.id AS idrequi', 'p.id_departamento')
-            ->where('req.estado_denegado', 1) // solo denegados
-            ->where('p.id_anio', $idanio)
+        $arrayRequiAgrupada = RequisicionAgrupada::where('estado', 1)
+            ->where('id_anio', $idanio)
             ->get();
 
-        foreach ($registro as $dd){
-            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
-            // obtener total de todos los materiales de la requisición
-            $arrayDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $dd->idrequi)->get();
-
-            $infoDepartamento = P_Departamento::where('id', $dd->id_departamento)->first();
-            $dd->departamento = $infoDepartamento->nombre;
-
-            $multi = 0;
-            foreach ($arrayDetalle as $info){
-                $multi += ($info->cantidad * $info->dinero_fijo);
-            }
-
-            $dd->multiplicado = '$' . number_format((float)$multi, 2, '.', ',');
+        foreach ($arrayRequiAgrupada as $info){
+            $info->fecha = date("d-m-Y", strtotime($info->fecha));
         }
 
-        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientos.tablarequerimientosdene', compact('registro'));
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientos.tablarequerimientosdene', compact('arrayRequiAgrupada'));
     }
 
 
@@ -947,15 +942,25 @@ class CotizacionesUnidadController extends Controller{
         return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientosdetalle.vistarequerimientosdenemateriales', compact('idrequi'));
     }
 
-    public function indexRequeDeneUnidadesMaterialesDetalle($idrequi){
 
-        $registro = RequisicionUnidadDetalle::where('id', $idrequi)->get();
+    public function indexRequeDeneUnidadesMaterialesDetalle($idrequiAgrupa){
 
-        foreach ($registro as $dd){
-            $dd->dinero_fijo = '$' . number_format((float)$dd->dinero_fijo, 2, '.', ',');
+        $arrayRequiAgrupadaDeta = RequisicionAgrupadaDetalle::where('id_requi_agrupada', $idrequiAgrupa)->get();
+
+        foreach ($arrayRequiAgrupadaDeta as $info){
+
+            $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $info->id_requi_unidad_detalle)->first();
+            $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
+
+            $info->nommaterial = $infoMaterial->descripcion;
+            $info->cantidad = $infoRequiDetalle->cantidad;
+            $info->costo = '$' . number_format((float)$infoRequiDetalle->dinero_fijo, 2, '.', ',');
         }
 
-        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientosdetalle.tablarequerimientosdenemateriales', compact('registro'));
+        return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.denegados.vistarequerimientosdetalle.tablarequerimientosdenemateriales', compact('arrayRequiAgrupadaDeta'));
     }
+
+
+
 
 }

@@ -396,6 +396,38 @@
     </div>
 
 
+
+    <!-- MUESTRA EL ESTADO DEL PROCESO QUE VA EL MATERIAL -->
+
+    <div class="modal fade" id="modalEstado">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Estados de Material</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="tablaEstado">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
 </div>
 
 @extends('backend.menus.footerjs')
@@ -1137,10 +1169,6 @@
                             }
                         })
 
-
-
-
-
                     }else if(response.data.success === 2){
 
                         // ACTUALIZADO
@@ -1305,6 +1333,45 @@
             // ID DE requisicion_unidad
 
             window.open("{{ URL::to('admin/p/generador/pdf/requisicion') }}/" + id);
+        }
+
+
+        // MUESTRA EL ESTADO DEL PROCESO DEL MATERIAL
+        // PENDIENTE
+        // AGRUPADO
+        // COTIZADO (SI FUE DENEGADA PASA AL AGRUPADO)
+        // ORDEN GENERADA (SI FUE DENEGADA PASA A CANCELADO)
+        // CANCELADO
+
+
+        function vistaModalEstadoMaterial(id){
+            var ruta = "{{ URL::to('/admin/p/modal/material/estados') }}/" + id;
+            $('#tablaEstado').load(ruta);
+            $('#modalEstado').modal('show');
+        }
+
+
+        function infoEstados(){
+            Swal.fire({
+                title: 'Tipo de Estados',
+                html: "Pendiente" + "<br>"
+                    + "Agrupado por Consolidador" + "<br>"
+                    + "Cotizado por UCP" + "<br>"
+                    + "Orden de Compra Generada" + "<br>"
+                    + "Requisición Denegada por UCP" + "<br>"
+                ,
+                icon: 'info',
+                showCancelButton: false,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                }
+            })
+
         }
 
 

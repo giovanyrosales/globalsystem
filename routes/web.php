@@ -834,6 +834,12 @@ Route::get('/admin/p/requerimientos/tabla/{idanio}', [RequerimientosUnidadContro
 // visualizar MODAL DE SALDOS para unidades. se recibe id p_presup_unidad
 Route::get('/admin/p/modal/saldo/unidad/{idpresup}', [RequerimientosUnidadController::class,'infoModalSaldoUnidad']);
 
+// VER ESTADOS DE LOS MATERIALES, TODOS SU PROCESO COMO VA
+Route::get('/admin/p/modal/material/estados/{idrequisicion}', [RequerimientosUnidadController::class,'infoModalEstadoMaterial']);
+
+
+
+
 // * MOVIMIENTOS DE CUENTA PARA UNIDAD
 
 // retorna vista para movimientos de cuenta para unidad
@@ -965,6 +971,11 @@ Route::get('/admin/p/cotizacion/unidad/denegadas/anio', [CotizacionesUnidadContr
 Route::get('/admin/p/cotizacion/unidad/denegadas/index/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesDenegadas']);
 // retorna tabla de cotizaciones unidad denegadas
 Route::get('/admin/p/cotizacion/unidad/denegadas/tabla/{idanio}', [CotizacionesUnidadController::class,'tablaCotizacionesUnidadesDenegadas']);
+
+// retorna ACTA que se subio al denegar una cotizacion
+Route::get('/admin/p/cotizacion/descargar/acta/{id}' , [CotizacionesUnidadController::class, 'descargarActaCotizacionDenegada']);
+
+
 
 
 // ORDENES DE COMPRA PARA UNIDADES

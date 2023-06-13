@@ -23,7 +23,7 @@
         <div class="container-fluid">
             <div class="row mb-12">
                 <div class="col-sm-12">
-                    <h1>REQUERIMIENTOS DENEGADOS - MATERIALES</h1>
+                    <h1>Requerimientos Denegados - Materiales</h1>
 
                 </div>
             </div>
@@ -74,11 +74,6 @@
         });
     </script>
 
-    <script>
 
-
-
-
-    </script>
 
 @endsection

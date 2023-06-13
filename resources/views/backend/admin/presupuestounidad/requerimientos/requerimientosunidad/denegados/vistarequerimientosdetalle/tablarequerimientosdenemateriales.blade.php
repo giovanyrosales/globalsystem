@@ -14,11 +14,11 @@
                             </thead>
                             <tbody>
 
-                            @foreach($registro as $dato)
+                            @foreach($arrayRequiAgrupadaDeta as $dato)
                                 <tr>
-                                    <td>{{ $dato->material_descripcion }}</td>
+                                    <td>{{ $dato->nommaterial }}</td>
                                     <td>{{ $dato->cantidad }}</td>
-                                    <td>{{ $dato->dinero_fijo }}</td>
+                                    <td>{{ $dato->costo }}</td>
 
                                 </tr>
                             @endforeach

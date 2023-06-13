@@ -161,6 +161,36 @@ class RequerimientosUnidadController extends Controller
         return view('backend.admin.presupuestounidad.requerimientos.modal.vistamodalsaldounidad', compact('presupuesto'));
     }
 
+
+    // VER ESTADO DE LOS MATERIALES DE UNA REQUISICION
+    public function infoModalEstadoMaterial($idrequi){
+
+        // presupuesto
+        $arrayRequiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $idrequi)->get();
+
+        foreach ($arrayRequiDetalle as $info){
+
+            $infoMaterial = P_Materiales::where('id', $info->id_material)->first();
+            $info->nommaterial = $infoMaterial->descripcion;
+
+            $estado = "Pendiente";
+
+            // FALTA AGREGAR MAS ESTADOS.   13/06/2023
+
+
+
+            $info->estado = $estado;
+        }
+
+        return view('backend.admin.presupuestounidad.requerimientos.modal.vistamodalmaterialesestado', compact('arrayRequiDetalle'));
+    }
+
+
+
+
+
+
+
     function redondear_dos_decimal($valor){
         $float_redondeado = round($valor * 100) / 100;
         return $float_redondeado;

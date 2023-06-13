@@ -28,9 +28,14 @@
                                             </button>
                                         @endcan
 
-
+                                        <br><br>
                                         <button type="button" class="btn btn-success btn-xs" onclick="vistaPDFRequerimiento({{ $dato->id }})">
                                             <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
+                                        </button>
+
+                                        <br><br>
+                                        <button type="button" class="btn btn-primary btn-xs" onclick="vistaModalEstadoMaterial({{ $dato->id }})">
+                                            <i class="fas fa-info" title="Estado"></i>&nbsp; Estado
                                         </button>
 
                                     </td>

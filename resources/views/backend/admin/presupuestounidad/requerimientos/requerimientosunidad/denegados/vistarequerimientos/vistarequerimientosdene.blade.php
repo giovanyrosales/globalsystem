@@ -23,7 +23,7 @@
         <div class="container-fluid">
             <div class="row mb-6">
                 <div class="col-sm-5">
-                    <h1>REQUERIMIENTOS DENEGADOS</h1>
+                    <h1>Requerimientos Agrupados Denegados</h1>
 
                 </div>
             </div>
@@ -77,8 +77,13 @@
     <script>
 
         function verMaterial(id){
+            // id requisicion agrupada
             window.location.href="{{ url('/admin/p/reque/dene/listado/materiales') }}/" + id;
         }
+
+
+
+
 
     </script>
 
