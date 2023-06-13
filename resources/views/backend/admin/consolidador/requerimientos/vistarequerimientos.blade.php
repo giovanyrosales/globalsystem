@@ -176,7 +176,6 @@
 
                                     </div>
 
-
                                     <div class="row">
 
                                         <div class="form-group col-md-6">
@@ -189,16 +188,30 @@
                                             </select>
 
                                         </div>
+                                    </div>
+
+                                    <div class="row">
 
                                         <div class="form-group col-md-6">
 
-                                            <label>Evaluador Técnico</label>
+                                            <label>Evaluador Técnico 1</label>
                                             <select class="custom-select" id="select-evaluador">
                                                 @foreach($adminContrato as $dd)
                                                     <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label>Evaluador Técnico 2</label>
+                                            <select class="custom-select" id="select-evaluador2">
+                                                <option value="">Seleccionar Opción</option>
+                                                @foreach($adminContrato as $dd)
+                                                    <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
                                     </div>
 
 
@@ -378,7 +391,7 @@
 
             var administrador = document.getElementById('select-administrador').value;
             var evaluador = document.getElementById('select-evaluador').value;
-
+            var evaluador2 = document.getElementById('select-evaluador2').value;
 
             if(fecha === ''){
                 toastr.error('Fecha es requerida');
@@ -407,9 +420,9 @@
             formData.append('lugar', lugar);
             formData.append('forma', forma);
             formData.append('otros', otros);
-
             formData.append('administrador', administrador);
             formData.append('evaluador', evaluador);
+            formData.append('evaluador2', evaluador2);
 
             var noHayElemento = true;
 
@@ -437,8 +450,6 @@
 
                 return;
             }
-
-
 
             openLoading();
 

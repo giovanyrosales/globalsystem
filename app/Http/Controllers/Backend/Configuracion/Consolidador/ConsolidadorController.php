@@ -233,17 +233,20 @@ class ConsolidadorController extends Controller
             'administrador' => 'required',
             'evaluador' => 'required'
         );
+
+        // evaluador2
+
+
+
         $id = $request->user()->id;
 
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()){ return ['success' => 0];}
 
-
         DB::beginTransaction();
 
         try {
-
 
             // REGISTRAR AGRUPADO
 
@@ -252,6 +255,7 @@ class ConsolidadorController extends Controller
             $dato->fecha = $request->fecha;
             $dato->id_contrato = $request->administrador;
             $dato->id_evaluador = $request->evaluador;
+            $dato->id_evaluador2 = $request->evaluador2;
             $dato->id_usuario = $id;
             $dato->nombreodestino = $request->nombreodestino;
             $dato->justificacion = $request->justificacion;
@@ -291,7 +295,6 @@ class ConsolidadorController extends Controller
                 ]);
             }
 
-
             DB::commit();
             return ['success' => 2];
 
@@ -301,8 +304,6 @@ class ConsolidadorController extends Controller
             return ['success' => 99];
         }
     }
-
-
 
 
     public function indexListaAgrupados(){
@@ -387,10 +388,20 @@ class ConsolidadorController extends Controller
 
         $nombreeva = $datoseva->nombre;
         $cargoeva = $datoseva->cargo;
+
+
+        $nombreeva2 = "";
+        $cargoeva2 = "";
+
+        if($datos = Administradores::where('id',$infoRequiAgrupado->id_evaluador2)->first()){
+            $nombreeva2 = $datos->nombre;
+            $cargoeva2 = $datos->cargo;
+        }
+
         $fecha = date("d-m-Y", strtotime($infoRequiAgrupado->fecha));
 
         $pdf = PDF::loadView('backend.admin.consolidador.agrupados.pdfformulario2', compact('infoRequiAgrupado',
-            'fecha', 'nombresDep', 'nombreadmin', 'nombreeva', 'cargoadmin', 'cargoeva', 'arrayReqADetalle'));
+            'fecha', 'nombresDep', 'nombreadmin', 'nombreeva2', 'cargoeva2', 'nombreeva', 'cargoadmin', 'cargoeva', 'arrayReqADetalle'));
         //$customPaper = array(0,0,470.61,612.36);
         //$customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper('Letter', 'portrait')->setWarnings(false);
@@ -451,6 +462,93 @@ class ConsolidadorController extends Controller
             return ['success' => 99];
         }
     }
+
+
+
+
+    public function informacionAgrupado(Request $request){
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($lista = RequisicionAgrupada::where('id', $request->id)->first()){
+
+            $arrayDatos = Administradores::orderBy('nombre')->get();
+
+            return ['success' => 1, 'lista' => $lista, 'arraydatos' => $arrayDatos];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+
+    public function actualizarAgrupado(Request $request){
+
+
+        $regla = array(
+            'idagrupado' => 'required', //
+            'fecha' => 'required',
+            'administrador' => 'required',
+            'evaluador' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        DB::beginTransaction();
+
+        try {
+
+            if($infoAgrupado = RequisicionAgrupada::where('id', $request->idagrupado)->first()){
+
+                // SI ESTE AGRUPADO SE ENCUENTRA COTIZADO, YA NO SE PUEDE EDITAR
+                if(CotizacionUnidad::where('id_agrupado', $infoAgrupado->id)->first()){
+
+                    return ['success' => 1]; // no se puede editar
+                }
+
+                RequisicionAgrupada::where('id', $infoAgrupado->id)->update([
+                    'id_contrato' => $request->administrador,
+                    'id_evaluador' => $request->evaluador,
+                    'id_evaluador2' => $request->evaluador2,
+                    'fecha' => $request->fecha,
+                    'nombreodestino' => $request->nombreodestino,
+                    'justificacion' => $request->justificacion,
+                    'entrega' => $request->entrega,
+                    'plazo' => $request->plazo,
+                    'lugar' => $request->lugar,
+                    'forma' => $request->forma,
+                    'otros' => $request->otros,
+                ]);
+
+
+                DB::commit();
+                return ['success' => 2];
+
+            }else{
+                return ['success' => 99];
+            }
+
+        } catch (\Throwable $e) {
+            Log::info('ee ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+
+
+    }
+
+
+
+
+
+
 
 
 

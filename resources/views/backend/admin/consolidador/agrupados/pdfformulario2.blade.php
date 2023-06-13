@@ -100,14 +100,26 @@
     <tr style="border: 1px solid black; border-collapse: collapse;">
         <td style="text-align: left; border: 1px solid black; border-collapse: collapse; background-color: #ccffdd;"><label style=" font-size: 13px; ">Propuesta de Admin. de Contrato</label></td>
         <td style="text-align: left; border: 1px solid black; border-collapse: collapse; background-color: #ccffdd;"><label style=" font-size: 13px; ">Propuesta de Evaluador Técnico</label></td>
+
+        @if ($infoRequiAgrupado->id_evaluador2 != null)
+            <td style="text-align: left; border: 1px solid black; border-collapse: collapse; background-color: #ccffdd;"><label style=" font-size: 13px; ">Propuesta de Evaluador Técnico</label></td>
+        @endif
+
     </tr>
     <tr style="border: 1px solid black; border-collapse: collapse;">
         <td style="text-align:left; width: 50%; border: 1px solid black; border-collapse: collapse;">Nombre: {{$nombreadmin}}</td>
         <td style="text-align:left; width: 50%; border: 1px solid black; border-collapse: collapse;">Nombre: {{$nombreeva}}</td>
+        @if ($infoRequiAgrupado->id_evaluador2 != null)
+        <td style="text-align:left; width: 50%; border: 1px solid black; border-collapse: collapse;">Nombre: {{$nombreeva2}}</td>
+        @endif
     </tr>
+
     <tr style="border: 1px solid black; border-collapse: collapse;">
         <td style="text-align:left; width: 50%; border: 1px solid black; border-collapse: collapse;">Cargo:{{$cargoadmin}}</td>
         <td style="text-align:left; width: 50%; border: 1px solid black; border-collapse: collapse;">Cargo:{{$cargoeva}}</td>
+        @if ($infoRequiAgrupado->id_evaluador2 != null)
+        <td style="text-align:left; width: 50%; border: 1px solid black; border-collapse: collapse;">Cargo:{{$cargoeva2}}</td>
+        @endif
     </tr>
 
 </table><br>

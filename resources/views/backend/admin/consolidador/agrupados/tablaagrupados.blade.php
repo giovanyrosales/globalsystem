@@ -32,12 +32,18 @@
                                         </button>
 
                                         @if($dato->btnborrar == 1)
-                                        <br><br>
-                                        <button type="button" class="btn btn-danger btn-xs" onclick="informacionBorrar({{ $dato->id }})">
-                                            <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar
-                                        </button>
+                                            <br><br>
+                                            <button type="button" class="btn btn-danger btn-xs" onclick="informacionBorrar({{ $dato->id }})">
+                                                <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar
+                                            </button>
                                         @endif
 
+                                        @if($dato->btnborrar == 1)
+                                            <br><br>
+                                            <button type="button" class="btn btn-primary btn-xs" onclick="informacionEditar({{ $dato->id }})">
+                                                <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
+                                            </button>
+                                        @endif
 
                                     </td>
                                 </tr>

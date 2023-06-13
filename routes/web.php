@@ -1140,9 +1140,11 @@ Route::get('/admin/consolidador/generar/pdf/{idagrupado}', [ConsolidadorControll
 // borrar agrupacion
 Route::post('/admin/consolidador/borrar/agrupado', [ConsolidadorController::class,'borrarAgrupado']);
 
+// informacion del agrupado
+Route::post('/admin/consolidador/informacion/agrupada', [ConsolidadorController::class, 'informacionAgrupado']);
 
-
-
+// editar unos campos del agrupado
+Route::post('/admin/consolidador/actualizar/agrupado', [ConsolidadorController::class, 'actualizarAgrupado']);
 
 
 
