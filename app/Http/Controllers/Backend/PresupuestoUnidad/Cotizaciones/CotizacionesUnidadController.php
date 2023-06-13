@@ -689,11 +689,14 @@ class CotizacionesUnidadController extends Controller{
 
             $multiFila = $dd->cantidad * $dd->dinero_fijo;
 
-            $costoporhoja += $multiFila;
+           // Log::info('fila: ' . $multiFila);
+
+            $costoporhoja = $costoporhoja + $multiFila;
+
 
             $multifila = number_format((float)$multiFila, 2, '.', ',');
             $dd->dinero_fijo = number_format((float)$dd->dinero_fijo, 2, '.', ',');
-            $costoporhoja = number_format((float)$costoporhoja, 2, '.', ',');
+            $costodd = number_format((float)$costoporhoja, 2, '.', ',');
 
 
             $dataArray[] = [
@@ -703,7 +706,7 @@ class CotizacionesUnidadController extends Controller{
                 'precio_u' => $dd->dinero_fijo,
                 'costofila' => $multifila,
                 'codigopres' => $infoObj->codigo,
-                'costoxhoja' => $costoporhoja
+                'costoxhoja' => $costodd
             ];
 
             // CANTIDAD POR HOJA
@@ -724,8 +727,8 @@ class CotizacionesUnidadController extends Controller{
         // INFORMACION DEL USUARIO AUTENTIFICADO
         $nombreUsuario = Auth::user()->nombre;
 
-        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
         $mpdf->SetTitle('Requerimiento');
         $stylesheet = file_get_contents('css/cssrequerimiento.css');
 
