@@ -913,7 +913,7 @@ class CotizacionesUnidadController extends Controller{
     public function tablaRequerimientosDenegadosUnidades($idanio){
 
 
-
+        return "dwe";
 
         $listado = DB::table('p_presup_unidad AS p')
             ->join('requisicion_unidad AS req', 'req.id_presup_unidad', '=', 'p.id')

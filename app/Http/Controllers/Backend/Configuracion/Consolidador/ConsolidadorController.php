@@ -348,7 +348,11 @@ class ConsolidadorController extends Controller
         $pilaIdDep = array();
         $infoRequiAgrupado = RequisicionAgrupada::where('id', $idagrupado)->first();
         $arrayReqADetalle = RequisicionAgrupadaDetalle::where('id_requi_agrupada',$idagrupado)->get();
+
+        $contador = 0;
         foreach ($arrayReqADetalle as $info){
+            $contador++;
+
             $infoRequiUnidadDetalle = RequisicionUnidadDetalle::where('id',$info->id_requi_unidad_detalle)->first();
             $infoRequiUnidad = RequisicionUnidad::where('id',$infoRequiUnidadDetalle->id_requisicion_unidad)->first();
             $infoPresuUnidad = P_PresupUnidad::where('id', $infoRequiUnidad->id_presup_unidad)->first();
@@ -362,6 +366,8 @@ class ConsolidadorController extends Controller
             $info->especificacion = $infoRequiUnidadDetalle->material_descripcion;
             $info->codigo = $infoCodigo->codigo;
             $info->unidadmedida = $infoUnidadM->nombre;
+
+            $info->contador = $contador;
         }
 
 
