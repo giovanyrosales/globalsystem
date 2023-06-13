@@ -727,8 +727,8 @@ class CotizacionesUnidadController extends Controller{
         // INFORMACION DEL USUARIO AUTENTIFICADO
         $nombreUsuario = Auth::user()->nombre;
 
-        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
         $mpdf->SetTitle('Requerimiento');
         $stylesheet = file_get_contents('css/cssrequerimiento.css');
 
