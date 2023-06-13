@@ -306,14 +306,11 @@ class ConsolidadorController extends Controller
 
 
     public function indexListaAgrupados(){
-
-
         return view('backend.admin.consolidador.agrupados.vistaagrupados');
     }
 
 
     public function tablaListaAgrupados(){
-
 
         $listado = RequisicionAgrupada::orderBy('fecha', 'DESC')->get();
 
@@ -327,6 +324,7 @@ class ConsolidadorController extends Controller
             $info->nomevaluador = $infoEvaluador->nombre;
 
             // PARA MOSTRAR BOTON DE BORRAR SINO HAY NINGUNA COTIZACION
+            // IGUALMENTE FUNCIONA PARA PODER EDITARLO
 
             $btnBorrar = 1;
 

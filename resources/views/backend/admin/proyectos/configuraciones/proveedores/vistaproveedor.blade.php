@@ -100,11 +100,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Correo:</label>
-                                        <input type="text" maxlength="20" class="form-control" id="correo-nuevo" autocomplete="off">
+                                        <input type="text" maxlength="120" class="form-control" id="correo-nuevo" autocomplete="off">
                                     </div>
                                     <div class="form-group">
                                         <label>Dirección:</label>
-                                        <input type="text" maxlength="20" class="form-control" id="direccion-nuevo" autocomplete="off">
+                                        <input type="text" maxlength="350" class="form-control" id="direccion-nuevo" autocomplete="off">
                                     </div>
 
                                 </div>
@@ -171,11 +171,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Correo:</label>
-                                        <input type="text" maxlength="20" class="form-control" id="correo-editar" autocomplete="off">
+                                        <input type="text" maxlength="120" class="form-control" id="correo-editar" autocomplete="off">
                                     </div>
                                     <div class="form-group">
                                         <label>Dirección:</label>
-                                        <input type="text" maxlength="20" class="form-control" id="direccion-editar" autocomplete="off">
+                                        <input type="text" maxlength="350" class="form-control" id="direccion-editar" autocomplete="off">
                                     </div>
                                 </div>
                             </div>

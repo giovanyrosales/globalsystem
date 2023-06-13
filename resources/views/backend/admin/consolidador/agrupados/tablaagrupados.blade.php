@@ -38,12 +38,6 @@
                                         </button>
                                         @endif
 
-                                        @if($dato->documento != null)
-                                            <br><br>
-                                            <button type="button" class="btn btn-warning btn-xs" onclick="informacionActa({{ $dato->id }})">
-                                                <i class="fas fa-file-pdf" title="Acta"></i>&nbsp; Acta
-                                            </button>
-                                        @endif
 
                                     </td>
                                 </tr>
