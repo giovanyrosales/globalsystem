@@ -408,20 +408,6 @@
                         $('#modalAgregar').modal('hide');
                         recargar();
                     }
-                    else if(response.data.success === 3){
-                        Swal.fire({
-                            title: 'Material Repetido',
-                            text: "El objeto específico, la clasificación, el nombre, y la unidad de medida están repetidos",
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
                     else {
                         toastr.error('Error al registrar');
                     }
@@ -575,21 +561,6 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        Swal.fire({
-                            title: 'Material Repetido',
-                            text: "El objeto específico, la clasificación, el nombre, y la unidad de medida están repetidos",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
                         recargar();

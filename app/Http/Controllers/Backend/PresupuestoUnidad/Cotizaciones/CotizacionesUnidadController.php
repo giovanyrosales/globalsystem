@@ -118,6 +118,7 @@ class CotizacionesUnidadController extends Controller{
                 $dato->materialformat = $texto;
             }
 
+
             return ['success' => 1, 'info' => $infoRequiAgrupada, 'listado' => $listado];
         }else{
             return ['success' => 2];
@@ -141,7 +142,6 @@ class CotizacionesUnidadController extends Controller{
             $dd->medida = $infoUnidad->nombre;
             $dd->codigo = $infoCodigo->codigo . " - " . $infoCodigo->nombre;
         }
-
 
         return ['success' => 1, 'lista' => $info];
     }
@@ -249,7 +249,7 @@ class CotizacionesUnidadController extends Controller{
                     // DINERO NO ALCALZA PARA BAJARLE
                     if($this->redondear_dos_decimal($resta) < 0){
 
-                        $disponibleFormat = number_format((float)$infoCuentaUnidad->saldo_inicial, 2, '.', ',');
+                        $disponibleFormat = number_format((float)$suma, 2, '.', ',');
 
                         DB::rollback();
 
@@ -284,8 +284,6 @@ class CotizacionesUnidadController extends Controller{
                     return ['success' => 4];
                 }
             }
-
-
 
             // PASO TODAS LAS VALIDACIONES
 
@@ -346,12 +344,14 @@ class CotizacionesUnidadController extends Controller{
     // retorna tabla con las cotizaciones pendientes
     public function indexCotizacionesUnidadesPendienteTabla($idanio){
 
+        // SE BUSCA POR AÑO DE COTIZACION
 
+        $infoAnio = P_AnioPresupuesto::where('id', $idanio)->first();
 
         $lista = DB::table('cotizacion_unidad AS cu')
             ->join('requisicion_agrupada AS ra', 'cu.id_agrupado', '=', 'ra.id')
-            ->select('cu.id', 'ra.id_anio', 'cu.estado', 'cu.id_proveedor',  'cu.fecha')
-            ->where('ra.id_anio', $idanio)
+            ->select('cu.id', 'ra.id_anio', 'ra.nombreodestino', 'ra.justificacion', 'cu.estado', 'cu.id_proveedor',  'cu.fecha')
+            ->whereYear('cu.fecha', $infoAnio->nombre)
             ->where('cu.estado', 0)
             ->orderBy('cu.id', 'ASC')
             ->get();
@@ -361,14 +361,7 @@ class CotizacionesUnidadController extends Controller{
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
 
             $infoProveedor = Proveedores::where('id', $dd->id_proveedor)->first();
-            //$infoRequisicion = RequisicionUnidad::where('id', )->first();
-            //$infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            //$infoDepar = P_Departamento::where('id', $infoPresupUni->id_departamento)->first();
-
             $dd->proveedor = $infoProveedor->nombre;
-            //$dd->necesidad = $infoRequisicion->necesidad;
-            //$dd->destino = $infoRequisicion->destino;
-            //$dd->departamento = $infoDepar->nombre;
         }
 
         return view('backend.admin.presupuestounidad.cotizaciones.pendientes.tablacotizacionpendienteunidad', compact('lista'));
@@ -469,13 +462,14 @@ class CotizacionesUnidadController extends Controller{
     // retorna tabla con las cotizaciones autorizaciones para unidades
     public function tablaCotizacionesUnidadesAutorizadas($idanio){
 
+        $infoAnio = P_AnioPresupuesto::where('id', $idanio)->first();
+
         // autorizadas
         $lista = DB::table('cotizacion_unidad AS cu')
             ->join('requisicion_agrupada AS ra', 'cu.id_agrupado', '=', 'ra.id')
             ->select('cu.id', 'cu.estado', 'cu.id_proveedor', 'cu.fecha', 'ra.id_anio')
             ->where('cu.estado', 1)
-            ->where('ra.id_anio', $idanio)
-            ->orderBy('cu.fecha', 'DESC') // la ultima cotizacion quiero primero
+            ->whereYear('cu.fecha', $infoAnio->nombre)
             ->get();
 
         foreach ($lista as $dd){
@@ -483,14 +477,8 @@ class CotizacionesUnidadController extends Controller{
             $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
 
             $infoProveedor = Proveedores::where('id', $dd->id_proveedor)->first();
-            //$infoRequisicion = RequisicionUnidad::where('id', $dd->id_requisicion_unidad)->first();
-           // $infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            //$infoDepar = P_Departamento::where('id', $infoPresupUni->id_departamento)->first();
 
             $dd->proveedor = $infoProveedor->nombre;
-            //$dd->necesidad = $infoRequisicion->necesidad;
-            //$dd->destino = $infoRequisicion->destino;
-            //$dd->departamento = $infoDepar->nombre;
 
             if(OrdenUnidad::where('id_cotizacion', $dd->id)->first()){
                 $dd->bloqueo = true;
@@ -505,39 +493,45 @@ class CotizacionesUnidadController extends Controller{
     // denegar una cotización de unidad
     public function denegarCotizacionUnidad(Request $request){
 
+        $regla = array(
+            'id' => 'required', // id cotizacion
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
         DB::beginTransaction();
 
         try {
 
             // COTIZACIÓN DENEGADA
             $infoCotizacion = CotizacionUnidad::where('id', $request->id)->first();
-            $infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
-            $infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            $infoAnio = P_AnioPresupuesto::where('id', $infoPresupUni->id_anio)->first();
+            $arrayAgrupadoDetalle = RequisicionAgrupadaDetalle::where('id_requi_agrupada', $infoCotizacion->id_agrupado)->get();
 
-            if($infoAnio->permiso == 0){
-                // sin permiso
+            if($infoCotizacion->estado == 1){
+
+                // ESTA COTIZACION ESTA YA APROBADA
                 return ['success' => 1];
             }
 
-            CotizacionUnidad::where('id', $request->id)->update([
-                'estado' => 2,
-                'fecha_estado' => Carbon::now('America/El_Salvador')
-            ]);
+            if($infoCotizacion->estado != 2){
 
-            // Hoy verificar cuales materiales fueron cotizados y volver a 0.
-            // Para que puedan ser cotizados de nuevo.
-
-            $listado = CotizacionUnidadDetalle::where('id_cotizacion_unidad', $request->id)->get();
-
-            foreach ($listado as $ll){
-                RequisicionUnidadDetalle::where('id', $ll->id_requi_unidaddetalle)->update([
-                    'estado' => 0,
+                CotizacionUnidad::where('id', $request->id)->update([
+                    'estado' => 2,
+                    'fecha_estado' => Carbon::now('America/El_Salvador')
                 ]);
+
+                foreach ($arrayAgrupadoDetalle as $info){
+                    RequisicionAgrupadaDetalle::where('id', $info->id)->update([
+                        'cotizado' => 0,
+                    ]);
+                }
             }
 
+
             DB::commit();
-            return ['success' => 2, 'idanio' => $infoPresupUni->id_anio];
+            return ['success' => 2];
 
         }catch(\Throwable $e){
             //Log::info('ee' . $e);
@@ -563,35 +557,27 @@ class CotizacionesUnidadController extends Controller{
     // retorna tabla con las cotizaciones autorizaciones para unidades
     public function tablaCotizacionesUnidadesDenegadas($idanio){
 
+        $infoAnio = P_AnioPresupuesto::where('id', $idanio)->first();
+
         // autorizadas
         $lista = DB::table('cotizacion_unidad AS cu')
-            ->join('requisicion_unidad AS ru', 'cu.id_requisicion_unidad', '=', 'ru.id')
-            ->join('p_presup_unidad AS pu', 'ru.id_presup_unidad', '=', 'pu.id')
-            ->select('cu.id', 'cu.estado', 'cu.id_proveedor', 'cu.id_requisicion_unidad', 'cu.fecha', 'pu.id_anio')
+            ->join('requisicion_agrupada AS ra', 'cu.id_agrupado', '=', 'ra.id')
+            ->select('cu.id', 'cu.estado', 'cu.id_agrupado AS idagrupado', 'cu.id_proveedor', 'cu.fecha', 'ra.id_anio')
             ->where('cu.estado', 2) // DENEGADAS
-            ->where('pu.id_anio', $idanio)
-            ->orderBy('cu.fecha', 'DESC') // la ultima cotizacion quiero primero
+            ->whereYear('cu.fecha', $infoAnio->nombre)
             ->get();
 
-        foreach ($lista as $dd){
+        foreach ($lista as $info){
 
-            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+            $info->fecha = date("d-m-Y", strtotime($info->fecha));
 
-            $infoProveedor = Proveedores::where('id', $dd->id_proveedor)->first();
-            $infoRequisicion = RequisicionUnidad::where('id', $dd->id_requisicion_unidad)->first();
-            $infoPresupUni = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            $infoDepar = P_Departamento::where('id', $infoPresupUni->id_departamento)->first();
+            $infoProveedor = Proveedores::where('id', $info->id_proveedor)->first();
+            $infoAgrupado = RequisicionAgrupada::where('id', $info->idagrupado)->first();
 
-            $dd->proveedor = $infoProveedor->nombre;
-            $dd->necesidad = $infoRequisicion->necesidad;
-            $dd->destino = $infoRequisicion->destino;
-            $dd->departamento = $infoDepar->nombre;
-
-            if(OrdenUnidad::where('id_cotizacion', $dd->id)->first()){
-                $dd->bloqueo = true;
-            }else{
-                $dd->bloqueo = false;
-            }
+            $info->proveedor = $infoProveedor->nombre;
+            $info->nomdestino = $infoAgrupado->nombreodestino;
+            $info->destino = $infoAgrupado->destino;
+            $info->justificacion = $infoAgrupado->justificacion;
         }
 
         return view('backend.admin.presupuestounidad.cotizaciones.denegadas.tablacotizaciondenegadaunidad', compact('lista'));
@@ -618,6 +604,8 @@ class CotizacionesUnidadController extends Controller{
         $infoRequisicion = RequisicionUnidad::where('id', $cotizacion->id_requisicion_unidad)->first();
         $infoProveedor = Proveedores::where('id', $cotizacion->id_proveedor)->first();
 
+        $infoAgrupado = RequisicionAgrupada::where('id', $cotizacion->id_agrupado)->first();
+
         $proveedor = $infoProveedor->nombre;
 
         $infoCotiDetalle = CotizacionUnidadDetalle::where('id_cotizacion_unidad', $id)->get();
@@ -641,11 +629,6 @@ class CotizacionesUnidadController extends Controller{
             $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $de->id_requi_unidaddetalle)->first();
             $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
 
-            /*if($infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first()){
-                $de->nombrematerial = $infoRequiDetalle->material_descripcion . " - " . $infoUnidad->nombre;
-            }else{
-                $de->nombrematerial = $infoRequiDetalle->material_descripcion;
-            }*/
             $de->nombrematerial = $infoRequiDetalle->material_descripcion;
 
             $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
@@ -664,7 +647,7 @@ class CotizacionesUnidadController extends Controller{
         $totalTotal = number_format((float)$totalTotal, 2, '.', ',');
 
         return view('backend.admin.presupuestounidad.cotizaciones.individual.vistacotizaciondetalleunidad', compact('id', 'infoRequisicion',
-            'proveedor', 'infoCotiDetalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
+            'proveedor', 'infoCotiDetalle', 'fecha', 'totalCantidad', 'infoAgrupado', 'totalPrecio', 'totalTotal'));
     }
 
 

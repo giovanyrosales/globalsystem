@@ -75,13 +75,6 @@ class MaterialesController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
-        if(CatalogoMateriales::where('id_objespecifico', $request->objespecifico)
-            ->where('nombre', $request->nombre)
-            ->where('id_unidadmedida', $request->unidad)
-            ->where('id_clasificacion', $request->clasificacion)
-            ->first()){
-            return ['success' => 3];
-        }
 
         $dato = new CatalogoMateriales();
         $dato->id_clasificacion = $request->clasificacion;
@@ -154,16 +147,6 @@ class MaterialesController extends Controller
 
         try {
 
-        // VERIFICAR MATERIAL REPETIDO
-        if(CatalogoMateriales::where('id', '!=', $request->id)
-            ->where('id_objespecifico', $request->codigo)
-            ->where('nombre', $request->nombre)
-            ->where('id_unidadmedida', $request->unidad)
-            ->where('id_clasificacion', $request->clasificacion)
-            ->first()){
-            return ['success' => 1];
-        }
-
         // PODRA MODIFICAR SI EL MATERIAL NO ESTA AGREGADO A PARTIDA DETALLE
         if(!PartidaDetalle::where('material_id', $request->id)->first()){
 
@@ -183,7 +166,7 @@ class MaterialesController extends Controller
         }
 
             DB::commit();
-            return ['success' => 2];
+            return ['success' => 1];
         }catch(\Throwable $e){
 
             DB::rollback();

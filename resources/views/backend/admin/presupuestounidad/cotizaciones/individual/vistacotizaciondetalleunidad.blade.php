@@ -46,12 +46,12 @@
                         <div class="col-sm-6">
 
                             <div class="form-group">
-                                <label>Destino</label>
-                                <input type="text" value="{{ $infoRequisicion->destino }}" class="form-control" disabled>
+                                <label>Nombre o Destino</label>
+                                <input type="text" value="{{ $infoAgrupado->nombreodestino }}" class="form-control" disabled>
                             </div>
                             <div class="form-group">
-                                <label>Necesidad</label>
-                                <textarea class="form-control" rows="3" disabled>{{ $infoRequisicion->necesidad }}</textarea>
+                                <label>Justificación</label>
+                                <textarea class="form-control" rows="3" disabled>{{ $infoAgrupado->justificacion }}</textarea>
                             </div>
                         </div>
 
@@ -97,7 +97,7 @@
                             @endforeach
 
                             <tr>
-                                <td><p class='form-control'>Total</p></td>
+                                <td><p style="font-size: 15px" class='form-control'>Total</p></td>
                                 <td><input disabled class="form-control" type="text" value="{{$totalCantidad}}"></td>
                                 <td><input disabled class="form-control" type="text"></td>
                                 <td><input disabled class="form-control" type="text"></td>

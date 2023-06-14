@@ -305,7 +305,7 @@
 
                         $('#idagrupado').val(id);
 
-                        $('#destino').val(response.data.info.destino);
+                        $('#destino').val(response.data.info.nombreodestino);
                         $('#justificacion').val(response.data.info.justificacion);
 
                         var fecha = new Date();
@@ -697,7 +697,7 @@
 
                     else if(response.data.success === 5){
 
-                        // NO ALCANCA EL DINERO
+                        // NO ALCANZA EL DINERO
 
                         let fila = response.data.fila;
                         let material = response.data.material;

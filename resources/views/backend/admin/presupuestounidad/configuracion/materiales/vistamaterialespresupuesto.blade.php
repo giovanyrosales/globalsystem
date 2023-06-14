@@ -514,24 +514,8 @@
             })
                 .then((response) => {
                     closeLoading();
-                    if(response.data.success === 1){
-                        $('#modalEditar').modal('hide');
 
-                        Swal.fire({
-                            title: 'Material Repetido',
-                            text: "El objeto específico, la clasificación, el nombre, y la unidad de medida están repetidos. Pero se actualizo los datos del Material",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2){
+                    if(response.data.success === 1){
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
 

@@ -946,7 +946,7 @@ Route::get('/admin/p/cotizacion/unidad/pendiente/index/{idanio}', [CotizacionesU
 Route::get('/admin/p/cotizacion/unidad/pendiente/tabla/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesPendienteTabla']);
 // ver detalle de una cotización para unidades
 Route::get('/admin/p/cotizacion/unidad/vistadetalle/{id}', [CotizacionesUnidadController::class,'indexCotizacionUnidadDetalle']);
-// autorizar cotización unidad jefe uaci
+// autorizar cotizacion
 Route::post('/admin/p/cotizacion/unidad/autorizar',  [CotizacionesUnidadController::class,'autorizarCotizacionUnidad']);
 
 
@@ -958,7 +958,7 @@ Route::get('/admin/p/cotizacion/unidad/autorizadas/anio', [CotizacionesUnidadCon
 Route::get('/admin/p/cotizacion/unidad/autorizadas/index/{idanio}', [CotizacionesUnidadController::class,'indexCotizacionesUnidadesAutorizadas']);
 // retorna tabla de cotizaciones unidad autorizadas
 Route::get('/admin/p/cotizacion/unidad/autorizadas/tabla/{idanio}', [CotizacionesUnidadController::class,'tablaCotizacionesUnidadesAutorizadas']);
-// denegar una cotización de unidad
+// DENEGAR COTIZACION POR JEFA DE UACI
 Route::post('/admin/p/cotizacion/denegar',  [CotizacionesUnidadController::class,'denegarCotizacionUnidad']);
 // vista de cotización detalle para procesadas o denegadas
 Route::get('/admin/p/cotizacion/unidad/detalle/{idcoti}', [CotizacionesUnidadController::class,'vistaDetalleCotizacionUnidad']);

@@ -136,26 +136,6 @@ class MaterialesPresupuestoUnidadController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
-
-
-        // VERIFICAR MATERIAL REPETIDO
-        if(P_Materiales::where('id', '!=', $request->id)
-            ->where('id_objespecifico', $request->codigo)
-            ->where('descripcion', $request->nombre)
-            ->where('id_unidadmedida', $request->unidad)
-            ->first()){
-
-            // SIEMPRE ACTUALIZAR
-            P_Materiales::where('id', $request->id)->update([
-                'id_unidadmedida' => $request->unidad,
-                'id_objespecifico' => $request->codigo,
-                'descripcion' => $request->nombre,
-                'costo' => $request->precio
-            ]);
-
-            return ['success' => 1];
-        }
-
         // MATERIAL ACTUALIZADO
         P_Materiales::where('id', $request->id)->update([
             'id_unidadmedida' => $request->unidad,
@@ -164,7 +144,7 @@ class MaterialesPresupuestoUnidadController extends Controller
             'costo' => $request->precio
         ]);
 
-        return ['success' => 2];
+        return ['success' => 1];
     }
 
     // oculta un material, pero siempre será visible si usuario ya había seleccionado ese material

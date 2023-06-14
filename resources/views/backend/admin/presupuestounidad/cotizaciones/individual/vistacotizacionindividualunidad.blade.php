@@ -50,7 +50,7 @@
                                 <input type="text" value="{{ $infoAgrupado->nombreodestino }}" class="form-control" disabled>
                             </div>
                             <div class="form-group">
-                                <label>Necesidad</label>
+                                <label>Justificación</label>
                                 <textarea class="form-control" rows="3" disabled>{{ $infoAgrupado->justificacion }}</textarea>
                             </div>
                         </div>
@@ -166,10 +166,6 @@
 
     <script>
 
-        function recargar(){
-
-        }
-
         function autorizarCotizacion(){
             Swal.fire({
                 title: 'Autorizar Cotización',
@@ -218,8 +214,6 @@
 
                     if(response.data.success === 1) {
 
-                        let idanio = response.data.idanio;
-
                         Swal.fire({
                             title: 'Cotización Autorizada',
                             text: "",
@@ -232,6 +226,8 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
 
+                                // REDIRECCIONAR A COTIZACIONES AUTORIZADAS
+                                window.location.href="{{ url('/admin/p/cotizacion/unidad/autorizadas/anio') }}";
                             }
                         })
                     }
@@ -256,12 +252,14 @@
             })
                 .then((response) => {
                     closeLoading();
+
                     if(response.data.success === 1){
 
+
                         Swal.fire({
-                            title: 'Permiso Denegado',
-                            text: "Para el Presente Año no es permitido realizar modificaciones",
-                            icon: 'info',
+                            title: 'Error',
+                            text: "La Cotización ya esta Aprobada",
+                            icon: 'success',
                             showCancelButton: false,
                             allowOutsideClick: false,
                             confirmButtonColor: '#28a745',
@@ -269,13 +267,15 @@
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                location.reload();
+
+                                // REDIRECCIONAR A COTIZACIONES AUTORIZADAS
+                                window.location.href="{{ url('/admin/p/cotizacion/unidad/autorizadas/anio') }}";
                             }
                         })
+
                     }
                     else if(response.data.success === 2){
 
-                        let idanio = response.data.idanio;
 
                         Swal.fire({
                             title: 'Cotización Denegada',
@@ -289,8 +289,9 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
 
-                                // id cotizacion unidad
-                                window.location.href="{{ url('/admin/p/cotizacion/unidad/denegadas/index') }}/" + idanio;
+                                // REDIRECCIONAR A COTIZACIONES DENEGADAS
+
+                                window.location.href="{{ url('/admin/p/cotizacion/unidad/denegadas/anio') }}";
                             }
                         })
                     }

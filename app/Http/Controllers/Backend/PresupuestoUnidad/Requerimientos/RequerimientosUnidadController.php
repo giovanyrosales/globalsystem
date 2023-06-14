@@ -628,20 +628,26 @@ class RequerimientosUnidadController extends Controller
             return ['success' => 1];
         }
 
-        // BUSCAR QUE UN MATERIAL DE ESTE AGRUPADO ESTE EN UNA COTIZACION, SI LO ESTA, YA NO PODRA CANCELAR
-        // TODOS EL AGRUPADO
+        // BUSCAR QUE UN MATERIAL DE ESTE AGRUPADO ESTE EN UNA COTIZACION, SI LO ESTA, VERIFICAR QUE SU PADRE
+        // QUE ES REQUISICION AGRUPADO, NO ESTE EN ESPERA O APROBADO
 
         $arrayAgrupadoDetalle = RequisicionAgrupadaDetalle::where('id_requi_agrupada', $infoAgrupado->id)->get();
 
         foreach ($arrayAgrupadoDetalle as $dato){
 
+            if($infoCotiUniDeta = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $dato->id_requi_unidad_detalle)->first()){
 
-            // TAN SOLO QUE HAYA UNA COTIZACION YA NO SE PUEDE DENEGAR, YA QUE PARA CANCELAR
-            // SE DEBE DENEGAR TODOS EL AGRUPADO
-            if(CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $dato->id_requi_unidad_detalle)->first()){
+                $infoCotiPadre = CotizacionUnidad::where('id', $infoCotiUniDeta->id_cotizacion_unidad)->first();
 
-                // UN MATERIAL YA ESTA COTIZADO (APROBADO O NO) DE ESTE AGRUPADO, YA NO SE PUEDE DENEGAR
-                return ['success' => 2];
+                // ESPERANDO RESPUESTA DE SER APROBADA O DENEGADA
+                if($infoCotiPadre->estado == 0){
+                    return ['success' => 2];
+                }
+
+                // ESTA APROBADA, ASI QUE NO SE PUEDE DENEGAR
+                if($infoCotiPadre->estado == 1){
+                    return ['success' => 2];
+                }
             }
         }
 
@@ -755,7 +761,7 @@ class RequerimientosUnidadController extends Controller
                             ->where('id_objespeci', $infoMaterial->id_objespecifico)
                             ->first();
 
-                        $suma = $infoCuenta->saldo_inicial + ($infoRequiDetalle->dinero_fijo * $infoRequiDetalle->cantidad);
+                        $suma = $infoCuenta->saldo_inicial + ($infoRequiDetalle->dinero * $infoRequiDetalle->cantidad);
 
                         RequisicionUnidadDetalle::where('id', $infoRequiDetalle->id)->update([
                             'cancelado' => 1

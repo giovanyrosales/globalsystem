@@ -8,10 +8,9 @@
                             <thead>
                             <tr>
                                 <th style="width: 10%">Número</th>
-                                <th style="width: 15%">Departamento</th>
-                                <th style="width: 35%">Destino</th>
+                                <th style="width: 15%">Destino</th>
+                                <th style="width: 35%">Justificación</th>
                                 <th style="width: 10%">Fecha</th>
-                                <th style="width: 17%">Necesidad</th>
                                 <th style="width: 17%">Proveedor</th>
                                 <th style="width: 12%">Opciones</th>
                             </tr>
@@ -21,10 +20,9 @@
                             @foreach($lista as $dato)
                                 <tr>
                                     <td>{{ $dato->id }}</td>
-                                    <td>{{ $dato->departamento }}</td>
-                                    <td>{{ $dato->destino }}</td>
+                                    <td>{{ $dato->nomdestino }}</td>
+                                    <td>{{ $dato->justificacion }}</td>
                                     <td>{{ $dato->fecha }}</td>
-                                    <td>{{ $dato->necesidad }}</td>
                                     <td>{{ $dato->proveedor }}</td>
                                     <td>
                                         <button type="button" class="btn btn-warning btn-xs" onclick="verInformacion({{ $dato->id }})">

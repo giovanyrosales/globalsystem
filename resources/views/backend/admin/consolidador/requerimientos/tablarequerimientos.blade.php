@@ -9,6 +9,8 @@
                             <tr>
                                 <th>Fecha Requisición</th>
                                 <th>Unidad</th>
+                                <th>Necesidad</th>
+                                <th>Destino</th>
                                 <th>Opciones</th>
                             </tr>
                             </thead>
@@ -18,7 +20,8 @@
                                 <tr>
                                     <td>{{ $dato->fecha }}</td>
                                     <td>{{ $dato->departamento }}</td>
-
+                                    <td>{{ $dato->destino }}</td>
+                                    <td>{{ $dato->necesidad }}</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="detalleRequisicion({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
