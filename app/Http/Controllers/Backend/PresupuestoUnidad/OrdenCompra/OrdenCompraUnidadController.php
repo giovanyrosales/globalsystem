@@ -33,16 +33,6 @@ use function Illuminate\Events\queueable;
 date_default_timezone_set('America/El_Salvador');
 setlocale(LC_TIME, "spanish");
 
-//Estados de las Ordenes
-// 0 - Default
-// 1 - Activa
-// 2 - Anulada
-
-//Estados de las Cotizaciones
-// 0 - Default
-// 1 - Aprobada
-// 2 - Denegada
-
 
 class OrdenCompraUnidadController extends Controller
 {
@@ -53,47 +43,34 @@ class OrdenCompraUnidadController extends Controller
     public function generarOrdenCompraUnidades(Request $request){
 
         $regla = array(
+            'idcoti' => 'required',
             'fecha' => 'required',
+            'numacta' => 'required',
+            'numacuerdo' => 'required',
         );
 
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()){return ['success' => 0];}
 
-        if($info = OrdenUnidad::where('id_cotizacion', $request->idcoti)->first()){
-            // no hacer nada, evita ordenes duplicadas
-            return ['success' => 1, 'id' => $info->id];
-        }
-
-       /* if($infocoti = CotizacionUnidad::where('id', $request->idcoti)->first()){
-            if($infocoti->estado != 1){
-                // por seguridad solo queremos cotizaciones aprobadas
-                return ['success' => 2];
-            }
-        }*/
-
         DB::beginTransaction();
         try {
 
-            $infoCoti = CotizacionUnidad::where('id', $request->idcoti)->first();
+            if(OrdenUnidad::where('id_cotizacion', $request->idcoti)->first()){
+                // YA ESTA REGISTRADA Y NO HACER NADA
 
-            //$infoRequi = RequisicionUnidad::where('id', $infoCoti->id_requisicion_unidad)->first();
-            //$infoPresupUni = P_PresupUnidad::where('id', $infoRequi->id_presup_unidad)->first();
-
-
-            $or = new OrdenUnidad();
-            $or->id_cotizacion = $infoCoti->id;
-            $or->fecha_orden = $request->fecha;
-            $or->lugar = $request->lugar;
-            $or->estado = 0;
-            $or->fecha_anulada = null;
-            $or->numero_acta = $request->numacta;
-            $or->numero_acuerdo = $request->numacuerdo;
-            $or->save();
+            }else{
+                $or = new OrdenUnidad();
+                $or->id_cotizacion = $request->idcoti;
+                $or->fecha_orden = $request->fecha;
+                $or->numero_acta = $request->numacta;
+                $or->numero_acuerdo = $request->numacuerdo;
+                $or->save();
+            }
 
 
             DB::commit();
-            return ['success' => 2, 'id' => $or->id];
+            return ['success' => 1, 'id' => $or->id];
 
         }catch(\Throwable $e){
             Log::info('error: ' . $e);
@@ -238,163 +215,29 @@ class OrdenCompraUnidadController extends Controller
     // retorna tabla con las ordenes de compras
     public function tablaOrdenesComprasAprobadasUnidades($idanio){
 
+        $infoAnio = P_AnioPresupuesto::where('id', $idanio)->first();
 
-
-        $lista = DB::table('orden_unidad AS or')
-            ->join('cotizacion_unidad AS cu', 'or.id_cotizacion', '=', 'cu.id')
-            ->join('requisicion_agrupada AS ra', 'cu.id_agrupado', '=', 'ra.id')
-            ->select('or.estado', 'or.fecha_orden', 'or.id_cotizacion', 'or.id')
-            ->where('ra.id_anio', $idanio)
-            ->where('or.estado', 0) // solo aprobadas
-            ->orderBy('or.fecha_orden')
+        $arrayOrdenUnidad = OrdenUnidad::whereYear('fecha_orden', $infoAnio->nombre)
+            ->orderBy('fecha_orden')
             ->get();
 
-        foreach($lista as $val){
-            $infoCotizacion = CotizacionUnidad::where('id', $val->id_cotizacion)->first();
-            //$infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
-            //$infoProveedor = Proveedores::where('id', $infoCotizacion->id_proveedor)->first();
-            //$infoPresup = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            //$infoDepar = P_Departamento::where('id', $infoPresup->id_departamento)->first();
 
-            //$val->departamento = $infoDepar->nombre;
+        foreach($arrayOrdenUnidad as $info){
 
-            if($infoacta = ActaUnidad::where('id_ordenunidad', $val->id)->first()){
-                $val->actaid = $infoacta->id;
-            }else{
-                $val->actaid = 0;
+            $info->fecha_orden = date("d-m-Y", strtotime($info->fecha_orden));
+
+            $hayActa = 0;
+            $idActa = 0;
+            if($infoacta = ActaUnidad::where('id_ordenunidad', $info->id)->first()){
+              $hayActa = 1;
+              $idActa = $infoacta->id;
             }
 
-           // $val->requidestino = $infoRequisicion->destino;
-           // $val->nomproveedor = $infoProveedor->nombre;
+            $info->idActa = $idActa;
+            $info->hayActa = $hayActa;
         }
 
-        return view('backend.admin.presupuestounidad.ordenes.ordenesaprobadas.tablaordenesunidadcompraaprobada', compact('lista'));
-    }
-
-    // anular una orden de compra para unidades.
-    public function anularCompraUnidades(Request $request){
-
-        DB::beginTransaction();
-        try {
-
-            // SOLO ANULAR SINO TIENE ACTA GENERADA
-            if(ActaUnidad::where('id_ordenunidad', $request->id)->first()){
-                return ['success' => 1];
-            }
-
-            if($infoOrden = OrdenUnidad::where('id', $request->id)->first()){
-
-                $infoCotizacion = CotizacionUnidad::where('id', $infoOrden->id_cotizacion)->first();
-                $infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
-                $infoPresup = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-                $infoAnio = P_AnioPresupuesto::where('id', $infoPresup->id_anio)->first();
-
-                if($infoAnio->permiso == 0){
-                    // pausado
-                    return ['success' => 3];
-                }
-
-                // pendiente de anulación
-                if($infoOrden->estado == 0){
-
-                    OrdenUnidad::where('id', $request->id)->update([
-                        'estado' => 1,
-                        'fecha_anulada' => Carbon::now('America/El_Salvador'),
-                    ]);
-
-                    $infoCotiDeta = CotizacionUnidadDetalle::where('id_cotizacion_unidad', $infoCotizacion->id)->get();
-
-                    // para que vuelva el dinero de RESTANTE, SE DEBERA BORRAR LA FILA
-                    CuentaUnidadRestante::where('id_ordenunidad', $infoOrden->id)->delete();
-
-                    // setear por cada material cotizado
-                    foreach ($infoCotiDeta as $dd){
-
-                        // para que pueda ser cotizado nuevamente
-                        RequisicionUnidadDetalle::where('id', $dd->id_requi_unidaddetalle)->update([
-                            'estado' => 0,
-                        ]);
-
-                        $infoRequiDetalle = RequisicionUnidadDetalle::where('id', $dd->id_requi_unidaddetalle)->first();
-                        $infoMaterial = P_Materiales::where('id', $infoRequiDetalle->id_material)->first();
-
-                        $cuentaUnidad = CuentaUnidad::where('id_presup_unidad', $infoRequisicion->id_presup_unidad)
-                            ->where('id_objespeci', $infoMaterial->id_objespecifico)
-                            ->first();
-
-                        // VOLVER A COLOCAR DINERO RETENIDO, porque la orden fue anulada, ya que el material
-                        // estara listo para ser cotizado de nuevo.
-                        if(!CuentaUnidadRetenido::where('id_requi_detalle', $infoRequiDetalle->id)
-                            ->where('id_cuenta_unidad', $cuentaUnidad->id)->first()){
-
-                            $retenido = new CuentaUnidadRetenido();
-                            $retenido->id_requi_detalle = $infoRequiDetalle->id;
-                            $retenido->id_cuenta_unidad = $cuentaUnidad->id;
-                            $retenido->save();
-                        }
-                    }
-                }
-
-                DB::commit();
-                return ['success' => 2];
-            }else{
-                return ['success' => 99];
-            }
-
-        }catch(\Throwable $e){
-            Log::info('error: ' . $e);
-            DB::rollback();
-            return ['success' => 99];
-        }
-    }
-
-
-    // seleccion de año para mostrar ordenes de compra denegadas para unidades
-    public function vistaAñoOrdenesComprasUnidadesDenegadas(){
-        $anios = P_AnioPresupuesto::orderBy('id', 'DESC')->get();
-
-        return view('backend.admin.presupuestounidad.ordenes.ordenesdenegadas.vistaanioordenesdenegadasunidades', compact('anios'));
-    }
-
-
-    // retorna vista para las ordenes de compra anuladas para unidades
-    public function indexOrdenesComprasUnidadesDenegadas($idanio){
-        return view('backend.admin.presupuestounidad.ordenes.ordenesdenegadas.vistaordenesunidadcompradenegadas', compact('idanio'));
-    }
-
-    // retorna tabla para las ordenes de compra anuladas para unidades
-    public function tablaOrdenesComprasUnidadesDenegadas($idanio){
-
-        $lista = DB::table('orden_unidad AS or')
-            ->join('cotizacion_unidad AS cu', 'or.id_cotizacion', '=', 'cu.id')
-            ->join('requisicion_unidad AS requ', 'cu.id_requisicion_unidad', '=', 'requ.id')
-            ->join('p_presup_unidad AS presu', 'requ.id_presup_unidad', '=', 'presu.id')
-            ->select('presu.id_anio', 'or.estado', 'or.fecha_orden', 'or.id_cotizacion', 'or.id')
-            ->where('presu.id_anio', $idanio)
-            ->where('or.estado', 1) // solo denegadas
-            ->orderBy('or.fecha_orden')
-            ->get();
-
-        foreach($lista as $val){
-            $infoCotizacion = CotizacionUnidad::where('id', $val->id_cotizacion)->first();
-            $infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
-            $infoProveedor = Proveedores::where('id', $infoCotizacion->id_proveedor)->first();
-            $infoPresup = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-            $infoDepar = P_Departamento::where('id', $infoPresup->id_departamento)->first();
-
-            $val->departamento = $infoDepar->nombre;
-
-            if($infoacta = ActaUnidad::where('id_ordenunidad', $val->id)->first()){
-                $val->actaid = $infoacta->id;
-            }else{
-                $val->actaid = 0;
-            }
-
-            $val->requidestino = $infoRequisicion->destino;
-            $val->nomproveedor = $infoProveedor->nombre;
-        }
-
-        return view('backend.admin.presupuestounidad.ordenes.ordenesdenegadas.tablaordenesunidadcompradenegadas', compact('lista'));
+        return view('backend.admin.presupuestounidad.ordenes.ordenesaprobadas.tablaordenesunidadcompraaprobada', compact('arrayOrdenUnidad'));
     }
 
     // vista detalle de una cotización unidad, esto se mira desde las ordenes de compra
@@ -402,7 +245,7 @@ class OrdenCompraUnidadController extends Controller
         // id de cotizacion
 
         $infoCotizacion = CotizacionUnidad::where('id', $idcoti)->first();
-        $infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
+        $infoAgrupado = RequisicionAgrupada::where('id', $infoCotizacion->id_agrupado)->first();
         $infoProveedor = Proveedores::where('id', $infoCotizacion->id_proveedor)->first();
 
         $proveedor = $infoProveedor->nombre;
@@ -442,7 +285,7 @@ class OrdenCompraUnidadController extends Controller
         $totalPrecio = number_format((float)$totalPrecio, 2, '.', ',');
         $totalTotal = number_format((float)$totalTotal, 2, '.', ',');
 
-        return view('backend.admin.presupuestounidad.ordenes.detalleorden.vistadetalleordenunidad', compact('idcoti', 'infoRequisicion',
+        return view('backend.admin.presupuestounidad.ordenes.detalleorden.vistadetalleordenunidad', compact('idcoti', 'infoAgrupado',
             'proveedor', 'infoCotiDetalle', 'fecha', 'totalCantidad', 'totalPrecio', 'totalTotal'));
     }
 
@@ -458,26 +301,16 @@ class OrdenCompraUnidadController extends Controller
 
         if ($validar->fails()){return ['success' => 0]; }
 
-        $infoOrden = OrdenUnidad::where('id', $request->idorden)->first();
-        $infoCotizacion = CotizacionUnidad::where('id', $infoOrden->id_cotizacion)->first();
-        $infoRequisicion = RequisicionUnidad::where('id', $infoCotizacion->id_requisicion_unidad)->first();
-        $infoPresuUnidad = P_PresupUnidad::where('id', $infoRequisicion->id_presup_unidad)->first();
-        $infoAnio = P_AnioPresupuesto::where('id', $infoPresuUnidad->id_anio)->first();
 
-        if($infoAnio->permiso == 0){
-            return ['success' => 1];
-        }
-
-        // si ya existe, solo retornar como que fue guardado
+        // EVITAR DUPLICADOS
         if($info = ActaUnidad::where('id_ordenunidad', $request->idorden)->first()){
-            return ['success' => 2, 'actaid'=> $info->id];
+            return ['success' => 1, 'actaid'=> $info->id];
         }else{
             $acta = new ActaUnidad();
             $acta->id_ordenunidad = $request->idorden;
-            $acta->estado = 1; // acta generada
 
             if($acta->save()) {
-                return ['success' => 2, 'actaid'=> $acta->id];
+                return ['success' => 1, 'actaid'=> $acta->id];
             }else {
                 return ['success' => 99];
             }
@@ -493,19 +326,17 @@ class OrdenCompraUnidadController extends Controller
         $proveedor =  Proveedores::where('id',  $cotizacion->id_proveedor)->first();
         $administrador = Administradores::where('id',  $orden->id_admin_contrato)->first();
 
-        $infoRequi = RequisicionUnidad::where('id', $cotizacion->id_requisicion_unidad)->first();
-        $infoPresu = P_PresupUnidad::where('id', $infoRequi->id_presup_unidad)->first();
 
-        $infoUsuarioDepa = P_UsuarioDepartamento::where('id_departamento', $infoPresu->id_departamento)->first();
 
-        $infoUsuario = Usuario::where('id', $infoUsuarioDepa->id_usuario)->first();
+
+
 
 
         $lugar = $orden->lugar;
 
 
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
-        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
         $mpdf->SetTitle('Acta');
 
         // mostrar errores
@@ -533,7 +364,7 @@ class OrdenCompraUnidadController extends Controller
             <label style='font-weight: bold; font-size: 15px;  text-align:justify;'></label>
             <label style=' font-size: 15px;  text-align:justify;'>del día  _______________</label>
             <label style=' font-size: 15px;  text-align:justify;'>; con el propósito de hacer entrega formal por parte de </label>
-            <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>$proveedor->nombre</label>
+            <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>xxx</label>
             <label style=' font-size: 15px;  text-align:justify;'>.</label></div>
         ";
 
@@ -541,9 +372,9 @@ class OrdenCompraUnidadController extends Controller
             <label style=' font-size: 15px;  text-align:justify;'>Todo lo correspondiente a la orden No.</label>
             <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>$orden->id</label>
             <label style=' font-size: 15px;  text-align:justify;'> y con base a lo solicitado; presente los señores</label>
-            <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>$proveedor->nombre</label>
+            <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>xxx</label>
             <label style=' font-size: 15px;  text-align:justify;'>, por parte del proveedor; </label>
-            <label style='font-weight: bold; font-size: 15px;  text-align:justify;'>$administrador->nombre.</label>
+            <label style='font-weight: bold; font-size: 15px;  text-align:justify;'>xxx.</label>
             <label style=' font-size: 15px;  text-align:justify;'> en calidad de administrador de contrato.</label>
             </div>
         ";
@@ -591,8 +422,8 @@ class OrdenCompraUnidadController extends Controller
                     </tr>";
 
         $tabla .= "<tr>
-                    <td width='25%' style='font-size: 12px'>$proveedor->nombre</td>
-                    <td width='25%' style='font-size: 14px; margin-left: 15px'>$administrador->nombre</td>
+                    <td width='25%' style='font-size: 12px'>xxx</td>
+                    <td width='25%' style='font-size: 14px; margin-left: 15px'>xxx</td>
                     </tr>";
 
         $tabla .= "</tbody></table>";
@@ -610,7 +441,7 @@ class OrdenCompraUnidadController extends Controller
                     </tr>";
 
         $tabla .= "<tr>
-                    <td width='25%' style='font-size: 14px; padding-left: 15px'>Nombre: $infoUsuario->nombre</td>
+                    <td width='25%' style='font-size: 14px; padding-left: 15px'>Nombre: xxx</td>
                     </tr>";
 
         $tabla .= "</tbody></table>";

@@ -7,50 +7,39 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 15%">Departamento</th>
-                                <th style="width: 10%">Num. de Orden</th>
-                                <th style="width: 17%">Requi. Destino</th>
-                                <th style="width: 17%">Cotización #</th>
-                                <th style="width: 17%">Proveedor</th>
+                                <th style="width: 10%"># de Orden</th>
+                                <th style="width: 17%"># de Cotización</th>
+                                <th style="width: 17%">Fecha de Orden</th>
                                 <th style="width: 12%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($lista as $dato)
+                            @foreach($arrayOrdenUnidad as $dato)
 
                                 <tr>
-                                    <td></td>
                                     <td>{{ $dato->id }}</td>
-                                    <td></td>
                                     <td>{{ $dato->id_cotizacion }}</td>
-                                    <td></td>
+                                    <td>{{ $dato->fecha_orden }}</td>
                                     <td>
-                                        <!-- acta a un no generada Y SOLO JEFE UACI PUEDE ANULAR ORDEN DE COMPRA-->
-                                        @if($dato->actaid == 0)
-                                            @can('boton.anular.orden.compra.unidad')
-                                            <button type="button" class="btn btn-danger btn-xs" onclick="abrirModalAnular({{ $dato->id }})">
-                                                <i class="fas fa-trash-alt" title="Anular"></i>&nbsp; Anular
-                                            </button>
-                                            <br> <br>
-                                            @endcan
-                                        @endif
 
                                         <button type="button" class="btn btn-primary btn-xs" onclick="verDetalles({{ $dato->id_cotizacion }})">
                                             <i class="fas fa-list-alt" title="Detalle"></i>&nbsp; Detalle
                                         </button>
+
                                         <br> <br>
                                         <button type="button" class="btn btn-success btn-xs" onclick="Imprimir({{ $dato->id }})">
                                             <i class="fa fa-print" title="Generar Acta"></i>&nbsp; Imprimir Orden
                                         </button>
 
-                                        <br> <br>
-                                        @if($dato->actaid == 0)
-                                            <button type="button" class="btn btn-warning btn-xs" onclick="abrirModalActa({{ $dato->id }})">
+                                        @if($dato->hayActa == 0)
+                                            <br><br>
+                                            <button type="button" class="btn btn-warning btn-xs" onclick="generarActta({{ $dato->id }})">
                                                 <i class="fa fa-file-pdf" title="Generar Acta"></i>&nbsp; Generar Acta
                                             </button>
                                         @else
-                                            <button type="button" class="btn btn-info btn-xs" onclick="imprimirActa({{ $dato->actaid }})">
+                                            <br><br>
+                                            <button type="button" class="btn btn-info btn-xs" onclick="imprimirActa({{ $dato->idActa }})">
                                                 <i class="fas fa-print" title="Imprimir Acta"></i>&nbsp; Imprimir Acta
                                             </button>
                                         @endif

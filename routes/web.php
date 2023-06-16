@@ -992,16 +992,10 @@ Route::get('/admin/p/ordenes/comprasunidades/aprobadas/anio', [OrdenCompraUnidad
 Route::get('/admin/p/ordenes/comprasunidades/aprobadas/index/{idanio}', [OrdenCompraUnidadController::class,'indexOrdenesComprasAprobadasUnidades']);
 // retorna tabla con las ordenes de compras para unidades
 Route::get('/admin/p/ordenes/comprasunidades/aprobadas/tabla/{idanio}', [OrdenCompraUnidadController::class,'tablaOrdenesComprasAprobadasUnidades']);
-// anular una orden de compra para unidades.
-Route::post('/admin/p/orden/compraunidad/anular',  [OrdenCompraUnidadController::class,'anularCompraUnidades']);
 
-// * ORDENES DE COMPRA DENEGADAS
 
-Route::get('/admin/p/ordenes/compras/unidades/denegadas/anio', [OrdenCompraUnidadController::class,'vistaAñoOrdenesComprasUnidadesDenegadas'])->name('admin.ordenes.compra.unidades.denegadas');
-// retorna vista para las ordenes de compra anuladas para unidades
-Route::get('/admin/p/ordenes/compras/unidades/denegadas/index/{idanio}', [OrdenCompraUnidadController::class,'indexOrdenesComprasUnidadesDenegadas']);
-// retorna tabla para las ordenes de compra anuladas para unidades
-Route::get('/admin/p/ordenes/compras/unidades/denegadas/tabla/{idanio}', [OrdenCompraUnidadController::class,'tablaOrdenesComprasUnidadesDenegadas']);
+
+
 
 // vista detalle de una cotización unidad, esto se mira desde las ordenes de compra
 Route::get('/admin/p/detalle/ordencompra/coti/unidad/{idorden}', [OrdenCompraUnidadController::class,'vistaDetalleCotizacionUnidadOrden']);

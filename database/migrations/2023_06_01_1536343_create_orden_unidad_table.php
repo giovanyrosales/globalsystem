@@ -16,25 +16,11 @@ class CreateOrdenUnidadTable extends Migration
         Schema::create('orden_unidad', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_cotizacion')->unsigned();
-
             $table->date('fecha_orden');
-            $table->string('lugar', 300);
-
-            // 0: defecto
-            // 1: orden anulada
-
-            $table->integer('estado');
-
-            // fecha de orden Anulada
-            $table->dateTime('fecha_anulada')->nullable();
-
-
             $table->string('numero_acta', 100);
             $table->string('numero_acuerdo', 100);
 
-
             $table->foreign('id_cotizacion')->references('id')->on('cotizacion_unidad');
-            $table->foreign('id_admin_contrato')->references('id')->on('administradores');
         });
     }
 

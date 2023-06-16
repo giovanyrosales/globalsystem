@@ -455,8 +455,7 @@ class CotizacionesUnidadController extends Controller{
 
     // retorna vista con las cotizaciones autorizaciones para unidades
     public function indexCotizacionesUnidadesAutorizadas($idanio){
-        $contrato = Administradores::orderBy('nombre')->get();
-        return view('backend.admin.presupuestounidad.cotizaciones.procesada.vistacotizacionprocesadaunidad', compact('contrato', 'idanio'));
+        return view('backend.admin.presupuestounidad.cotizaciones.procesada.vistacotizacionprocesadaunidad', compact( 'idanio'));
     }
 
     // retorna tabla con las cotizaciones autorizaciones para unidades
@@ -467,23 +466,22 @@ class CotizacionesUnidadController extends Controller{
         // autorizadas
         $lista = DB::table('cotizacion_unidad AS cu')
             ->join('requisicion_agrupada AS ra', 'cu.id_agrupado', '=', 'ra.id')
-            ->select('cu.id', 'cu.estado', 'cu.id_proveedor', 'cu.fecha', 'ra.id_anio')
+            ->select('cu.id', 'cu.estado', 'ra.nombreodestino', 'ra.justificacion', 'cu.id_proveedor', 'cu.fecha', 'ra.id_anio')
             ->where('cu.estado', 1)
             ->whereYear('cu.fecha', $infoAnio->nombre)
             ->get();
 
-        foreach ($lista as $dd){
+        foreach ($lista as $info){
 
-            $dd->fecha = date("d-m-Y", strtotime($dd->fecha));
+            $info->fecha = date("d-m-Y", strtotime($info->fecha));
 
-            $infoProveedor = Proveedores::where('id', $dd->id_proveedor)->first();
+            $infoProveedor = Proveedores::where('id', $info->id_proveedor)->first();
+            $info->proveedor = $infoProveedor->nombre;
 
-            $dd->proveedor = $infoProveedor->nombre;
-
-            if(OrdenUnidad::where('id_cotizacion', $dd->id)->first()){
-                $dd->bloqueo = true;
+            if(OrdenUnidad::where('id_cotizacion', $info->id)->first()){
+                $info->bloqueo = true;
             }else{
-                $dd->bloqueo = false;
+                $info->bloqueo = false;
             }
         }
 

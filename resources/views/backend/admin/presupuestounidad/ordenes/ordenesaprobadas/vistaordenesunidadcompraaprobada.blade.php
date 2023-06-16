@@ -170,93 +170,12 @@
 
         function verProcesadas(id){
             // ID COTIZACION
-
             window.location.href="{{ url('/admin/p/detalle/ordencompra/coti/unidad') }}/" + id;
         }
 
-        function abrirModalAnular(id){
 
-            Swal.fire({
-                title: 'Anular Orden',
-                text: "",
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#808080',
-                cancelButtonText: 'Cancelar',
-                confirmButtonText: 'Anular',
-                reverseButtons: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    anularOrden(id);
-                }
-            })
-        }
 
-        function anularOrden(id){
-
-            openLoading();
-
-            axios.post(url+'/p/orden/compraunidad/anular',{
-                'id': id
-            })
-                .then((response) => {
-                   closeLoading();
-
-                    if(response.data.success === 1){
-
-                        Swal.fire({
-                            title: 'Acta Encontrada',
-                            text: "La orden de compra tiene un Acta Generada, no se puede Anular esta orden",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#808080',
-                            confirmButtonText: 'Recargar',
-                            reverseButtons: true,
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2){
-                        toastr.success('Orden Anulada!');
-                        recargar();
-                    }
-                    else if(response.data.success === 3) {
-
-                        Swal.fire({
-                            title: 'Permiso Denegado',
-                            text: "Para el Presente Año no es permitido realizar modificaciones",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-
-                    }
-                    else{
-                        toastr.error('Error al Anular Orden');
-                    }
-                })
-                .catch((error) => {
-                    closeLoading();
-                    toastr.error('Error al Anular Orden');
-                });
-        }
-
-        function abrirModalActa(id){
-            //$('#modalGenerarActa').modal('show');
-            //$('#idacta').val(id); // id orden
-
+        function generarActta(id){
             let formData = new FormData();
             formData.append('idorden', id);
 
@@ -265,27 +184,9 @@
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1){
-
-                        Swal.fire({
-                            title: 'Permiso Denegado',
-                            text: "Para el Presente Año no es permitido realizar modificaciones",
-                            icon: 'info',
-                            showCancelButton: false,
-                            allowOutsideClick: false,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2) {
+                    if(response.data.success === 1) {
                         toastr.success('Acta creada correctamente');
                         recargar();
-                        $('#modalGenerarActa').modal('hide');
                         window.open("{{ URL::to('admin/p/ordenes/acta/unidad/reporte') }}/" + response.data.actaid);
                     }
                     else{
@@ -298,68 +199,17 @@
                 });
         }
 
-        // NO SE UTILIZA YA
-        function enviarModalGenerarActa(){
-            var idorden = document.getElementById('idacta').value;
-            var horaacta = document.getElementById('horaacta').value;
-            var fechaacta = document.getElementById('fechaacta').value;
 
-            if(horaacta === ''){
-                toastr.error('Hora para Acta es requerido');
-                return;
-            }
-
-            if(fechaacta === ''){
-                toastr.error('Fecha para Acta es requerida');
-                return;
-            }
-
-
-        }
 
         function imprimirActa(actaid){
             window.open("{{ URL::to('admin/p/ordenes/acta/unidad/reporte') }}/" + actaid);
         }
 
         function Imprimir(id){
-            // PREGUNTAR CUANDO MATERIALES QUIERE POR HOJA
-            //$('#id-pagina').val(id);
-            //$('#modalHoja').modal('show');
             window.open("{{ URL::to('admin/p/ordencompra/unidad/pdf') }}/" + id + "/" + 12);
         }
 
-        // YA NO UTILIZADO
-        function generarImpresion(){
 
-            var id = document.getElementById('id-pagina').value;
-            var cantidad = document.getElementById('cantidad-pagina').value;
-
-            if(cantidad === ''){
-                toastr.error('Cantidad por Página es Requerido');
-                return;
-            }
-
-            var reglaNumeroEntero = /^[0-9]\d*$/;
-
-            if(!cantidad.match(reglaNumeroEntero)) {
-                toastr.error('Cantidad debe ser número Entero');
-                return;
-            }
-
-            if(cantidad <= 0){
-                toastr.error('Cantidad no debe tener negativos o Cero');
-                return;
-            }
-
-            if(cantidad.length > 3){
-                toastr.error('Cantidad máximo 3 dígitos de límite');
-                return;
-            }
-
-            $('#modalHoja').modal('hide');
-
-            window.open("{{ URL::to('admin/p/ordencompra/unidad/pdf') }}/" + id + "/" + cantidad);
-        }
 
         function verDetalles(id){
             // ID COTIZACION

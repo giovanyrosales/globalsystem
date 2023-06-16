@@ -58,6 +58,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+
                 <div class="modal-body">
                     <form id="formulario-crear-orden">
                         <div class="card-body">
@@ -66,22 +67,12 @@
                                     <div class="row">
 
                                         <div class="form-group col-md-6">
-                                            <label>Administrador de Contrato</label>
-                                            <select class="custom-select" id="select-administrador">
-                                                @foreach( $contrato as $dd)
-                                                    <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="form-group col-md-6">
                                             <label>Fecha de Orden</label>
                                             <input type="date" id="fecha_orden" class="form-control">
                                             <input type="hidden" id="id-coti" class="form-control">
                                         </div>
 
                                     </div>
-
 
                                     <div class="row">
 
@@ -99,11 +90,6 @@
                                             </div>
                                         </div>
 
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Lugar</label>
-                                        <input type="text" class="form-control" maxlength="300" id="lugar">
                                     </div>
                                 </div>
                             </div>
@@ -155,6 +141,7 @@
             $('#tablaDatatable').load(ruta);
         }
 
+        // VER DETALLES
         function verProcesadas(idcoti){
             window.location.href="{{ url('/admin/p/cotizacion/unidad/detalle') }}/" + idcoti;
         }
@@ -167,30 +154,13 @@
 
         function verificarOrden(){
             var fecha = document.getElementById('fecha_orden').value;
-            var lugar = document.getElementById('lugar').value;
-            var admin = document.getElementById('select-administrador').value;
             var idcoti = document.getElementById('id-coti').value;
 
             var numacuerdo = document.getElementById('num_acuerdo').value;
             var numacta = document.getElementById('num_acta').value;
 
-            if(admin === ''){
-                toastr.error('Seleccionar Administrador');
-                return;
-            }
-
             if(fecha === ''){
                 toastr.error('Fecha para es requerida');
-                return;
-            }
-
-            if(lugar === ''){
-                toastr.error('El Lugar es requerido');
-                return;
-            }
-
-            if(lugar.length > 300){
-                toastr.error('Lugar debe tener máximo 300 caracteres');
                 return;
             }
 
@@ -218,8 +188,6 @@
             var formData = new FormData();
             formData.append('idcoti', idcoti);
             formData.append('fecha', fecha);
-            formData.append('lugar', lugar);
-            formData.append('admin', admin);
             formData.append('numacta', numacta);
             formData.append('numacuerdo', numacuerdo);
 
@@ -228,14 +196,7 @@
                 .then((response) => {
                     closeLoading();
 
-                    if(response.data.success === 1){
-
-                        // ESTA REPETIDO YA
-
-                        toastr.error('Orden esta repetido');
-
-                    }
-                    else if(response.data.success === 2) {
+                    if(response.data.success === 1) {
                        // GENERADO CORRECTAMENTE
 
                         Swal.fire({
