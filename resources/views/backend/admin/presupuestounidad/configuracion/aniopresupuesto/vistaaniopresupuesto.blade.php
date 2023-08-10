@@ -63,7 +63,7 @@
 
                                     <div class="form-group">
                                         <label>Año (4 dígitos)</label>
-                                        <input type="number" maxlength="4" autocomplete="off" class="form-control" id="Año">
+                                        <input type="number" maxlength="4" autocomplete="off" class="form-control" id="nombre-nuevo">
                                     </div>
 
                                 </div>
@@ -161,7 +161,7 @@
         }
 
         function nuevo(){
-            var nombre = document.getElementById('nombre').value;
+            var nombre = document.getElementById('nombre-nuevo').value;
 
             if(nombre === ''){
                 toastr.error('Año es requerido');
