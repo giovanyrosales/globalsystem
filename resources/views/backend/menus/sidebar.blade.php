@@ -356,7 +356,7 @@
 
                             @can('ordenes.compras.denegadas.unidades.index')
                                     <li class="nav-item">
-                                    <a href="{{ route('admin.ordenes.compra.unidades.denegadas') }}" target="frameprincipal" class="nav-link">
+                                    <a href="#" target="frameprincipal" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>
                                             Ordenes Denegadas
