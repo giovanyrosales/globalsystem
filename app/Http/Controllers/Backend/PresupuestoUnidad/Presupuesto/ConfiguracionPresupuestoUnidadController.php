@@ -413,7 +413,7 @@ class ConfiguracionPresupuestoUnidadController extends Controller
                     foreach ($subSecciones3 as $subLista){
 
                         $uni = P_UnidadMedida::where('id', $subLista->id_unidadmedida)->first();
-                        $unimedida = $uni->simbolo;
+                        $unimedida = $uni->nombre;
 
                         $subLista->unimedida = $unimedida;
 

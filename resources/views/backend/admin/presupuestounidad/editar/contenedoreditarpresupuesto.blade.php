@@ -88,7 +88,7 @@
                                                                                                 <tr>
                                                                                                     <th style="width: 30%; text-align: center">Descripción</th>
                                                                                                     <th style="width: 20%; text-align: center">U/M</th>
-                                                                                                    <th style="width: 15%; text-align: center">Costo</th>
+                                                                                                    <th style="width: 15%; text-align: center">Costo ($)</th>
                                                                                                     <th style="width: 10%; text-align: center">Unidades</th>
                                                                                                     <th style="width: 10%; text-align: center">Periodo</th>
                                                                                                     <th style="width: 10%; text-align: center">Total</th>
