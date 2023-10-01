@@ -44,7 +44,7 @@ class CreateRequisicionAgrupadaTable extends Migration
 
             // CUANDO UCP LO VA A DENEGAR TODOS COMPLETAMENTE
             // 0 - estado defecto
-            // 1- denegado por ucp
+            // 1- denegado por Usuario UCP, por que el jefe solo puede denegar la cotizacion
             $table->boolean('estado');
 
             $table->string('nota_cancelado', 800)->nullable();

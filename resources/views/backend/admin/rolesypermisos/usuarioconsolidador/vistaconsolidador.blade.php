@@ -130,6 +130,16 @@
                 },
             });
 
+
+            $('#select-departamento').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Búsqueda no encontrada";
+                    }
+                },
+            });
+
             document.getElementById("divcontenedor").style.display = "block";
         });
     </script>

@@ -56,8 +56,10 @@ class OrdenCompraUnidadController extends Controller
         DB::beginTransaction();
         try {
 
-            if(OrdenUnidad::where('id_cotizacion', $request->idcoti)->first()){
+            if($infoOrden = OrdenUnidad::where('id_cotizacion', $request->idcoti)->first()){
                 // YA ESTA REGISTRADA Y NO HACER NADA
+
+                $idorden = $infoOrden->id;
 
             }else{
                 $or = new OrdenUnidad();
@@ -66,11 +68,13 @@ class OrdenCompraUnidadController extends Controller
                 $or->numero_acta = $request->numacta;
                 $or->numero_acuerdo = $request->numacuerdo;
                 $or->save();
+
+                $idorden = $or->id;
+
+                DB::commit();
             }
 
-
-            DB::commit();
-            return ['success' => 1, 'id' => $or->id];
+            return ['success' => 1, 'id' => $idorden];
 
         }catch(\Throwable $e){
             Log::info('error: ' . $e);
@@ -348,7 +352,7 @@ class OrdenCompraUnidadController extends Controller
      <TABLE BORDER>
 	<TR>
 		<TD ROWSPAN=2> <img id='logo' src='$logoalcaldia'> </TD>
-	    	<TD style='padding-left: 20px; font-weight: bold; font-size: 20px'>ACTA DE RECEPCIONES DE BIENES, SERVICIOS Y OBRAS.</TD>
+	    	<TD style='padding-left: 20px; font-weight: bold; font-size: 20px;'>ACTA DE RECEPCIONES DE BIENES, SERVICIOS Y OBRAS.</TD>
 	</TR>
 	<TR>
 		<TD style='text-align: center; font-size: 18px; font-weight: bold; padding-top: 15px'>Alcaldía Municipal de Metapán.</TD>

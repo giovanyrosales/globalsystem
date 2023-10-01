@@ -319,7 +319,9 @@ class ConsolidadorController extends Controller
 
             $infoAdministrador = Administradores::where('id', $info->id_contrato)->first();
             $infoEvaluador = Administradores::where('id', $info->id_evaluador)->first();
-            $info->fecha = date("d-m-Y", strtotime($info->fecha));
+
+
+            //$info->fecha = date("d-m-Y", strtotime($info->fecha));
 
             $info->nomadmin = $infoAdministrador->nombre;
             $info->nomevaluador = $infoEvaluador->nombre;
@@ -330,9 +332,18 @@ class ConsolidadorController extends Controller
             $btnBorrar = 1;
 
 
+            // ya esta cotizado
             if (CotizacionUnidad::where('id_agrupado', $info->id)->first()) {
                 $btnBorrar = 0;
             }
+
+            // verificar si fue denegado por usuario UCP
+            if($info->estado == 1){
+                $btnBorrar = 0;
+            }
+
+
+
             $info->btnborrar = $btnBorrar;
         }
 
@@ -428,11 +439,19 @@ class ConsolidadorController extends Controller
 
             if($infoAgrupado = RequisicionAgrupada::where('id', $request->id)->first()){
 
+
+                // ESTE AGRUPADO FUE DENEGADO POR USUARIO UCP
+                if($infoAgrupado->estado == 1){
+                    return ['success' => 1]; // no se puede borrar
+                }
+
+
                 // SI ESTE AGRUPADO SE ENCUENTRA COTIZADO, YA NO SE PUEDE BORRAR
                 if(CotizacionUnidad::where('id_agrupado', $infoAgrupado->id)->first()){
 
-                    return ['success' => 1]; // no se puede borrar
+                    return ['success' => 2]; // no se puede borrar
                 }
+
 
                 // VOLVER A SETEAR DE AGRUPADO LOS MATERIALES
                 $arrayRequi = RequisicionAgrupadaDetalle::where('id_requi_agrupada', $infoAgrupado->id)->get();
@@ -450,7 +469,7 @@ class ConsolidadorController extends Controller
                 RequisicionAgrupada::where('id', $infoAgrupado->id)->delete();
 
                 DB::commit();
-                return ['success' => 2];
+                return ['success' => 3];
 
             }else{
                 return ['success' => 99];

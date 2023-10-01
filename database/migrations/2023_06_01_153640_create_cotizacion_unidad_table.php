@@ -22,7 +22,7 @@ class CreateCotizacionUnidadTable extends Migration
             // fecha se creo la cotizacion
             $table->date('fecha');
 
-            // fecha cuando se modifica su estado
+            // fecha cuando se modifica su estado el jefe ucp
             $table->dateTime('fecha_estado')->nullable();
 
             // 0: defecto

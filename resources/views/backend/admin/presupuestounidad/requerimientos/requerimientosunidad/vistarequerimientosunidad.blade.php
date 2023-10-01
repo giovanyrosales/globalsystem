@@ -1357,8 +1357,9 @@
                 html: "Pendiente" + "<br>"
                     + "Agrupado por Consolidador" + "<br>"
                     + "Cotizado por UCP" + "<br>"
+                    + "Aprobado por Jefe de UCP" + "<br>"
                     + "Orden de Compra Generada" + "<br>"
-                    + "Requisición Denegada por UCP" + "<br>"
+                    + "Si Fue cancelado (Requisición Denegada por UCP)" + "<br>"
                 ,
                 icon: 'info',
                 showCancelButton: false,

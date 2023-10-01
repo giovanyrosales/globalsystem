@@ -7,6 +7,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                <th style="width: 6%">ID</th>
                                 <th style="width: 10%">Nombre</th>
                                 <th style="width: 10%">Rol</th>
                                 <th style="width: 10%">Usuario</th>
@@ -18,6 +19,7 @@
 
                             @foreach($usuarios as $dato)
                                 <tr>
+                                    <td>{{ $dato->id }}</td>
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->roles->implode('name', ', ') }}</td>
                                     <td>{{ $dato->usuario }}</td>

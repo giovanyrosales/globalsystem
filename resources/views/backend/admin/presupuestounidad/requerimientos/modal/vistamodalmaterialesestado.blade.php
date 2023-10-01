@@ -79,6 +79,7 @@
     <tr>
         <td width="30%" style="font-weight: bold">Material</td>
         <td width="8%" style="font-weight: bold">Estado</td>
+        <td width="8%" style="font-weight: bold">Fecha</td>
     </tr>
 
     @foreach($arrayRequiDetalle as $info)
@@ -86,6 +87,7 @@
         <tr>
             <td width="8%" style="font-weight: bold">{{ $info->nommaterial }}</td>
             <td width="8%" style="font-weight: bold">{{ $info->estado }}</td>
+            <td width="8%" style="font-weight: bold">{{ $info->fechaestado }}</td>
         </tr>
 
     @endforeach

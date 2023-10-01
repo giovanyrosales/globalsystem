@@ -61,9 +61,22 @@ class CotizacionesUnidadController extends Controller{
 
         // DEL AÑO ELEGIDO
 
-        // OBTENER LISTADO DE REQUISICION AGRUPADA DETALLE DONDE COTIZADO SEA 0
+        // OBTENER LISTADO DE REQUISICION AGRUPADA DETALLE DONDE COTIZADO SEA 0 Y SEA DEL X ANIO ELEGIDO
 
-        $arrayAgruDetalle = RequisicionAgrupadaDetalle::where('cotizado', 0)->get();
+        $arrayAgrupado = RequisicionAgrupada::where('id_anio', $idanio)->get();
+
+
+        $pilaID = array();
+
+        foreach ($arrayAgrupado as $dato){
+            array_push($pilaID, $dato->id);
+        }
+
+
+        $arrayAgruDetalle = RequisicionAgrupadaDetalle::whereIn('id_requi_agrupada', $pilaID)
+            ->where('cotizado', 0)
+            ->get();
+
 
         $pilaPadre = array();
 
@@ -73,12 +86,12 @@ class CotizacionesUnidadController extends Controller{
 
             // NO ESTA DENEGADA POR UCP
             if($infoPadre->estado == 0){
-                // SE DEBE INGRESAR EL PADRE
+                // SE DEBE INGRESAR EL PADRE ID
                 array_push($pilaPadre, $dato->id_requi_agrupada);
             }
         }
 
-        $listado = RequisicionAgrupada::where('id', $pilaPadre)->get();
+        $listado = RequisicionAgrupada::whereIn('id', $pilaPadre)->get();
 
 
         return view('backend.admin.presupuestounidad.requerimientos.requerimientosunidad.revision.tablarequerimientosunidadrevision', compact('listado'));
@@ -854,7 +867,7 @@ class CotizacionesUnidadController extends Controller{
 
         <tr>
             <td style='text-align: left; font-weight: bold; padding-top: 10px; font-size:11px;'>PRESUPUESTO</td>
-            <td style='text-align: right; font-weight: bold; padding-top: 10px; font-size:11px;'>RECIBE UACI</td>
+            <td style='text-align: right; font-weight: bold; padding-top: 10px; font-size:11px;'>RECIBE UCP</td>
         </tr>
 
         <tr>

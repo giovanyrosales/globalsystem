@@ -174,11 +174,84 @@ class RequerimientosUnidadController extends Controller
             $info->nommaterial = $infoMaterial->descripcion;
 
             $estado = "Pendiente";
+            $fechaestado = "";
 
-            // FALTA AGREGAR MAS ESTADOS.   13/06/2023
+            // ESTADOS
+
+            //1- pendiente
+            //2- agrupado
+            //3- cotizado
+            //4- aprobado por ucp
+            //5- orden compra generada
+            //6- denegada (por jefe ucp o por usuario UCP)
+
+            if($info->agrupado == 1){
+                $estado = "Agrupado";
+
+                if($infoDetaAgrupado = RequisicionAgrupadaDetalle::where('id_requi_unidad_detalle', $info->id)->first()){
+
+                    $infoAgrupado = RequisicionAgrupada::where('id', $infoDetaAgrupado->id_requi_agrupada)->first();
+
+                    $fechaestado = date("d-m-Y", strtotime($infoAgrupado->fecha));
+                }
+
+            }
+
+            $idCotiUnidad = 0;
+
+            if($infoCoUni = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $info->id)->first()){
+                $estado = "Cotizado";
+                $idCotiUnidad = $infoCoUni->id_cotizacion_unidad;
+
+                $buscarFecha = CotizacionUnidad::where('id', $infoCoUni->id_cotizacion_unidad)->first();
+
+                $fechaestado = date("d-m-Y", strtotime($buscarFecha->fecha));
+            }
+
+            if($infoDetalleCoti = CotizacionUnidad::where('id', $idCotiUnidad)->first()){
+                if($infoDetalleCoti->estado == 1){
+                    $estado = "Aprobado por UCP";
+
+                    $fechaestado = date("d-m-Y", strtotime($infoDetalleCoti->fecha_estado));
+                }
+            }
+
+            if($infoOrden = OrdenUnidad::where('id_cotizacion', $idCotiUnidad)->first()){
+                $estado = "Orden de Compra Generada";
+
+                $fechaestado = date("d-m-Y", strtotime($infoOrden->fecha_orden));
+            }
+
+
+            // ESTADO DENEGADO POR JEFE UCP
+            if($infoCoUni = CotizacionUnidadDetalle::where('id_requi_unidaddetalle', $info->id)->first()){
+
+                $infoDetalle = CotizacionUnidad::where('id', $infoCoUni->id_cotizacion_unidad)->first();
+
+                if($infoDetalle->estado == 2){
+                    $estado = "Denegado por UCP";
+
+                    $fechaestado = date("d-m-Y", strtotime($infoDetalle->fecha_estado));
+                }
+            }
+
+            // DENEGADO POR USUARIO UCP
+            if($datoinfo = RequisicionAgrupadaDetalle::where('id_requi_unidad_detalle', $info->id)->first()){
+
+                $infoRe = RequisicionAgrupada::where('id', $datoinfo->id_requi_agrupada)->first();
+
+                // DENEGADO
+                if($infoRe->estado == 1){
+                    $estado = "Denegado por UCP";
+
+                    $fechaestado = date("d-m-Y", strtotime($infoRe->fecha));
+                }
+
+            }
 
 
 
+            $info->fechaestado = $fechaestado;
             $info->estado = $estado;
         }
 

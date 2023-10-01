@@ -232,7 +232,7 @@
 
             Swal.fire({
                 title: 'Borrar Agrupado',
-                text: "Solo se podrá Borrar si ningún material ha sido cotizado de esta Agrupación",
+                text: "Solo se podrá Borrar si ningún material ha sido cotizado o denegado de esta Agrupación",
                 icon: 'info',
                 showCancelButton: true,
                 allowOutsideClick: false,
@@ -261,7 +261,30 @@
                 .then((response) => {
                     closeLoading();
 
+
                     if(response.data.success === 1){
+
+                        // FUE DENEGADO POR UCP
+
+                        Swal.fire({
+                            title: 'Error al Borrar',
+                            text: "El agrupado por Denegado por UCP",
+                            icon: 'info',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            cancelButtonText: 'Cancelar',
+                            confirmButtonText: 'Aceptar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                recargar();
+                            }
+                        })
+
+                    }
+
+                    else if(response.data.success === 2){
 
                         // UN MATERIAL YA ESTA COTIZADO
 
@@ -283,7 +306,7 @@
 
                     }
 
-                    else if(response.data.success === 2){
+                    else if(response.data.success === 3){
 
                         // BORRADO CORRECTAMENTE
 
@@ -310,7 +333,7 @@
 
             Swal.fire({
                 title: 'Editar Agrupado',
-                text: "Solo se podrá Editar si ningún material ha sido cotizado de esta Agrupación",
+                text: "Solo se podrá Editar si ningún material ha sido cotizado o denegado de esta Agrupación",
                 icon: 'info',
                 showCancelButton: true,
                 allowOutsideClick: false,

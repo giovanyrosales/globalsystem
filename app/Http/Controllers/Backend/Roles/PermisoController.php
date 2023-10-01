@@ -365,12 +365,8 @@ class PermisoController extends Controller
 
         // ID DE USUARIOS
         // 59- rosmery
-        // 60- marlene
-        // 61- ruby
-        // 62- karen
-        // 63- leiny
 
-        $usuarios = Usuario::whereIn('id', [59, 60, 61, 62, 63])->orderBy('nombre')->get();
+        $usuarios = Usuario::whereIn('id', [59])->orderBy('nombre')->get();
 
         return view('backend.admin.rolesypermisos.usuarioconsolidador.vistaconsolidador', compact('unidades', 'usuarios'));
     }
@@ -380,13 +376,13 @@ class PermisoController extends Controller
     // activo fijo, proveduria y bodega (nueva), servicios generales, catastro, promocion social,
     // unidad de la mujer, unidad de la niñez, unidad de formacion tecnica y vocacional,
     // unidad de la juventud, unidad de asistencia agropecuaria, unidad de clinica de salud,
-    //uniad de cultura y turismo, unidad de deportes
-    //
+    // unidad de cultura y turismo, unidad de deportes
+
 
     // listado de requerimientos (bot.
     //on detalle para ver que pidio nomas)
 
-    //
+
 
 
     public function tablaVistaConsolidador(){

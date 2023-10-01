@@ -160,7 +160,7 @@
                     <a href="#" class="nav-link nav-">
                         <i class="fas fa-tasks"></i>
                         <p>
-                            Cotizaciones
+                            Cotizaciones Proyecto
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
@@ -208,7 +208,7 @@
                             <a href="#" class="nav-link nav-">
                                 <i class="far fa-edit"></i>
                                 <p>
-                                    Ordenes de Compra
+                                    Orden de Compra Proy.
                                     <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
@@ -354,16 +354,6 @@
                                 </li>
                             @endcan
 
-                            @can('ordenes.compras.denegadas.unidades.index')
-                                    <li class="nav-item">
-                                    <a href="#" target="frameprincipal" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>
-                                            Ordenes Denegadas
-                                        </p>
-                                    </a>
-                                </li>
-                            @endcan
 
                         </ul>
                     </li>

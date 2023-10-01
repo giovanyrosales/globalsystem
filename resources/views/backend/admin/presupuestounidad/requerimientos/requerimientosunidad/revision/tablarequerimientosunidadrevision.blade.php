@@ -7,7 +7,7 @@
                         <table id="tabla-requisicion" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 12%">Fecha Agrupado</th>
+                                <th style="width: 8%">Fecha Agrupado</th>
                                 <th style="width: 15%">Nombre o Destino</th>
                                 <th style="width: 15%">Justificación</th>
                                 <th style="width: 10%">Opciones</th>
@@ -18,9 +18,9 @@
                             @foreach($listado as $dato)
 
                                 <tr>
-                                    <td style="width: 4%">{{ $dato->fecha }}</td>
-                                    <td style="width: 10%">{{ $dato->nombreodestino }}</td>
-                                    <td style="width: 10%">{{ $dato->justificacion }}</td>
+                                    <td style="width: 8%">{{ $dato->fecha }}</td>
+                                    <td style="width: 15%">{{ $dato->nombreodestino }}</td>
+                                    <td style="width: 15%">{{ $dato->justificacion }}</td>
 
                                     <td>
 
