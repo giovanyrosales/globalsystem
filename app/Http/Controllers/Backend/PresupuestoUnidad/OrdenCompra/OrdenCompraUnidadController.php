@@ -70,6 +70,7 @@ class OrdenCompraUnidadController extends Controller
                 $or->numero_acta = $request->numacta;
                 $or->numero_acuerdo = $request->numacuerdo;
                 $or->id_referencia = $request->referencia;
+                $or->codigo_proyecto = $request->codigoproy;
                 $or->save();
 
                 $idorden = $or->id;
@@ -98,6 +99,7 @@ class OrdenCompraUnidadController extends Controller
         $infoAgrupada = RequisicionAgrupada::where('id', $cotizacion->id_agrupado)->first();
         $destino = $infoAgrupada->nombreodestino;
 
+        $codigoproyecto = $orden->codigo_proyecto;
 
 
         $total = 0;
@@ -169,6 +171,25 @@ class OrdenCompraUnidadController extends Controller
             }
         }
 
+        // PASAR A LETRAS
+
+        $formatterES = new \NumberFormatter("es-ES", \NumberFormatter::SPELLOUT);
+        $izquierda = intval(floor($total));
+        //$derecha = intval(($total - floor($total)) * 100);
+        $totalEnLetras = $formatterES->format($izquierda);
+
+
+        // OBTENER SOLO LA PARTE DECIMAL
+        $whole = floor($total);      // 1
+        $resultadoDema = $total - $whole; // .25
+
+        return [$resultadoDema];
+
+        $totalSoloDecimal = intval($resultadoDema);
+
+
+
+
         $total = number_format((float)$total, 2, '.', ',');
 
         //$fecha = strftime("%d-%B-%Y", strtotime($orden->fechaorden));
@@ -204,7 +225,6 @@ class OrdenCompraUnidadController extends Controller
             $nombreConsolidador = $infoUsuario->nombre;
             $depaConsolidador = $infoDepa->nombre;
             $cargoConsolidador = $datoConsolidador->cargo;
-
         }
 
 
@@ -212,7 +232,8 @@ class OrdenCompraUnidadController extends Controller
         $pdf = PDF::loadView('backend.admin.presupuestounidad.reportes.pdfordencompraunidades', compact('orden',
             'cotizacion', 'dia','mes', 'anio','proveedor','dataArray',
              'total', 'idorden', 'arraycodigos',  'acta_acuerdo',
-                'destino', 'cargoConsolidador', 'nombreConsolidador', 'depaConsolidador'));
+                'destino', 'cargoConsolidador', 'nombreConsolidador', 'depaConsolidador',
+            'codigoproyecto', 'totalEnLetras', 'totalSoloDecimal'));
         //$customPaper = array(0,0,470.61,612.36);
         //$customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper('Letter', 'portrait')->setWarnings(false);

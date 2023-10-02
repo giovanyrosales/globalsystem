@@ -95,7 +95,7 @@
                   Cargo: {{ $cargoConsolidador }}
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
-                  Cod. Proyecto:
+                  Cod. Proyecto: {{ $codigoproyecto  }}
                 </td>
             </tr>
         </table>
@@ -132,9 +132,10 @@
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
                   Forma de pago:
                 </td>
-                <td width="50%" style="text-align:left; padding-left: 10px; ">
-                  DOLARES 00/100
+                <td width="50%" style="text-align:left; padding-left: 10px; font-size: 12px">
+                  {{ $totalEnLetras }} DOLARES {{ $totalSoloDecimal }}/100
                 </td>
+
             </tr>
         </table>
         <table  class="table-head"  border="1" style="border-collapse: collapse;"> >

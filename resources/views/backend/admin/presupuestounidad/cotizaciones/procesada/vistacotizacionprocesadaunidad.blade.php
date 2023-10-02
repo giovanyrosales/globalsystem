@@ -92,18 +92,25 @@
                                         <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Número de Acta (no ingresar palabra acta)</label>
-                                                <input type="text" class="form-control" maxlength="100" id="num_acta">
+                                                <input type="text" autocomplete="off" class="form-control" maxlength="100" id="num_acta">
                                             </div>
                                         </div>
 
                                         <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label>Número de Acuerdo (no ingresar palabra acuerdo)</label>
-                                                <input type="text" class="form-control" maxlength="100" id="num_acuerdo">
+                                                <input type="text" autocomplete="off" class="form-control" maxlength="100" id="num_acuerdo">
                                             </div>
                                         </div>
 
                                     </div>
+
+
+                                    <div class="form-group col-md-6">
+                                        <label>Código de Proyecto</label>
+                                        <input type="text" class="form-control" autocomplete="off"  maxlength="50" id="codigo-proyecto">
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -174,6 +181,8 @@
 
             var referencia = document.getElementById('select-referencia').value;
 
+            var codigoproy = document.getElementById('codigo-proyecto').value;
+
             if(fecha === ''){
                 toastr.error('Fecha para es requerida');
                 return;
@@ -206,6 +215,8 @@
             formData.append('numacta', numacta);
             formData.append('numacuerdo', numacuerdo);
             formData.append('referencia', referencia);
+            formData.append('codigoproy', codigoproy);
+
 
             axios.post(url+'/p/ordencompra/unidad/generar', formData, {
             })
