@@ -72,6 +72,19 @@
                                             <input type="hidden" id="id-coti" class="form-control">
                                         </div>
 
+
+                                        <div class="form-group col-md-6">
+                                            <label>Referencia</label>
+                                            <div>
+                                                <select class="form-control" id="select-referencia">
+                                                    @foreach($arrayReferencias as $item)
+                                                        <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+
                                     </div>
 
                                     <div class="row">
@@ -159,6 +172,8 @@
             var numacuerdo = document.getElementById('num_acuerdo').value;
             var numacta = document.getElementById('num_acta').value;
 
+            var referencia = document.getElementById('select-referencia').value;
+
             if(fecha === ''){
                 toastr.error('Fecha para es requerida');
                 return;
@@ -190,6 +205,7 @@
             formData.append('fecha', fecha);
             formData.append('numacta', numacta);
             formData.append('numacuerdo', numacuerdo);
+            formData.append('referencia', referencia);
 
             axios.post(url+'/p/ordencompra/unidad/generar', formData, {
             })

@@ -58,6 +58,14 @@
                             </a>
                         </li>
 
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.informacion.consolidador.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Información Consolidador</p>
+                            </a>
+                        </li>
+
                     </ul>
                  </li>
                 @endcan
@@ -668,6 +676,16 @@
                                     <a href="{{ route('p.admin.nuevas.solicitudes.materiales.aprobados') }}" target="frameprincipal" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Solicitudes Aprobadas</p>
+                                    </a>
+                                </li>
+                            @endcan
+
+
+                            @can('p.sidebar.referencias')
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.referencias.orden.index') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Referencias</p>
                                     </a>
                                 </li>
                             @endcan

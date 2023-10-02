@@ -8,6 +8,7 @@ use App\Models\Administradores;
 use App\Models\CotizacionUnidad;
 use App\Models\CotizacionUnidadDetalle;
 use App\Models\CuentaUnidad;
+use App\Models\InformacionConsolidador;
 use App\Models\ObjEspecifico;
 use App\Models\OrdenUnidad;
 use App\Models\P_AnioPresupuesto;
@@ -47,6 +48,7 @@ class OrdenCompraUnidadController extends Controller
             'fecha' => 'required',
             'numacta' => 'required',
             'numacuerdo' => 'required',
+            'referencia' => 'required'
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -67,6 +69,7 @@ class OrdenCompraUnidadController extends Controller
                 $or->fecha_orden = $request->fecha;
                 $or->numero_acta = $request->numacta;
                 $or->numero_acuerdo = $request->numacuerdo;
+                $or->id_referencia = $request->referencia;
                 $or->save();
 
                 $idorden = $or->id;
@@ -90,16 +93,11 @@ class OrdenCompraUnidadController extends Controller
 
         $cotizacion = CotizacionUnidad::where('id', $orden->id_cotizacion)->first();
         $proveedor =  Proveedores::where('id',  $cotizacion->id_proveedor)->first();
-        //$administrador = Administradores::where('id',  $orden->id_admin_contrato)->first();
         $det_cotizacion = CotizacionUnidadDetalle::where('id_cotizacion_unidad',  $orden->id_cotizacion)->get();
 
         $infoAgrupada = RequisicionAgrupada::where('id', $cotizacion->id_agrupado)->first();
-
-        //$infoRequisiUnidad = RequisicionUnidad::where('id', $infoAgrupada->id_requisicion_unidad)->first();
-
-
         $destino = $infoAgrupada->nombreodestino;
-        //$destinounidad = $orden->lugar;
+
 
 
         $total = 0;
@@ -190,10 +188,31 @@ class OrdenCompraUnidadController extends Controller
         $acta_acuerdo = "Acta #" . $orden->numero_acta . " Acuerdo #" . $orden->numero_acuerdo;
 
 
+        // Informacion del consolidador
+
+        $cargoConsolidador = "";
+        $nombreConsolidador = "";
+        $depaConsolidador = "";
+
+
+        if($datoConsolidador = InformacionConsolidador::where('id_usuario', $infoAgrupada->id_usuario)->first()){
+
+            $infoUsuario = Usuario::where('id', $datoConsolidador->id_usuario)->first();
+            $infoDepa = P_Departamento::where('id', $datoConsolidador->id_departamento)->first();
+
+
+            $nombreConsolidador = $infoUsuario->nombre;
+            $depaConsolidador = $infoDepa->nombre;
+            $cargoConsolidador = $datoConsolidador->cargo;
+
+        }
+
+
+
         $pdf = PDF::loadView('backend.admin.presupuestounidad.reportes.pdfordencompraunidades', compact('orden',
             'cotizacion', 'dia','mes', 'anio','proveedor','dataArray',
              'total', 'idorden', 'arraycodigos',  'acta_acuerdo',
-                'destino'));
+                'destino', 'cargoConsolidador', 'nombreConsolidador', 'depaConsolidador'));
         //$customPaper = array(0,0,470.61,612.36);
         //$customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper('Letter', 'portrait')->setWarnings(false);

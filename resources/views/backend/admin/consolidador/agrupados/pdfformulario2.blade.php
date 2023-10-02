@@ -83,6 +83,8 @@
             <td style="text-align: center; border: 1px solid black; border-collapse: collapse; background-color: #ccffdd;"><label style=" font-size: 13px; ">U. Medida </label></td>
             <td style="text-align: center; border: 1px solid black; border-collapse: collapse; background-color: #ccffdd;"><label style=" font-size: 13px; ">Descripción del Bien</label></td>
             <td style="text-align: center; border: 1px solid black; border-collapse: collapse; background-color: #ccffdd;"><label style=" font-size: 13px; ">Especificación Técnica</label></td>
+            <td style="text-align: center; border: 1px solid black; border-collapse: collapse; background-color: #ccffdd;"><label style=" font-size: 13px; ">P. Unitario</label></td>
+            <td style="text-align: center; border: 1px solid black; border-collapse: collapse; background-color: #ccffdd;"><label style=" font-size: 13px; ">Total</label></td>
         </tr>
         @foreach($arrayReqADetalle as $detalles)
         <tr style="border: 1px solid black; border-collapse: collapse;">
@@ -92,8 +94,27 @@
             <td style="text-align:center; width: 10%; border: 1px solid black; border-collapse: collapse;">{{$detalles->unidadmedida}}</td>
             <td style="text-align:center; width: 30%; border: 1px solid black; border-collapse: collapse;">{{$detalles->descripcion}}</td>
             <td style="text-align:center; width: 35%; border: 1px solid black; border-collapse: collapse;">{{$detalles->especificacion}}</td>
+            <td style="text-align:center; width: 20%; border: 1px solid black; border-collapse: collapse;">{{ $detalles->unitarioFormat }}</td>
+            <td style="text-align:center; width: 20%; border: 1px solid black; border-collapse: collapse;">{{ $detalles->multiplicadoFormat }}</td>
         </tr>
         @endforeach
+
+
+    <tr style="border: 1px solid black; border-collapse: collapse;">
+        <td style="text-align:center; width: 5%; border: 1px solid black; border-collapse: collapse;">TOTAL</td>
+        <td style="text-align:center; width: 10%; border: 1px solid black; border-collapse: collapse;"></td>
+        <td style="text-align:center; width: 10%; border: 1px solid black; border-collapse: collapse;"></td>
+        <td style="text-align:center; width: 10%; border: 1px solid black; border-collapse: collapse;"></td>
+        <td style="text-align:center; width: 30%; border: 1px solid black; border-collapse: collapse;"></td>
+        <td style="text-align:center; width: 35%; border: 1px solid black; border-collapse: collapse;"></td>
+        <td style="text-align:center; width: 20%; border: 1px solid black; border-collapse: collapse;"></td>
+        <td style="text-align:center; width: 20%; border: 1px solid black; border-collapse: collapse; font-weight: bold">{{ $totalsumado }}</td>
+    </tr>
+
+
+
+
+
 </table><br>
 <table  class="table-head"  style=" border: 1px solid black; border-collapse: collapse;">
 

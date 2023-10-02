@@ -43,7 +43,7 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\Cotizaciones\CotizacionesUnid
 use App\Http\Controllers\Backend\PresupuestoUnidad\OrdenCompra\OrdenCompraUnidadController;
 use App\Http\Controllers\Backend\DescargosDirectos\DescargosDirectosController;
 use App\Http\Controllers\Backend\Configuracion\Consolidador\ConsolidadorController;
-
+use App\Http\Controllers\Backend\Configuracion\Referencias\ReferenciasController;
 
 // --- LOGIN ---
 
@@ -93,6 +93,17 @@ Route::get('/admin/usuario/consolidador/index', [PermisoController::class,'index
 Route::get('/admin/usuario/consolidador/tabla', [PermisoController::class,'tablaVistaConsolidador']);
 Route::post('/admin/registrar/usuario/consolidador', [PermisoController::class, 'registrarUsuarioConsolidador']);
 Route::post('/admin/borrar/usuario/consolidador', [PermisoController::class, 'borrarUsuarioConsolidador']);
+
+
+
+// --- INFORMACION DE UN CONSOLIDADOR PARA EL PDF DE ORDEN DE COMPRA
+
+
+Route::get('/admin/informacion/consolidador/index', [ConsolidadorController::class,'indexInformacionConsolidador'])->name('admin.informacion.consolidador.index');
+Route::get('/admin/informacion/consolidador/tabla', [ConsolidadorController::class,'tablaInformacionConsolidador']);
+Route::post('/admin/informacion/consolidador/nuevo', [ConsolidadorController::class, 'nuevaInformacionConsolidador']);
+Route::post('/admin/informacion/consolidador/informacion', [ConsolidadorController::class, 'infoInformacionConsolidador']);
+Route::post('/admin/informacion/consolidador/actualizar', [ConsolidadorController::class, 'actualizarInformacionConsolidador']);
 
 
 
@@ -1151,6 +1162,16 @@ Route::post('/admin/consolidador/informacion/agrupada', [ConsolidadorController:
 // editar unos campos del agrupado
 Route::post('/admin/consolidador/actualizar/agrupado', [ConsolidadorController::class, 'actualizarAgrupado']);
 
+
+
+// --- REFERENCIAS ---
+
+// retorna vista de años para presupuesto
+Route::get('/admin/referencias/orden/index', [ReferenciasController::class,'indexReferencia'])->name('admin.referencias.orden.index');
+Route::get('/admin/referencias/orden/tabla', [ReferenciasController::class,'tablaReferencia']);
+Route::post('/admin/referencias/orden/nuevo', [ReferenciasController::class, 'nuevaReferencia']);
+Route::post('/admin/referencias/orden/informacion', [ReferenciasController::class, 'informacionReferencia']);
+Route::post('/admin/referencias/orden/editar', [ReferenciasController::class, 'editarReferencia']);
 
 
 

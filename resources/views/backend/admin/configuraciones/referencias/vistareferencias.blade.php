@@ -22,14 +22,14 @@
                 <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" onclick="modalAgregar()"
                         class="button button-3d button-rounded button-pill button-small">
                     <i class="fas fa-pencil-alt"></i>
-                    Nuevo Equipo
+                    Nueva Referencia
                 </button>
             </div>
 
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Equipo</li>
-                    <li class="breadcrumb-item active">Listado de Equipos</li>
+                    <li class="breadcrumb-item">Referencias</li>
+                    <li class="breadcrumb-item active">Listado de Referencias</li>
                 </ol>
             </div>
         </div>
@@ -57,7 +57,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nuevo Equipo</h4>
+                    <h4 class="modal-title">Nueva Referencias</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -69,18 +69,8 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Código</label>
-                                        <input type="text" maxlength="10" class="form-control" id="codigo-nuevo" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group" >
-                                        <label>Descripción</label>
-                                        <input type="text" maxlength="3500"  class="form-control" id="descripcion-nuevo" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Placa</label>
-                                        <input type="text" maxlength="25"  class="form-control" id="placa-nuevo" autocomplete="off">
+                                        <label>Nombre de Referencia</label>
+                                        <input type="text" maxlength="100"  class="form-control" id="nombre-nuevo" autocomplete="off">
                                     </div>
 
                                 </div>
@@ -101,7 +91,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Editar Equipo</h4>
+                    <h4 class="modal-title">Editar Referencia</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -117,18 +107,8 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Código</label>
-                                        <input type="text" maxlength="10" class="form-control" id="codigo-editar" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Descripción</label>
-                                        <input type="text" maxlength="3500" class="form-control" id="descripcion-editar" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Placa</label>
-                                        <input type="text" maxlength="25" class="form-control" id="placa-editar" autocomplete="off">
+                                        <label>Nombre de Referencia</label>
+                                        <input type="text" maxlength="100" class="form-control" id="nombre-editar" autocomplete="off">
                                     </div>
 
                                 </div>
@@ -159,7 +139,7 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/equipos/tabla/index') }}";
+            var ruta = "{{ URL::to('/admin/referencias/orden/tabla') }}";
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -170,7 +150,7 @@
     <script>
 
         function recargar(){
-            var ruta = "{{ url('/admin/equipos/tabla/index') }}";
+            var ruta = "{{ url('/admin/referencias/orden/tabla') }}";
             $('#tablaDatatable').load(ruta);
         }
 
@@ -180,31 +160,18 @@
         }
 
         function nuevo(){
-            var codigo = document.getElementById('codigo-nuevo').value;
-            var descripcion = document.getElementById('descripcion-nuevo').value;
-            var placa = document.getElementById('placa-nuevo').value;
+            var nombre = document.getElementById('nombre-nuevo').value;
 
-            if(codigo === ''){
-                toastr.error('Codigo es requerido');
-                return;
-            }
-            if(descripcion === ''){
-                toastr.error('Descripcion es requerido');
-                return;
-            }
-
-            if(placa.length > 25){
-                toastr.error('Placa máximo 25 caracteres');
+            if(nombre === ''){
+                toastr.error('Nombre es requerido');
                 return;
             }
 
             openLoading();
             var formData = new FormData();
-            formData.append('codigo', codigo);
-            formData.append('descripcion', descripcion);
-            formData.append('placa', placa);
+            formData.append('nombre', nombre);
 
-            axios.post(url+'/equipos/nuevo', formData, {
+            axios.post(url+'/referencias/orden/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -227,7 +194,7 @@
             openLoading();
             document.getElementById("formulario-editar").reset();
 
-            axios.post(url+'/equipos/informacion',{
+            axios.post(url+'/referencias/orden/informacion',{
                 'id': id
             })
                 .then((response) => {
@@ -235,9 +202,7 @@
                     if(response.data.success === 1){
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(response.data.lista.id);
-                        $('#codigo-editar').val(response.data.lista.codigo);
-                        $('#descripcion-editar').val(response.data.lista.descripcion);
-                        $('#placa-editar').val(response.data.lista.placa);
+                        $('#nombre-editar').val(response.data.lista.nombre);
 
                     }else{
                         toastr.error('Información no encontrada');
@@ -251,29 +216,20 @@
 
         function editar(){
             var id = document.getElementById('id-editar').value;
-            var codigo = document.getElementById('codigo-editar').value;
-            var descripcion = document.getElementById('descripcion-editar').value;
-            var placa = document.getElementById('placa-editar').value;
+            var nombre = document.getElementById('nombre-editar').value;
 
-            if(codigo === ''){
-                toastr.error('Codigo es requerido');
+            if(nombre === ''){
+                toastr.error('Nombre es requerido');
                 return;
             }
-            if(descripcion === ''){
-                toastr.error('Descripcion es requerido');
-                return;
-            }
-
 
 
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
-            formData.append('codigo', codigo);
-            formData.append('descripcion', descripcion);
-            formData.append('placa', placa);
+            formData.append('nombre', nombre);
 
-            axios.post(url+'/equipos/editar', formData, {
+            axios.post(url+'/referencias/orden/editar', formData, {
             })
                 .then((response) => {
                     closeLoading();

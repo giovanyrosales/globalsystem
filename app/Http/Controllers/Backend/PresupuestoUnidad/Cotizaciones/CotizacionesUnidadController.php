@@ -16,6 +16,7 @@ use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
 use App\Models\P_UnidadMedida;
 use App\Models\Proveedores;
+use App\Models\Referencias;
 use App\Models\RequisicionAgrupada;
 use App\Models\RequisicionAgrupadaDetalle;
 use App\Models\RequisicionUnidad;
@@ -122,6 +123,7 @@ class CotizacionesUnidadController extends Controller{
                 ->join('obj_especifico AS obj', 'mate.id_objespecifico', '=', 'obj.id')
                 ->select('ru.id', 'obj.codigo', 'rad.id_requi_agrupada', 'mate.descripcion')
                 ->where('rad.id_requi_agrupada', $infoRequiAgrupada->id)
+                ->where('rad.cotizado', 0)
                 ->orderBy('obj.codigo', 'ASC')
                 ->get();
 
@@ -468,7 +470,10 @@ class CotizacionesUnidadController extends Controller{
 
     // retorna vista con las cotizaciones autorizaciones para unidades
     public function indexCotizacionesUnidadesAutorizadas($idanio){
-        return view('backend.admin.presupuestounidad.cotizaciones.procesada.vistacotizacionprocesadaunidad', compact( 'idanio'));
+
+        $arrayReferencias = Referencias::orderBy('nombre')->get();
+
+        return view('backend.admin.presupuestounidad.cotizaciones.procesada.vistacotizacionprocesadaunidad', compact( 'idanio', 'arrayReferencias'));
     }
 
     // retorna tabla con las cotizaciones autorizaciones para unidades

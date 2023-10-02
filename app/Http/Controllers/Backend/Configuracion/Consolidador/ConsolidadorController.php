@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Administradores;
 use App\Models\ConsolidadoresUnidades;
 use App\Models\CotizacionUnidad;
+use App\Models\InformacionConsolidador;
 use App\Models\ObjEspecifico;
 use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
@@ -18,6 +19,7 @@ use App\Models\RequisicionAgrupadaDetalle;
 use App\Models\RequisicionUnidad;
 use App\Models\RequisicionUnidadDetalle;
 use App\Models\UnidadMedida;
+use App\Models\Usuario;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,12 +29,14 @@ use Illuminate\Support\Facades\Validator;
 
 class ConsolidadorController extends Controller
 {
-    public function __construct(){
+    public function __construct()
+    {
         $this->middleware('auth');
     }
 
 
-    public function indexRequerimientosPendientes(){
+    public function indexRequerimientosPendientes()
+    {
 
         // años para buscar los requerimientos de esos años
         $anios = P_AnioPresupuesto::orderBy('id', 'DESC')->get();
@@ -41,18 +45,20 @@ class ConsolidadorController extends Controller
     }
 
 
-    public function vistaRequerimientosPendientes($idanio){
+    public function vistaRequerimientosPendientes($idanio)
+    {
 
         // CARGAR REQUERIMIENTOS DEL CONSOLIDADOR, TODOS AQUELLOS QUE NO HAN SIDO AGRUPADOS
 
         $adminContrato = Administradores::orderBy('nombre')->get();
 
         return view('backend.admin.consolidador.requerimientos.vistarequerimientos', compact('idanio',
-        'adminContrato'));
+            'adminContrato'));
     }
 
 
-    public function tablaRequerimientosPendientes($idanio){
+    public function tablaRequerimientosPendientes($idanio)
+    {
 
         // REGLAS
 
@@ -70,7 +76,7 @@ class ConsolidadorController extends Controller
 
         $pilaIdDepartamentos = array();
 
-        foreach ($arrayUnidades as $dd){
+        foreach ($arrayUnidades as $dd) {
             array_push($pilaIdDepartamentos, $dd->id_departamento);
         }
 
@@ -87,14 +93,14 @@ class ConsolidadorController extends Controller
 
         $pilaIdPendiente = array();
 
-        foreach ($lista as $dato){
+        foreach ($lista as $dato) {
 
             $arrayRequiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $dato->id)->get();
 
-            foreach ($arrayRequiDetalle as $info){
+            foreach ($arrayRequiDetalle as $info) {
 
-                 // SOLO MOSTRAR SI NO ESTA AGRUPADO Y NO ESTA CANCELADO
-                if($info->agrupado == 0 && $info->cancelado == 0){
+                // SOLO MOSTRAR SI NO ESTA AGRUPADO Y NO ESTA CANCELADO
+                if ($info->agrupado == 0 && $info->cancelado == 0) {
 
                     // METER A LA LISTA, NO IMPORTA QUE SE REPITA EL ID
                     array_push($pilaIdPendiente, $dato->id);
@@ -109,7 +115,7 @@ class ConsolidadorController extends Controller
         $arrayRequisicionPendiente = RequisicionUnidad::whereIn('id', $pilaIdPendiente)->get();
 
 
-        foreach ($arrayRequisicionPendiente as $dd){
+        foreach ($arrayRequisicionPendiente as $dd) {
 
             $infoPresupuesto = P_PresupUnidad::where('id', $dd->id_presup_unidad)->first();
             $infoDepartamento = P_Departamento::where('id', $infoPresupuesto->id_departamento)->first();
@@ -119,12 +125,12 @@ class ConsolidadorController extends Controller
         }
 
 
-
         return view('backend.admin.consolidador.requerimientos.tablarequerimientos', compact('arrayRequisicionPendiente'));
     }
 
 
-    public function listadoAgrupadosParaSelect(Request $request){
+    public function listadoAgrupadosParaSelect(Request $request)
+    {
 
         // REQUEST
         // anio
@@ -145,7 +151,7 @@ class ConsolidadorController extends Controller
 
         $pilaIdDepartamentos = array();
 
-        foreach ($arrayUnidades as $dd){
+        foreach ($arrayUnidades as $dd) {
             array_push($pilaIdDepartamentos, $dd->id_departamento);
         }
 
@@ -162,13 +168,13 @@ class ConsolidadorController extends Controller
 
         $pilaIdPendiente = array();
 
-        foreach ($lista as $dato){
+        foreach ($lista as $dato) {
 
             $arrayRequiDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $dato->id)->get();
 
-            foreach ($arrayRequiDetalle as $info){
+            foreach ($arrayRequiDetalle as $info) {
 
-                if($info->agrupado == 0 && $info->cancelado == 0){
+                if ($info->agrupado == 0 && $info->cancelado == 0) {
 
                     // METER A LA LISTA, TODOS LOS ID DE REQUISICION UNIDAD DETALLE
                     array_push($pilaIdPendiente, $info->id);
@@ -188,7 +194,7 @@ class ConsolidadorController extends Controller
             ->get();
 
 
-        foreach ($arrayRequisicionPendiente as $info){
+        foreach ($arrayRequisicionPendiente as $info) {
 
             $texto = "(" . $info->codigo . ") " . $info->descripcion;
             $info->texto = $texto;
@@ -198,15 +204,15 @@ class ConsolidadorController extends Controller
     }
 
 
-
-    public function informacionDetalleRequisicion($idrequi){
+    public function informacionDetalleRequisicion($idrequi)
+    {
 
         $arrayDetalle = RequisicionUnidadDetalle::where('id_requisicion_unidad', $idrequi)
             ->where('agrupado', 0)
             ->where('cancelado', 0)
             ->get();
 
-        foreach ($arrayDetalle as $info){
+        foreach ($arrayDetalle as $info) {
 
             $infoMaterial = P_Materiales::where('id', $info->id_material)->first();
             $infoObj = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
@@ -221,7 +227,8 @@ class ConsolidadorController extends Controller
     }
 
 
-    public function registrarAgrupados(Request $request){
+    public function registrarAgrupados(Request $request)
+    {
 
         // REQUEST
 
@@ -237,12 +244,13 @@ class ConsolidadorController extends Controller
         // evaluador2
 
 
-
         $id = $request->user()->id;
 
         $validar = Validator::make($request->all(), $regla);
 
-        if ($validar->fails()){ return ['success' => 0];}
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
 
         DB::beginTransaction();
 
@@ -273,11 +281,11 @@ class ConsolidadorController extends Controller
                 ->orderBy('id', 'ASC')
                 ->get();
 
-            foreach ($infoRequiDetalle as $info){
+            foreach ($infoRequiDetalle as $info) {
 
 
                 // NO DEBE ESTAR AGRUPADO O CANCELADO
-                if($info->agrupado == 1 || $info->cancelado == 1){
+                if ($info->agrupado == 1 || $info->cancelado == 1) {
                     DB::rollback();
                     return ['success' => 1];
                 }
@@ -306,12 +314,14 @@ class ConsolidadorController extends Controller
     }
 
 
-    public function indexListaAgrupados(){
+    public function indexListaAgrupados()
+    {
         return view('backend.admin.consolidador.agrupados.vistaagrupados');
     }
 
 
-    public function tablaListaAgrupados(){
+    public function tablaListaAgrupados()
+    {
 
         $listado = RequisicionAgrupada::orderBy('fecha', 'DESC')->get();
 
@@ -338,10 +348,9 @@ class ConsolidadorController extends Controller
             }
 
             // verificar si fue denegado por usuario UCP
-            if($info->estado == 1){
+            if ($info->estado == 1) {
                 $btnBorrar = 0;
             }
-
 
 
             $info->btnborrar = $btnBorrar;
@@ -352,25 +361,27 @@ class ConsolidadorController extends Controller
     }
 
 
-
-    public function generarPdfAgrupado($idagrupado){
+    public function generarPdfAgrupado($idagrupado)
+    {
 
         $pilaIdDep = array();
         $infoRequiAgrupado = RequisicionAgrupada::where('id', $idagrupado)->first();
-        $arrayReqADetalle = RequisicionAgrupadaDetalle::where('id_requi_agrupada',$idagrupado)->get();
+        $arrayReqADetalle = RequisicionAgrupadaDetalle::where('id_requi_agrupada', $idagrupado)->get();
 
         $contador = 0;
-        foreach ($arrayReqADetalle as $info){
+        $totalsumado = 0;
+
+        foreach ($arrayReqADetalle as $info) {
             $contador++;
 
-            $infoRequiUnidadDetalle = RequisicionUnidadDetalle::where('id',$info->id_requi_unidad_detalle)->first();
-            $infoRequiUnidad = RequisicionUnidad::where('id',$infoRequiUnidadDetalle->id_requisicion_unidad)->first();
+            $infoRequiUnidadDetalle = RequisicionUnidadDetalle::where('id', $info->id_requi_unidad_detalle)->first();
+            $infoRequiUnidad = RequisicionUnidad::where('id', $infoRequiUnidadDetalle->id_requisicion_unidad)->first();
             $infoPresuUnidad = P_PresupUnidad::where('id', $infoRequiUnidad->id_presup_unidad)->first();
             array_push($pilaIdDep, $infoPresuUnidad->id_departamento);
 
-            $infoMaterial = P_Materiales::where('id',$infoRequiUnidadDetalle->id_material)->first();
-            $infoCodigo = ObjEspecifico::where('id',$infoMaterial->id_objespecifico)->first();
-            $infoUnidadM = P_UnidadMedida::where('id',$infoMaterial->id_unidadmedida)->first();
+            $infoMaterial = P_Materiales::where('id', $infoRequiUnidadDetalle->id_material)->first();
+            $infoCodigo = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
+            $infoUnidadM = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
             $info->cantidad = $infoRequiUnidadDetalle->cantidad;
             $info->descripcion = $infoMaterial->descripcion;
             $info->especificacion = $infoRequiUnidadDetalle->material_descripcion;
@@ -378,21 +389,32 @@ class ConsolidadorController extends Controller
             $info->unidadmedida = $infoUnidadM->nombre;
 
             $info->contador = $contador;
+
+
+            // PRECIO UNITARIO Y TOTAL
+            $multiplicado = $infoRequiUnidadDetalle->cantidad * $infoRequiUnidadDetalle->dinero_fijo;
+
+            $totalsumado = $totalsumado + $multiplicado;
+
+            $info->multiplicadoFormat = '$' . number_format((float)$multiplicado, 2, '.', ',');
+            $info->unitarioFormat = '$' . number_format((float)$infoRequiUnidadDetalle->dinero_fijo, 2, '.', ',');
         }
+
+        $totalsumado = '$' . number_format((float)$totalsumado, 2, '.', ',');
 
 
         $arraydepto = P_Departamento::whereIn('id', $pilaIdDep)->get();
         $nombresDep = '';
-        foreach($arraydepto as $info){
-            if($arraydepto->last() == $info){
-                $nombresDep = $nombresDep.$info->nombre;
-            }else {
-                $nombresDep = $nombresDep.$info->nombre . ", ";
+        foreach ($arraydepto as $info) {
+            if ($arraydepto->last() == $info) {
+                $nombresDep = $nombresDep . $info->nombre;
+            } else {
+                $nombresDep = $nombresDep . $info->nombre . ", ";
             }
 
         }
-        $datosadmin = Administradores::where('id',$infoRequiAgrupado->id_contrato)->first();
-        $datoseva = Administradores::where('id',$infoRequiAgrupado->id_evaluador)->first();
+        $datosadmin = Administradores::where('id', $infoRequiAgrupado->id_contrato)->first();
+        $datoseva = Administradores::where('id', $infoRequiAgrupado->id_evaluador)->first();
 
         $nombreadmin = $datosadmin->nombre;
         $cargoadmin = $datosadmin->cargo;
@@ -404,7 +426,7 @@ class ConsolidadorController extends Controller
         $nombreeva2 = "";
         $cargoeva2 = "";
 
-        if($datos = Administradores::where('id',$infoRequiAgrupado->id_evaluador2)->first()){
+        if ($datos = Administradores::where('id', $infoRequiAgrupado->id_evaluador2)->first()) {
             $nombreeva2 = $datos->nombre;
             $cargoeva2 = $datos->cargo;
         }
@@ -412,7 +434,8 @@ class ConsolidadorController extends Controller
         $fecha = date("d-m-Y", strtotime($infoRequiAgrupado->fecha));
 
         $pdf = PDF::loadView('backend.admin.consolidador.agrupados.pdfformulario2', compact('infoRequiAgrupado',
-            'fecha', 'nombresDep', 'nombreadmin', 'nombreeva2', 'cargoeva2', 'nombreeva', 'cargoadmin', 'cargoeva', 'arrayReqADetalle'));
+            'fecha', 'nombresDep', 'nombreadmin', 'nombreeva2', 'cargoeva2', 'nombreeva', 'cargoadmin',
+            'cargoeva', 'arrayReqADetalle', 'totalsumado'));
         //$customPaper = array(0,0,470.61,612.36);
         //$customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper('Letter', 'portrait')->setWarnings(false);
@@ -420,8 +443,8 @@ class ConsolidadorController extends Controller
     }
 
 
-
-    public function borrarAgrupado(Request $request){
+    public function borrarAgrupado(Request $request)
+    {
 
         $regla = array(
             'id' => 'required', // id requisicion_agrupado
@@ -430,24 +453,26 @@ class ConsolidadorController extends Controller
 
         $validar = Validator::make($request->all(), $regla);
 
-        if ($validar->fails()){ return ['success' => 0];}
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
 
 
         DB::beginTransaction();
 
         try {
 
-            if($infoAgrupado = RequisicionAgrupada::where('id', $request->id)->first()){
+            if ($infoAgrupado = RequisicionAgrupada::where('id', $request->id)->first()) {
 
 
                 // ESTE AGRUPADO FUE DENEGADO POR USUARIO UCP
-                if($infoAgrupado->estado == 1){
+                if ($infoAgrupado->estado == 1) {
                     return ['success' => 1]; // no se puede borrar
                 }
 
 
                 // SI ESTE AGRUPADO SE ENCUENTRA COTIZADO, YA NO SE PUEDE BORRAR
-                if(CotizacionUnidad::where('id_agrupado', $infoAgrupado->id)->first()){
+                if (CotizacionUnidad::where('id_agrupado', $infoAgrupado->id)->first()) {
 
                     return ['success' => 2]; // no se puede borrar
                 }
@@ -456,7 +481,7 @@ class ConsolidadorController extends Controller
                 // VOLVER A SETEAR DE AGRUPADO LOS MATERIALES
                 $arrayRequi = RequisicionAgrupadaDetalle::where('id_requi_agrupada', $infoAgrupado->id)->get();
 
-                foreach ($arrayRequi as $dato){
+                foreach ($arrayRequi as $dato) {
 
                     RequisicionUnidadDetalle::where('id', $dato->id_requi_unidad_detalle)->update([
                         'agrupado' => 0
@@ -471,7 +496,7 @@ class ConsolidadorController extends Controller
                 DB::commit();
                 return ['success' => 3];
 
-            }else{
+            } else {
                 return ['success' => 99];
             }
 
@@ -483,32 +508,31 @@ class ConsolidadorController extends Controller
     }
 
 
-
-
-    public function informacionAgrupado(Request $request){
+    public function informacionAgrupado(Request $request)
+    {
         $regla = array(
             'id' => 'required',
         );
 
         $validar = Validator::make($request->all(), $regla);
 
-        if ($validar->fails()){ return ['success' => 0];}
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
 
-        if($lista = RequisicionAgrupada::where('id', $request->id)->first()){
+        if ($lista = RequisicionAgrupada::where('id', $request->id)->first()) {
 
             $arrayDatos = Administradores::orderBy('nombre')->get();
 
             return ['success' => 1, 'lista' => $lista, 'arraydatos' => $arrayDatos];
-        }else{
+        } else {
             return ['success' => 2];
         }
     }
 
 
-
-    public function actualizarAgrupado(Request $request){
-
-
+    public function actualizarAgrupado(Request $request)
+    {
         $regla = array(
             'idagrupado' => 'required', //
             'fecha' => 'required',
@@ -518,16 +542,18 @@ class ConsolidadorController extends Controller
 
         $validar = Validator::make($request->all(), $regla);
 
-        if ($validar->fails()){ return ['success' => 0];}
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
 
         DB::beginTransaction();
 
         try {
 
-            if($infoAgrupado = RequisicionAgrupada::where('id', $request->idagrupado)->first()){
+            if ($infoAgrupado = RequisicionAgrupada::where('id', $request->idagrupado)->first()) {
 
                 // SI ESTE AGRUPADO SE ENCUENTRA COTIZADO, YA NO SE PUEDE EDITAR
-                if(CotizacionUnidad::where('id_agrupado', $infoAgrupado->id)->first()){
+                if (CotizacionUnidad::where('id_agrupado', $infoAgrupado->id)->first()) {
 
                     return ['success' => 1]; // no se puede editar
                 }
@@ -550,7 +576,7 @@ class ConsolidadorController extends Controller
                 DB::commit();
                 return ['success' => 2];
 
-            }else{
+            } else {
                 return ['success' => 99];
             }
 
@@ -559,16 +585,136 @@ class ConsolidadorController extends Controller
             DB::rollback();
             return ['success' => 99];
         }
+    }
 
 
+    // -------------------------------------------------------------------------
+
+
+    public function indexInformacionConsolidador()
+    {
+
+        $arrayUsuarios = Usuario::orderBy('nombre')->get();
+        $arrayDepartamentos = P_Departamento::orderBy('nombre')->get();
+
+
+        return view('backend.admin.consolidador.informacion.vistainformacionconsolidador', compact('arrayUsuarios', 'arrayDepartamentos'));
+    }
+
+
+    public function tablaInformacionConsolidador()
+    {
+
+        $listado = InformacionConsolidador::orderBy('id_usuario')->get();
+
+        foreach ($listado as $dato) {
+
+            $infoUsuario = Usuario::where('id', $dato->id_usuario)->first();
+            $infoDepa = P_Departamento::where('id', $dato->id_departamento)->first();
+
+            $dato->nombreusuario = $infoUsuario->usuario;
+            $dato->nombredepa = $infoDepa->nombre;
+        }
+
+        return view('backend.admin.consolidador.informacion.tablainformacionconsolidador', compact('listado'));
+    }
+
+
+    public function nuevaInformacionConsolidador(Request $request)
+    {
+
+
+        $regla = array(
+            'idusuario' => 'required',
+            'iddepartamento' => 'required',
+            'cargo' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+
+        if (InformacionConsolidador::where('id_usuario', $request->idusuario)->first()) {
+            return ['success' => 1];
+        }
+
+
+        $dato = new InformacionConsolidador();
+        $dato->id_usuario = $request->idusuario;
+        $dato->id_departamento = $request->iddepartamento;
+        $dato->cargo = $request->cargo;
+
+        if ($dato->save()) {
+            return ['success' => 2];
+        } else {
+            return ['success' => 99];
+        }
+    }
+
+    public function infoInformacionConsolidador(Request $request)
+    {
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        if ($info = InformacionConsolidador::where('id', $request->id)->first()) {
+
+            $listaUsuarios = Usuario::orderBy('nombre')->get();
+            $listaDepartamentos = P_Departamento::orderBy('nombre')->get();
+
+            return ['success' => 1, 'lista' => $info, 'listausuario' => $listaUsuarios, 'listadepa' => $listaDepartamentos];
+
+        } else {
+            return ['success' => 2];
+        }
     }
 
 
 
+    public function actualizarInformacionConsolidador(Request $request){
 
 
+        $regla = array(
+            'id' => 'required',
+            'idusuario' => 'required',
+            'iddepartamento' => 'required',
+            'cargo' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        // no usuarios repetidos
+
+        if(InformacionConsolidador::where('id_usuario', $request->idusuario)
+            ->where('id', '!=', $request->id)->first()){
+            return ['success' => 1];
+        }
 
 
+        InformacionConsolidador::where('id', $request->id)->update([
+                'id_usuario' => $request->idusuario,
+                'id_departamento' => $request->iddepartamento,
+                'cargo' => $request->cargo,
+            ]);
+
+
+        return ['success' => 2];
+    }
 
 
 }
+

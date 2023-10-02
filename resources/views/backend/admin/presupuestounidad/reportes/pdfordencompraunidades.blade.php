@@ -84,15 +84,15 @@
             </tr>
             <tr>
                 <td width="50%" style="text-align:left; ">
-                  Nombre: xxxx
+                  Nombre: {{ $nombreConsolidador }}
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
-                  Nombre Unidad:
+                  Nombre Unidad: {{ $depaConsolidador }}
                 </td>
             </tr>
             <tr>
                 <td width="50%" style="text-align:left; ">
-                  Cargo:
+                  Cargo: {{ $cargoConsolidador }}
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
                   Cod. Proyecto:
