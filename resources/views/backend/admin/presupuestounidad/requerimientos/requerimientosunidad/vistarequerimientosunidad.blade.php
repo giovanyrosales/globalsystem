@@ -1341,6 +1341,7 @@
         // AGRUPADO
         // COTIZADO (SI FUE DENEGADA PASA AL AGRUPADO)
         // ORDEN GENERADA (SI FUE DENEGADA PASA A CANCELADO)
+        // FINALIZADO
         // CANCELADO
 
 
@@ -1359,6 +1360,7 @@
                     + "Cotizado por UCP" + "<br>"
                     + "Aprobado por Jefe de UCP" + "<br>"
                     + "Orden de Compra Generada" + "<br>"
+                    + "Finalizado" + "<br>"
                     + "Si Fue cancelado (Requisición Denegada por UCP)" + "<br>"
                 ,
                 icon: 'info',

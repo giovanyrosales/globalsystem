@@ -101,6 +101,19 @@ class OrdenCompraUnidadController extends Controller
 
         $codigoproyecto = $orden->codigo_proyecto;
 
+        $lugarDeEntrega = $infoAgrupada->lugar;
+        $formaDePago = $infoAgrupada->forma;
+        $plazoEntrega = $infoAgrupada->plazo;
+        $otrosPresentar = $infoAgrupada->otros;
+
+
+        $nombreAdminContrato = "";
+
+        if($infoAd = Administradores::where('id', $infoAgrupada->id_contrato)->first()){
+            $nombreAdminContrato = $infoAd->nombre;
+        }
+
+
 
         $total = 0;
 
@@ -176,21 +189,17 @@ class OrdenCompraUnidadController extends Controller
         $formatterES = new \NumberFormatter("es-ES", \NumberFormatter::SPELLOUT);
         $izquierda = intval(floor($total));
         //$derecha = intval(($total - floor($total)) * 100);
-        $totalEnLetras = $formatterES->format($izquierda);
+        $totalEnLetras = strtoupper($formatterES->format($izquierda)) . " DOLARES";
 
 
         // OBTENER SOLO LA PARTE DECIMAL
-        $whole = floor($total);      // 1
-        $resultadoDema = $total - $whole; // .25
-
-        return [$resultadoDema];
-
-        $totalSoloDecimal = intval($resultadoDema);
-
-
-
+        $decimales = explode(".",number_format((float)$total, 2, '.', ','));
+        $totalSoloDecimal = $decimales[1];
 
         $total = number_format((float)$total, 2, '.', ',');
+
+
+
 
         //$fecha = strftime("%d-%B-%Y", strtotime($orden->fechaorden));
         $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
@@ -233,7 +242,8 @@ class OrdenCompraUnidadController extends Controller
             'cotizacion', 'dia','mes', 'anio','proveedor','dataArray',
              'total', 'idorden', 'arraycodigos',  'acta_acuerdo',
                 'destino', 'cargoConsolidador', 'nombreConsolidador', 'depaConsolidador',
-            'codigoproyecto', 'totalEnLetras', 'totalSoloDecimal'));
+            'codigoproyecto', 'totalEnLetras', 'totalSoloDecimal', 'nombreAdminContrato', 'formaDePago',
+                'lugarDeEntrega', 'plazoEntrega', 'otrosPresentar'));
         //$customPaper = array(0,0,470.61,612.36);
         //$customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper('Letter', 'portrait')->setWarnings(false);

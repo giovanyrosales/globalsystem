@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActaUnidad;
 use App\Models\CotizacionUnidad;
 use App\Models\CotizacionUnidadDetalle;
 use App\Models\Cuenta;
@@ -183,6 +184,7 @@ class RequerimientosUnidadController extends Controller
             //3- cotizado
             //4- aprobado por ucp
             //5- orden compra generada
+            // - finalizado (acta generada)
             //6- denegada (por jefe ucp o por usuario UCP)
 
             if($info->agrupado == 1){
@@ -220,6 +222,17 @@ class RequerimientosUnidadController extends Controller
                 $estado = "Orden de Compra Generada";
 
                 $fechaestado = date("d-m-Y", strtotime($infoOrden->fecha_orden));
+            }
+
+
+            if($infoOrdenGa = OrdenUnidad::where('id_cotizacion', $idCotiUnidad)->first()){
+
+                // ver si acta fue generada
+                if(ActaUnidad::where('id_ordenunidad', $infoOrdenGa->id)->first()){
+                    $estado = "Finalizado";
+
+                    $fechaestado = "Finalizado";
+                }
             }
 
 

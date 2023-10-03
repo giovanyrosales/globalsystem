@@ -127,13 +127,13 @@
             </tr>
             <tr>
                 <td width="50%" style="text-align:left; ">
-                  Dirección entrega:
+                    {{ $lugarDeEntrega }}
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
-                  Forma de pago:
+                    {{ $formaDePago }}
                 </td>
-                <td width="50%" style="text-align:left; padding-left: 10px; font-size: 12px">
-                  {{ $totalEnLetras }} DOLARES {{ $totalSoloDecimal }}/100
+                <td width="50%" style="text-align:left; padding-left: 10px; font-size: 13px">
+                  {{ $totalEnLetras }} {{ $totalSoloDecimal }}/100
                 </td>
 
             </tr>
@@ -146,13 +146,13 @@
             </tr>
             <tr>
                 <td width="50%" style="text-align:left; ">
-                  Plazo de entrega
+                    {{ $plazoEntrega }}
                 </td>
                 <td width="50%" style="text-align:left; padding-left: 10px; ">
-                  Garantía a Presentar
+                  {{ $otrosPresentar }}
                 </td>
-                <td width="50%" style="text-align:left; padding-left: 10px; ">
-                xxx
+                <td width="50%" style="text-align:left; padding-left: 16px; ">
+                {{ $nombreAdminContrato }}
                 </td>
             </tr>
         </table>
