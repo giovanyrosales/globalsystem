@@ -18,6 +18,7 @@ use App\Models\P_PresupUnidad;
 use App\Models\P_UnidadMedida;
 use App\Models\P_UsuarioDepartamento;
 use App\Models\Proveedores;
+use App\Models\Referencias;
 use App\Models\RequisicionAgrupada;
 use App\Models\RequisicionUnidad;
 use App\Models\RequisicionUnidadDetalle;
@@ -91,6 +92,10 @@ class OrdenCompraUnidadController extends Controller
     public function vistaPdfOrdenUnidad($id, $cantidad){ // id de la orden
 
         $orden = OrdenUnidad::where('id', $id)->first();
+        $idorden = $orden->id;
+
+        $anioOrden = date("Y", strtotime($orden->fecha_orden));
+
 
         $cotizacion = CotizacionUnidad::where('id', $orden->id_cotizacion)->first();
         $proveedor =  Proveedores::where('id',  $cotizacion->id_proveedor)->first();
@@ -113,6 +118,34 @@ class OrdenCompraUnidadController extends Controller
             $nombreAdminContrato = $infoAd->nombre;
         }
 
+        $textoReferencia = "";
+
+
+        // REFERENCIA
+        if($infoReferencia = Referencias::where('id', $orden->id_referencia)->first()){
+
+            $ceros = str_repeat("0", 5);
+
+            if ($idorden <= 9) {
+                $numerales = $ceros[0] . $ceros[1] . $ceros[2] . $ceros[3] . $ceros[4] . $idorden;
+            } else if ($idorden <= 99) {
+                $numerales = $ceros[0] . $ceros[1] . $ceros[2] . $ceros[3] . $idorden;
+            } else if ($idorden <= 999) {
+                $numerales = $ceros[0] . $ceros[1] . $ceros[2] . $idorden;
+            }
+            else if ($idorden <= 9999) {
+                $numerales = $ceros[0] . $ceros[1] . $idorden;
+            }
+            else if ($idorden <= 99999) {
+                $numerales = $ceros[0] . $idorden;
+            }
+            else {
+                $numerales = $idorden;
+            }
+
+            $textoReferencia = $infoReferencia->nombre . "-" . $numerales . "-" . $anioOrden . "AMM";
+
+        }
 
 
         $total = 0;
@@ -212,7 +245,7 @@ class OrdenCompraUnidadController extends Controller
 
         Carbon::now()->format('y');
 
-        $idorden = $orden->id;
+
 
 
         $acta_acuerdo = "Acta #" . $orden->numero_acta . " Acuerdo #" . $orden->numero_acuerdo;
@@ -243,7 +276,7 @@ class OrdenCompraUnidadController extends Controller
              'total', 'idorden', 'arraycodigos',  'acta_acuerdo',
                 'destino', 'cargoConsolidador', 'nombreConsolidador', 'depaConsolidador',
             'codigoproyecto', 'totalEnLetras', 'totalSoloDecimal', 'nombreAdminContrato', 'formaDePago',
-                'lugarDeEntrega', 'plazoEntrega', 'otrosPresentar'));
+                'lugarDeEntrega', 'plazoEntrega', 'otrosPresentar', 'textoReferencia'));
         //$customPaper = array(0,0,470.61,612.36);
         //$customPaper = array(0,0,470.61,612.36);
         $pdf->setPaper('Letter', 'portrait')->setWarnings(false);

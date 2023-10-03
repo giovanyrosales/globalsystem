@@ -49,7 +49,7 @@
                 <td width="40%" style="text-align:left; ">
                    No. {{ $idorden }}<br>
                    Fecha: {{ $dia." ".$mes." ".$anio }}<br>
-                   Ref.
+                   Ref. {{ $textoReferencia }}
                 </td>
             </tr>
         </table>
