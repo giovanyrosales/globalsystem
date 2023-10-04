@@ -447,9 +447,17 @@ class OrdenCompraUnidadController extends Controller
         $orden = OrdenUnidad::where('id',  $acta->id_ordenunidad)->first();
         $cotizacion = CotizacionUnidad::where('id', $orden->id_cotizacion)->first();
         $proveedor =  Proveedores::where('id',  $cotizacion->id_proveedor)->first();
-        $administrador = Administradores::where('id',  $orden->id_admin_contrato)->first();
+
+        $infoAgrupado = RequisicionAgrupada::where('id', $cotizacion->id_agrupado)->first();
+
+        $infoAdministrador = Administradores::where('id', $infoAgrupado->id_contrato)->first();
+        $infoUsuario = Usuario::where('id', $infoAgrupado->id_usuario)->first();
 
 
+
+        $textoProveedor = $proveedor->nombre;
+        $textoAdministrador = $infoAdministrador->nombre;
+        $textoSolicitante = $infoUsuario->nombre;
 
 
         $lugar = $orden->lugar;
@@ -484,7 +492,7 @@ class OrdenCompraUnidadController extends Controller
             <label style='font-weight: bold; font-size: 15px;  text-align:justify;'></label>
             <label style=' font-size: 15px;  text-align:justify;'>del día  _______________</label>
             <label style=' font-size: 15px;  text-align:justify;'>; con el propósito de hacer entrega formal por parte de </label>
-            <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>xxx</label>
+            <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>$textoProveedor</label>
             <label style=' font-size: 15px;  text-align:justify;'>.</label></div>
         ";
 
@@ -494,7 +502,7 @@ class OrdenCompraUnidadController extends Controller
             <label style=' font-size: 15px;  text-align:justify;'> y con base a lo solicitado; presente los señores</label>
             <label style='font-weight: normal; font-size: 15px;  text-align:justify;'>xxx</label>
             <label style=' font-size: 15px;  text-align:justify;'>, por parte del proveedor; </label>
-            <label style='font-weight: bold; font-size: 15px;  text-align:justify;'>xxx.</label>
+            <label style='font-weight: bold; font-size: 15px;  text-align:justify;'>$textoAdministrador.</label>
             <label style=' font-size: 15px;  text-align:justify;'> en calidad de administrador de contrato.</label>
             </div>
         ";
@@ -537,13 +545,13 @@ class OrdenCompraUnidadController extends Controller
             <tbody>";
 
         $tabla .= "<tr>
-                    <td width='25%' style='font-weight: normal; font-size: 14px'>Proveedor: </td>
-                    <td width='25%' style='font-weight: normal; font-size: 14px; margin-left: 15px'>Administrador de Contrato</td>
-                    </tr>";
+                    <td width='25%' style='font-weight: normal; text-align: left; font-size: 14px'>Proveedor </td>
+                    <td width='25%' style='font-weight: normal; text-align: left; font-size: 14px; margin-left: 25px;'>Administrador de Contrato</td>
+                   </tr>";
 
         $tabla .= "<tr>
-                    <td width='25%' style='font-size: 12px'>xxx</td>
-                    <td width='25%' style='font-size: 14px; margin-left: 15px'>xxx</td>
+                    <td width='25%' style='font-size: 12px'>&nbsp;&nbsp;&nbsp;&nbsp; $textoProveedor</td>
+                    <td width='25%' style='font-size: 14px; margin-left: 15px'>&nbsp;&nbsp;&nbsp;&nbsp; $textoAdministrador</td>
                     </tr>";
 
         $tabla .= "</tbody></table>";
@@ -561,7 +569,7 @@ class OrdenCompraUnidadController extends Controller
                     </tr>";
 
         $tabla .= "<tr>
-                    <td width='25%' style='font-size: 14px; padding-left: 15px'>Nombre: xxx</td>
+                    <td width='25%' style='font-size: 14px; padding-left: 15px'> $textoSolicitante</td>
                     </tr>";
 
         $tabla .= "</tbody></table>";
