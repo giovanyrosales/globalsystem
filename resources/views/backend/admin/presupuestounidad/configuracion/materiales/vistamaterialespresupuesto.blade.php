@@ -521,7 +521,7 @@
 
                         Swal.fire({
                             title: 'Material Actualizado',
-                            text: "",
+                            text: "No se mostrara el Precio en la tabla, hasta que recarge la Página",
                             icon: 'success',
                             showCancelButton: false,
                             allowOutsideClick: false,
@@ -529,7 +529,7 @@
                             confirmButtonText: 'Aceptar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                location.reload();
+                                //location.reload();
                             }
                         })
                     }

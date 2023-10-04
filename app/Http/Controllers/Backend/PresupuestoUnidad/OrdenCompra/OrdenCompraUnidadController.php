@@ -219,7 +219,7 @@ class OrdenCompraUnidadController extends Controller
 
         // PASAR A LETRAS
 
-        $formatterES = new \NumberFormatter("es-ES", \NumberFormatter::SPELLOUT);
+        $formatterES = new NumberFormatter("es-ES", NumberFormatter::SPELLOUT);
         $izquierda = intval(floor($total));
         //$derecha = intval(($total - floor($total)) * 100);
         $totalEnLetras = strtoupper($formatterES->format($izquierda)) . " DOLARES";
