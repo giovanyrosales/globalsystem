@@ -308,10 +308,46 @@ class OrdenCompraUnidadController extends Controller
             ->orderBy('fecha_orden')
             ->get();
 
-
         foreach($arrayOrdenUnidad as $info){
 
             $info->fecha_orden = date("d-m-Y", strtotime($info->fecha_orden));
+
+            $idorden = $info->id;
+
+            $textoReferencia = "";
+
+            $anioOrden = date("Y", strtotime($info->fecha_orden));
+
+            // REFERENCIA
+            if($infoReferencia = Referencias::where('id', $info->id_referencia)->first()){
+
+                $ceros = str_repeat("0", 5);
+
+                if ($idorden <= 9) {
+                    $numerales = $ceros[0] . $ceros[1] . $ceros[2] . $ceros[3] . $ceros[4] . $idorden;
+                } else if ($idorden <= 99) {
+                    $numerales = $ceros[0] . $ceros[1] . $ceros[2] . $ceros[3] . $idorden;
+                } else if ($idorden <= 999) {
+                    $numerales = $ceros[0] . $ceros[1] . $ceros[2] . $idorden;
+                }
+                else if ($idorden <= 9999) {
+                    $numerales = $ceros[0] . $ceros[1] . $idorden;
+                }
+                else if ($idorden <= 99999) {
+                    $numerales = $ceros[0] . $idorden;
+                }
+                else {
+                    $numerales = $idorden;
+                }
+
+                $textoReferencia = $infoReferencia->nombre . "-" . $numerales . "-" . $anioOrden . "AMM";
+
+            }
+
+
+            $info->referencia = $textoReferencia;
+
+
 
             $hayActa = 0;
             $idActa = 0;

@@ -9,6 +9,7 @@
                             <tr>
                                 <th style="width: 10%"># de Orden</th>
                                 <th style="width: 17%"># de Cotización</th>
+                                <th style="width: 17%">Referencia</th>
                                 <th style="width: 17%">Fecha de Orden</th>
                                 <th style="width: 12%">Opciones</th>
                             </tr>
@@ -20,6 +21,7 @@
                                 <tr>
                                     <td>{{ $dato->id }}</td>
                                     <td>{{ $dato->id_cotizacion }}</td>
+                                    <td>{{ $dato->referencia }}</td>
                                     <td>{{ $dato->fecha_orden }}</td>
                                     <td>
 
