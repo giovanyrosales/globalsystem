@@ -164,8 +164,8 @@ class ConfiguracionPresupuestoUnidadController extends Controller
     public function buscarMaterialPresupuestoUnidad(Request $request){
 
         $data = P_Materiales::where('descripcion', 'LIKE', "%{$request->texto}%")
-            ->where('visible', 0) // solo buscar materiales visibles
-            ->take(25)
+            ->where('visible', 1) // solo buscar materiales visibles
+            ->take(50)
             ->get();
 
         $haymaterial = true;
