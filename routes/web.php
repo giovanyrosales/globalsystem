@@ -775,6 +775,10 @@ Route::post('/admin/p/registrar/proyecto/presupuesto/unidad', [ConfiguracionPres
 // solo obtener las unidades de medida para registrar material solicitado por unidad
 Route::post('/admin/p/presupuesto/obtener/unidad/medida', [ConfiguracionPresupuestoUnidadController::class,'informacionUnidadMedidaPresupuesto']);
 
+// actualizar fila de un proyecto aprobado
+Route::post('/admin/p/actualizar/proyecto/aprobadosfila', [ConfiguracionPresupuestoUnidadController::class,'actualizarDatosProyectoAprobado']);
+
+
 
 
 
@@ -1172,6 +1176,12 @@ Route::get('/admin/referencias/orden/tabla', [ReferenciasController::class,'tabl
 Route::post('/admin/referencias/orden/nuevo', [ReferenciasController::class, 'nuevaReferencia']);
 Route::post('/admin/referencias/orden/informacion', [ReferenciasController::class, 'informacionReferencia']);
 Route::post('/admin/referencias/orden/editar', [ReferenciasController::class, 'editarReferencia']);
+
+
+// informacion de un proyecto aprobado del presupuesto unidad
+Route::post('/admin/p/proyectos/informacion/deaprobados', [ConsolidadorController::class, 'informacionPresupuestoUniProyectos']);
+
+
 
 
 

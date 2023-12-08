@@ -230,6 +230,61 @@
     </div>
 
 
+
+
+
+
+
+
+
+
+    <!-- EDITAR FILA DE UN PROYECTO APROBADO PARA ELIMINAR O EDITAR, SOLO SINO A SIDO APROBADO -->
+    <div class="modal fade" id="modalEditarFilaProy">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Editar Proyecto</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-edit-proy">
+                        <div class="card-body">
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Descripción</label>
+                                            <input type="hidden" id="id-proyecto-aprobado">
+                                            <input type="text" class="form-control" maxlength="300" id="info-descripcion-proyecto">
+                                        </div>
+
+                                        <div class="form-group" style="margin-top: 15px">
+                                            <label>Costo</label>
+                                            <input type="number" min="0" class="form-control" id="info-costo-proyecto">
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="actualizarEdicionProyecto()">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 
@@ -604,6 +659,97 @@
                     closeLoading();
                 });
 
+        }
+
+
+        function actualizarEdicionProyecto(){
+
+
+            var id = document.getElementById('id-proyecto-aprobado').value;
+            var descripcion = document.getElementById('info-descripcion-proyecto').value;
+            var costo = document.getElementById('info-costo-proyecto').value;
+
+            var reglaNumeroDecimal = /^[0-9]\d*(\.\d+)?$/;
+
+            //*************
+
+            if(costo === ''){
+                toastr.error('Costo es requerida');
+                return;
+            }
+
+            if(!costo.match(reglaNumeroDecimal)) {
+                toastr.error('Costo debe ser número Decimal y no Negativo. Solo 2 decimales');
+                return;
+            }
+
+            if(costo <= 0){
+                toastr.error('Costo no debe ser negativo o cero');
+                return;
+            }
+
+            if(costo > 9000000){
+                toastr.error('Costo máximo 9 millones');
+                return;
+            }
+
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('nombre', descripcion);
+            formData.append('costo', costo);
+
+            axios.post(url+'/p/actualizar/proyecto/aprobadosfila', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        Swal.fire({
+                            title: 'No Actualizado',
+                            text: "El presupuesto cambio de estado al: Aprobado",
+                            icon: 'error',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Recargar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+
+                    else if(response.data.success === 2){
+
+                        Swal.fire({
+                            title: 'Actualizado',
+                            text: "",
+                            icon: 'success',
+                            showCancelButton: false,
+                            allowOutsideClick: false,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Recargar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        })
+                    }
+
+                    else {
+                        toastr.error('Error al registrar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al registrar');
+                    closeLoading();
+                });
         }
 
     </script>

@@ -12,6 +12,7 @@ use App\Models\P_AnioPresupuesto;
 use App\Models\P_Departamento;
 use App\Models\P_Materiales;
 use App\Models\P_PresupUnidad;
+use App\Models\P_ProyectosAprobados;
 use App\Models\P_UnidadMedida;
 use App\Models\Requisicion;
 use App\Models\RequisicionAgrupada;
@@ -713,6 +714,28 @@ class ConsolidadorController extends Controller
 
 
         return ['success' => 2];
+    }
+
+
+
+
+
+    public function informacionPresupuestoUniProyectos(Request $request){
+
+        $regla = array(
+            'id' => 'required', // tabla: P_ProyectosAprobados
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        $infoTabla = P_ProyectosAprobados::where('id', $request->id)->first();
+
+
+        return ['success' => 1, 'info' => $infoTabla];
     }
 
 

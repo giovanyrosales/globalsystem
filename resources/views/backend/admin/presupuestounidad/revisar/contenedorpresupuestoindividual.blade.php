@@ -250,6 +250,7 @@
                                                             <th style="width: 12%; text-align: center">Fuente Recursos</th>
                                                             <th style="width: 12%; text-align: center">Línea Trabajo</th>
                                                             <th style="width: 12%; text-align: center">Área Gestión</th>
+                                                            <th style="width: 12%; text-align: center">Opción</th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
@@ -263,6 +264,11 @@
                                                                 <td><input disabled value="{{ $lp->fuenterecurso }}" class="form-control"></td>
                                                                 <td><input disabled value="{{ $lp->lineatrabajo }}" class="form-control"></td>
                                                                 <td><input disabled value="{{ $lp->areagestion }}" class="form-control"></td>
+                                                                <td>
+                                                                    @if($idestado != 3)
+                                                                        <button type="button" class="btn btn-warning" style="color: white" onclick="infoFilaEditar({{ $lp->id }})">Editar</button>
+                                                                    @endif
+                                                                </td>
                                                             </tr>
 
                                                         @endforeach
@@ -401,6 +407,39 @@
         $('#proyecto-descripcion-nuevo').val(descripcion);
         $('#proyecto-costo-nuevo').val(costo);
         $('#proyecto-id-aborrar').val(idproborrar);
+    }
+
+
+    function infoFilaEditar(idproyecto){
+        // tabla: P_ProyectosAprobados
+
+        openLoading();
+        document.getElementById("formulario-edit-proy").reset();
+
+        axios.post(url+'/p/proyectos/informacion/deaprobados',{
+            'id': idproyecto
+        })
+            .then((response) => {
+                closeLoading();
+
+                console.log(response)
+
+                if(response.data.success === 1){
+                    $('#modalEditarFilaProy').modal('show');
+                    $('#id-proyecto-aprobado').val(idproyecto);
+                    $('#info-descripcion-proyecto').val(response.data.info.descripcion);
+                    $('#info-costo-proyecto').val(response.data.info.costo);
+
+                }else{
+                    toastr.error('Información no encontrada');
+                }
+            })
+            .catch((error) => {
+                closeLoading();
+                toastr.error('Información no encontrada');
+            });
+
+
     }
 
 

@@ -665,9 +665,9 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         foreach ($listadoProyectoAprobados as $dd){
 
             $infoObjeto = ObjEspecifico::where('id', $dd->id_objespeci)->first();
-            $infoFuenteR = ObjEspecifico::where('id', $dd->id_fuenter)->first();
-            $infoLinea = ObjEspecifico::where('id', $dd->id_lineatrabajo)->first();
-            $infoArea = ObjEspecifico::where('id', $dd->id_areagestion)->first();
+            $infoFuenteR = FuenteRecursos::where('id', $dd->id_fuenter)->first();
+            $infoLinea = LineaTrabajo::where('id', $dd->id_lineatrabajo)->first();
+            $infoArea = AreaGestion::where('id', $dd->id_areagestion)->first();
 
             $dd->codigoobj = $infoObjeto->codigo;
             $dd->objeto = $infoObjeto->codigo . " - " . $infoObjeto->nombre;
@@ -1054,6 +1054,40 @@ class ConfiguracionPresupuestoUnidadController extends Controller
         return ['success' => 1, 'arrayunidad' => $arrayUnidad];
     }
 
+
+    public function actualizarDatosProyectoAprobado(Request $request){
+
+        $rules = array(
+            'id' => 'required',
+            'nombre' => 'required',
+            'costo' => 'required'
+        );
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ( $validator->fails()){
+            return ['success' => 0];
+        }
+
+        if($info = P_ProyectosAprobados::where('id', $request->id)->first()){
+
+            if($dato = P_PresupUnidad::where('id', $info->id_presup_unidad)->first()){
+                 if($dato->id_estado == 3){
+                     return ['success' => 1];
+                 }
+            }
+
+
+            P_ProyectosAprobados::where('id', $request->id)->update([
+                'descripcion' => $request->nombre,
+                'costo' => $request->costo
+            ]);
+
+            return ['success' => 2];
+        }else{
+            return ['success' => 99];
+        }
+    }
 
 
 }
