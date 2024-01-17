@@ -785,6 +785,8 @@
 
         var idpresupuesto = {{ $idpresupuesto }};
 
+        console.log('idPres ' + idpresupuesto);
+
         formData.append('idpresupuesto', idpresupuesto);
 
         axios.post(url+'/p/editar/presupuesto/editar', formData, {

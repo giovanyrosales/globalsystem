@@ -135,9 +135,9 @@
         formData.append('usuario', usuario);
         formData.append('password', password);
 
-        // /globalsystem/admin/login
+        // comprasalcaldia.com
 
-        axios.post('/globalsystem/admin/login', formData, {
+        axios.post('/comprasalcaldia.com/admin/login', formData, {
         })
             .then((response) => {
                 closeLoading();
