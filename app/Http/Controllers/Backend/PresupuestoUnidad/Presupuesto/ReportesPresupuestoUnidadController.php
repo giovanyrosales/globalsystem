@@ -742,7 +742,26 @@ class ReportesPresupuestoUnidadController extends Controller
         $arrayPresupUnidad = P_PresupUnidad::where('id_anio', $anio)->get();
         $fechaanio = P_AnioPresupuesto::where('id', $anio)->pluck('nombre')->first();
 
-        $listadoProyectoAprobados = P_ProyectosAprobados::orderBy('descripcion', 'ASC')->get();
+
+
+
+
+        // NECESITO OBENER EL ANIO SEGUN FECHA CONSOLIDADO
+
+        // listado de presub unidad de un x anio
+        $arrayPresuUniAnio = P_PresupUnidad::where('id_anio', $anio)
+            ->select('id')
+            ->get();
+
+
+        $listadoProyectoAprobados = P_ProyectosAprobados::whereIn('id_presup_unidad', $arrayPresuUniAnio)
+            ->orderBy('descripcion', 'ASC')
+            ->get();
+
+
+
+
+
 
         foreach ($listadoProyectoAprobados as $dd){
 
