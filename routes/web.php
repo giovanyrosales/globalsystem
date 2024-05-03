@@ -1184,6 +1184,27 @@ Route::post('/admin/p/proyectos/informacion/deaprobados', [ConsolidadorControlle
 
 
 
+// SECRETARIA DESPACHO
+
+Route::get('/admin/secretaria/despacho/index', [ReferenciasController::class,'indexSecreDespacho'])->name('sidebar.secretaria.despacho');
+Route::get('/admin/secretaria/despacho/tabla', [ReferenciasController::class,'tablaSecreDespacho']);
+Route::post('/admin/secretaria/despacho/nuevo', [ReferenciasController::class,'guardarSecreDespacho']);
+Route::post('/admin/secretaria/despacho/borrar', [ReferenciasController::class,'borrarSecreDespacho']);
+Route::post('/admin/secretaria/despacho/informacion', [ReferenciasController::class,'informacionSecreDespacho']);
+Route::post('/admin/secretaria/despacho/editar', [ReferenciasController::class,'editarSecreDespacho']);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

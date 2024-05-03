@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Backend\Configuracion\Referencias;
 
 use App\Http\Controllers\Controller;
 use App\Models\Referencias;
+use App\Models\SecretariaDespacho;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -92,6 +94,151 @@ class ReferenciasController extends Controller
 
         return ['success' => 1];
     }
+
+
+
+
+    public function indexSecreDespacho(){
+
+        $fecha = Carbon::now('America/El_Salvador')->toDateString();;
+
+        return view('backend.admin.secredespacho.despacho.vistadespacho', compact('fecha'));
+    }
+
+
+
+    public function tablaSecreDespacho(){
+
+        $listado = SecretariaDespacho::orderBy('fecha', 'DESC')->get();
+
+        foreach ($listado as $dato){
+
+            $dato->fechaFormat = date("d-m-Y", strtotime($dato->fecha));
+        }
+
+        return view('backend.admin.secredespacho.despacho.tabladespacho', compact('listado'));
+    }
+
+
+    public function guardarSecreDespacho(Request $request){
+
+        $regla = array(
+            'fecha' => 'required',
+            'nombre' => 'required',
+        );
+
+        // telefono, direccion, editor
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        DB::beginTransaction();
+
+        try {
+
+            $dato = new SecretariaDespacho();
+            $dato->nombre = $request->nombre;
+            $dato->fecha = $request->fecha;
+            $dato->telefono = $request->telefono;
+            $dato->direccion = $request->direccion;
+            $dato->descripcion = $request->editor;
+            $dato->save();
+
+            DB::commit();
+            return ['success' => 1];
+        }catch(\Throwable $e){
+
+            DB::rollback();
+            return ['success' => 99];
+        }
+
+    }
+
+
+
+    public function borrarSecreDespacho(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        // telefono, direccion, editor
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(SecretariaDespacho::where('id', $request->id)->first()){
+            SecretariaDespacho::where('id', $request->id)->delete();
+        }
+
+        return ['success' => 1];
+    }
+
+
+
+    public function informacionSecreDespacho(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        // telefono, direccion, editor
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($info = SecretariaDespacho::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'info' => $info];
+        }
+
+        return ['success' => 2];
+    }
+
+
+
+    public function editarSecreDespacho(Request $request){
+
+        $regla = array(
+            'fecha' => 'required',
+            'nombre' => 'required',
+        );
+
+        // telefono, direccion, editor
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        DB::beginTransaction();
+
+        try {
+
+            SecretariaDespacho::where('id', $request->id)->update([
+                'fecha' => $request->fecha,
+                'nombre' => $request->nombre,
+                'telefono' => $request->telefono,
+                'direccion' => $request->direccion,
+                'descripcion' => $request->editor,
+            ]);
+
+            DB::commit();
+            return ['success' => 1];
+        }catch(\Throwable $e){
+
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
+
+
+
+
+
 
 
 }

@@ -828,6 +828,35 @@
 
 
 
+
+
+                <!-- SECRETARIA DESPACHO -->
+
+                @can('sidebar.secretaria.despacho')
+
+                    <a href="{{ route('sidebar.secretaria.despacho') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Despacho</p>
+                    </a>
+
+
+
+
+                @endcan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             </ul>
         </nav>
 

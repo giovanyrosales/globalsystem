@@ -65,6 +65,12 @@ class ControlController extends Controller
              $ruta = 'requerimientos.pendientes.consolidadoras';
          }
 
+         // SECRETARIA DESPACHO
+         else  if($user->hasRole('despacho')){
+             $ruta = 'sidebar.secretaria.despacho';
+         }
+
+
         else{
             // no tiene ningun permiso de vista, redirigir a pantalla sin permisos
             $ruta = 'no.permisos.index';
