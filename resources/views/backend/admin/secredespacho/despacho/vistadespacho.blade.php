@@ -94,8 +94,8 @@
                                     <input type="text" name="content" id="direccion-nuevo" class="form-control" maxlength="300">
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Descripción</label>
+                                <div class="form-group" style="margin-top: 10px">
+                                    <label>Solicitud</label>
                                     <textarea name="content" id="editor-nuevo" rows="12" cols="50"></textarea>
                                 </div>
 
@@ -152,8 +152,8 @@
                                     <input type="text" name="content" id="direccion-editar" class="form-control" maxlength="300">
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Descripción</label>
+                                <div class="form-group" style="margin-top: 10px">
+                                    <label>Solicitud</label>
                                     <textarea name="content" id="editor-editar" rows="12" cols="50"></textarea>
                                 </div>
 
