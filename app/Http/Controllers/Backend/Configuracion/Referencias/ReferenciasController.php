@@ -143,6 +143,7 @@ class ReferenciasController extends Controller
             $dato->telefono = $request->telefono;
             $dato->direccion = $request->direccion;
             $dato->descripcion = $request->editor;
+            $dato->tiposolicitud = $request->tiposolicitud;
             $dato->save();
 
             DB::commit();
@@ -223,6 +224,7 @@ class ReferenciasController extends Controller
                 'telefono' => $request->telefono,
                 'direccion' => $request->direccion,
                 'descripcion' => $request->editor,
+                'tiposolicitud' => $request->tiposolucitud
             ]);
 
             DB::commit();
