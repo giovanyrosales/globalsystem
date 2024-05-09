@@ -93,7 +93,16 @@
                                     <label>Dirección</label>
                                     <input type="text" name="content" id="direccion-nuevo" class="form-control" maxlength="300">
                                 </div>
-
+                                <div class="form-group">
+                                    <label>Tipo de Solicitud:</label>
+                                    <div>
+                                        <select class="form-control " id="tiposolicitud-nuevo">
+                                            <option value="">Seleccione una opción...</option>
+                                            <option value="vivienda">Vivienda</option>
+                                            <option value="materiales">Materiales de Construcción</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="form-group" style="margin-top: 10px">
                                     <label>Solicitud</label>
                                     <textarea name="content" id="editor-nuevo" rows="12" cols="50"></textarea>
@@ -151,7 +160,13 @@
                                     <label>Dirección</label>
                                     <input type="text" name="content" id="direccion-editar" class="form-control" maxlength="300">
                                 </div>
-
+                                <div class="form-group">
+                                    <label>Tipo de Solicitud:</label>
+                                    <div>
+                                        <select class="form-control " id="tiposolicitud-editar">
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="form-group" style="margin-top: 10px">
                                     <label>Solicitud</label>
                                     <textarea name="content" id="editor-editar" rows="12" cols="50"></textarea>
@@ -248,7 +263,7 @@
             var nombre = document.getElementById('nombre-nuevo').value;
             var telefono = document.getElementById('telefono-nuevo').value;
             var direccion = document.getElementById('direccion-nuevo').value;
-
+            var tiposolicitud = document.getElementById('tiposolicitud-nuevo').value;
             if(fecha === ''){
                 toastr.error('Fecha es requerido');
                 return;
@@ -268,6 +283,7 @@
             formData.append('telefono', telefono);
             formData.append('direccion', direccion);
             formData.append('editor', editorNuevo);
+            formData.append('tiposolicitud', tiposolicitud);
 
             axios.post(url+'/secretaria/despacho/nuevo', formData, {
             })
@@ -349,7 +365,6 @@
                         $('#telefono-editar').val(response.data.info.telefono);
                         $('#direccion-editar').val(response.data.info.direccion);
 
-
                         varGlobalEditorEditar.setData(response.data.info.descripcion);
 
                     }else{
@@ -370,6 +385,7 @@
             var nombre = document.getElementById('nombre-editar').value;
             var telefono = document.getElementById('telefono-editar').value;
             var direccion = document.getElementById('direccion-editar').value;
+            var tiposolicitud = document.getElementById('tiposolicitud-editar').value;
 
             if(fecha === ''){
                 toastr.error('Fecha es requerido');
@@ -391,6 +407,7 @@
             formData.append('telefono', telefono);
             formData.append('direccion', direccion);
             formData.append('editor', editorNuevoE);
+            formData.append('tiposolicitud', tiposolicitud);
 
             axios.post(url+'/secretaria/despacho/editar', formData, {
             })

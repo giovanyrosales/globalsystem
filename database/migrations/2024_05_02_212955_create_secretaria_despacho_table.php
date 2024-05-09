@@ -23,9 +23,7 @@ class CreateSecretariaDespachoTable extends Migration
             $table->string('direccion', 500)->nullable();
 
             $table->text('descripcion')->nullable();
-
-
-
+            $table->string('tiposolicitud', 100);
 
         });
     }
