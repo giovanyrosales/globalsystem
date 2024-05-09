@@ -97,9 +97,9 @@
                                     <label>Tipo de Solicitud:</label>
                                     <div>
                                         <select class="form-control " id="tiposolicitud-nuevo">
-                                            <option value="">Seleccione una opción...</option>
-                                            <option value="vivienda">Vivienda</option>
-                                            <option value="materiales">Materiales de Construcción</option>
+                                            <option value="0">Seleccione una opción...</option>
+                                            <option value="1">Vivienda</option>
+                                            <option value="2">Materiales de Construcción</option>
                                         </select>
                                     </div>
                                 </div>
@@ -365,6 +365,11 @@
                         $('#telefono-editar').val(response.data.info.telefono);
                         $('#direccion-editar').val(response.data.info.direccion);
 
+                        if(response.data.info.tiposolicitud == 1) {
+                            $('#tiposolicitud-editar').prop('selectedIndex', 1).change();
+                        }else if (response.data.info.tiposolicitud == 2){
+                            $('#tiposolicitud-editar').prop('selectedIndex', 2).change();
+                        }
                         varGlobalEditorEditar.setData(response.data.info.descripcion);
 
                     }else{
