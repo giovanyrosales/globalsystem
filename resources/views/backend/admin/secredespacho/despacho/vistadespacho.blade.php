@@ -164,6 +164,8 @@
                                     <label>Tipo de Solicitud:</label>
                                     <div>
                                         <select class="form-control " id="tiposolicitud-editar">
+                                            <option value="1">Vivienda</option>
+                                            <option value="2">Materiales de Construcción</option>
                                         </select>
                                     </div>
                                 </div>
