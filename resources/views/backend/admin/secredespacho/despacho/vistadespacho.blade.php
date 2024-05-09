@@ -238,6 +238,7 @@
         function modalAgregar(){
             document.getElementById("formulario-nuevo").reset();
             $('#modalAgregar').modal('show');
+            $('#editor-nuevo').val('');
         }
 
 
