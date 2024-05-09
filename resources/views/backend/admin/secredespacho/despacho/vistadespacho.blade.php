@@ -98,8 +98,11 @@
                                     <div>
                                         <select class="form-control " id="tiposolicitud-nuevo">
                                             <option value="0">Seleccione una opción...</option>
-                                            <option value="1">Vivienda</option>
-                                            <option value="2">Materiales de Construcción</option>
+                                            <option value="1">Vivienda Completa</option>
+                                            <option value="2">Solo Vivienda</option>
+                                            <option value="3">Materiales de Construcción</option>
+                                            <option value="4">Viveres</option>
+                                            <option value="5">Construcción</option>
                                         </select>
                                     </div>
                                 </div>
@@ -164,8 +167,12 @@
                                     <label>Tipo de Solicitud:</label>
                                     <div>
                                         <select class="form-control " id="tiposolicitud-editar">
-                                            <option value="1">Vivienda</option>
-                                            <option value="2">Materiales de Construcción</option>
+                                            <option value="0">Seleccione una opción...</option>
+                                            <option value="1">Vivienda Completa</option>
+                                            <option value="2">Solo Vivienda</option>
+                                            <option value="3">Materiales de Construcción</option>
+                                            <option value="4">Viveres</option>
+                                            <option value="5">Construcción</option>
                                         </select>
                                     </div>
                                 </div>
@@ -276,6 +283,11 @@
                 return;
             }
 
+            if(tiposolicitud == '0'){
+                toastr.error('Seleccionar Tipo de Solicitud');
+                return;
+            }
+
             const editorNuevo = varGlobalEditorNuevo.getData();
 
             openLoading();
@@ -368,9 +380,20 @@
                         $('#direccion-editar').val(response.data.info.direccion);
 
                         if(response.data.info.tiposolicitud == 1) {
-                            $('#tiposolicitud-editar').prop('selectedIndex', 1).change();
+                            moverSelect(1)
                         }else if (response.data.info.tiposolicitud == 2){
-                            $('#tiposolicitud-editar').prop('selectedIndex', 2).change();
+                            moverSelect(2)
+                        }
+                        else if (response.data.info.tiposolicitud == 3){
+                            moverSelect(3)
+                        }
+                        else if (response.data.info.tiposolicitud == 4){
+                            moverSelect(4)
+                        }
+                        else if (response.data.info.tiposolicitud == 5){
+                            moverSelect(5)
+                        }else{
+                            moverSelect(0)
                         }
                         varGlobalEditorEditar.setData(response.data.info.descripcion);
 
@@ -384,6 +407,10 @@
                 });
         }
 
+
+        function moverSelect(posicion){
+            $('#tiposolicitud-editar').prop('selectedIndex', posicion).change();
+        }
 
 
         function editarRegistro(){

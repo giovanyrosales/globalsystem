@@ -8,6 +8,7 @@ use App\Models\SecretariaDespacho;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class ReferenciasController extends Controller
@@ -114,6 +115,26 @@ class ReferenciasController extends Controller
         foreach ($listado as $dato){
 
             $dato->fechaFormat = date("d-m-Y", strtotime($dato->fecha));
+
+            $tiposoli = "";
+
+            if($dato->tiposolicitud == 1){
+                $tiposoli = "Vivienda Completa";
+            }
+            else if($dato->tiposolicitud == 2){
+                $tiposoli = "Solo Vivienda";
+            }
+            else if($dato->tiposolicitud == 3){
+                $tiposoli = "Materiales de Construcción";
+            }
+            else if($dato->tiposolicitud == 4){
+                $tiposoli = "Viveres";
+            }
+            else if($dato->tiposolicitud == 5){
+                $tiposoli = "Construcción";
+            }
+
+            $dato->tiposoli = $tiposoli;
         }
 
         return view('backend.admin.secredespacho.despacho.tabladespacho', compact('listado'));
@@ -127,7 +148,7 @@ class ReferenciasController extends Controller
             'nombre' => 'required',
         );
 
-        // telefono, direccion, editor
+        // telefono, direccion, editor, tiposolicitud
 
         $validar = Validator::make($request->all(), $regla);
 
@@ -208,7 +229,7 @@ class ReferenciasController extends Controller
             'nombre' => 'required',
         );
 
-        // telefono, direccion, editor
+        // telefono, direccion, editor, tiposolicitud
 
         $validar = Validator::make($request->all(), $regla);
 
@@ -224,13 +245,13 @@ class ReferenciasController extends Controller
                 'telefono' => $request->telefono,
                 'direccion' => $request->direccion,
                 'descripcion' => $request->editor,
-                'tiposolicitud' => $request->tiposolucitud
+                'tiposolicitud' => $request->tiposolicitud
             ]);
 
             DB::commit();
             return ['success' => 1];
         }catch(\Throwable $e){
-
+            Log::info('err: ' . $e);
             DB::rollback();
             return ['success' => 99];
         }

@@ -11,6 +11,7 @@
                                 <th  style="width: 15%">Nombre</th>
                                 <th  style="width: 15%">Teléfono</th>
                                 <th  style="width: 15%">Dirección</th>
+                                <th  style="width: 15%">Tipo Solicitud</th>
                                 <th  style="width: 15%">Opciones</th>
                             </tr>
                             </thead>
@@ -22,7 +23,7 @@
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->telefono }}</td>
                                     <td>{{ $dato->direccion }}</td>
-
+                                    <td>{{ $dato->tiposoli }}</td>
                                     <td>
                                         <button type="button" style="font-weight: normal; color: white !important;"
                                                 class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
