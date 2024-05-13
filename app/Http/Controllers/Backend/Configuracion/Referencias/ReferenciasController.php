@@ -357,6 +357,10 @@ class ReferenciasController extends Controller
 
                 $tabla .= "</tbody></table>";
 
+                $tabla .= "<div style='margin-top: 5px'>
+                <p><strong>Dirección: $dato->direccion</strong><br>
+                </div>";
+
                     $tabla .= "<div style='margin-top: 5px'>
                 <p><strong>Descripción: $dato->descripcion</strong><br>
                 </div>";
