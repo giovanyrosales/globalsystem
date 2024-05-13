@@ -840,7 +840,10 @@
                     </a>
 
 
-
+                    <a href="{{ route('sidebar.reportes.despacho') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Reportes</p>
+                    </a>
 
                 @endcan
 

@@ -23,17 +23,37 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="callout callout-info">
-                        <h5><i class="fas fa-info"></i> Generar Reportes</h5>
+                        <h5><i class="fas fa-info"></i> Generar Reporte</h5>
                         <div class="card">
                             <form class="form-horizontal">
                                 <div class="card-body">
-                                    <div class="form-group row">
-                                        <div class="col-sm-5">
-                                            <div class="info-box shadow">
-                                                <span class="info-box-icon bg-transparent"><i class="far fa-calendar-alt"></i></span>
-                                                <div class="info-box-content">
-                                                    <label>Año de Presupuesto</label>
 
+                                    <div class="form-group row">
+                                        <div class="col-sm-9 row">
+                                            <div class="info-box shadow">
+                                                <div class="info-box-content">
+
+                                                    <div class="row">
+
+                                                        <div class="form-group col-md-2" >
+                                                            <label style="color: #686868">Desde: </label>
+                                                            <input type="date" autocomplete="off" class="form-control" id="fecha-desde">
+                                                        </div>
+
+                                                        <div class="form-group col-md-2" >
+                                                            <label style="color: #686868">Hasta: </label>
+                                                            <input type="date" autocomplete="off" class="form-control" id="fecha-hasta">
+                                                        </div>
+
+                                                    </div>
+
+                                                    <select class="form-control " id="tiposolicitud">
+                                                        <option value="1">Vivienda Completa</option>
+                                                        <option value="2">Solo Vivienda</option>
+                                                        <option value="3">Materiales de Construcción</option>
+                                                        <option value="4">Viveres</option>
+                                                        <option value="5">Construcción</option>
+                                                    </select>
 
 
                                                 </div>
@@ -41,11 +61,9 @@
                                         </div>
                                     </div>
 
-                                    <h5><i class="fas fa-file"></i> Generar Plan Anual de Compras</h5> <br>
-
                                     <div class="row">
-                                        <button type="button" onclick="generarPdfPlanAnual()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
-                                            <img src="{{ asset('images/logopdf.png') }}" width="55px" height="55px">
+                                        <button type="button" onclick="generarPdfMovimientos()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
+                                            <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
                                             Generar PDF
                                         </button>
 
@@ -60,57 +78,6 @@
         </div>
     </section>
 
-
-    <section class="content" id="divcontenedor" style="display: none">
-        <div class="container-fluid">
-            <div class="card card-success">
-                <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div id="tablaDatatable">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <div class="modal fade" id="modalPendiente">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Presupuestos aun sin Aprobar</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-
-                <div class="modal-body">
-                    <form id="formulario">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-
-                                    <select class="form-control" id="select-departamento">
-                                    </select>
-
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 </div>
 
@@ -145,12 +112,25 @@
 
     <script>
 
+        // reporte pdf generado por jefe de presupuesto para movimientos de cuenta
+        function generarPdfMovimientos(){
 
-        function generarPdfPlanAnual(){
-            var idanio = document.getElementById('select-anio').value;
-            window.open("{{ URL::to('admin/p/generador/pdf/plan') }}/" + idanio);
+            let fechaDesde = document.getElementById("fecha-desde").value;
+            let fechaHasta = document.getElementById("fecha-hasta").value;
+            let tipo = document.getElementById("tiposolicitud").value;
+
+            if(fechaDesde === ''){
+                toastr.error('Fecha Desde es requerido');
+                return;
+            }
+
+            if(fechaHasta === ''){
+                toastr.error('Fecha Hasta es requerido');
+                return;
+            }
+
+            window.open("{{ URL::to('admin/reporte/despacho') }}/" + fechaDesde + "/" + fechaHasta + "/" + tipo);
         }
-
 
     </script>
 

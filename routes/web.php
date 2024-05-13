@@ -1193,6 +1193,8 @@ Route::post('/admin/secretaria/despacho/borrar', [ReferenciasController::class,'
 Route::post('/admin/secretaria/despacho/informacion', [ReferenciasController::class,'informacionSecreDespacho']);
 Route::post('/admin/secretaria/despacho/editar', [ReferenciasController::class,'editarSecreDespacho']);
 
+Route::get('/admin/secretaria/reportes/index', [ReferenciasController::class,'indexReportes'])->name('sidebar.reportes.despacho');
+Route::get('/admin/reporte/despacho/{desde}/{hasta}/{tipo}', [ReferenciasController::class,'reporteDespachoSecretaria']);
 
 
 

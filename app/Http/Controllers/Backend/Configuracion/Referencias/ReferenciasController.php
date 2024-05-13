@@ -260,6 +260,122 @@ class ReferenciasController extends Controller
 
 
 
+    public function indexReportes(){
+
+        return view('backend.admin.secredespacho.reportes.vistareportedespacho');
+    }
+
+
+    public function reporteDespachoSecretaria($desde, $hasta, $tipo){
+
+        $solicitud = "";
+
+        if($tipo == 1){
+            $solicitud = "Vivienda Completa";
+        }
+        else if($tipo == 2){
+            $solicitud = "Solo Vivienda";
+        }
+        else if($tipo == 3){
+            $solicitud = "Materiales de Construcción";
+        }
+        else if($tipo == 4){
+            $solicitud = "Viveres";
+        }
+        if($tipo == 5){
+            $solicitud = "Construcción";
+        }
+
+
+        $start = Carbon::parse($desde)->startOfDay();
+        $end = Carbon::parse($hasta)->endOfDay();
+
+        $desdeFormat = date("d-m-Y", strtotime($desde));
+        $hastaFormat = date("d-m-Y", strtotime($hasta));
+
+
+        $arrayDespacho = SecretariaDespacho::where('tiposolicitud', $tipo)
+            ->whereBetween('fecha', [$start, $end])
+            ->orderBy('fecha', 'ASC')
+            ->get();
+
+        $vuelta = 0;
+        foreach ($arrayDespacho as $dato){
+            $vuelta = $vuelta + 1;
+            $dato->vuelta = $vuelta;
+
+            $fechaFormat = date("d-m-Y", strtotime($dato->fecha));
+
+            $dato->fechaFormat = $fechaFormat;
+        }
+
+
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+        $mpdf->SetTitle('Recetas Denegadas');
+
+
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+        $logoalcaldia = 'images/logonuevo.png';
+
+        $tabla = "<div class='contenedorp'>
+            <img id='logo' src='$logoalcaldia' style='width: 150px !important;'>
+            <p id='titulo'>Distrito de Metapán<br>
+
+            Solicitud: $solicitud <br> <br>
+
+            Fecha:  $desdeFormat - $hastaFormat</p>
+            </div>";
+
+
+            foreach ($arrayDespacho as $dato){
+
+                if($dato->vuelta > 1){
+                    $tabla .= "<hr>";
+                }
+
+                $tabla .= "<table width='100%' id='tablaFor'>
+                <tbody>";
+
+                $tabla .= "<tr>
+                    <td style='font-weight: bold; width: 11%; font-size: 14px'>Fecha.</td>
+                    <td style='font-weight: bold; width: 11%; font-size: 14px'>Nombre</td>
+                    <td style='font-weight: bold; width: 12%; font-size: 14px'>Teléfono</td>
+                    <td style='font-weight: bold; width: 12%; font-size: 14px'>Tipo Solicitud</td>
+            <tr>";
+
+                $tabla .= "<tr>
+                <td>$dato->fechaFormat</td>
+                <td>$dato->nombre</td>
+                <td>$dato->telefono</td>
+                <td>$solicitud</td>
+                </tr>";
+
+                $tabla .= "</tbody></table>";
+
+                    $tabla .= "<div style='margin-top: 5px'>
+                <p><strong>Descripción: $dato->descripcion</strong><br>
+                </div>";
+
+
+            }
+
+
+        $stylesheet = file_get_contents('css/csspresupuesto.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+
+    }
+
+
 
 
 
