@@ -85,6 +85,11 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label>DUI</label>
+                                    <input type="text" name="content" id="dui-nuevo" class="form-control" maxlength="12">
+                                </div>
+
+                                <div class="form-group">
                                     <label>Teléfono</label>
                                     <input type="text" name="content" id="telefono-nuevo" class="form-control" maxlength="300">
                                 </div>
@@ -103,6 +108,7 @@
                                             <option value="3">Materiales de Construcción</option>
                                             <option value="4">Viveres</option>
                                             <option value="5">Construcción</option>
+                                            <option value="6">Proyecto</option>
                                         </select>
                                     </div>
                                 </div>
@@ -153,6 +159,10 @@
                                     <label>Nombre</label>
                                     <input type="text" name="content" id="nombre-editar" class="form-control" maxlength="300">
                                 </div>
+                                <div class="form-group">
+                                    <label>DUI</label>
+                                    <input type="text" name="content" id="dui-editar" class="form-control" maxlength="12">
+                                </div>
 
                                 <div class="form-group">
                                     <label>Teléfono</label>
@@ -173,6 +183,7 @@
                                             <option value="3">Materiales de Construcción</option>
                                             <option value="4">Viveres</option>
                                             <option value="5">Construcción</option>
+                                            <option value="6">Proyecto</option>
                                         </select>
                                     </div>
                                 </div>
@@ -243,7 +254,6 @@
 
                 });
 
-
             var ruta = "{{ URL::to('/admin/secretaria/despacho/tabla') }}";
             $('#tablaDatatable').load(ruta);
 
@@ -270,6 +280,7 @@
 
             var fecha = document.getElementById('fecha-nuevo').value;
             var nombre = document.getElementById('nombre-nuevo').value;
+            var dui = document.getElementById('dui-nuevo').value;
             var telefono = document.getElementById('telefono-nuevo').value;
             var direccion = document.getElementById('direccion-nuevo').value;
             var tiposolicitud = document.getElementById('tiposolicitud-nuevo').value;
@@ -294,6 +305,7 @@
             var formData = new FormData();
             formData.append('fecha', fecha);
             formData.append('nombre', nombre);
+            formData.append('dui', dui);
             formData.append('telefono', telefono);
             formData.append('direccion', direccion);
             formData.append('editor', editorNuevo);
@@ -376,6 +388,7 @@
 
                         $('#fecha-editar').val(response.data.info.fecha);
                         $('#nombre-editar').val(response.data.info.nombre);
+                        $('#dui-editar').val(response.data.info.dui);
                         $('#telefono-editar').val(response.data.info.telefono);
                         $('#direccion-editar').val(response.data.info.direccion);
 
@@ -417,6 +430,7 @@
             var id = document.getElementById('id-editar').value;
             var fecha = document.getElementById('fecha-editar').value;
             var nombre = document.getElementById('nombre-editar').value;
+            var dui = document.getElementById('dui-editar').value;
             var telefono = document.getElementById('telefono-editar').value;
             var direccion = document.getElementById('direccion-editar').value;
             var tiposolicitud = document.getElementById('tiposolicitud-editar').value;
@@ -438,6 +452,7 @@
             formData.append('id', id);
             formData.append('fecha', fecha);
             formData.append('nombre', nombre);
+            formData.append('dui', dui);
             formData.append('telefono', telefono);
             formData.append('direccion', direccion);
             formData.append('editor', editorNuevoE);

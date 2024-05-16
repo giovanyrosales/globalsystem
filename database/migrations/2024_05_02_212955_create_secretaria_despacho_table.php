@@ -17,6 +17,7 @@ class CreateSecretariaDespachoTable extends Migration
             $table->id();
 
             $table->string('nombre', 300);
+            $table->string('dui', 12);
             $table->date('fecha');
 
             $table->string('telefono', 100)->nullable();

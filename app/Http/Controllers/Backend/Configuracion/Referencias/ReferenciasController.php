@@ -133,6 +133,9 @@ class ReferenciasController extends Controller
             else if($dato->tiposolicitud == 5){
                 $tiposoli = "Construcción";
             }
+            else if($dato->tiposolicitud == 6){
+                $tiposoli = "Proyecto";
+            }
 
             $dato->tiposoli = $tiposoli;
         }
@@ -160,6 +163,7 @@ class ReferenciasController extends Controller
 
             $dato = new SecretariaDespacho();
             $dato->nombre = $request->nombre;
+            $dato->dui = $request->dui;
             $dato->fecha = $request->fecha;
             $dato->telefono = $request->telefono;
             $dato->direccion = $request->direccion;
@@ -242,6 +246,7 @@ class ReferenciasController extends Controller
             SecretariaDespacho::where('id', $request->id)->update([
                 'fecha' => $request->fecha,
                 'nombre' => $request->nombre,
+                'dui' => $request->dui,
                 'telefono' => $request->telefono,
                 'direccion' => $request->direccion,
                 'descripcion' => $request->editor,
@@ -285,6 +290,9 @@ class ReferenciasController extends Controller
         if($tipo == 5){
             $solicitud = "Construcción";
         }
+        if($tipo == 6){
+            $solicitud = "Proyecto";
+        }
 
 
         $start = Carbon::parse($desde)->startOfDay();
@@ -313,7 +321,7 @@ class ReferenciasController extends Controller
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
         $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
-        $mpdf->SetTitle('Recetas Denegadas');
+        $mpdf->SetTitle('Listado Solicitudes');
 
 
 
