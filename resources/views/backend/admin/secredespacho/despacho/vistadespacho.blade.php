@@ -405,6 +405,9 @@
                         }
                         else if (response.data.info.tiposolicitud == 5){
                             moverSelect(5)
+                        }
+                        else if (response.data.info.tiposolicitud == 6){
+                            moverSelect(6)
                         }else{
                             moverSelect(0)
                         }
