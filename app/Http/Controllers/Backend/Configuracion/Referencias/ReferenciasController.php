@@ -136,6 +136,10 @@ class ReferenciasController extends Controller
             else if($dato->tiposolicitud == 6){
                 $tiposoli = "Proyecto";
             }
+            else if($dato->tiposolicitud == 7){
+                $tiposoli = "Afectaciones de la Vista";
+            }
+
 
             $dato->tiposoli = $tiposoli;
         }
@@ -292,6 +296,9 @@ class ReferenciasController extends Controller
         }
         if($tipo == 6){
             $solicitud = "Proyecto";
+        }
+        if($tipo == 7){
+            $solicitud = "Afectaciones de la Vista";
         }
 
 

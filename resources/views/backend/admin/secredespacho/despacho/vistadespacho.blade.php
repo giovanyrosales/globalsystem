@@ -109,6 +109,7 @@
                                             <option value="4">Viveres</option>
                                             <option value="5">Construcción</option>
                                             <option value="6">Proyecto</option>
+                                            <option value="7">Afectaciones de la Vista</option>
                                         </select>
                                     </div>
                                 </div>
@@ -184,6 +185,7 @@
                                             <option value="4">Viveres</option>
                                             <option value="5">Construcción</option>
                                             <option value="6">Proyecto</option>
+                                            <option value="7">Afectaciones de la Vista</option>
                                         </select>
                                     </div>
                                 </div>
@@ -408,7 +410,11 @@
                         }
                         else if (response.data.info.tiposolicitud == 6){
                             moverSelect(6)
-                        }else{
+                        }
+                        else if (response.data.info.tiposolicitud == 7){
+                            moverSelect(7)
+                        }
+                        else{
                             moverSelect(0)
                         }
                         varGlobalEditorEditar.setData(response.data.info.descripcion);
