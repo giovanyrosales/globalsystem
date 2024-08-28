@@ -209,10 +209,13 @@
 
         // nuevo usuario de sistema
         function nuevoUsuario(){
+
             var nombre = document.getElementById('nombre-nuevo').value;
             var usuario = document.getElementById('usuario-nuevo').value;
             var password = document.getElementById('password-nuevo').value;
             var idrol = document.getElementById('rol-nuevo').value;
+
+
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
@@ -338,6 +341,7 @@
 
             var t = document.getElementById('toggle-editar').checked;
             var toggle = t ? 1 : 0;
+
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');

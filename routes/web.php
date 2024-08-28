@@ -45,6 +45,9 @@ use App\Http\Controllers\Backend\DescargosDirectos\DescargosDirectosController;
 use App\Http\Controllers\Backend\Configuracion\Consolidador\ConsolidadorController;
 use App\Http\Controllers\Backend\Configuracion\Referencias\ReferenciasController;
 
+use App\Http\Controllers\Backend\Recursos\RecursosHumanosController;
+
+
 // --- LOGIN ---
 
 Route::get('/', [LoginController::class,'index'])->name('login');
@@ -1198,6 +1201,14 @@ Route::get('/admin/reporte/despacho/{desde}/{hasta}/{tipo}', [ReferenciasControl
 
 
 
+
+
+Route::get('/admin/rrhh/hojadatos/index', [ReferenciasController::class,'indexRRHHDatosHoja'])->name('sidebar.rrhh.actualizacion.datos');
+
+
+// RECURSOS HUMANOS - PUBLICO
+Route::get('/actualizacion/datos', [RecursosHumanosController::class,'vistaIngresoDatos']);
+Route::post('/actualizacion/datos/guardar', [RecursosHumanosController::class,'guardarIngresoDatos']);
 
 
 

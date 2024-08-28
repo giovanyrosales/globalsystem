@@ -71,6 +71,11 @@ class ControlController extends Controller
          }
 
 
+         // RRHH ACTUALIZACION DATOS PERSONAL
+         else  if($user->hasRole('rrhh.datos')){
+             $ruta = 'sidebar.rrhh.actualizacion.datos';
+         }
+
         else{
             // no tiene ningun permiso de vista, redirigir a pantalla sin permisos
             $ruta = 'no.permisos.index';

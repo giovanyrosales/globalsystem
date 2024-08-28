@@ -848,15 +848,13 @@
                 @endcan
 
 
-
-
-
-
-
-
-
-
-
+                <!-- RECURSOS HUMANOS INGRESO DE DATOS -->
+                @can('sidebar.rrhh.datos.personal')
+                <a href="{{ route('sidebar.rrhh.actualizacion.datos') }}" target="frameprincipal" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Datos</p>
+                </a>
+                @endcan
 
 
 

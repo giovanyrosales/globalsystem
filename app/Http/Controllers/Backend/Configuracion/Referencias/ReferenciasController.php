@@ -18,18 +18,13 @@ class ReferenciasController extends Controller
         $this->middleware('auth');
     }
 
-
-
     public function indexReferencia(){
-
         return view('backend.admin.configuraciones.referencias.vistareferencias');
     }
 
 
     public function tablaReferencia(){
-
         $lista = Referencias::orderBy('nombre')->get();
-
         return view('backend.admin.configuraciones.referencias.tablareferencias', compact('lista'));
     }
 
@@ -391,12 +386,16 @@ class ReferenciasController extends Controller
         $mpdf->WriteHTML($tabla,2);
 
         $mpdf->Output();
-
     }
 
 
 
+    //*************** RECURSOS HUMANOS PARA ACTUALIZACION DE DATOS DE PERSONAL ****************
 
+    public function indexRRHHDatosHoja(){
+
+        return "vista privadoa";
+    }
 
 
 }

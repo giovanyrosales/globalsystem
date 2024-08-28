@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsuarioTable extends Migration
+class CreateRrhhCargoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,9 @@ class CreateUsuarioTable extends Migration
      */
     public function up()
     {
-        Schema::create('usuario', function (Blueprint $table) {
+        Schema::create('rrhh_cargo', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 50);
-            $table->boolean('activo');
-            $table->string('usuario', 50);
-            $table->string('password', 255);
+            $table->string('nombre', 300);
         });
     }
 
@@ -29,6 +26,6 @@ class CreateUsuarioTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('usuario');
+        Schema::dropIfExists('rrhh_cargo');
     }
 }
