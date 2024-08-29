@@ -39,8 +39,7 @@
             <div class="row">
 
                 <div class="col-md-12">
-
-                        <form id="formulario-nuevo">
+                    <form id="formulario-nuevo">
                             <div class="card-body">
                                 <div class="card card-gray-dark">
                                     <div class="card-header">
@@ -81,7 +80,7 @@
                                     <div id="contenedor-nuevonombre" style="display: none;">
                                         <div class="form-group">
                                             <label>Nombre Empleado <label style="color: red"> * </label></label>
-                                            <input type="text" id="nombre-nuevo" maxlength="100" placeholder="Nombre" class="form-control">
+                                            <input type="text" autocomplete="off" id="nombre-nuevo" maxlength="100" placeholder="Nombre" class="form-control">
                                         </div>
                                     </div>
 
@@ -109,12 +108,12 @@
 
                                     <div class="form-group">
                                         <label>DUI <label style="color: red"> * </label></label>
-                                        <input type="text" id="dui" maxlength="20" class="form-control">
+                                        <input type="text" autocomplete="off" id="dui" maxlength="20" class="form-control">
                                     </div>
 
                                     <div class="form-group">
                                         <label>NIT <label style="color: red"> (Opcional)</label></label>
-                                        <input type="text" id="nit" maxlength="20" class="form-control">
+                                        <input type="text" autocomplete="off" id="nit" maxlength="20" class="form-control">
                                     </div>
 
 
@@ -136,13 +135,10 @@
 
                                     <div class="form-group">
                                         <label>Lugar de Nacimiento <label style="color: red"> * </label></label>
-                                        <input type="text" id="lugar-nacimiento" maxlength="200" class="form-control">
+                                        <input type="text" autocomplete="off" id="lugar-nacimiento" maxlength="200" class="form-control">
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>Edad <label style="color: red"> * </label></label>
-                                        <input type="number" id="edad" min="10" max="150" oninput="validarNumero(event)" class="form-control">
-                                    </div>
+
 
 
                                     <div class="form-group">
@@ -157,17 +153,17 @@
 
                                     <div class="form-group">
                                         <label>Profesión <label style="color: red"> (Opcional)</label></label>
-                                        <input type="text" id="profesion" maxlength="100" class="form-control">
+                                        <input type="text" autocomplete="off" id="profesion" maxlength="100" class="form-control">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Dirección Actual <label style="color: red"> * </label></label>
-                                        <input type="text" id="direccion-actual" maxlength="200" class="form-control">
+                                        <input type="text" autocomplete="off" id="direccion-actual" maxlength="200" class="form-control">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Celular <label style="color: red"> * </label></label>
-                                        <input type="number" id="celular" oninput="validarNumero(event)" class="form-control">
+                                        <input type="number" autocomplete="off" id="celular" oninput="validarNumero(event)" class="form-control">
                                     </div>
 
                                     <br>
@@ -175,12 +171,12 @@
 
                                     <div class="form-group">
                                         <label>En Emergencias Llamar A: <label style="color: red"> * </label></label>
-                                        <input type="text" id="emergencias-llamar" maxlength="100" class="form-control">
+                                        <input type="text" autocomplete="off" id="emergencias-llamar" maxlength="100" class="form-control">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Celular Emergencia <label style="color: red"> * </label></label>
-                                        <input type="number" id="celular-emergencia" oninput="validarNumero(event)" class="form-control">
+                                        <input type="number" autocomplete="off" id="celular-emergencia" oninput="validarNumero(event)" class="form-control">
                                     </div>
 
                                     <hr>
@@ -205,7 +201,7 @@
                                     <div id="contenedor-nuevoenfermedad" style="display: none;">
                                         <div class="form-group">
                                             <label>Enfermedad <label style="color: red"> * </label></label>
-                                            <input type="text" id="enfermedad-nuevo" maxlength="100" placeholder="Nombre" class="form-control">
+                                            <input type="text" autocomplete="off" id="enfermedad-nuevo" maxlength="100" placeholder="Nombre" class="form-control">
                                         </div>
                                     </div>
                                 </div>
@@ -226,7 +222,7 @@
                                             <div class="container-fluid">
                                                 <div class="card card-primary">
 
-                                                    <table class="table" id="matriz" data-toggle="table"">
+                                                    <table class="table" id="matriz" data-toggle="table">
                                                         <thead>
                                                         <tr>
                                                             <th style="width: 4%">#</th>
@@ -247,13 +243,13 @@
                                                                 <p>1</p>
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayNombre[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayNombre[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayParentesco[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayParentesco[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="number"  name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
+                                                                <input type="number" autocomplete="off"  name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
                                                             </td>
                                                         </tr>
 
@@ -262,13 +258,13 @@
                                                                 <p>2</p>
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayNombre[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayNombre[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayParentesco[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayParentesco[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="number" name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
+                                                                <input type="number" autocomplete="off" name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
                                                             </td>
                                                         </tr>
 
@@ -277,13 +273,13 @@
                                                                 <p>3</p>
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayNombre[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayNombre[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayParentesco[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayParentesco[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="number" name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
+                                                                <input type="number" autocomplete="off" name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
                                                             </td>
                                                         </tr>
 
@@ -292,13 +288,13 @@
                                                                 <p>4</p>
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayNombre[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayNombre[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayParentesco[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayParentesco[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="number" name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
+                                                                <input type="number" autocomplete="off" name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
                                                             </td>
                                                         </tr>
 
@@ -307,13 +303,13 @@
                                                                 <p>5</p>
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayNombre[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayNombre[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="text" name="arrayParentesco[]" maxlength="100" class="form-control">
+                                                                <input type="text" autocomplete="off" name="arrayParentesco[]" maxlength="100" class="form-control">
                                                             </td>
                                                             <td>
-                                                                <input type="number" name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
+                                                                <input type="number" autocomplete="off" name="arrayPorcentaje[]" oninput="validarNumero(event)" min="0" max="100" class="form-control">
                                                             </td>
                                                         </tr>
 
@@ -331,17 +327,8 @@
                                 </div>
 
 
-
-
-
-
-
                             </div>
-
-
                         </form>
-
-
                 </div>
 
 
@@ -456,7 +443,7 @@
         function registrar(){
 
             // ***** BLOQUE 1 *****
-            /*var selectNombreEmpleado = document.getElementById('select-nombre').value;
+            var selectNombreEmpleado = document.getElementById('select-nombre').value;
             let tEmpleadoCheck = document.getElementById('empleado-check').checked;
             let valEmpleadoCheck = tEmpleadoCheck ? 1 : 0;
             var nombreNuevo = document.getElementById('nombre-nuevo').value;
@@ -499,7 +486,6 @@
             // ***** BLOQUE 2 *****
             var fechaNacimiento = document.getElementById('fecha-nacimiento').value;
             var lugarNacimiento = document.getElementById('lugar-nacimiento').value;
-            var edad = document.getElementById('edad').value;
             var selectAcademico = document.getElementById('select-academico').value;
             var profesion = document.getElementById('profesion').value;
             var direccionActual = document.getElementById('direccion-actual').value;
@@ -519,11 +505,6 @@
 
             if(lugarNacimiento === ''){
                 alertaCampoRequerido('Lugar de Nacimiento es Requerido')
-                return
-            }
-
-            if(edad === ''){
-                alertaCampoRequerido('Edad es Requerido')
                 return
             }
 
@@ -568,7 +549,7 @@
                     alertaCampoRequerido('Enfermedad es Requerido')
                     return
                 }
-            }*/
+            }
 
 
 
@@ -630,7 +611,7 @@
 
             openLoading();
             var formData = new FormData();
-            /*formData.append('selectNombre', selectNombreEmpleado);
+            formData.append('selectNombre', selectNombreEmpleado);
             formData.append('empleadoCheck', valEmpleadoCheck);
             formData.append('nombreNuevo', nombreNuevo);
             formData.append('selectCargos', selectCargos);
@@ -640,7 +621,6 @@
 
             formData.append('fechaNacimiento', fechaNacimiento);
             formData.append('lugarNacimiento', lugarNacimiento);
-            formData.append('edad', edad);
             formData.append('selectAcademica', selectAcademico);
             formData.append('profesion', profesion);
             formData.append('direccionActual', direccionActual);
@@ -649,9 +629,10 @@
             formData.append('celularEmergencia', celularEmergencia);
             formData.append('selectEnfermedad', selectEnfermedad);
             formData.append('enfermedadCheck', valEnfermedadCheck);
-            formData.append('enfermedadNuevo', enfermedadNuevo);*/
+            formData.append('enfermedadNuevo', enfermedadNuevo);
             formData.append('contenedorArray', JSON.stringify(contenedorArray));
 
+            // /comprasalcaldia.com/
             axios.post('/actualizacion/datos/guardar', formData, {
             })
                 .then((response) => {

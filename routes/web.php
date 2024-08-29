@@ -1204,6 +1204,9 @@ Route::get('/admin/reporte/despacho/{desde}/{hasta}/{tipo}', [ReferenciasControl
 
 
 Route::get('/admin/rrhh/hojadatos/index', [ReferenciasController::class,'indexRRHHDatosHoja'])->name('sidebar.rrhh.actualizacion.datos');
+Route::get('/admin/rrhh/hojadatos/tabla', [ReferenciasController::class,'tablaRRHHDatosHoja']);
+Route::get('/admin/rrhh/hojadatos/reporte/{id}', [ReferenciasController::class,'RRHHDatosReporte']);
+Route::post('/admin/rrhh/hojadatos/borrar', [ReferenciasController::class,'RRHHDatosBorrar']);
 
 
 // RECURSOS HUMANOS - PUBLICO
