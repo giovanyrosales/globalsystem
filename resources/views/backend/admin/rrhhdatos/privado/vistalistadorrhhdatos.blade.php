@@ -105,7 +105,7 @@
         function borrarRegistro(id){
             openLoading();
 
-            axios.post(url+'/rrhh/hojadatos/borrar',{
+            axios.post(url+'/rrhh/hojadatos/borrarregistro',{
                 'id': id
             })
                 .then((response) => {

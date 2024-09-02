@@ -656,6 +656,7 @@ class ReferenciasController extends Controller
 
     public function RRHHDatosBorrar(Request $request){
 
+        Log::info($request->all());
         $regla = array(
             'id' => 'required',
         );
