@@ -31,7 +31,7 @@ class CreateRrhhDatosTable extends Migration
             $table->date('fecha_nacimiento');
             $table->string('lugar_nacimiento', 200);
             $table->integer('select_academico');
-            $table->string('profesion', 100);
+            $table->string('profesion', 100)->nullable();
             $table->string('direccion_actual', 200);
             $table->string('celular', 50);
             $table->string('emergencia_llamar', 100);

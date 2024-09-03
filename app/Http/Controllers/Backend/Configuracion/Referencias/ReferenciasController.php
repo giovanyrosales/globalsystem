@@ -472,11 +472,14 @@ class ReferenciasController extends Controller
             $academico = "";
         }
 
+        $enfermedad = "";
+
         if($infoDatos->enfermedad_check == 1){
             $enfermedad = $infoDatos->enfermedad_nuevo;
         }else{
-            $infoEnfe = RRHHenfermedades::where('id', $infoDatos->id_enfermedad)->first();
-            $enfermedad = $infoEnfe->nombre;
+            if($infoEnfe = RRHHenfermedades::where('id', $infoDatos->id_enfermedad)->first()) {
+                $enfermedad = $infoEnfe->nombre;
+            }
         }
 
 
