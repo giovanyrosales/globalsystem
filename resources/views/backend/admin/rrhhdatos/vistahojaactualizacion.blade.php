@@ -144,7 +144,7 @@
                                     <div class="form-group">
                                         <label>Nivel Académico <label style="color: red"> * </label></label>
                                         <select class="form-control" id="select-academico">
-                                            <option value="0">Seleccionar Opción</option>
+                                            <option value="0">Ninguno</option>
                                             <option value="1">BASICO</option>
                                             <option value="2">MEDIO</option>
                                             <option value="3">SUPERIOR</option>
@@ -505,11 +505,6 @@
 
             if(lugarNacimiento === ''){
                 alertaCampoRequerido('Lugar de Nacimiento es Requerido')
-                return
-            }
-
-            if(selectAcademico === '0'){
-                alertaCampoRequerido('Nivel Académico es Requerido')
                 return
             }
 

@@ -155,3 +155,19 @@ br[style] {
 }
 
 
+
+.signature {
+    text-align: center;
+    margin-top: 50px;
+}
+.signature .line {
+    width: 200px;
+    border-bottom: 1px solid black;
+    margin: 0 auto;
+}
+.signature .name {
+    margin-top: 10px;
+    font-weight: normal;
+    font-family: 'Calibri', sans-serif;
+    font-size: 14px;
+}

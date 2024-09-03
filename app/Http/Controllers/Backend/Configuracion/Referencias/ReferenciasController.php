@@ -462,7 +462,10 @@ class ReferenciasController extends Controller
 
         $edad = Carbon::parse($infoDatos->fecha_nacimiento)->age;
 
-        if($infoDatos->select_academico == 1){
+        if($infoDatos->select_academico == 0){
+            $academico = "NINGUNO";
+        }
+        else if($infoDatos->select_academico == 1){
             $academico = "BASICO";
         }else if($infoDatos->select_academico == 2){
             $academico = "MEDIO";
@@ -645,6 +648,18 @@ class ReferenciasController extends Controller
             }
 
         $tabla .="</tbody></table>";
+
+        $tabla .= "<br>";
+
+        $tabla .= "<p>Declaro bajo juramento que los datos anteriormente presentados son brindados por mi persona
+                y para los efectos que la municipalidad estime conveniente firmo la presente.</p>";
+
+        $tabla .= "<br><br>";
+        $tabla .= "
+                <div class='signature'>
+                    <div class='line'></div>
+                    <div class='name'>$nombreFormat</div>
+                </div>'";
 
 
         $stylesheet = file_get_contents('css/cssrrhh.css');
