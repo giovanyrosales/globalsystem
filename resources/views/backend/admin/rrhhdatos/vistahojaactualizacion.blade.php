@@ -184,7 +184,7 @@
                                     <div class="form-group" id="contenedor-enfermedadlist">
                                         <label>¿Padece Alguna Enfermedad Crónica o Existe Alguna Condición Fisica? <label style="color: red"> * </label></label>
                                         <select class="form-control" id="select-enfermedad">
-                                            <option value="0">Seleccionar opción</option>
+                                            <option value="0">Ninguna</option>
                                             @foreach($listaEnfermedad as $dato)
                                                 <option value="{{ $dato->id }}">{{ $dato->nombre }}</option>
                                             @endforeach
@@ -540,10 +540,7 @@
 
 
             if(valEnfermedadCheck === 0){
-                if(selectEnfermedad === '0'){
-                    alertaCampoRequerido('Enfermedad Crónica/Física es Requerido')
-                    return
-                }
+               // no hacer nada
             }else{
                 if(enfermedadNuevo === ''){
                     alertaCampoRequerido('Enfermedad es Requerido')
@@ -632,8 +629,8 @@
             formData.append('enfermedadNuevo', enfermedadNuevo);
             formData.append('contenedorArray', JSON.stringify(contenedorArray));
 
-            // /comprasalcaldia.com/
-            axios.post('/actualizacion/datos/guardar', formData, {
+
+            axios.post('/admin/actualizacion/datos/guardar', formData, {
             })
                 .then((response) => {
                     closeLoading();

@@ -1211,7 +1211,7 @@ Route::post('/admin/rrhh/hojadatos/borrarregistro', [ReferenciasController::clas
 
 // RECURSOS HUMANOS - PUBLICO
 Route::get('/actualizacion/datos', [RecursosHumanosController::class,'vistaIngresoDatos']);
-Route::post('/actualizacion/datos/guardar', [RecursosHumanosController::class,'guardarIngresoDatos']);
+Route::post('/admin/actualizacion/datos/guardar', [RecursosHumanosController::class,'guardarIngresoDatos']);
 
 
 

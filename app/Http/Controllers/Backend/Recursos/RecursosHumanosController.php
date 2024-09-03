@@ -68,8 +68,13 @@ class RecursosHumanosController extends Controller
                 $registro->enfermedad_nuevo = $request->enfermedadNuevo;
                 $registro->id_enfermedad = null;
             }else{
-                $registro->id_enfermedad = $request->selectEnfermedad;
-                $registro->enfermedad_nuevo = null;
+                if($request->selectEnfermedad == '0'){
+                    $registro->id_enfermedad = null;
+                    $registro->enfermedad_nuevo = null;
+                }else{
+                    $registro->id_enfermedad = $request->selectEnfermedad;
+                    $registro->enfermedad_nuevo = null;
+                }
             }
 
             $registro->enfermedad_check = $request->enfermedadCheck;
