@@ -513,11 +513,6 @@
                 return
             }
 
-            if(profesion === ''){
-                alertaCampoRequerido('Profesión es Requerido')
-                return
-            }
-
             if(direccionActual === ''){
                 alertaCampoRequerido('Dirección Actual es Requerido')
                 return
