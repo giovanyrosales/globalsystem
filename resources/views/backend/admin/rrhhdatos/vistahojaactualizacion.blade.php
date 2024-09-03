@@ -630,7 +630,7 @@
             formData.append('contenedorArray', JSON.stringify(contenedorArray));
 
 
-            axios.post('/admin/actualizacion/datos/guardar', formData, {
+            axios.post('/comprasalcaldia.com/admin/actualizacion/datos/guardar', formData, {
             })
                 .then((response) => {
                     closeLoading();
