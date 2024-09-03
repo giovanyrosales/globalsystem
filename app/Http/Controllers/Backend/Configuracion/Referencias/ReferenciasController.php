@@ -606,7 +606,7 @@ class ReferenciasController extends Controller
                 </td>
                 <td style=' text-align: left;  padding: 8px;'>
                         <strong style='font-weight: bold'>CELULAR: </strong>
-                        <strong style='font-weight: normal'>$infoDatos->celular</strong>
+                        <strong style='font-weight: normal'>$infoDatos->celular_emergencia</strong>
                 </td>
                </tr>
 
