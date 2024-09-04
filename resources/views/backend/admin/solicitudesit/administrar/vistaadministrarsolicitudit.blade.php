@@ -55,8 +55,32 @@
                                     <button type="button" onclick="verListadoEquipos()" style="font-weight: bold; background-color: #28a745; color: white !important;"
                                             class="button button-rounded button-pill button-small">Ver Lista</button>
                                 </div>
+                            </div>
+
+
+                            <hr>
+                            <br>
+
+
+                            <div class="col-md-6" style="float: right">
+
+                                <div class="card card-gray">
+                                    <div class="card-header">
+                                        <h3 class="card-title">FECHA LÍMITE</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <input class="form-control" type="date" id="fechalimite" value="{{ $fechaLimite }}">
+                                        <br>
+
+                                        <button type="button" onclick="actualizarFecha()" style="font-weight: bold; background-color: #2c96d5; color: white !important;"
+                                                class="button button-rounded button-pill button-small">Actualizar</button>
+                                    </div>
+
+                                </div>
 
                             </div>
+
+
 
 
 
@@ -130,6 +154,40 @@
             var idFila = document.getElementById('select-unidades').value;
 
             window.location.href="{{ url('/admin/solicitudit/administracion/tablafinal') }}/" + idFila;
+        }
+
+
+        function actualizarFecha(){
+
+
+            var fecha = document.getElementById('fechalimite').value;
+
+            if(fecha === ''){
+                toastr.error('Fecha es requerida');
+                return;
+            }
+
+            openLoading();
+            var formData = new FormData();
+
+            formData.append('fecha', fecha);
+
+            axios.post(url+'/solicitudesit/fechalimite', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado');
+                    }
+                    else {
+                        toastr.error('error al registrar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al registrar');
+                    closeLoading();
+                });
         }
 
     </script>

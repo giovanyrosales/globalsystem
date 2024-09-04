@@ -1231,6 +1231,7 @@ Route::post('/admin/p/solicitudesit/guardardatos', [SolicitudesITController::cla
 Route::get('/admin/solicitudit/administracion', [SolicitudesITController::class,'indexSolicitudesITControl'])->name('admin.solicitudit.control.index');
 Route::post('/admin/solicitudesit/listadounidades', [SolicitudesITController::class, 'listadoSolicitudeITBloqueFecha']);
 Route::get('/admin/solicitudit/administracion/tablafinal/{idfila}', [SolicitudesITController::class,'indexSolicitudTablaFinal']);
+Route::post('/admin/solicitudesit/fechalimite', [SolicitudesITController::class, 'guardarFechaLimiteSolicitudIT']);
 
 
 

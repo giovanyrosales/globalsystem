@@ -184,15 +184,17 @@ class SolicitudesITController extends Controller
     }
 
 
-
-
     // *** ADMINISTRACION ****
 
     function indexSolicitudesITControl(){
 
         $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
 
-        return view('backend.admin.solicitudesit.administrar.vistaadministrarsolicitudit', compact('anios'));
+        $infoGenera = InformacionGeneral::where('id', 1)->first();
+        $fechaLimite = $infoGenera->fecha_it;
+
+        return view('backend.admin.solicitudesit.administrar.vistaadministrarsolicitudit',
+            compact('anios', 'fechaLimite'));
     }
 
 
@@ -237,6 +239,16 @@ class SolicitudesITController extends Controller
             // datos no encontrados
             return "Datos no encontrados";
         }
+    }
+
+
+    public function guardarFechaLimiteSolicitudIT(Request $request){
+
+        InformacionGeneral::where('id', 1)->update([
+            'fecha_it' => $request->fecha,
+        ]);
+
+        return ['success' => 1];
     }
 
 
