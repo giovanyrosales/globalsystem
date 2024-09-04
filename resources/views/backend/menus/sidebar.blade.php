@@ -66,6 +66,13 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a href="{{ route('admin.solicitudit.control.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Solicitud IT</p>
+                            </a>
+                        </li>
+
                     </ul>
                  </li>
                 @endcan
@@ -792,6 +799,13 @@
                             <i class="nav-icon fas fa-list-alt"></i>
                             <p>
                                 Requerimientos
+                            </p>
+                        </a>
+
+                        <a href="{{ route('admin.p.solicitudesit.bloquefecha') }}" target="frameprincipal" class="nav-link">
+                            <i class="nav-icon fas fa-list-alt"></i>
+                            <p>
+                                Solicitudes IT
                             </p>
                         </a>
                     </li>

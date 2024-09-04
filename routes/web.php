@@ -46,6 +46,10 @@ use App\Http\Controllers\Backend\Configuracion\Consolidador\ConsolidadorControll
 use App\Http\Controllers\Backend\Configuracion\Referencias\ReferenciasController;
 
 use App\Http\Controllers\Backend\Recursos\RecursosHumanosController;
+use App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos\SolicitudesITController;
+
+
+
 
 
 // --- LOGIN ---
@@ -1214,6 +1218,19 @@ Route::get('/actualizacion/datos', [RecursosHumanosController::class,'vistaIngre
 Route::post('/admin/actualizacion/datos/guardar', [RecursosHumanosController::class,'guardarIngresoDatos']);
 
 
+
+// ** SOLICITUDES IT ***
+
+// retornar vista para poder elegir año de de solicitudes IT
+Route::get('/admin/p/solicitudesit/index', [SolicitudesITController::class,'indexSolicitudesIT'])->name('admin.p.solicitudesit.bloquefecha');
+Route::get('/admin/p/solicitudesit/vistaanio/{idanio}', [SolicitudesITController::class, 'indexListadoSolicitudesIT']);
+Route::post('/admin/p/solicitudesit/guardardatos', [SolicitudesITController::class, 'guardarDatosSolicitudesIT']);
+
+
+// ADMINISTRAR SOLICITUD IT
+Route::get('/admin/solicitudit/administracion', [SolicitudesITController::class,'indexSolicitudesITControl'])->name('admin.solicitudit.control.index');
+Route::post('/admin/solicitudesit/listadounidades', [SolicitudesITController::class, 'listadoSolicitudeITBloqueFecha']);
+Route::get('/admin/solicitudit/administracion/tablafinal/{idfila}', [SolicitudesITController::class,'indexSolicitudTablaFinal']);
 
 
 
