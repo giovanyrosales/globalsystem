@@ -55,30 +55,31 @@
             font-weight:500;
         }
         .image-size-small{
-            width:140px;
+            width:180px;
             margin:0 auto;
         }
         .image-size-small img{
-            width:140px;
+            width:180px;
             margin-bottom:-70px;
         }
-
     </style>
 </head>
 
 <body>
 <div class="container">
     <div>
-        <div class="demo-container" style="margin-top: 25px">
+        <div class="demo-container" style="margin-top: 30px">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6 col-12 mx-auto">
-                        <div class="text-center image-size-small position-relative">
-                            <img src="{{ asset('images/logo.png') }}" class="rounded-circle p-2 bg-white">
-                        </div>
+                        
+                        
                         <div class="p-5 bg-white rounded shadow-lg">
-                            <h3 class="mb-2 text-center pt-5"><strong>Alcaldía Municipal de Metapán</strong></h3>
-                            <p class="text-center lead" style="font-weight: bold">Control de Presupuesto</p>
+                        <div class="text-center image-size-small position-relative">
+                            <img src="{{ asset('images/logo.png') }}" class=" p-2">
+                        </div>
+                            <h3 class="mb-2 text-center pt-5"><strong>&nbsp;</strong></h3>
+                            <p class="text-center lead" style="font-weight: bold">Sistema de Administración Municipal</p>
                             <form>
                                 <label style="margin-top: 10px" class="font-500">Usuario</label>
                                 <input class="form-control form-control-lg mb-3" id="usuario" autocomplete="off" type="text">
