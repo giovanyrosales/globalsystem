@@ -31,7 +31,7 @@
                         <form class="form-horizontal">
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label style="margin: 8px">Año de Presupuesto</label>
+                                    <label style="margin: 8px">Año</label>
                                     <div style="margin-left: 6px" class="col-sm-2">
                                         <select class="form-control" id="select-anio">
                                             @foreach($anios as $item)
@@ -40,7 +40,7 @@
                                         </select>
                                     </div>
                                     <button type="button" onclick="verificar()" style="font-weight: bold; background-color: #28a745; color: white !important;"
-                                            class="button button-rounded button-pill button-small">Buscar</button>
+                                            class="button button-rounded button-pill button-small">Seleccionar</button>
                                 </div>
                             </div>
 
