@@ -1234,8 +1234,8 @@ Route::get('/admin/solicitudit/administracion/tablafinal/{idfila}', [Solicitudes
 Route::post('/admin/solicitudesit/fechalimite', [SolicitudesITController::class, 'guardarFechaLimiteSolicitudIT']);
 
 
-
-Route::post('/admin/actualizartabla', [SolicitudesITController::class, 'actualizarTabla']);
+// ACTUALIZAR TABLA DE COSTOS 11/09/2024
+//Route::post('/admin/actualizartabla', [SolicitudesITController::class, 'actualizarTabla']);
 
 
 

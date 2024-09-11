@@ -32,10 +32,10 @@
                 Lista de Permisos
             </button>
 
-            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" value="Actualizar" onclick="actualizarTabla()" class="button button-3d button-rounded button-pill button-small">
+           <!-- <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" value="Actualizar" onclick="actualizarTabla()" class="button button-3d button-rounded button-pill button-small">
                 <i class="fas fa-list-alt"></i>
                 Actualizar Tabla
-            </button>
+            </button>-->
 
         </div>
     </section>
@@ -241,6 +241,7 @@
         }
 
 
+        // PARA ACTUALIZAR TABLA DE COSTOS
         function actualizarTabla(){
 
             openLoading()

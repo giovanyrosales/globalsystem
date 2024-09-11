@@ -257,6 +257,7 @@ class SolicitudesITController extends Controller
     }
 
 
+    // ACTUALIZAR TABLA DE COSTOS
     public function actualizarTabla(Request $request){
 
         DB::beginTransaction();
