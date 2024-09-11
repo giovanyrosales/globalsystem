@@ -20,92 +20,94 @@ use Illuminate\Support\Facades\Log;
 class SolicitudesITController extends Controller
 {
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->middleware('auth');
     }
 
-    public function indexSolicitudesIT(){
+    public function indexSolicitudesIT()
+    {
         $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
         return view('backend.admin.solicitudesit.bloquefecha.vistafechasolicitudit', compact('anios'));
     }
 
-    public function indexListadoSolicitudesIT($idanio){
+    public function indexListadoSolicitudesIT($idanio)
+    {
 
         // obtener usuario
         $user = Auth::user();
-        if($infoDepartamento = P_UsuarioDepartamento::where('id_usuario', $user->id)->first()){
-           $idUsuario = $infoDepartamento->id_usuario;
-           $idDepartamento = $infoDepartamento->id_departamento;
+        if ($infoDepartamento = P_UsuarioDepartamento::where('id_usuario', $user->id)->first()) {
+            $idUsuario = $infoDepartamento->id_usuario;
+            $idDepartamento = $infoDepartamento->id_departamento;
 
-           $infoAnio = P_AnioPresupuesto::where('id',$idanio)->first();
-           $anio = $infoAnio->nombre;
+            $infoAnio = P_AnioPresupuesto::where('id', $idanio)->first();
+            $anio = $infoAnio->nombre;
 
-           $listado = null;
-           $haydatos = 0;
+            $listado = null;
+            $haydatos = 0;
 
-           //** FECHA MAXIMO PARA PODER EDITAR **/
-           $infoGeneral = InformacionGeneral::where('id', 1)->first();
-           $fechaActual = Carbon::now('America/El_Salvador')->startOfDay();
-           $otraFecha = Carbon::createFromFormat('Y-m-d', $infoGeneral->fecha_it);
-           $fechaLimite = date("d-m-Y", strtotime($infoGeneral->fecha_it));
+            //** FECHA MAXIMO PARA PODER EDITAR **/
+            $infoGeneral = InformacionGeneral::where('id', 1)->first();
+            $fechaActual = Carbon::now('America/El_Salvador')->startOfDay();
+            $otraFecha = Carbon::createFromFormat('Y-m-d', $infoGeneral->fecha_it);
+            $fechaLimite = date("d-m-Y", strtotime($infoGeneral->fecha_it));
 
-           $puedeActualizar = 0;
-           if ($fechaActual->greaterThan($otraFecha)) {
-               // SUPERO LA FECHA LIMITE
-               $puedeActualizar = 1;
-           }
+            $puedeActualizar = 0;
+            if ($fechaActual->greaterThan($otraFecha)) {
+                // SUPERO LA FECHA LIMITE
+                $puedeActualizar = 1;
+            }
 
 
-           if($fila = SolicitudITDatos::where('id_anio', $idanio)->where('id_departamento', $idDepartamento)->first()){
+            if ($fila = SolicitudITDatos::where('id_anio', $idanio)->where('id_departamento', $idDepartamento)->first()) {
 
-               $listado = SolicitudITDatosTabla::where('id_solicitudit_datos', $fila->id)
+                $listado = SolicitudITDatosTabla::where('id_solicitudit_datos', $fila->id)
                     ->orderBY('nombre', 'ASC')
                     ->get();
 
-               $conteo = 0;
-               foreach ($listado as $item){
-                   $conteo++;
+                $conteo = 0;
+                foreach ($listado as $item) {
+                    $conteo++;
 
-                   $item->conteo = $conteo;
-               }
+                    $item->conteo = $conteo;
+                }
 
-               if ($listado->isNotEmpty()) {
-                   $haydatos = 1;
-               }
-           }
+                if ($listado->isNotEmpty()) {
+                    $haydatos = 1;
+                }
+            }
 
 
-           // EJEMPLO DE LISTADO INFORMATICO
+            // EJEMPLO DE LISTADO INFORMATICO
 
             $arrayInformatico = P_Materiales::whereIn('id_objespecifico', [34, 81])
                 ->orderBy('descripcion')
                 ->get();
 
-           $conteoEquipo = 0;
-           foreach ($arrayInformatico as $dato){
-               $conteoEquipo++;
-               $infoObj = ObjEspecifico::where('id', $dato->id_objespecifico)->first();
-               $dato->codigo = $infoObj->codigo;
-               $dato->conteo = $conteoEquipo;
-           }
-
+            $conteoEquipo = 0;
+            foreach ($arrayInformatico as $dato) {
+                $conteoEquipo++;
+                $infoObj = ObjEspecifico::where('id', $dato->id_objespecifico)->first();
+                $dato->codigo = $infoObj->codigo;
+                $dato->conteo = $conteoEquipo;
+            }
 
 
             return view('backend.admin.solicitudesit.vistatabla.vistalistadosolicitudesit',
                 compact('idanio', 'anio', 'listado', 'haydatos', 'puedeActualizar', 'fechaLimite',
-                'arrayInformatico'));
+                    'arrayInformatico'));
 
-        }else{
+        } else {
             return "Usuario no tiene asignado un Departamento";
         }
     }
 
 
-
-    public function guardarDatosSolicitudesIT(Request $request){
+    public function guardarDatosSolicitudesIT(Request $request)
+    {
 
         $user = Auth::user();
-        if($infoDepartamento = P_UsuarioDepartamento::where('id_usuario', $user->id)->first()) {
+        if ($infoDepartamento = P_UsuarioDepartamento::where('id_usuario', $user->id)->first()) {
             $idUsuario = $infoDepartamento->id_usuario;
             $idDepartamento = $infoDepartamento->id_departamento;
             $idAnio = $request->idanio;
@@ -117,16 +119,16 @@ class SolicitudesITController extends Controller
 
             if ($fechaActual->greaterThan($otraFecha)) {
                 // FECHA LIMITE SUPERADA PARA PODER EDITAR
-              return ['success' => 1];
+                return ['success' => 1];
             }
 
             DB::beginTransaction();
 
             try {
 
-                if($filaSoli = SolicitudITDatos::where('id_anio', $idAnio)
+                if ($filaSoli = SolicitudITDatos::where('id_anio', $idAnio)
                     ->where('id_departamento', $idDepartamento)
-                    ->first()){
+                    ->first()) {
 
                     // YA HAY REGISTRO GUARDADO, SOLO MODIFICAR LA TABLA
                     // BORRAR TODOS LOS REGISTROS Y GUARDAR LOS NUEVOS
@@ -145,7 +147,7 @@ class SolicitudesITController extends Controller
                             $detalle->save();
                         }
                     }
-                }else{
+                } else {
 
                     // NO HABIA REGISTROS AUN, SE GUARDARA COMO NUEVO
                     $registro = new SolicitudITDatos();
@@ -176,8 +178,7 @@ class SolicitudesITController extends Controller
                 DB::rollback();
                 return ['success' => 99];
             }
-        }
-        else{
+        } else {
             // error usuario no encontrado
             return ['success' => 99];
         }
@@ -186,7 +187,8 @@ class SolicitudesITController extends Controller
 
     // *** ADMINISTRACION ****
 
-    function indexSolicitudesITControl(){
+    function indexSolicitudesITControl()
+    {
 
         $anios = P_AnioPresupuesto::orderBy('nombre', 'DESC')->get();
 
@@ -199,7 +201,8 @@ class SolicitudesITController extends Controller
 
 
     // OBTENER LISTADO DE UNIDADES QUE YA SOLICITARON POR X AÑO
-    function listadoSolicitudeITBloqueFecha(Request $request){
+    function listadoSolicitudeITBloqueFecha(Request $request)
+    {
 
         $listado = DB::table('solicitudit_datos AS so')
             ->join('p_departamento AS depa', 'so.id_departamento', '=', 'depa.id')
@@ -211,9 +214,10 @@ class SolicitudesITController extends Controller
     }
 
 
-    public function indexSolicitudTablaFinal($idfila){
+    public function indexSolicitudTablaFinal($idfila)
+    {
 
-        if($infoSoli = SolicitudITDatos::where('id', $idfila)->first()){
+        if ($infoSoli = SolicitudITDatos::where('id', $idfila)->first()) {
 
             $infoAnio = P_AnioPresupuesto::where('id', $infoSoli->id_anio)->first();
             $anioActual = $infoAnio->nombre;
@@ -227,7 +231,7 @@ class SolicitudesITController extends Controller
                 ->orderBY('nombre', 'ASC')
                 ->get();
 
-            foreach ($arrayDatos as $item){
+            foreach ($arrayDatos as $item) {
                 $conteo++;
                 $haydatos = 1;
                 $item->conteo = $conteo;
@@ -235,14 +239,15 @@ class SolicitudesITController extends Controller
 
             return view('backend.admin.solicitudesit.administrar.vistasolicitudittablafinal',
                 compact('departamento', 'anioActual', 'arrayDatos', 'haydatos'));
-        }else{
+        } else {
             // datos no encontrados
             return "Datos no encontrados";
         }
     }
 
 
-    public function guardarFechaLimiteSolicitudIT(Request $request){
+    public function guardarFechaLimiteSolicitudIT(Request $request)
+    {
 
         InformacionGeneral::where('id', 1)->update([
             'fecha_it' => $request->fecha,
@@ -250,6 +255,30 @@ class SolicitudesITController extends Controller
 
         return ['success' => 1];
     }
+
+
+    public function actualizarTabla(Request $request){
+
+        DB::beginTransaction();
+
+        try {
+
+            DB::table('p_materiales AS pm')
+                ->join('tablatemporal AS tt', 'pm.id', '=', 'tt.id')
+                ->update([
+                    'pm.costo' => DB::raw('tt.costo')
+                ]);
+
+            DB::commit();
+            return ['success' => 1];
+        } catch (\Throwable $e) {
+            Log::info('error: ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
+
 
 
 }

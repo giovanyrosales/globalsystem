@@ -1235,6 +1235,7 @@ Route::post('/admin/solicitudesit/fechalimite', [SolicitudesITController::class,
 
 
 
+Route::post('/admin/actualizartabla', [SolicitudesITController::class, 'actualizarTabla']);
 
 
 

@@ -32,6 +32,11 @@
                 Lista de Permisos
             </button>
 
+            <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" value="Actualizar" onclick="actualizarTabla()" class="button button-3d button-rounded button-pill button-small">
+                <i class="fas fa-list-alt"></i>
+                Actualizar Tabla
+            </button>
+
         </div>
     </section>
 
@@ -234,6 +239,34 @@
             var ruta = "{{ url('/admin/roles/tabla') }}";
             $('#tablaDatatable').load(ruta);
         }
+
+
+        function actualizarTabla(){
+
+            openLoading()
+
+            axios.post(url+'/actualizartabla', {
+            })
+                .then((response) => {
+                    closeLoading()
+
+                    if (response.data.success === 1) {
+                        toastr.success('completado');
+                    }
+                    else {
+                        toastr.error('Error al guardar');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading()
+                    toastr.error('Error al guardar');
+                });
+        }
+
+
+
+
+
 
     </script>
 
