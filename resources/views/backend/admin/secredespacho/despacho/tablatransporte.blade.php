@@ -9,10 +9,10 @@
                             <tr>
                                 <th  style="width: 10%">Fecha</th>
                                 <th  style="width: 20%">Nombre</th>
-                                <th  style="width: 10%">Acompañantes</th>
-                                <th  style="width: 30%">Lugar</th>
-                                <th  style="width: 10%">Teléfono</th>
-                                <th  style="width: 10%">Se sube en:</th>
+                                <th  style="width: 10%">Acompañan.</th>
+                                <th  style="width: 25%">Lugar</th>
+                                <th  style="width: 10%">Tel.</th>
+                                <th  style="width: 15%">Se sube en:</th>
                                 <th  style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
