@@ -1192,6 +1192,7 @@ Route::post('/admin/p/proyectos/informacion/deaprobados', [ConsolidadorControlle
 
 
 // SECRETARIA DESPACHO
+//Transporte
 Route::get('/admin/secretaria/calendario/index', [ReferenciasController::class,'indexSecreCalendario'])->name('sidebar.secretaria.calendario');
 Route::get('/admin/secretaria/calendario/informacion', [ReferenciasController::class, 'getRegistrosPorDia']);
 Route::post('/admin/secretaria/calendario/nuevo', [ReferenciasController::class, 'guardarRegistro']);
@@ -1202,14 +1203,17 @@ Route::post('/admin/secretaria/transporte/nuevo', [ReferenciasController::class,
 Route::post('/admin/secretaria/transporte/borrar', [ReferenciasController::class,'borrarSecreTransporte']);
 Route::post('/admin/secretaria/transporte/informacion', [ReferenciasController::class,'informacionSecreTransporte']);
 Route::post('/admin/secretaria/transporte/editar', [ReferenciasController::class,'editarSecreTransporte']);
-
+//Reportes de Transporte
+Route::get('/admin/secretaria/reportes/index', [ReferenciasController::class,'indexReportes'])->name('sidebar.reportes.despacho');
+Route::get('/admin/reporte/despacho/{desde}/{hasta}/{tipo}', [ReferenciasController::class,'reporteDespachoSecretaria']);
+//Solicitudes de Despacho
 Route::get('/admin/secretaria/despacho/index', [ReferenciasController::class,'indexSecreDespacho'])->name('sidebar.secretaria.despacho');
 Route::get('/admin/secretaria/despacho/tabla', [ReferenciasController::class,'tablaSecreDespacho']);
 Route::post('/admin/secretaria/despacho/nuevo', [ReferenciasController::class,'guardarSecreDespacho']);
 Route::post('/admin/secretaria/despacho/borrar', [ReferenciasController::class,'borrarSecreDespacho']);
 Route::post('/admin/secretaria/despacho/informacion', [ReferenciasController::class,'informacionSecreDespacho']);
 Route::post('/admin/secretaria/despacho/editar', [ReferenciasController::class,'editarSecreDespacho']);
-
+//Reportes de solicitudes de despacho
 Route::get('/admin/secretaria/reportes/index', [ReferenciasController::class,'indexReportes'])->name('sidebar.reportes.despacho');
 Route::get('/admin/reporte/despacho/{desde}/{hasta}/{tipo}', [ReferenciasController::class,'reporteDespachoSecretaria']);
 

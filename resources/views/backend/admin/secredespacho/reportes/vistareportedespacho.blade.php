@@ -54,6 +54,8 @@
                                                         <option value="4">Viveres</option>
                                                         <option value="5">Construcción</option>
                                                         <option value="6">Proyectos</option>
+                                                        <option value="7">Afectaciones de la Vista</option>
+                                                        <option value="8">Otros</option>
                                                     </select>
 
 
@@ -76,6 +78,66 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="callout callout-info">
+                        <h5><i class="fas fa-info"></i> Generar Reporte de transporte</h5>
+                        <div class="card">
+                            <form class="form-horizontal">
+                                <div class="card-body">
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-9 row">
+                                            <div class="info-box shadow">
+                                                <div class="info-box-content">
+
+                                                    <div class="row">
+
+                                                        <div class="form-group col-md-2" >
+                                                            <label style="color: #686868">Desde: </label>
+                                                            <input type="date" autocomplete="off" class="form-control" id="fecha-desde">
+                                                        </div>
+
+                                                        <div class="form-group col-md-2" >
+                                                            <label style="color: #686868">Hasta: </label>
+                                                            <input type="date" autocomplete="off" class="form-control" id="fecha-hasta">
+                                                        </div>
+
+                                                    </div>
+
+                                                    <select class="form-control " id="tiposolicitud">
+                                                        <option value="1">Vivienda Completa</option>
+                                                        <option value="2">Solo Vivienda</option>
+                                                        <option value="3">Materiales de Construcción</option>
+                                                        <option value="4">Viveres</option>
+                                                        <option value="5">Construcción</option>
+                                                        <option value="6">Proyectos</option>
+                                                        <option value="7">Afectaciones de la Vista</option>
+                                                        <option value="8">Otros</option>
+                                                    </select>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <button type="button" onclick="generarPdfMovimientos()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
+                                            <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
+                                            Generar PDF
+                                        </button>
+
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 

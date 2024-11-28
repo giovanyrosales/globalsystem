@@ -444,6 +444,9 @@ class ReferenciasController extends Controller
         if($tipo == 7){
             $solicitud = "Afectaciones de la Vista";
         }
+        if($tipo == 8){
+            $solicitud = "Otros";
+        }
 
 
         $start = Carbon::parse($desde)->startOfDay();
