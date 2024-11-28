@@ -8,11 +8,12 @@
                             <thead>
                             <tr>
                                 <th  style="width: 10%">Fecha</th>
-                                <th  style="width: 25%">Nombre</th>
+                                <th  style="width: 20%">Nombre</th>
                                 <th  style="width: 10%">Acompañantes</th>
                                 <th  style="width: 30%">Lugar</th>
                                 <th  style="width: 10%">Teléfono</th>
-                                <th  style="width: 15%">Opciones</th>
+                                <th  style="width: 10%">Se sube en:</th>
+                                <th  style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -24,6 +25,7 @@
                                     <td>{{ $dato->acompanantes }}</td>
                                     <td>{{ $dato->lugar }}</td>
                                     <td>{{ $dato->telefono }}</td>
+                                    <td>{{ $dato->subida }}</td>
                                     <td>
                                         <button type="button" style="font-weight: normal; color: white !important;"
                                                 class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
