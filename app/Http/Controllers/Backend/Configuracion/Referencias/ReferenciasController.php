@@ -11,6 +11,7 @@ use App\Models\RRHHempleados;
 use App\Models\RRHHenfermedades;
 use App\Models\RRHHunidad;
 use App\Models\SecretariaDespacho;
+use App\Models\Viaje;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -102,13 +103,149 @@ class ReferenciasController extends Controller
 
     public function indexSecreDespacho(){
 
-        $fecha = Carbon::now('America/El_Salvador')->toDateString();;
+        $fecha = Carbon::now('America/El_Salvador')->toDateString();
 
         return view('backend.admin.secredespacho.despacho.vistadespacho', compact('fecha'));
     }
+    //Carga la vista de los registros de transporte
+    public function indexSecreTransporte(){
 
 
+        return view('backend.admin.secredespacho.despacho.vistatransporte');
+    }
+    //Carga la vista del calendario
+    public function indexSecreCalendario(){
 
+        $fecha = Carbon::now('America/El_Salvador')->toDateString();
+
+        return view('backend.admin.secredespacho.despacho.vistacalendario', compact('fecha'));
+    }
+
+     // Obtener registros agrupados por fecha para el calendario
+        public function getRegistrosPorDia()
+    {
+        $registros = Viaje::selectRaw('fecha, COUNT(*) as total, SUM(acompanantes) as total_acompanantes')
+            ->groupBy('fecha')
+            ->get();
+
+        $eventos = $registros->map(function ($registro) {
+            // Calcula el total de personas (registros + acompañantes)
+            $totalPersonas = $registro->total + $registro->total_acompanantes;
+
+            return [
+                'title' => $totalPersonas . ' Pasajeros',  // Muestra el total de personas
+                'start' => $registro->fecha,  // Fecha del evento
+            ];
+        });
+
+        return response()->json($eventos);
+    }
+
+        /**
+         * Guardar un nuevo registro desde el modal.
+         */
+        public function guardarRegistro(Request $request)
+    {
+        // Validar los datos recibidos
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'fecha' => 'required|date',
+            'acompanantes' => 'required|integer|min:0',
+            'lugar' => 'required|string|max:255',
+        ]);
+
+        // Crear un nuevo registro
+        Viaje::create([
+            'nombre' => $validated['nombre'],
+            'fecha' => $validated['fecha'],
+            'acompanantes' => $validated['acompanantes'],
+            'lugar' => $validated['lugar'],
+        ]);
+
+        // Responder con éxito
+        return response()->json(['message' => 'Registro guardado con éxito'], 200);
+    }
+    //Carga la tabla de registros de transporte
+    public function tablaSecreTransporte(){
+
+        $registros = Viaje::orderBy('fecha', 'DESC')->get();
+
+        foreach ($registros as $dato){
+
+            $dato->fechaFormat = date("d-m-Y", strtotime($dato->fecha));
+        }
+
+        return view('backend.admin.secredespacho.despacho.tablatransporte', compact('registros'));
+    }
+    //Borrar registros de transporte guardados
+    public function borrarSecreTransporte(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        // Borrar el registro
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(Viaje::where('id', $request->id)->first()){
+            Viaje::where('id', $request->id)->delete();
+        }
+
+        return ['success' => 1];
+    }
+    //Obtiene la información para editar, de los registros de transporte
+    public function informacionSecreTransporte(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($info = Viaje::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'info' => $info];
+        }
+
+        return ['success' => 2];
+    }
+    //Editar un registro de la tabla viajes
+    public function editarSecreTransporte(Request $request){
+
+        $regla = array(
+            'fecha' => 'required',
+            'nombre' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        DB::beginTransaction();
+
+        try {
+
+            Viaje::where('id', $request->id)->update([
+                'fecha' => $request->fecha,
+                'nombre' => $request->nombre,
+                'lugar' => $request->lugar,
+                'acompanantes' => $request->acompanantes
+            ]);
+
+            DB::commit();
+            return ['success' => 1];
+        }catch(\Throwable $e){
+            Log::info('err: ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+    // tabla de solicitudes de despacho
     public function tablaSecreDespacho(){
 
         $listado = SecretariaDespacho::orderBy('fecha', 'DESC')->get();
