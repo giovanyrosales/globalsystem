@@ -456,7 +456,7 @@ class ReferenciasController extends Controller
         $tabla = "<div class='contenedorp'>
             <img id='logo' src='$logoalcaldia' style='width: 150px !important;'>
             <p id='titulo'>Alcaldía Municipal de Santa Ana Norte<br>
-
+            Reporte de personas transportadas<br>
             Fecha:  $desdeFormat - $hastaFormat</p>
             </div>";
 
