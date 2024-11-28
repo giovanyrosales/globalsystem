@@ -81,7 +81,7 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="callout callout-info">
+                    <div class="callout callout-warning">
                         <h5><i class="fas fa-info"></i> Generar Reporte de transporte ()</h5>
                         <div class="card">
                             <form class="form-horizontal">
@@ -96,12 +96,10 @@
                                                             <label style="color: #686868">Desde: </label>
                                                             <input type="date" autocomplete="off" class="form-control" id="fecha-desdet">
                                                         </div>
-
                                                         <div class="form-group col-md-2" >
                                                             <label style="color: #686868">Hasta: </label>
                                                             <input type="date" autocomplete="off" class="form-control" id="fecha-hastat">
                                                         </div>
-
                                                     </div>
                                                 </div>
                                             </div>
