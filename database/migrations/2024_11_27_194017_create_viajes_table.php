@@ -19,6 +19,8 @@ class CreateViajesTable extends Migration
             $table->integer('acompanantes');
             $table->string('lugar');
             $table->date('fecha');
+            $table->string('subida');
+            $table->integer('telefono');
             $table->timestamps();
         });
     }

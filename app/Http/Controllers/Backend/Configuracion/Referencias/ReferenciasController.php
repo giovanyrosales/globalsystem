@@ -152,6 +152,8 @@ class ReferenciasController extends Controller
             'fecha' => 'required|date',
             'acompanantes' => 'required|integer|min:0',
             'lugar' => 'required|string|max:255',
+            'subida' => 'string|max:500',
+            'telefono' => 'required|integer'
         ]);
 
         // Crear un nuevo registro
@@ -160,6 +162,8 @@ class ReferenciasController extends Controller
             'fecha' => $validated['fecha'],
             'acompanantes' => $validated['acompanantes'],
             'lugar' => $validated['lugar'],
+            'subida' => $validated['subida'],
+            'telefono' => $validated['telefono']
         ]);
 
         // Responder con éxito
@@ -234,7 +238,9 @@ class ReferenciasController extends Controller
                 'fecha' => $request->fecha,
                 'nombre' => $request->nombre,
                 'lugar' => $request->lugar,
-                'acompanantes' => $request->acompanantes
+                'acompanantes' => $request->acompanantes,
+                'subida' => $request->subida,
+                'telefono' => $request->telefono
             ]);
 
             DB::commit();

@@ -9,5 +9,5 @@ class Viaje extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'acompanantes', 'lugar', 'fecha'];
+    protected $fillable = ['nombre', 'acompanantes', 'lugar', 'fecha', 'subida', 'telefono'];
 }

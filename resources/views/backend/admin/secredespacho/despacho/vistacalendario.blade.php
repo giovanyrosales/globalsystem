@@ -76,11 +76,19 @@
                 </div>
                 <div class="form-group">
                     <label for="acompanantes">Número de Acompañantes:</label>
-                    <input type="number" id="acompanantes" name="acompanantes" class="form-control" required>
+                    <input type="number" id="acompanantes" name="acompanantes" class="form-control" >
                 </div>
                 <div class="form-group">
                     <label for="lugar">Lugar de Llegada:</label>
                     <input type="text" id="lugar" name="lugar" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="subida">Se sube en:</label>
+                    <input type="text" id="subida" name="subida" class="form-control" >
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="number" id="telefono" name="telefono" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </form>

@@ -69,7 +69,7 @@
 
                             <div class="form-group">
                                 <input name="id-editar" type="hidden" id="id-editar">
-                                <label for="fecha-editar">Fecha</label>
+                                <label for="fecha-editar">Fecha:</label>
                                 <input type="date" id="fecha-editar" name="fecha"  class="form-control" required>
                             </div>
 
@@ -79,13 +79,21 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="acompanantes-editar">Cantidad de Acompañantes</label>
+                                <label for="acompanantes-editar">Cantidad de Acompañantes:</label>
                                 <input type="number" id="acompanantes-editar" name="acompanantes"  class="form-control" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="lugar-editar">Lugar</label>
+                                <label for="lugar-editar">Lugar:</label>
                                 <input type="text" id="lugar-editar" name="lugar"  class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="subida-editar">Se sube en:</label>
+                                <input type="text" id="subida-editar" name="subida"  class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono-editar">Teléfono:</label>
+                                <input type="text" id="telefono-editar" name="telefono"  class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -190,6 +198,8 @@
                         $('#nombre-editar').val(response.data.info.nombre);
                         $('#acompanantes-editar').val(response.data.info.acompanantes);
                         $('#lugar-editar').val(response.data.info.lugar);
+                        $('#subida-editar').val(response.data.info.subida);
+                        $('#telefono-editar').val(response.data.info.telefono);
                     } else {
                         toastr.error('Información no encontrada');   
                     }
@@ -206,6 +216,8 @@
             var nombre = document.getElementById('nombre-editar').value;
             var acompanantes = document.getElementById('acompanantes-editar').value;
             var lugar = document.getElementById('lugar-editar').value;
+            var subida = document.getElementById('subida-editar').value;
+            var telefono = document.getElementById('telefono-editar').value;
             
 
             if(fecha === ''){
@@ -226,6 +238,8 @@
             formData.append('nombre', nombre);
             formData.append('acompanantes', acompanantes);
             formData.append('lugar', lugar);
+            formData.append('subida', subida);
+            formData.append('telefono', telefono);
             axios.post(url+'/secretaria/transporte/editar', formData, {
             })
                 .then((response) => {
