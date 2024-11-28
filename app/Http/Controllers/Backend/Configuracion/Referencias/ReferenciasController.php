@@ -460,32 +460,29 @@ class ReferenciasController extends Controller
             Fecha:  $desdeFormat - $hastaFormat</p>
             </div>";
 
+        // Encabezado de la tabla
+            $tabla .= "<table width='100%' id='tablaFor'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 11%; font-size: 14px'>Fecha</th>
+                    <th style='font-weight: bold; width: 11%; font-size: 14px'>Nombre</th>
+                    <th style='font-weight: bold; width: 12%; font-size: 14px'>Lugar</th>
+                    <th style='font-weight: bold; width: 12%; font-size: 14px'>Teléfono</th>
+                </tr>
+            </thead>
+            <tbody>";
 
-            foreach ($arrayDespacho as $dato){
-
-                if($dato->vuelta > 1){
-                    $tabla .= "<hr>";
-                }
-
-                $tabla .= "<table width='100%' id='tablaFor'>
-                <tbody>";
-
-                $tabla .= "<tr>
-                    <td style='font-weight: bold; width: 11%; font-size: 14px'>Fecha.</td>
-                    <td style='font-weight: bold; width: 11%; font-size: 14px'>Nombre</td>
-                    <td style='font-weight: bold; width: 12%; font-size: 14px'>Lugar</td>
-                    <td style='font-weight: bold; width: 12%; font-size: 14px'>Teléfono</td>
-            <tr>";
-
-                $tabla .= "<tr>
+        // Filas de la tabla
+        foreach ($arrayDespacho as $dato) {
+            $tabla .= "<tr>
                 <td>$dato->fechaFormat</td>
                 <td>$dato->nombre</td>
                 <td>$dato->lugar</td>
                 <td>$dato->telefono</td>
-                </tr>";
+            </tr>";
+        }
 
-                $tabla .= "</tbody></table>";
-            }
+        $tabla .= "</tbody></table>";
 
 
         $stylesheet = file_get_contents('css/csspresupuesto.css');
