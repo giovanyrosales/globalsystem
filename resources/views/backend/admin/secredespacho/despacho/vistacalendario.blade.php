@@ -108,7 +108,7 @@
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'es',
-            events: '/admin/secretaria/calendario/informacion', // Ruta para cargar eventos desde el backend
+            events: url2+'/secretaria/calendario/informacion', // Ruta para cargar eventos desde el backend
             dateClick: function (info) {
                 //console.log('Día seleccionado:', info.dateStr);
                 abrirModal(info.dateStr);
@@ -130,7 +130,7 @@
             e.preventDefault(); // Evita el envío del formulario por defecto
 
             $.ajax({
-                url: '/admin/secretaria/calendario/nuevo', // Ruta para guardar el registro
+                url: url2+'/secretaria/calendario/nuevo', // Ruta para guardar el registro
                 method: 'POST',
                 data: $(this).serialize(), // Serializa los datos del formulario
                 success: function (response) {
