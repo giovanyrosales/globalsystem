@@ -418,7 +418,86 @@ class ReferenciasController extends Controller
         return view('backend.admin.secredespacho.reportes.vistareportedespacho');
     }
 
+    //Reporte de transporte de despacho
+    public function reporteDespachoTransporte($desde, $hasta){
 
+
+        $start = Carbon::parse($desde)->startOfDay();
+        $end = Carbon::parse($hasta)->endOfDay();
+
+        $desdeFormat = date("d-m-Y", strtotime($desde));
+        $hastaFormat = date("d-m-Y", strtotime($hasta));
+
+        $arrayDespacho = Viaje::whereBetween('fecha', [$start, $end])
+            ->orderBy('fecha', 'ASC')
+            ->get();
+
+        $vuelta = 0;
+        foreach ($arrayDespacho as $dato){
+            $vuelta = $vuelta + 1;
+            $dato->vuelta = $vuelta;
+
+            $fechaFormat = date("d-m-Y", strtotime($dato->fecha));
+
+            $dato->fechaFormat = $fechaFormat;
+        }
+
+
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+        $mpdf->SetTitle('Listado personas transportadas');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+        $logoalcaldia = 'images/logonuevo.png';
+
+        $tabla = "<div class='contenedorp'>
+            <img id='logo' src='$logoalcaldia' style='width: 150px !important;'>
+            <p id='titulo'>Alcaldía Municipal de Santa Ana Norte<br>
+
+            Fecha:  $desdeFormat - $hastaFormat</p>
+            </div>";
+
+
+            foreach ($arrayDespacho as $dato){
+
+                if($dato->vuelta > 1){
+                    $tabla .= "<hr>";
+                }
+
+                $tabla .= "<table width='100%' id='tablaFor'>
+                <tbody>";
+
+                $tabla .= "<tr>
+                    <td style='font-weight: bold; width: 11%; font-size: 14px'>Fecha.</td>
+                    <td style='font-weight: bold; width: 11%; font-size: 14px'>Nombre</td>
+                    <td style='font-weight: bold; width: 12%; font-size: 14px'>Lugar</td>
+                    <td style='font-weight: bold; width: 12%; font-size: 14px'>Teléfono</td>
+            <tr>";
+
+                $tabla .= "<tr>
+                <td>$dato->fechaFormat</td>
+                <td>$dato->nombre</td>
+                <td>$dato->lugar</td>
+                <td>$dato->telefono</td>
+                </tr>";
+
+                $tabla .= "</tbody></table>";
+            }
+
+
+        $stylesheet = file_get_contents('css/csspresupuesto.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+    }
+
+    //Reporte de solicitudes de despacho
     public function reporteDespachoSecretaria($desde, $hasta, $tipo){
 
         $solicitud = "";
