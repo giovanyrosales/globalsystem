@@ -464,10 +464,11 @@ class ReferenciasController extends Controller
             $tabla .= "<table width='100%' id='tablaFor'>
             <thead>
                 <tr>
-                    <th style='font-weight: bold; width: 11%; font-size: 14px; text-align: center;'>Fecha</th>
-                    <th style='font-weight: bold; width: 11%; font-size: 14px; text-align: center;'>Nombre</th>
-                    <th style='font-weight: bold; width: 12%; font-size: 14px; text-align: center;'>Lugar</th>
-                    <th style='font-weight: bold; width: 12%; font-size: 14px; text-align: center;'>Teléfono</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 14px; text-align: center;'>Fecha</th>
+                    <th style='font-weight: bold; width: 25%; font-size: 14px; text-align: center;'>Nombre</th>
+                    <th style='font-weight: bold; width: 25%; font-size: 14px; text-align: center;'>Lugar</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 14px; text-align: center;'>Tel.</th>
+                    <th style='font-weight: bold; width: 25%; font-size: 14px; text-align: center;'>Sube</th>
                 </tr>
             </thead>
             <tbody>";
@@ -479,6 +480,7 @@ class ReferenciasController extends Controller
                 <td>$dato->nombre</td>
                 <td>$dato->lugar</td>
                 <td>$dato->telefono</td>
+                <td>$dato->subida</td>
             </tr>";
         }
 
