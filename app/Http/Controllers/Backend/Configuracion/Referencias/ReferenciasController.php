@@ -469,7 +469,7 @@ class ReferenciasController extends Controller
                     <th style='font-weight: bold; width: 20%; font-size: 14px; text-align: center;'>Lugar</th>
                     <th style='font-weight: bold; width: 15%; font-size: 14px; text-align: center;'>Tel.</th>
                     <th style='font-weight: bold; width: 20%; font-size: 14px; text-align: center;'>Sube</th>
-                    <th style='font-weight: bold; width: 10%; font-size: 14px; text-align: center;'>Extra</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 14px; text-align: center;'>Acomp.</th>
                 </tr>
             </thead>
             <tbody>";
