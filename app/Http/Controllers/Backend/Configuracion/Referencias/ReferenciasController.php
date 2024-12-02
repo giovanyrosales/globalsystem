@@ -464,12 +464,12 @@ class ReferenciasController extends Controller
             $tabla .= "<table width='100%' id='tablaFor'>
             <thead>
                 <tr>
-                    <th style='font-weight: bold; width: 12%; font-size: 14px; text-align: center;'>Fecha</th>
+                    <th style='font-weight: bold; width: 15%; font-size: 14px; text-align: center;'>Fecha</th>
                     <th style='font-weight: bold; width: 20%; font-size: 14px; text-align: center;'>Nombre</th>
-                    <th style='font-weight: bold; width: 25%; font-size: 14px; text-align: center;'>Lugar</th>
-                    <th style='font-weight: bold; width: 12%; font-size: 14px; text-align: center;'>Tel.</th>
-                    <th style='font-weight: bold; width: 25%; font-size: 14px; text-align: center;'>Sube</th>
-                    <th style='font-weight: bold; width: 6%; font-size: 14px; text-align: center;'>Extra</th>
+                    <th style='font-weight: bold; width: 20%; font-size: 14px; text-align: center;'>Lugar</th>
+                    <th style='font-weight: bold; width: 15%; font-size: 14px; text-align: center;'>Tel.</th>
+                    <th style='font-weight: bold; width: 20%; font-size: 14px; text-align: center;'>Sube</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 14px; text-align: center;'>Extra</th>
                 </tr>
             </thead>
             <tbody>";
