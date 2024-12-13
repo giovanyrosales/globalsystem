@@ -847,10 +847,18 @@
                 <!-- SECRETARIA DESPACHO -->
 
                 @can('sidebar.secretaria.despacho')
+                    <a href="{{ route('sidebar.secretaria.calendario') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Calendario</p>
+                    </a>
 
                     <a href="{{ route('sidebar.secretaria.despacho') }}" target="frameprincipal" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Despacho</p>
+                        <p>Solicitudes Despacho</p>
+                    </a>
+                    <a href="{{ route('sidebar.secretaria.transporte') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Admin. Transporte</p>
                     </a>
 
 

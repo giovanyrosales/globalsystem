@@ -56,10 +56,6 @@
         </div>
     </section>
 
-
-
-
-
     <div class="modal fade" id="modalAgregar" >
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -110,6 +106,7 @@
                                             <option value="5">Construcción</option>
                                             <option value="6">Proyecto</option>
                                             <option value="7">Afectaciones de la Vista</option>
+                                            <option value="8">Otros</option>
                                         </select>
                                     </div>
                                 </div>
@@ -186,6 +183,7 @@
                                             <option value="5">Construcción</option>
                                             <option value="6">Proyecto</option>
                                             <option value="7">Afectaciones de la Vista</option>
+                                            <option value="8">Otros</option>
                                         </select>
                                     </div>
                                 </div>
@@ -413,6 +411,9 @@
                         }
                         else if (response.data.info.tiposolicitud == 7){
                             moverSelect(7)
+                        }
+                        else if (response.data.info.tiposolicitud == 8){
+                            moverSelect(8)
                         }
                         else{
                             moverSelect(0)

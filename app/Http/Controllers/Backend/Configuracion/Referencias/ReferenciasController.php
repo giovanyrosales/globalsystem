@@ -11,6 +11,7 @@ use App\Models\RRHHempleados;
 use App\Models\RRHHenfermedades;
 use App\Models\RRHHunidad;
 use App\Models\SecretariaDespacho;
+use App\Models\Viaje;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -102,13 +103,155 @@ class ReferenciasController extends Controller
 
     public function indexSecreDespacho(){
 
-        $fecha = Carbon::now('America/El_Salvador')->toDateString();;
+        $fecha = Carbon::now('America/El_Salvador')->toDateString();
 
         return view('backend.admin.secredespacho.despacho.vistadespacho', compact('fecha'));
     }
+    //Carga la vista de los registros de transporte
+    public function indexSecreTransporte(){
 
 
+        return view('backend.admin.secredespacho.despacho.vistatransporte');
+    }
+    //Carga la vista del calendario
+    public function indexSecreCalendario(){
 
+        $fecha = Carbon::now('America/El_Salvador')->toDateString();
+
+        return view('backend.admin.secredespacho.despacho.vistacalendario', compact('fecha'));
+    }
+
+     // Obtener registros agrupados por fecha para el calendario
+        public function getRegistrosPorDia()
+    {
+        $registros = Viaje::selectRaw('fecha, COUNT(*) as total, SUM(acompanantes) as total_acompanantes')
+            ->groupBy('fecha')
+            ->get();
+
+        $eventos = $registros->map(function ($registro) {
+            // Calcula el total de personas (registros + acompañantes)
+            $totalPersonas = $registro->total + $registro->total_acompanantes;
+
+            return [
+                'title' => $totalPersonas . ' Pasajeros',  // Muestra el total de personas
+                'start' => $registro->fecha,  // Fecha del evento
+            ];
+        });
+
+        return response()->json($eventos);
+    }
+
+        /**
+         * Guardar un nuevo registro desde el modal.
+         */
+        public function guardarRegistro(Request $request)
+    {
+        // Validar los datos recibidos
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'fecha' => 'required|date',
+            'acompanantes' => 'required|integer|min:0',
+            'lugar' => 'required|string|max:255',
+            'subida' => 'string|max:500',
+            'telefono' => 'required|integer'
+        ]);
+
+        // Crear un nuevo registro
+        Viaje::create([
+            'nombre' => $validated['nombre'],
+            'fecha' => $validated['fecha'],
+            'acompanantes' => $validated['acompanantes'],
+            'lugar' => $validated['lugar'],
+            'subida' => $validated['subida'],
+            'telefono' => $validated['telefono']
+        ]);
+
+        // Responder con éxito
+        return response()->json(['message' => 'Registro guardado con éxito'], 200);
+    }
+    //Carga la tabla de registros de transporte
+    public function tablaSecreTransporte(){
+
+        $registros = Viaje::orderBy('fecha', 'DESC')->get();
+
+        foreach ($registros as $dato){
+
+            $dato->fechaFormat = date("d-m-Y", strtotime($dato->fecha));
+        }
+
+        return view('backend.admin.secredespacho.despacho.tablatransporte', compact('registros'));
+    }
+    //Borrar registros de transporte guardados
+    public function borrarSecreTransporte(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        // Borrar el registro
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(Viaje::where('id', $request->id)->first()){
+            Viaje::where('id', $request->id)->delete();
+        }
+
+        return ['success' => 1];
+    }
+    //Obtiene la información para editar, de los registros de transporte
+    public function informacionSecreTransporte(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($info = Viaje::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'info' => $info];
+        }
+
+        return ['success' => 2];
+    }
+    //Editar un registro de la tabla viajes
+    public function editarSecreTransporte(Request $request){
+
+        $regla = array(
+            'fecha' => 'required',
+            'nombre' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        DB::beginTransaction();
+
+        try {
+
+            Viaje::where('id', $request->id)->update([
+                'fecha' => $request->fecha,
+                'nombre' => $request->nombre,
+                'lugar' => $request->lugar,
+                'acompanantes' => $request->acompanantes,
+                'subida' => $request->subida,
+                'telefono' => $request->telefono
+            ]);
+
+            DB::commit();
+            return ['success' => 1];
+        }catch(\Throwable $e){
+            Log::info('err: ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+    // tabla de solicitudes de despacho
     public function tablaSecreDespacho(){
 
         $listado = SecretariaDespacho::orderBy('fecha', 'DESC')->get();
@@ -275,7 +418,87 @@ class ReferenciasController extends Controller
         return view('backend.admin.secredespacho.reportes.vistareportedespacho');
     }
 
+    //Reporte de transporte de despacho
+    public function reporteDespachoTransporte($desde, $hasta){
 
+
+        $start = Carbon::parse($desde)->startOfDay();
+        $end = Carbon::parse($hasta)->endOfDay();
+
+        $desdeFormat = date("d-m-Y", strtotime($desde));
+        $hastaFormat = date("d-m-Y", strtotime($hasta));
+
+        $arrayDespacho = Viaje::whereBetween('fecha', [$start, $end])
+            ->orderBy('fecha', 'ASC')
+            ->get();
+
+        $vuelta = 0;
+        foreach ($arrayDespacho as $dato){
+            $vuelta = $vuelta + 1;
+            $dato->vuelta = $vuelta;
+
+            $fechaFormat = date("d-m-Y", strtotime($dato->fecha));
+
+            $dato->fechaFormat = $fechaFormat;
+        }
+
+
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+        $mpdf->SetTitle('Listado personas transportadas');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+        $logoalcaldia = 'images/logonuevo.png';
+
+        $tabla = "<div class='contenedorp'>
+            <img id='logo' src='$logoalcaldia' style='width: 150px !important;'>
+            <p id='titulo'>Alcaldía Municipal de Santa Ana Norte<br>
+            Reporte de personas transportadas<br>
+            Fecha:  $desdeFormat - $hastaFormat</p>
+            </div>";
+
+        // Encabezado de la tabla
+            $tabla .= "<table width='100%' id='tablaFor'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 15%; font-size: 14px; text-align: center;'>Fecha</th>
+                    <th style='font-weight: bold; width: 20%; font-size: 14px; text-align: center;'>Nombre</th>
+                    <th style='font-weight: bold; width: 20%; font-size: 14px; text-align: center;'>Lugar</th>
+                    <th style='font-weight: bold; width: 15%; font-size: 14px; text-align: center;'>Tel.</th>
+                    <th style='font-weight: bold; width: 20%; font-size: 14px; text-align: center;'>Sube</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 14px; text-align: center;'>Acomp</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+        // Filas de la tabla
+        foreach ($arrayDespacho as $dato) {
+            $tabla .= "<tr>
+                <td>$dato->fechaFormat</td>
+                <td>$dato->nombre</td>
+                <td>$dato->lugar</td>
+                <td>$dato->telefono</td>
+                <td>$dato->subida</td>
+                <td>$dato->acompanantes</td>
+            </tr>";
+        }
+
+        $tabla .= "</tbody></table>";
+
+
+        $stylesheet = file_get_contents('css/csspresupuesto.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+    }
+
+    //Reporte de solicitudes de despacho
     public function reporteDespachoSecretaria($desde, $hasta, $tipo){
 
         $solicitud = "";
@@ -300,6 +523,9 @@ class ReferenciasController extends Controller
         }
         if($tipo == 7){
             $solicitud = "Afectaciones de la Vista";
+        }
+        if($tipo == 8){
+            $solicitud = "Otros";
         }
 
 
