@@ -47,6 +47,9 @@ use App\Http\Controllers\Backend\Configuracion\Referencias\ReferenciasController
 
 use App\Http\Controllers\Backend\Recursos\RecursosHumanosController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos\SolicitudesITController;
+use App\Http\Controllers\Backend\Bodega\BMaterialesController;
+use App\Http\Controllers\Backend\Bodega\BSolicitudesController;
+use App\Http\Controllers\Backend\Bodega\BReportesController;
 
 
 
@@ -1248,6 +1251,38 @@ Route::get('/admin/solicitudit/administracion', [SolicitudesITController::class,
 Route::post('/admin/solicitudesit/listadounidades', [SolicitudesITController::class, 'listadoSolicitudeITBloqueFecha']);
 Route::get('/admin/solicitudit/administracion/tablafinal/{idfila}', [SolicitudesITController::class,'indexSolicitudTablaFinal']);
 Route::post('/admin/solicitudesit/fechalimite', [SolicitudesITController::class, 'guardarFechaLimiteSolicitudIT']);
+
+
+// ** BODEGA ***
+
+// bodega.control Gestiona las solicitudes de materiales de bodega que hacen las unidades
+// bodega.solicita Solicita materiales de bodega 
+// bodega.reportes Genera reportes de las entradas y salidas de bodega
+
+// Administrar Materiales de bodega
+Route::get('/admin/bodega/materiales/index', [BMaterialesController::class,'indexBodegaMateriales'])->name('sidebar.bodega.materiales');
+Route::get('/admin/bodega/materiales/tabla/index', [BMaterialesController::class,'tablaMateriales']);
+Route::post('/admin/bodega/materiales/nuevo', [BMaterialesController::class, 'nuevoMaterial']);
+Route::post('/admin/bodega/materiales/informacion', [BMaterialesController::class, 'informacionMaterial']);
+Route::post('/admin/bodega/materiales/editar', [BMaterialesController::class, 'editarMaterial']);
+
+// Realizar Solicitud
+Route::get('/admin/bodega/solicitud/index', [BSolicitudesController::class,'indexSecreTransporte'])->name('sidebar.bodega.solicitud');
+
+// Administrar solicitudes
+Route::get('/admin/bodega/solicitudes/index', [BSolicitudesController::class,'indexSecreTransporte'])->name('sidebar.bodega.solicitudes');
+
+// Registrar Entradas de Materiales
+Route::get('/admin/bodega/entradas/index', [BMaterialesController::class,'indexSecreTransporte'])->name('sidebar.bodega.entradas');
+
+// Registrar Salidas de Materiales
+Route::get('/admin/bodega/salidas/index', [BMaterialesController::class,'indexSecreTransporte'])->name('sidebar.bodega.salidas');
+
+// Generar Reportes de bodega
+
+Route::get('/admin/bodega/reportes/index', [BReportesController::class,'indexSecreTransporte'])->name('sidebar.bodega.reportes');
+
+
 
 
 // ACTUALIZAR TABLA DE COSTOS 11/09/2024

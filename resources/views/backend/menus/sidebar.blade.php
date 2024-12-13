@@ -869,6 +869,42 @@
 
                 @endcan
 
+                <!-- BODEGA -->
+
+                @can('bodega.control')
+                    <a href="{{ route('sidebar.bodega.materiales') }}" target="frameprincipal" class="nav-link">
+                        <i class="fa fa-book nav-icon"></i>
+                        <p>Materiales</p>
+                    </a>
+                    <a href="{{ route('sidebar.bodega.solicitudes') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-list-alt nav-icon"></i>
+                        <p>Solicitudes</p>
+                    </a>
+                    <a href="{{ route('sidebar.bodega.entradas') }}" target="frameprincipal" class="nav-link">
+                        <i class="fa fa-chevron-circle-left"></i>
+                        <p>Entradas</p>
+                    </a>
+                    <a href="{{ route('sidebar.bodega.salidas') }}" target="frameprincipal" class="nav-link">
+                        <i class="fa fa-chevron-circle-right"></i>
+                        <p>Salidas</p>
+                    </a>
+                
+                
+                @endcan
+                @can('bodega.solicitud')
+                    <a href="{{ route('sidebar.bodega.solicitud') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-edit nav-icon"></i>
+                        <p>Solicitud de Materiales</p>
+                    </a>
+                @endcan
+                @can('bodega.reportes')
+                    <a href="{{ route('sidebar.bodega.reportes') }}" target="frameprincipal" class="nav-link">
+                        <i class="fa fa-list nav-icon"></i>
+                        <p>Reportes</p>
+                    </a>
+                @endcan
+                
+
 
                 <!-- RECURSOS HUMANOS INGRESO DE DATOS -->
                 @can('sidebar.rrhh.datos.personal')
