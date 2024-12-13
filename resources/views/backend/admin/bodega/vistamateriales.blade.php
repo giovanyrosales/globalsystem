@@ -74,18 +74,21 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Presidente</label>
-                                        <input type="text"  class="form-control" id="presidente-nuevo" autocomplete="off">
+                                        <label>Unidad de medida</label>
+                                        <select id="select-unidadmedida" class="form-control">
+                                            @foreach($unidadmedida as $item)
+                                                <option value="{{$item->id}}"> {{ $item->medida }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>DUI</label>
-                                        <input type="text" class="form-control" id="dui-nuevo" autocomplete="off">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Tel.</label>
-                                        <input type="text" class="form-control" id="tel-nuevo" autocomplete="off">
+                                        <label>Objeto Especifico</label>
+                                        <select id="select-objespecifico" class="form-control">
+                                            @foreach($objespecifico as $item)
+                                                <option value="{{$item->id}}">{{$item->codigo}} - {{ $item->nombre }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
 
                                 </div>
@@ -127,19 +130,24 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Presidente</label>
-                                        <input type="text"  class="form-control" id="presidente-editar" autocomplete="off">
+                                        <label style="color:#191818">Unidad Medida:</label>
+                                        <br>
+                                        <div>
+                                            <select class="form-control" id="unidadmedida-editar">
+                                            </select>
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label>DUI</label>
-                                        <input type="text"  class="form-control" id="dui-editar" autocomplete="off">
-                                    </div>
 
                                     <div class="form-group">
-                                        <label>Tel.</label>
-                                        <input type="text" class="form-control" id="tel-editar" autocomplete="off">
+                                        <label style="color:#191818">Objeto Especifico:</label>
+                                        <br>
+                                        <div>
+                                            <select class="form-control" id="objespecifico-editar">
+                                            </select>
+                                        </div>
                                     </div>
+
 
                                 </div>
                             </div>
@@ -192,41 +200,19 @@
 
         function nuevo(){
             var nombre = document.getElementById('nombre-nuevo').value;
-            var presidente = document.getElementById('presidente-nuevo').value;
-            var dui = document.getElementById('dui-nuevo').value;
-            var tel = document.getElementById('tel-nuevo').value;
+            var unidadmedida = document.getElementById('select-unidadmedida').value;
+            var objespecifico = document.getElementById('select-objespecifico').value;
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
                 return;
             }
 
-            if(nombre.length > 550){
-                toastr.error('Nombre máximo 350 caracteres');
-                return;
-            }
-
-            if(presidente.length > 550){
-                toastr.error('Presidente máximo 350 caracteres');
-                return;
-            }
-
-            if(dui.length > 25){
-                toastr.error('Dui máximo 25 caracteres');
-                return;
-            }
-
-            if(tel.length > 15){
-                toastr.error('Tel máximo 15 caracteres');
-                return;
-            }
-
             openLoading();
             var formData = new FormData();
             formData.append('nombre', nombre);
-            formData.append('presidente', presidente);
-            formData.append('dui', dui);
-            formData.append('tel', tel);
+            formData.append('id_unidadmedida', unidadmedida);
+            formData.append('id_objespecifico', objespecifico);
 
             axios.post(url+'/bodega/materiales/nuevo', formData, {
             })
@@ -260,10 +246,24 @@
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(response.data.lista.id);
                         $('#nombre-editar').val(response.data.lista.nombre);
-                        $('#presidente-editar').val(response.data.lista.presidente);
-                        $('#dui-editar').val(response.data.lista.dui);
-                        $('#tel-editar').val(response.data.lista.tel);
-
+                       
+                        document.getElementById("unidadmedida-editar").options.length = 0;
+                        document.getElementById("objespecifico-editar").options.length = 0;
+                    
+                        $.each(response.data.um, function( key, val ){
+                            if(response.data.lista.id_unidadmedida === val.id){
+                                $('#unidadmedida-editar').append('<option value="' +val.id +'" selected="selected">'+val.medida+'</option>');
+                            }else{
+                                $('#unidadmedida-editar').append('<option value="' +val.id +'">'+val.medida+'</option>');
+                            }
+                        });
+                        $.each(response.data.obj, function( key, val ){
+                            if(response.data.lista.id_objespecifico === val.id){
+                                $('#objespecifico-editar').append('<option value="' +val.id +'" selected="selected">'+val.codigo+' '+val.nombre+'</option>');
+                            }else{
+                                $('#objespecifico-editar').append('<option value="' +val.id +'">'+val.codigo+' '+val.nombre+'</option>');
+                            }
+                        });
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -277,32 +277,16 @@
         function editar(){
             var id = document.getElementById('id-editar').value;
             var nombre = document.getElementById('nombre-editar').value;
-            var presidente = document.getElementById('presidente-editar').value;
-            var dui = document.getElementById('dui-editar').value;
-            var tel = document.getElementById('tel-editar').value;
+            var id_unidadmedida = document.getElementById('unidadmedida-editar').value;
+            var id_objespecifico = document.getElementById('objespecifico-editar').value;
 
             if(nombre === ''){
                 toastr.error('Nombre es requerido');
                 return;
             }
 
-            if(nombre.length > 150){
+            if(nombre.length > 350){
                 toastr.error('Nombre máximo 150 caracteres');
-                return;
-            }
-
-            if(presidente.length > 350){
-                toastr.error('Presidente máximo 350 caracteres');
-                return;
-            }
-
-            if(dui.length > 25){
-                toastr.error('Dui máximo 25 caracteres');
-                return;
-            }
-
-            if(tel.length > 15){
-                toastr.error('Tel máximo 15 caracteres');
                 return;
             }
 
@@ -310,9 +294,8 @@
             var formData = new FormData();
             formData.append('id', id);
             formData.append('nombre', nombre);
-            formData.append('presidente', presidente);
-            formData.append('dui', dui);
-            formData.append('tel', tel);
+            formData.append('id_unidadmedida', id_unidadmedida);
+            formData.append('id_objespecifico', id_objespecifico);
 
             axios.post(url+'/bodega/materiales/editar', formData, {
             })

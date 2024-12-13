@@ -9,7 +9,7 @@
                             <tr>
                                 <th>Nombre</th>
                                 <th>U. Medida</th>
-                                <th>Precio</th>
+                                <th>Objeto Especif.</th>
                                 <th>Cantidad</th>
                                 <th>Opciones</th>
                             </tr>
@@ -20,7 +20,7 @@
                                 <tr>
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->id_unidadmedida }}</td>
-                                    <td>{{ $dato->precio }}</td>
+                                    <td>{{ $dato->id_objespecifico }}</td>
                                     <td>{{ $dato->cantidad }}</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
