@@ -52,7 +52,7 @@ use App\Http\Controllers\Backend\Bodega\BSolicitudesController;
 use App\Http\Controllers\Backend\Bodega\BReportesController;
 
 
-
+use App\Http\Controllers\Backend\Sindico\SindicoController;
 
 
 // --- LOGIN ---
@@ -1256,7 +1256,7 @@ Route::post('/admin/solicitudesit/fechalimite', [SolicitudesITController::class,
 // ** BODEGA ***
 
 // bodega.control Gestiona las solicitudes de materiales de bodega que hacen las unidades
-// bodega.solicita Solicita materiales de bodega 
+// bodega.solicita Solicita materiales de bodega
 // bodega.reportes Genera reportes de las entradas y salidas de bodega
 
 // Administrar Materiales de bodega
@@ -1287,6 +1287,51 @@ Route::get('/admin/bodega/reportes/index', [BReportesController::class,'indexSec
 
 // ACTUALIZAR TABLA DE COSTOS 11/09/2024
 //Route::post('/admin/actualizartabla', [SolicitudesITController::class, 'actualizarTabla']);
+
+
+// *** SINDICATURA *** 13/12/2024
+
+// Agregar los Estados
+Route::get('/admin/sindico/estados/index', [SindicoController::class,'indexEstado'])->name('admin.sindico.estados.index');
+Route::get('/admin/sindico/estados/tabla', [SindicoController::class, 'tablaEstado']);
+Route::post('/admin/sindico/estados/nuevo', [SindicoController::class, 'nuevoEstado']);
+Route::post('/admin/sindico/estados/informacion', [SindicoController::class, 'informacionEstado']);
+Route::post('/admin/sindico/estados/editar', [SindicoController::class, 'actualizarEstado']);
+
+// Agregar los tipos de solicitudes
+Route::get('/admin/sindico/tiposolicitud/index', [SindicoController::class,'indexTipoSolicitud'])->name('admin.sindico.tiposolicitud.index');
+Route::get('/admin/sindico/tiposolicitud/tabla', [SindicoController::class, 'tablaTipoSolicitud']);
+Route::post('/admin/sindico/tiposolicitud/nuevo', [SindicoController::class, 'nuevoTipoSolicitud']);
+Route::post('/admin/sindico/tiposolicitud/informacion', [SindicoController::class, 'informacionTipoSolicitud']);
+Route::post('/admin/sindico/tiposolicitud/editar', [SindicoController::class, 'actualizarTipoSolicitud']);
+
+// Agregar los estados de inmueble
+Route::get('/admin/sindico/inmueble/index', [SindicoController::class,'indexInmueble'])->name('admin.sindico.inmueble.index');
+Route::get('/admin/sindico/inmueble/tabla', [SindicoController::class, 'tablaInmueble']);
+Route::post('/admin/sindico/inmueble/nuevo', [SindicoController::class, 'nuevoInmueble']);
+Route::post('/admin/sindico/inmueble/informacion', [SindicoController::class, 'informacionInmueble']);
+Route::post('/admin/sindico/inmueble/editar', [SindicoController::class, 'actualizarInmueble']);
+
+// Agregar los tipos deligencia
+Route::get('/admin/sindico/tipodeligencia/index', [SindicoController::class,'indexTipoDeligencia'])->name('admin.sindico.tipodeligencia.index');
+Route::get('/admin/sindico/tipodeligencia/tabla', [SindicoController::class, 'tablaTipoDeligencia']);
+Route::post('/admin/sindico/tipodeligencia/nuevo', [SindicoController::class, 'nuevoTipoDeligencia']);
+Route::post('/admin/sindico/tipodeligencia/informacion', [SindicoController::class, 'informacionTipoDeligencia']);
+Route::post('/admin/sindico/tipodeligencia/editar', [SindicoController::class, 'actualizarTipoDeligencia']);
+
+
+// registro datos sindico
+Route::get('/admin/sindico/registro/index', [SindicoController::class,'indexRegistroDatos'])->name('admin.sindico.registro.index');
+Route::post('/admin/sindico/registro/nuevo', [SindicoController::class, 'registroDatosSindicatura']);
+
+Route::get('/admin/sindico/registrotodos/index', [SindicoController::class,'indexTodosRegistros'])->name('admin.sindico.registro.todos.index');
+Route::get('/admin/sindico/registrotodos/tabla', [SindicoController::class,'tablaTodosRegistros']);
+Route::post('/admin/sindico/registrotodos/borrar', [SindicoController::class, 'borrarDatosSindicatura']);
+Route::post('/admin/sindico/registrotodos/informacion', [SindicoController::class, 'informacionDatosSindicatura']);
+Route::post('/admin/sindico/registrotodos/editar', [SindicoController::class, 'editarDatosSindicatura']);
+
+
+
 
 
 

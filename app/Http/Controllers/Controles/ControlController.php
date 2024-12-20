@@ -76,6 +76,15 @@ class ControlController extends Controller
              $ruta = 'sidebar.rrhh.actualizacion.datos';
          }
 
+
+         // SINDICATURA
+         else  if($user->hasRole('sindico')){
+             $ruta = 'admin.sindico.registro.index';
+         }
+
+
+
+
         else{
             // no tiene ningun permiso de vista, redirigir a pantalla sin permisos
             $ruta = 'no.permisos.index';
