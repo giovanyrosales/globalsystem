@@ -966,21 +966,12 @@
                                 </a>
                             </li>
 
-
-                            <li class="nav-item">
-                                <a href="{{ route('admin.sindico.inmueble.index') }}" target="frameprincipal" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Inmueble</p>
-                                </a>
-                            </li>
-
                             <li class="nav-item">
                                 <a href="{{ route('admin.sindico.tipodeligencia.index') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Tipo Deligencia</p>
                                 </a>
                             </li>
-
 
                         </ul>
                     </li>

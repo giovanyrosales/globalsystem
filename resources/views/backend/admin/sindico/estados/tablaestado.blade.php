@@ -7,9 +7,9 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 4%">ID</th>
+                                <th style="width: 2%">ID</th>
                                 <th style="width: 20%">Estado</th>
-                                <th style="width: 15%">Opciones</th>
+                                <th style="width: 7%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -17,9 +17,9 @@
                             @foreach($listado as $dato)
                                 <tr>
 
-                                    <td style="width: 4%">{{ $dato->id }}</td>
+                                    <td style="width: 2%">{{ $dato->id }}</td>
                                     <td style="width: 20%">{{ $dato->nombre }}</td>
-                                    <td style="width: 15%">
+                                    <td style="width: 7%">
                                         <button type="button" class="btn btn-success btn-xs" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
                                         </button>

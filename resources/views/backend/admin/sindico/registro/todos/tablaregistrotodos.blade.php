@@ -7,9 +7,9 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 5%">Fecha General</th>
+                                <th style="width: 3%">Fecha General</th>
                                 <th style="width: 20%">Tipo Solicitud</th>
-                                <th style="width: 8%">Opciones</th>
+                                <th style="width: 6%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -17,9 +17,9 @@
                             @foreach($listado as $dato)
                                 <tr>
 
-                                    <td style="width: 5%">{{ $dato->fecha_general }}</td>
+                                    <td style="width: 3%">{{ $dato->fecha_general }}</td>
                                     <td style="width: 20%">{{ $dato->solicitud }}</td>
-                                    <td style="width: 8%">
+                                    <td style="width: 6%">
                                         <button type="button" class="btn btn-success btn-xs"
                                                 onclick="tipoVista({{ $dato->id }}, '{{ $dato->id_tiposolicitud }}')">
                                             <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
@@ -54,7 +54,7 @@
             "info": true,
             "autoWidth": false,
             "pagingType": "full_numbers",
-            "lengthMenu": [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Todo"]],
+            "lengthMenu": [[500, -1], [500, "Todo"]],
             "language": {
 
                 "sProcessing": "Procesando...",

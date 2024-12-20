@@ -551,6 +551,8 @@ class SindicoController extends Controller
 
             $dato = SindicoTipoSolicitud::where('id', $registro->id_tiposolicitud)->first();
             $registro->solicitud = $dato->nombre;
+
+            $registro->fecha_general = date("d-m-Y", strtotime($registro->fecha_general));
         }
 
         return view('backend.admin.sindico.registro.todos.tablaregistrotodos', compact('listado'));
