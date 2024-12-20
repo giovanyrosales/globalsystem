@@ -18,7 +18,6 @@ class CreateSindicoRegistroTable extends Migration
 
             $table->bigInteger('id_tiposolicitud')->unsigned();
             $table->bigInteger('id_estado')->unsigned()->nullable();
-            $table->bigInteger('id_inmueble')->unsigned()->nullable();
             $table->bigInteger('id_tipodeligencia')->unsigned()->nullable();
             $table->bigInteger('id_adesco')->unsigned()->nullable();
 
@@ -78,7 +77,6 @@ class CreateSindicoRegistroTable extends Migration
 
             $table->foreign('id_tiposolicitud')->references('id')->on('sindico_tiposolicitud');
             $table->foreign('id_estado')->references('id')->on('sindico_estado');
-            $table->foreign('id_inmueble')->references('id')->on('sindico_inmueble');
             $table->foreign('id_tipodeligencia')->references('id')->on('sindico_tipodeligencia');
             $table->foreign('id_adesco')->references('id')->on('adescos');
 
