@@ -377,13 +377,12 @@ class SindicoController extends Controller
 
         $arrayTipoSoli = SindicoTipoSolicitud::orderBy('nombre', 'ASC')->get();
         $arrayEstados = SindicoEstado::orderBy('nombre', 'ASC')->get();
-        $arrayInmueble = SindicoInmueble::orderBy('nombre', 'ASC')->get();
         $arrayTipoDeligencia = SindicoTipoDeligencia::orderBy('nombre', 'ASC')->get();
         $arrayAdesco = Adescos::orderBy('nombre', 'ASC')->get();
 
         return view('backend.admin.sindico.registro.vistaregistro',
             compact('arrayTipoSoli', 'arrayEstados',
-                'arrayInmueble', 'arrayTipoDeligencia', 'arrayAdesco'));
+                 'arrayTipoDeligencia', 'arrayAdesco'));
     }
 
 
