@@ -892,10 +892,27 @@
                 
                 @endcan
                 @can('bodega.solicitud')
-                    <a href="{{ route('sidebar.bodega.solicitud') }}" target="frameprincipal" class="nav-link">
-                        <i class="far fa-edit nav-icon"></i>
-                        <p>Solicitud de Materiales</p>
-                    </a>
+                <li class="nav-item">
+
+                        <a href="#" class="nav-link">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Solicitudes a Bodega
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+                            <a href="{{ route('sidebar.bodega.solicitud') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-edit nav-icon"></i>
+                                <p>Crear Solicitud</p>
+                            </a>
+                            <a href="{{ route('sidebar.bodega.solicitud') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-list-alt nav-icon"></i>
+                                <p>Mis Solicitudes</p>
+                            </a>
+                        </ul>
+                </li>
                 @endcan
                 @can('bodega.reportes')
                     <a href="{{ route('sidebar.bodega.reportes') }}" target="frameprincipal" class="nav-link">

@@ -1267,7 +1267,7 @@ Route::post('/admin/bodega/materiales/informacion', [BMaterialesController::clas
 Route::post('/admin/bodega/materiales/editar', [BMaterialesController::class, 'editarMaterial']);
 
 // Realizar Solicitud
-Route::get('/admin/bodega/solicitud/index', [BSolicitudesController::class,'indexSecreTransporte'])->name('sidebar.bodega.solicitud');
+Route::get('/admin/bodega/solicitud/index', [BSolicitudesController::class,'indexBodegaSolicitud'])->name('sidebar.bodega.solicitud');
 
 // Administrar solicitudes
 Route::get('/admin/bodega/solicitudes/index', [BSolicitudesController::class,'indexSecreTransporte'])->name('sidebar.bodega.solicitudes');
