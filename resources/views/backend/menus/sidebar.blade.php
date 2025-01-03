@@ -888,8 +888,8 @@
                         <i class="fa fa-chevron-circle-right"></i>
                         <p>Salidas</p>
                     </a>
-                
-                
+
+
                 @endcan
                 @can('bodega.solicitud')
                 <li class="nav-item">
@@ -920,7 +920,7 @@
                         <p>Reportes</p>
                     </a>
                 @endcan
-                
+
 
 
                 <!-- RECURSOS HUMANOS INGRESO DE DATOS -->
@@ -931,6 +931,72 @@
                 </a>
                 @endcan
 
+
+
+
+
+
+
+
+
+                <!-- SINDICATURA -->
+                @can('sidebar.sindico')
+
+
+                    <li class="nav-item">
+                        <a href="{{ route('admin.sindico.registro.index') }}" target="frameprincipal" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Registrar</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('admin.sindico.registro.todos.index') }}" target="frameprincipal" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Todos</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Configuración
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.sindico.estados.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Estados</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.sindico.tiposolicitud.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Tipo Solicitud</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.sindico.tipodeligencia.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Tipo Deligencia</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+
+
+
+                @endcan
 
 
             </ul>
