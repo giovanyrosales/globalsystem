@@ -449,7 +449,7 @@ class SindicoController extends Controller
                 DB::commit();
                 return ['success' => 1];
             }
-            else if($tipoSolicitud == 5){
+            else if($tipoSolicitud == 5){ // DILIGENCIA DE JURISDICCION VOLUNTARIA
 
                 $registro->id_tiposolicitud = 5;
                 $registro->id_tipodeligencia = $request->tipoDeligencia;
@@ -575,9 +575,17 @@ class SindicoController extends Controller
                 $registro->fecha_emision_diligencia = date("d-m-Y", strtotime($registro->fecha_emision_diligencia));
             }
 
+            if($registro->fecha_entrega != null){
+                $registro->fecha_entrega = date("d-m-Y", strtotime($registro->fecha_entrega));
+            }
+
+
         }
 
-        if($id == 7){ // INSPECCION DE INMUEBLE
+        if($id == 5){ // DILIGENCIA DE JURISDICCION VOLUNTARIA
+            return view('backend.admin.sindico.registro.todos.bloque.tablabloque5', compact('listado'));
+        }
+        else if($id == 7){ // INSPECCION DE INMUEBLE
             return view('backend.admin.sindico.registro.todos.bloque.tablabloque7', compact('listado'));
         }
 

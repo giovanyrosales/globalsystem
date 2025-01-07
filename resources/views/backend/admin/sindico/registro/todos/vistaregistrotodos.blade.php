@@ -737,12 +737,7 @@
             $('#tablaDatatable').load(ruta);
         }
 
-        function recargar(){
-            var id = document.getElementById('select-tiposolicitudglobal').value;
-            openLoading()
-            var ruta = "{{ URL::to('/admin/sindico/registrotodos/tabla') }}/" + id;
-            $('#tablaDatatable').load(ruta);
-        }
+
 
         function tipoVista(id, tipo){
 
@@ -973,7 +968,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal1').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1012,7 +1007,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal2').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1055,7 +1050,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal3').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1096,7 +1091,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal4').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1151,7 +1146,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal5').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1192,7 +1187,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal6').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1244,7 +1239,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal7').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1288,7 +1283,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal8').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1332,7 +1327,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal9').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1372,7 +1367,7 @@
                     if(response.data.success === 1){
                         toastr.success('Actualizado');
                         $('#modal10').modal('hide');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -1416,7 +1411,7 @@
                     closeLoading();
                     if(response.data.success === 1){
                         toastr.success('Borrado');
-                        recargar();
+                        cargarTabla();
                     }
                     else {
                         toastr.error('Error al borrar');
