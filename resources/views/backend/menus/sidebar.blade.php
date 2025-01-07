@@ -889,8 +889,14 @@
                         <p>Salidas</p>
                     </a>
 
-
                 @endcan
+
+
+
+
+
+
+
                 @can('bodega.solicitud')
                     <a href="{{ route('sidebar.bodega.solicitud') }}" target="frameprincipal" class="nav-link">
                         <i class="far fa-edit nav-icon"></i>
@@ -969,7 +975,7 @@
                             <li class="nav-item">
                                 <a href="{{ route('admin.sindico.tipodeligencia.index') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Tipo Deligencia</p>
+                                    <p>Tipo Diligencia</p>
                                 </a>
                             </li>
 

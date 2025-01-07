@@ -376,6 +376,13 @@ class SindicoController extends Controller
     public function indexRegistroDatos(){
 
         $arrayTipoSoli = SindicoTipoSolicitud::orderBy('nombre', 'ASC')->get();
+
+        $contador = 1;
+        foreach ($arrayTipoSoli as $dato){
+            $dato->nombre = $contador . "- " . $dato->nombre;
+            $contador++;
+        }
+
         $arrayEstados = SindicoEstado::orderBy('nombre', 'ASC')->get();
         $arrayTipoDeligencia = SindicoTipoDeligencia::orderBy('nombre', 'ASC')->get();
         $arrayAdesco = Adescos::orderBy('nombre', 'ASC')->get();
@@ -460,7 +467,7 @@ class SindicoController extends Controller
                 DB::commit();
                 return ['success' => 1];
             }
-            else if($tipoSolicitud == 6){
+            else if($tipoSolicitud == 6){ // SOLICITUDES DE ADESCO
 
                 $registro->id_tiposolicitud = 6;
                 $registro->id_adesco = $request->adesco;
@@ -472,7 +479,7 @@ class SindicoController extends Controller
                 return ['success' => 1];
 
             }
-            else if($tipoSolicitud == 7){
+            else if($tipoSolicitud == 7){ // INSPECCION DE INMUEBLE
 
                 $registro->id_tiposolicitud = 7;
                 $registro->id_tipodeligencia = $request->tipoDiligencia;
@@ -537,21 +544,35 @@ class SindicoController extends Controller
 
     public function indexTodosRegistros()
     {
-        return view('backend.admin.sindico.registro.todos.vistaregistrotodos');
+        $listado = SindicoTipoSolicitud::orderBy('nombre', 'asc')->get();
+        $contador = 1;
+        foreach ($listado as $dato){
+            $dato->nombre = $contador . "- " . $dato->nombre;
+            $contador++;
+        }
+
+        return view('backend.admin.sindico.registro.todos.vistaregistrotodos', compact('listado'));
     }
 
 
-
-    public function tablaTodosRegistros()
+    public function tablaTodosRegistros($id)
     {
-        $listado = SindicoRegistro::orderBy('fecha_general', 'DESC')->get();
+        $listado = SindicoRegistro::where('id_tiposolicitud', $id)
+            ->orderBy('fecha_general', 'DESC')
+            ->get();
 
         foreach ($listado as $registro) {
 
             $dato = SindicoTipoSolicitud::where('id', $registro->id_tiposolicitud)->first();
             $registro->solicitud = $dato->nombre;
-
             $registro->fecha_general = date("d-m-Y", strtotime($registro->fecha_general));
+
+            $registro->fecha_inspeccion = date("d-m-Y", strtotime($registro->fecha_inspeccion));
+            $registro->fecha_emision_diligencia = date("d-m-Y", strtotime($registro->fecha_emision_diligencia));
+        }
+
+        if($id == 7){ // INSPECCION DE INMUEBLE
+            return view('backend.admin.sindico.registro.todos.bloque.tablabloque7', compact('listado'));
         }
 
         return view('backend.admin.sindico.registro.todos.tablaregistrotodos', compact('listado'));

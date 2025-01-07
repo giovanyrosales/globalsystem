@@ -20,6 +20,17 @@
     <section class="content-header">
         <div class="row mb-2">
 
+            <div class="col-md-6">
+                <select id="select-tiposolicitudglobal" class="form-control" onchange="cargarTabla(this)">
+                    <option value="0">Seleccionar opción</option>
+                    @foreach($listado as $dd)
+                        <option value="{{ $dd->id }}">{{ $dd->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+
+
         </div>
     </section>
 
@@ -705,8 +716,7 @@
     <script type="text/javascript">
         $(document).ready(function(){
 
-            var ruta = "{{ URL::to('/admin/sindico/registrotodos/tabla') }}";
-            $('#tablaDatatable').load(ruta);
+
 
             document.getElementById("divcontenedor").style.display = "block";
         });
@@ -714,8 +724,23 @@
 
     <script>
 
+        function cargarTabla(){
+            var id = document.getElementById('select-tiposolicitudglobal').value;
+
+            if(id == '0'){
+                $('#tablaDatatable').load('');
+                return
+            }
+
+            openLoading()
+            var ruta = "{{ URL::to('/admin/sindico/registrotodos/tabla') }}/" + id;
+            $('#tablaDatatable').load(ruta);
+        }
+
         function recargar(){
-            var ruta = "{{ URL::to('/admin/sindico/registrotodos/tabla') }}";
+            var id = document.getElementById('select-tiposolicitudglobal').value;
+            openLoading()
+            var ruta = "{{ URL::to('/admin/sindico/registrotodos/tabla') }}/" + id;
             $('#tablaDatatable').load(ruta);
         }
 

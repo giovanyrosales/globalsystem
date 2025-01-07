@@ -8,7 +8,8 @@
                             <thead>
                             <tr>
                                 <th style="width: 3%">Fecha General</th>
-                                <th style="width: 20%">Tipo Solicitud</th>
+                                <th style="width: 20%">Fecha de Inspección</th>
+                                <th style="width: 20%">Fecha de Emisión de Resolución</th>
                                 <th style="width: 6%">Opciones</th>
                             </tr>
                             </thead>
@@ -18,7 +19,8 @@
                                 <tr>
 
                                     <td style="width: 3%">{{ $dato->fecha_general }}</td>
-                                    <td style="width: 20%">{{ $dato->solicitud }}</td>
+                                    <td style="width: 20%">{{ $dato->fecha_inspeccion }}</td>
+                                    <td style="width: 20%">{{ $dato->fecha_emision_diligencia }}</td>
                                     <td style="width: 6%">
                                         <button type="button" class="btn btn-success btn-xs"
                                                 onclick="tipoVista({{ $dato->id }}, '{{ $dato->id_tiposolicitud }}')">

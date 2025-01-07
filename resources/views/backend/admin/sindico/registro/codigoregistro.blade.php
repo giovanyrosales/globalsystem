@@ -1,6 +1,6 @@
 <script>
 
-    function nuevoRegistro1(){
+    function nuevoRegistro1(){ // REUNIONES DE CONCEJO MUNICIPAL
 
         var fechaReunion = document.getElementById('fecha-reunion-1').value;
         var asesoria = document.getElementById('asesoria-1').value;
@@ -33,7 +33,7 @@
             });
     }
 
-    function nuevoRegistro2(){
+    function nuevoRegistro2(){ // LEGALIZACION DE ZONAS VERDES
 
         var fechaInscripcion = document.getElementById('fecha-inscripcion-2').value;
         var ubicacion = document.getElementById('ubicacion-2').value;
@@ -64,7 +64,7 @@
             });
     }
 
-    function nuevoRegistro3(){
+    function nuevoRegistro3(){ // LEGALIZACION DE INMUEBLE
 
         var matricula = document.getElementById('matricula-3').value;
         var fechaInicio = document.getElementById('fecha-inicio-3').value;
@@ -99,7 +99,7 @@
             });
     }
 
-    function nuevoRegistro4(){
+    function nuevoRegistro4(){ // AVALUO DE INMUEBLE
 
         var inmueble = document.getElementById('inmueble-4').value;
         var fechaRealizacion = document.getElementById('fecha-realizacion-4').value;
@@ -132,7 +132,7 @@
             });
     }
 
-    function nuevoRegistro5(){
+    function nuevoRegistro5(){ // DILIGENCIAS DE JURISDICCION VOLUNTARIA
 
         var tipoDeligencia = document.getElementById('select-deligencia-5').value;
         var fechaRecepcion = document.getElementById('fecha-recepcion-5').value;
@@ -179,7 +179,7 @@
             });
     }
 
-    function nuevoRegistro6(){
+    function nuevoRegistro6(){ // SOLICITUDES DE ADESCO
 
         var adesco = document.getElementById('select-adesco-6').value;
         var estadoProceso = document.getElementById('select-estado-6').value;
@@ -212,7 +212,7 @@
             });
     }
 
-    function nuevoRegistro7(){
+    function nuevoRegistro7(){ // INSPECCION DE INMUEBLE
 
         var tipoDiligencia = document.getElementById('select-tipodiligencia-7').value;
         var fechaRecepcion = document.getElementById('fecha-recepcion-7').value;
@@ -256,7 +256,7 @@
             });
     }
 
-    function nuevoRegistro8(){
+    function nuevoRegistro8(){ // REGISTRO DE INFORMES DE RECUPERACION DE MORA
 
         var fechaRecepcion = document.getElementById('fecha-recepcion-8').value;
         var nombreEncargado = document.getElementById('nombre-8').value;
@@ -291,7 +291,7 @@
             });
     }
 
-    function nuevoRegistro9(){
+    function nuevoRegistro9(){ // INFORME DE AUTM PARA COBRO JUDICIAL
 
         var fechaRecepcion = document.getElementById('fecha-recepcion-9').value;
         var encargadoRemitir = document.getElementById('encargado-9').value;
@@ -326,7 +326,7 @@
             });
     }
 
-    function nuevoRegistro10(){
+    function nuevoRegistro10(){ // MONITOREO DE CONTROL DE GASTOS A NIVEL GENERAL
 
         var fechaRevision = document.getElementById('fecha-revision-10').value;
         var totalDocumentos = document.getElementById('totaldoc-10').value;

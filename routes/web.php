@@ -1325,7 +1325,8 @@ Route::get('/admin/sindico/registro/index', [SindicoController::class,'indexRegi
 Route::post('/admin/sindico/registro/nuevo', [SindicoController::class, 'registroDatosSindicatura']);
 
 Route::get('/admin/sindico/registrotodos/index', [SindicoController::class,'indexTodosRegistros'])->name('admin.sindico.registro.todos.index');
-Route::get('/admin/sindico/registrotodos/tabla', [SindicoController::class,'tablaTodosRegistros']);
+Route::get('/admin/sindico/registrotodos/tabla/{id}', [SindicoController::class,'tablaTodosRegistros']);
+
 Route::post('/admin/sindico/registrotodos/borrar', [SindicoController::class, 'borrarDatosSindicatura']);
 Route::post('/admin/sindico/registrotodos/informacion', [SindicoController::class, 'informacionDatosSindicatura']);
 Route::post('/admin/sindico/registrotodos/editar', [SindicoController::class, 'editarDatosSindicatura']);
