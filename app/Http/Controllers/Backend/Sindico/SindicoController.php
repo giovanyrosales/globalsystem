@@ -567,8 +567,14 @@ class SindicoController extends Controller
             $registro->solicitud = $dato->nombre;
             $registro->fecha_general = date("d-m-Y", strtotime($registro->fecha_general));
 
-            $registro->fecha_inspeccion = date("d-m-Y", strtotime($registro->fecha_inspeccion));
-            $registro->fecha_emision_diligencia = date("d-m-Y", strtotime($registro->fecha_emision_diligencia));
+            if($registro->fecha_inspeccion != null){
+                $registro->fecha_inspeccion = date("d-m-Y", strtotime($registro->fecha_inspeccion));
+            }
+
+            if($registro->fecha_emision_diligencia != null){
+                $registro->fecha_emision_diligencia = date("d-m-Y", strtotime($registro->fecha_emision_diligencia));
+            }
+
         }
 
         if($id == 7){ // INSPECCION DE INMUEBLE
