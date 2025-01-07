@@ -13,5 +13,11 @@ use Illuminate\Support\Facades\Validator;
 
 class BSolicitudesController extends Controller
 {
-    //
+    // retorna vista de crear solicitud de la seccion de bodega en cada unidad solicitante
+    public function indexBodegaSolicitud(){
+        $unidadmedida = UnidadMedida::orderBy('medida', 'ASC')->get();
+        $objespecifico = ObjEspecifico::orderBy('codigo', 'ASC')->get();
+
+        return view('backend.admin.bodega.vistamateriales', compact('unidadmedida', 'objespecifico'));
+    }
 }
