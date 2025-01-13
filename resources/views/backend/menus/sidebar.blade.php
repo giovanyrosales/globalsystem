@@ -58,7 +58,6 @@
                             </a>
                         </li>
 
-
                         <li class="nav-item">
                             <a href="{{ route('admin.informacion.consolidador.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
@@ -70,6 +69,13 @@
                             <a href="{{ route('admin.solicitudit.control.index') }}" target="frameprincipal" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Solicitud IT</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.usuario.bodega.objespecifico.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Usuario Bodega - ObjEspecífico</p>
                             </a>
                         </li>
 
@@ -869,63 +875,123 @@
 
                 @endcan
 
-                <!-- BODEGA -->
+
+
+
+
+
+                <!-- *************************** SECCION DE BODEGA ****************************** -->
 
                 @can('bodega.control')
                     <a href="{{ route('sidebar.bodega.materiales') }}" target="frameprincipal" class="nav-link">
                         <i class="fa fa-book nav-icon"></i>
                         <p>Materiales</p>
                     </a>
-                    <a href="{{ route('sidebar.bodega.solicitudes') }}" target="frameprincipal" class="nav-link">
-                        <i class="far fa-list-alt nav-icon"></i>
-                        <p>Solicitudes</p>
-                    </a>
-                    <a href="{{ route('sidebar.bodega.entradas') }}" target="frameprincipal" class="nav-link">
-                        <i class="fa fa-chevron-circle-left"></i>
-                        <p>Entradas</p>
-                    </a>
-                    <a href="{{ route('sidebar.bodega.salidas') }}" target="frameprincipal" class="nav-link">
-                        <i class="fa fa-chevron-circle-right"></i>
-                        <p>Salidas</p>
-                    </a>
 
-                @endcan
-
-
-
-
-
-
-
-                @can('bodega.solicitud')
-                <li class="nav-item">
+                    <li class="nav-item">
 
                         <a href="#" class="nav-link">
                             <i class="far fa-edit"></i>
                             <p>
-                                Solicitudes a Bodega
+                                Solicitudes
                                 <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
 
                         <ul class="nav nav-treeview">
-                            <a href="{{ route('sidebar.bodega.solicitud') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-edit nav-icon"></i>
-                                <p>Crear Solicitud</p>
-                            </a>
-                            <a href="{{ route('sidebar.bodega.solicitud') }}" target="frameprincipal" class="nav-link">
-                                <i class="far fa-list-alt nav-icon"></i>
-                                <p>Mis Solicitudes</p>
-                            </a>
+
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.bodega.solicitudes.pendientes') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pendientes</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Finalizadas</p>
+                                </a>
+                            </li>
+
                         </ul>
-                </li>
-                @endcan
-                @can('bodega.reportes')
-                    <a href="{{ route('sidebar.bodega.reportes') }}" target="frameprincipal" class="nav-link">
-                        <i class="fa fa-list nav-icon"></i>
-                        <p>Reportes</p>
+                    </li>
+
+                    <a href="{{ route('sidebar.bodega.entradasregistro') }}" target="frameprincipal" class="nav-link">
+                        <i class="fa fa-chevron-circle-left"></i>
+                        <p>Entradas</p>
                     </a>
+
+
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Historial
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.bodega.historial.entradas') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Entradas</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+
                 @endcan
+
+                @can('bodega.solicitud')
+
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Solicitud Bodega
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.bodega.nueva.solicitudunidad') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Crear Solicitud</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.bodega.mis.solicitudunidad') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Mis Solicitudes</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+
+                @endcan
+
+                @can('bodega.reportes')
+
+                @endcan
+
+
+
+                <!-- *************************** END - SECCION DE BODEGA ****************************** -->
+
+
+
 
 
 
@@ -936,12 +1002,6 @@
                     <p>Datos</p>
                 </a>
                 @endcan
-
-
-
-
-
-
 
 
 

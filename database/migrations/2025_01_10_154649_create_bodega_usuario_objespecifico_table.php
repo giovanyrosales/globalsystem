@@ -4,23 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBodegaMaterialesTable extends Migration
+class CreateBodegaUsuarioObjespecificoTable extends Migration
 {
     /**
-     * LISTADO DE MATERIALES PARA BODEGA
+     * PARA QUE EL USUARIO ADMINISTRADOR BODEGA, VEA SU CODIGO UNICAMENTE
      *
      * @return void
      */
     public function up()
     {
-        Schema::create('bodega_materiales', function (Blueprint $table) {
+        Schema::create('bodega_usuario_objespecifico', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('id_unidadmedida')->unsigned();
+            $table->bigInteger('id_usuario')->unsigned();
             $table->bigInteger('id_objespecifico')->unsigned();
-            $table->string('nombre', 300);
-            $table->integer('cantidad');
 
-            $table->foreign('id_unidadmedida')->references('id')->on('unidad_medida');
+            $table->foreign('id_usuario')->references('id')->on('usuario');
             $table->foreign('id_objespecifico')->references('id')->on('obj_especifico');
         });
     }
@@ -32,6 +30,6 @@ class CreateBodegaMaterialesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bodega_materiales');
+        Schema::dropIfExists('bodega_usuario_objespecifico');
     }
 }

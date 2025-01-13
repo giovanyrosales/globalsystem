@@ -19,7 +19,7 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                <button type="button" style="font-weight: bold; background-color: #2798eb; color: white !important;"
                         onclick="modalAgregar()" class="button button-3d button-rounded button-pill button-small">
                     <i class="fas fa-pencil-alt"></i>
                     Nuevo Material
@@ -37,7 +37,7 @@
 
     <section class="content">
         <div class="container-fluid">
-            <div class="card card-success">
+            <div class="card card-gray-dark">
                 <div class="card-header">
                     <h3 class="card-title">Listado</h3>
                 </div>
@@ -246,10 +246,10 @@
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(response.data.lista.id);
                         $('#nombre-editar').val(response.data.lista.nombre);
-                       
+
                         document.getElementById("unidadmedida-editar").options.length = 0;
                         document.getElementById("objespecifico-editar").options.length = 0;
-                    
+
                         $.each(response.data.um, function( key, val ){
                             if(response.data.lista.id_unidadmedida === val.id){
                                 $('#unidadmedida-editar').append('<option value="' +val.id +'" selected="selected">'+val.medida+'</option>');

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateBodegaSalidasTable extends Migration
 {
     /**
-     * Run the migrations.
+     * BODEGA -SALIDAS DE PRODUCTO A UNA SOLICITUD
      *
      * @return void
      */
@@ -15,12 +15,12 @@ class CreateBodegaSalidasTable extends Migration
     {
         Schema::create('bodega_salidas', function (Blueprint $table) {
             $table->id();
+            $table->dateTime('fecha');
+            $table->bigInteger('id_usuario')->unsigned(); // quien hizo la salida
             $table->bigInteger('id_solicitud')->unsigned();
-            $table->string('descripcion', 300)->nullable();
-            $table->date('fecha')->nullable();
-            $table->timestamps();
 
-            $table->foreign('id_solicitud')->references('id')->on('bodega_salidas');
+            $table->foreign('id_usuario')->references('id')->on('usuario');
+            $table->foreign('id_solicitud')->references('id')->on('bodega_solicitud');
         });
     }
 

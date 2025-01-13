@@ -49,7 +49,7 @@ use App\Http\Controllers\Backend\Recursos\RecursosHumanosController;
 use App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos\SolicitudesITController;
 use App\Http\Controllers\Backend\Bodega\BMaterialesController;
 use App\Http\Controllers\Backend\Bodega\BSolicitudesController;
-use App\Http\Controllers\Backend\Bodega\BReportesController;
+use App\Http\Controllers\Backend\Bodega\BHistorialController;
 
 
 use App\Http\Controllers\Backend\Sindico\SindicoController;
@@ -1255,10 +1255,6 @@ Route::post('/admin/solicitudesit/fechalimite', [SolicitudesITController::class,
 
 // ** BODEGA ***
 
-// bodega.control Gestiona las solicitudes de materiales de bodega que hacen las unidades
-// bodega.solicita Solicita materiales de bodega
-// bodega.reportes Genera reportes de las entradas y salidas de bodega
-
 // Administrar Materiales de bodega
 Route::get('/admin/bodega/materiales/index', [BMaterialesController::class,'indexBodegaMateriales'])->name('sidebar.bodega.materiales');
 Route::get('/admin/bodega/materiales/tabla/index', [BMaterialesController::class,'tablaMateriales']);
@@ -1266,21 +1262,59 @@ Route::post('/admin/bodega/materiales/nuevo', [BMaterialesController::class, 'nu
 Route::post('/admin/bodega/materiales/informacion', [BMaterialesController::class, 'informacionMaterial']);
 Route::post('/admin/bodega/materiales/editar', [BMaterialesController::class, 'editarMaterial']);
 
-// Realizar Solicitud
-Route::get('/admin/bodega/solicitud/index', [BSolicitudesController::class,'indexBodegaSolicitud'])->name('sidebar.bodega.solicitud');
+// registrar entradas
+Route::get('/admin/bodega/entradasregistro/index', [BMaterialesController::class,'indexEntradasRegistro'])->name('sidebar.bodega.entradasregistro');
+Route::post('/admin/bodega/buscar/producto',  [BMaterialesController::class,'buscarProducto']);
+Route::post('/admin/bodega/registrar/productos',  [BMaterialesController::class,'registrarProductos']);
 
-// Administrar solicitudes
-Route::get('/admin/bodega/solicitudes/index', [BSolicitudesController::class,'indexSecreTransporte'])->name('sidebar.bodega.solicitudes');
+// Realizar Solicitud por parte de unidad
+Route::get('/admin/bodega/nuevasolicitud/index', [BSolicitudesController::class,'indexNuevaSolicitud'])->name('sidebar.bodega.nueva.solicitudunidad');
+Route::post('/admin/bodega/registrar/nuevasolicitud',  [BSolicitudesController::class,'registrarSolicitudUnidad']);
 
-// Registrar Entradas de Materiales
-Route::get('/admin/bodega/entradas/index', [BMaterialesController::class,'indexSecreTransporte'])->name('sidebar.bodega.entradas');
+// Ver mis solicitudes como unidad
+Route::get('/admin/bodega/missolicitudes/index', [BSolicitudesController::class,'indexMisSolicitudUnidad'])->name('sidebar.bodega.mis.solicitudunidad');
+Route::get('/admin/bodega/missolicitudes/tabla', [BSolicitudesController::class,'tablaMisSolicitudUnidad']);
+// detalle
+Route::get('/admin/bodega/missolicitudes/detalle/index/{id}', [BSolicitudesController::class,'indexDetalleMisSolicitudUnidad']);
+Route::get('/admin/bodega/missolicitudes/detalle/tabla/{id}', [BSolicitudesController::class,'tablaDetalleMisSolicitudUnidad']);
 
-// Registrar Salidas de Materiales
-Route::get('/admin/bodega/salidas/index', [BMaterialesController::class,'indexSecreTransporte'])->name('sidebar.bodega.salidas');
+// asignar usuario bodega a su objeto especifico correspondiente
+Route::get('/admin/bodega/usuario/objespecifico/index', [PermisoController::class,'indexVistaUsuarioBodegaObjEspecifico'])->name('admin.usuario.bodega.objespecifico.index');
+Route::get('/admin/bodega/usuario/objespecifico/tabla', [PermisoController::class,'tablaVistaUsuarioBodegaObjEspecifico']);
+Route::post('/admin/bodega/usuario/objespecifico/borrar', [PermisoController::class, 'borrarUsuarioBodegaObjEspecifico']);
+Route::post('/admin/bodega/usuario/objespecifico/registrar', [PermisoController::class, 'registrarUsuarioBodegaObjEspecifico']);
 
-// Generar Reportes de bodega
+// Historial
+Route::get('/admin/bodega/historial/entrada/index', [BHistorialController::class,'indexHistorialEntradas'])->name('sidebar.bodega.historial.entradas');
+Route::get('/admin/bodega/historial/entrada/tabla', [BHistorialController::class,'tablaHistorialEntradas']);
+Route::get('/admin/bodega/historial/entradadetalle/index/{id}', [BHistorialController::class,'indexHistorialEntradasDetalle']);
+Route::get('/admin/bodega/historial/entradadetalle/tabla/{id}', [BHistorialController::class,'tablaHistorialEntradasDetalle']);
 
-Route::get('/admin/bodega/reportes/index', [BReportesController::class,'indexSecreTransporte'])->name('sidebar.bodega.reportes');
+// borrar entrada completa
+Route::post('/admin/bodega/historial/entrada/borrarlote', [BHistorialController::class, 'historialEntradaBorrarLote']);
+Route::post('/admin/bodega/historial/entradadetalle/borraritem', [BHistorialController::class, 'historialEntradaDetalleBorrarItem']);
+
+
+// ver solicitudes para entregar
+Route::get('/admin/bodega/solicitudpendiente/index', [BSolicitudesController::class,'indexSolicitudesPendientes'])->name('sidebar.bodega.solicitudes.pendientes');
+Route::get('/admin/bodega/solicitudpendiente/tabla', [BSolicitudesController::class,'tablaSolicitudesPendientes']);
+// cambiar estado completo -> finalizar
+Route::post('/admin/bodega/solicitudpendiente/estadofinalizar', [BSolicitudesController::class, 'cambiarEstadoAFinalizar']);
+
+Route::get('/admin/bodega/solicitudpendiente/detalle/index/{id}', [BSolicitudesController::class,'indexDetalleSolicitudesPendientes']);
+Route::get('/admin/bodega/solicitudpendiente/detalle/tabla/{id}', [BSolicitudesController::class,'tablaDetalleSolicitudesPendientes']);
+
+// informacion de fila bodega_solicitud_detalla
+Route::post('/admin/bodega/solicitudpendiente/infobodesolituddetalle', [BSolicitudesController::class, 'infoBodegaSolitudDetalleFila']);
+
+
+
+
+
+
+
+
+
 
 
 

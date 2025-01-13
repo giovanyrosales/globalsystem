@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBodegaDetalleSolicitudTable extends Migration
+class CreateBodegaEntradasDetalleTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,17 @@ class CreateBodegaDetalleSolicitudTable extends Migration
      */
     public function up()
     {
-        Schema::create('bodega_detalle_solicitud', function (Blueprint $table) {
+        Schema::create('bodega_entradas_detalle', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('id_solicitud')->unsigned();
+            $table->bigInteger('id_entrada')->unsigned();
             $table->bigInteger('id_material')->unsigned();
-            $table->decimal('cantidad', 10, 2);
-            $table->timestamps();
-            
-            $table->foreign('id_solicitud')->references('id')->on('bodega_solicitudes');
+            $table->integer('cantidad');
+            $table->decimal('precio', 10, 2);
+
+            // solo es un nombre copia de respaldo
+            $table->string('nombre_copia', 300);
+
+            $table->foreign('id_entrada')->references('id')->on('bodega_entradas');
             $table->foreign('id_material')->references('id')->on('bodega_materiales');
         });
     }
@@ -32,6 +35,6 @@ class CreateBodegaDetalleSolicitudTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bodega_detalle_solicitud');
+        Schema::dropIfExists('bodega_entradas_detalle');
     }
 }

@@ -7,28 +7,31 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>U. Medida</th>
-                                <th>Objeto Especif.</th>
-                                <th>Cantidad</th>
-                                <th>Opciones</th>
+                                <th style="width: 3%">Fecha Solicitud</th>
+                                <th style="width: 20%">Obj. Específico</th>
+                                <th style="width: 6%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
-                            @foreach($lista as $dato)
+                            @foreach($listado as $dato)
                                 <tr>
-                                    <td>{{ $dato->nombre }}</td>
-                                    <td>{{ $dato->id_unidadmedida }}</td>
-                                    <td>{{ $dato->id_objespecifico }}</td>
-                                    <td>{{ $dato->cantidad }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
+                                    <td style="width: 3%">{{ $dato->fecha }}</td>
+                                    <td style="width: 20%">{{ $dato->objetoEspecifico }}</td>
+                                    <td style="width: 6%">
+                                        <button type="button" class="btn btn-info btn-xs"
+                                                onclick="vistaDetalle({{ $dato->id }})">
+                                            <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
                                         </button>
                                     </td>
                                 </tr>
                             @endforeach
+
+                            <script>
+                                setTimeout(function () {
+                                    closeLoading();
+                                }, 1000);
+                            </script>
 
                             </tbody>
                         </table>
@@ -45,12 +48,13 @@
         $("#tabla").DataTable({
             "paging": true,
             "lengthChange": true,
+            "order": [[0, 'desc']],
             "searching": true,
             "ordering": true,
             "info": true,
             "autoWidth": false,
             "pagingType": "full_numbers",
-            "lengthMenu": [[10, 25, 50, 100, 150, -1], [10, 25, 50, 100, 150, "Todo"]],
+            "lengthMenu": [[500, -1], [500, "Todo"]],
             "language": {
 
                 "sProcessing": "Procesando...",

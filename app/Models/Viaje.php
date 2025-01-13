@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Viaje extends Model
 {
     use HasFactory;
-
+    protected $table = 'viajes';
     protected $fillable = ['nombre', 'acompanantes', 'lugar', 'fecha', 'subida', 'telefono'];
 }

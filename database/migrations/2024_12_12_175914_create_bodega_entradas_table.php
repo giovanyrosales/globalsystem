@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateBodegaEntradasTable extends Migration
 {
     /**
-     * Run the migrations.
+     * LISTADO DE ENTRADAS
      *
      * @return void
      */
@@ -15,9 +15,12 @@ class CreateBodegaEntradasTable extends Migration
     {
         Schema::create('bodega_entradas', function (Blueprint $table) {
             $table->id();
-            $table->string('descripcion', 300)->nullable();
-            $table->date('fecha')->nullable();
-            $table->timestamps();
+            $table->bigInteger('id_usuario')->unsigned();
+            $table->date('fecha');
+            $table->string('observacion', 300)->nullable();
+            $table->string('lote', 50)->nullable();
+
+            $table->foreign('id_usuario')->references('id')->on('usuario');
         });
     }
 

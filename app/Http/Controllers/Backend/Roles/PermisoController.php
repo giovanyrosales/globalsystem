@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Backend\Roles;
 
 use App\Http\Controllers\Controller;
+use App\Models\BodegaUsuarioObjEspecifico;
 use App\Models\ConsolidadoresUnidades;
+use App\Models\ObjEspecifico;
 use App\Models\P_Departamento;
 use App\Models\P_PresupUnidad;
 use App\Models\P_UsuarioDepartamento;
@@ -445,6 +447,91 @@ class PermisoController extends Controller
 
         return ['success' => 1];
     }
+
+
+
+
+
+    //************* USUARIO BODEGA PARA ASIGNARLE SU OBJETO ESPECIFICO ***************************
+
+
+    public function indexVistaUsuarioBodegaObjEspecifico(){
+
+        $arrayObjEspecifico = ObjEspecifico::orderBy('nombre')->get();
+        $arrayUsuario = Usuario::orderBy('nombre')->get();
+
+        foreach ($arrayUsuario as $fila){
+
+            $fila->nombreUsuario = $fila->nombre . ' (' . $fila->usuario . ')';
+        }
+
+        return view('backend.admin.bodega.asignarusuariobodega.vistausuariobodega',
+            compact('arrayUsuario', 'arrayObjEspecifico'));
+    }
+
+
+    public function tablaVistaUsuarioBodegaObjEspecifico()
+    {
+        $listado = DB::table('bodega_usuario_objespecifico AS bode')
+            ->join('usuario AS u', 'bode.id_usuario', '=', 'u.id')
+            ->join('obj_especifico AS obj', 'bode.id_objespecifico', '=', 'obj.id')
+            ->select('bode.id', 'u.nombre', 'u.usuario', 'obj.nombre AS nombreObj', 'obj.codigo')
+            ->orderBy('u.nombre', 'ASC')
+            ->get();
+
+        return view('backend.admin.bodega.asignarusuariobodega.tablausuariobodega', compact('listado'));
+    }
+
+
+    public function registrarUsuarioBodegaObjEspecifico(Request $request)
+    {
+        $regla = array(
+            'usuario' => 'required',
+            'objeto' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        // NO DEPARTAMENTOS REPETIDOS
+        if(BodegaUsuarioObjEspecifico::where('id_usuario', $request->usuario)
+            ->where('id_objespecifico', $request->objeto)
+            ->first()){
+            return ['success' => 1];
+        }
+
+        $dato = new BodegaUsuarioObjEspecifico();
+        $dato->id_usuario = $request->usuario;
+        $dato->id_objespecifico = $request->objeto;
+        $dato->save();
+
+        return ['success' => 2];
+    }
+
+
+
+
+    public function borrarUsuarioBodegaObjEspecifico(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(BodegaUsuarioObjEspecifico::where('id', $request->id)->first()){
+            BodegaUsuarioObjEspecifico::where('id', $request->id)->delete();
+        }
+
+        return ['success' => 1];
+    }
+
+
+
+
 
 
 
