@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Backend\Bodega;
 
 use App\Http\Controllers\Controller;
+use App\Models\BodegaEntradas;
+use App\Models\BodegaEntradasDetalle;
 use App\Models\BodegaMateriales;
 use App\Models\BodegaSolicitud;
 use App\Models\BodegaSolicitudDetalle;
@@ -243,11 +245,12 @@ class BSolicitudesController extends Controller
     public function indexDetalleSolicitudesPendientes($idsolicitud)
     {
 
-        $arrayReferencia = BodegaSolicitudDetalle::where('id_bodesolicitud', $idsolicitud)
+        $arraySinReferencia = BodegaSolicitudDetalle::where('id_bodesolicitud', $idsolicitud)
+            ->where('id_referencia', null)
             ->orderBy('nombre', 'asc')
             ->get();
 
-        foreach ($arrayReferencia as $fila){
+        foreach ($arraySinReferencia as $fila){
             $infoUnidad = P_UnidadMedida::where('id', $fila->id_unidad)->first();
             $fila->unidadMedida = $infoUnidad->nombre;
         }
@@ -264,18 +267,44 @@ class BSolicitudesController extends Controller
             ->orderBy('nombre', 'asc')
             ->get();
 
+
+        // LISTADO QUE YA TIENEN UNA REFERENCIA
+        $arrayReferencia = BodegaSolicitudDetalle::where('id_bodesolicitud', $idsolicitud)
+            ->where('id_referencia', '!=', null)
+            ->orderBy('nombre', 'asc')
+            ->get();
+
+        $contadorFila = 1;
+        foreach ($arrayReferencia as $fila){
+            $fila->numeralFila = $contadorFila;
+            $contadorFila++;
+            $infoUnidad = P_UnidadMedida::where('id', $fila->id_unidad)->first();
+            $fila->unidadMedida = $infoUnidad->nombre;
+
+            if($fila->estado == 1){
+                $nombreEstado = "Pendiente";
+            }
+            else if($fila->estado == 2){
+                $nombreEstado = "Entregado";
+            }
+            else if($fila->estado == 3){
+                $nombreEstado = "Entregado/Parcial";
+            }else{
+                $nombreEstado = "Denegado";
+            }
+            $fila->nombreEstado = $nombreEstado;
+
+            // siempre tendra referencia
+            $infoMaterial = BodegaMateriales::where('id', $fila->id_referencia)->first();
+            $fila->nombreReferencia = $infoMaterial->nombre;
+        }
+
+
         return view('backend.admin.bodega.solicitudespendientes.pendientes.detalle.vistadetallesolicitudpendiente',
-        compact('idsolicitud', 'arrayReferencia', 'arrayMateriales'));
+        compact('idsolicitud', 'arraySinReferencia', 'arrayMateriales', 'arrayReferencia'));
     }
 
-    public function tablaDetalleSolicitudesPendientes($idsolicitud)
-    {
 
-
-        return "dfgreg";
-
-        return view('backend.admin.bodega.solicitudespendientes.pendientes.detalle.tabladetallesolicitudpendiente');
-    }
 
 
 
@@ -292,13 +321,119 @@ class BSolicitudesController extends Controller
         $info = BodegaSolicitudDetalle::where('id', $request->id)->first();
         $infoUnidad = P_UnidadMedida::where('id', $info->id_unidad)->first();
         $nombreUnidad = $infoUnidad->nombre;
+        $infoMaterial = BodegaMateriales::where('id', $info->id_referencia)->first();
+        $nombreMaterial = $infoMaterial->nombre;
 
+        return ['success' => 1, 'info' => $info,
+            'nombreUnidad' => $nombreUnidad,
+            'nombreMaterial' => $nombreMaterial];
+    }
 
-        return ['success' => 1, 'info' => $info, 'nombreUnidad' => $nombreUnidad];
+    public function asignarReferenciaMaterialSolicitado(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+            'idmaterial' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        // verificar que no tenga ya referencia
+        if($info = BodegaSolicitudDetalle::where('id', $request->id)->first()){
+            if ($info->id_referencia == null) {
+
+                BodegaSolicitudDetalle::where('id', $request->id)->update([
+                    'id_referencia' => $request->idmaterial
+                ]);
+
+                return ['success' => 2];
+            }else{
+                return ['success' => 1];// ya tiene referencia, asi que error
+            }
+        }else{
+            return ['success' => 99];
+        }
     }
 
 
+    public function modificarEstadoFilaSolicitud(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+            'idestado' => 'required'
+        );
 
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(BodegaSolicitudDetalle::where('id', $request->id)->first()){
+
+            BodegaSolicitudDetalle::where('id', $request->id)->update([
+                'estado' => $request->idestado
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 99];
+        }
+    }
+
+
+    public function infoBodegaMaterialLoteDetalleFila(Request $request)
+    {
+        $regla = array(
+            'id' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        $info = BodegaSolicitudDetalle::where('id', $request->id)->first();
+        $infoUnidad = P_UnidadMedida::where('id', $info->id_unidad)->first();
+        $nombreUnidad = $infoUnidad->nombre;
+        $infoMaterial = BodegaMateriales::where('id', $info->id_referencia)->first();
+        $nombreMaterial = $infoMaterial->nombre;
+
+        // listado del mismo material pero de diferentes lotes para retirar
+
+        $listado = BodegaEntradasDetalle::where('id_material', $info->id_referencia)
+            ->whereColumn('cantidad_entregada', '<', 'cantidad')
+            ->get();
+
+        foreach ($listado as $fila){
+            $infoPadre = BodegaEntradas::where('id', $fila->id_entrada)->first();
+
+            $fila->lote = $infoPadre->lote;
+
+            $fecha = date("d-m-Y", strtotime($infoPadre->fecha));
+            $fila->fechaIngreso = $fecha;
+        }
+
+        return ['success' => 1, 'info' => $info,
+            'nombreUnidad' => $nombreUnidad,
+            'nombreMaterial' => $nombreMaterial,
+            'arrayIngreso' => $listado];
+    }
+
+
+    public function registrarSalidaBodegaSolicitud(Request $request)
+    {
+        $regla = array(
+            'fecha' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        Log::info($request->all());
+
+        return ['success' => 1];
+    }
 
 
 }

@@ -23,6 +23,8 @@ class CreateBodegaEntradasDetalleTable extends Migration
             // solo es un nombre copia de respaldo
             $table->string('nombre_copia', 300);
 
+            $table->integer('cantidad_entregada');
+
             $table->foreign('id_entrada')->references('id')->on('bodega_entradas');
             $table->foreign('id_material')->references('id')->on('bodega_materiales');
         });

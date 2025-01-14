@@ -20,6 +20,8 @@ class CreateBodegaSolicitudDetalleTable extends Migration
             $table->bigInteger('id_referencia')->unsigned()->nullable();
 
             $table->string('nombre', 300);
+
+            // se va ir sumando y restando la cantidad global
             $table->integer('cantidad');
             $table->integer('prioridad'); // 1- baja 2- media 3- alta  // dado por el solicitante
 

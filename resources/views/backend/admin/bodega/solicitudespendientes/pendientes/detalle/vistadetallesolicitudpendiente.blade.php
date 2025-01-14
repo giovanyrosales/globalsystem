@@ -33,7 +33,7 @@
         </div>
     </section>
 
-    @if($arrayReferencia->isNotEmpty())
+    @if($arraySinReferencia->isNotEmpty())
 
     <section class="content">
         <div class="container-fluid">
@@ -55,7 +55,7 @@
                                 </thead>
                                 <tbody>
 
-                            @foreach($arrayReferencia as $fila)
+                            @foreach($arraySinReferencia as $fila)
                                 <tr>
                                     <td style="width: 3%">{{ $fila->nombre }}</td>
                                     <td style="width: 2%">{{ $fila->unidadMedida }}</td>
@@ -79,24 +79,81 @@
 
     @endif
 
+    @if($arrayReferencia->isNotEmpty())
 
     <section class="content">
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
+                    <h3 class="card-title">Materiales con Referencia</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <div id="tablaDatatable">
-                            </div>
+
+                            <table id="tabla" class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                    <th style="width: 2%">#</th>
+                                    <th style="width: 7%">Solicitado</th>
+                                    <th style="width: 7%">Referencia</th>
+                                    <th style="width: 2%">U/M</th>
+                                    <th style="width: 2%">Cantidad Solicitado</th>
+                                    <th style="width: 3%">Estado</th>
+                                    <th style="width: 2%">Cantidad Entregada</th>
+                                    <th style="width: 4%">Opciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                @foreach($arrayReferencia as $fila)
+                                    <tr>
+                                        <td style="width: 2%">{{ $fila->numeralFila }}</td>
+                                        <td style="width: 7%">{{ $fila->nombre }}</td>
+                                        <td style="width: 7%">{{ $fila->nombreReferencia }}</td>
+                                        <td style="width: 2%">{{ $fila->unidadMedida }}</td>
+                                        <td style="width: 2%">{{ $fila->cantidad }}</td>
+                                        <td style="width: 3%">
+                                            @if($fila->estado == 1)
+                                                <span class="badge bg-gray-dark">{{ $fila->nombreEstado }}</span>
+                                            @elseif($fila->estado == 2)
+                                                <span class="badge bg-success">{{ $fila->nombreEstado }}</span>
+                                            @elseif($fila->estado == 3)
+                                                <span class="badge bg-warning">{{ $fila->nombreEstado }}</span>
+                                            @else
+                                                <span class="badge bg-danger">{{ $fila->nombreEstado }}</span>
+                                            @endif
+                                        </td>
+                                        <td style="width: 2%">xx</td>
+                                        <td style="width: 4%">
+                                            <button type="button" class="btn btn-success btn-xs"
+                                                    onclick="vistaAgregarMaterial({{ $fila->id }})">
+                                                <i class="fas fa-plus" title="Agregar"></i>&nbsp; Agregar
+                                            </button>
+
+                                            <button type="button" class="btn btn-info btn-xs" onclick="vistaCambiarEstado({{ $fila->id }})" style="color: white; margin: 3px">
+                                                <i class="fas fa-eye" title="Estado" style="color: white;"></i>&nbsp; Estado
+                                            </button>
+
+                                            <button type="button" class="btn btn-warning btn-xs" onclick="vistaCambiarReferencia({{ $fila->id }})" style="color: white; margin: 3px">
+                                                <i class="fas fa-edit" title="Referencia" style="color: white;"></i>&nbsp; Referencia
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+
+                                </tbody>
+                            </table>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    @endif
+
 
 
     <div class="modal fade" id="modalAgregar">
@@ -143,11 +200,134 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="nuevo()">Guardar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="nuevaAsignacion()">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalEstado">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Asignación de Estado</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-estado">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" disabled class="form-control" id="id-refestado" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Estado</label>
+                                        <select class="form-control" id="select-estadoref">
+                                            <option value="1">Pendiente</option>
+                                            <option value="2">Entregado</option>
+                                            <option value="3">Entregado/Parcial</option>
+                                            <option value="4">Denegado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="cambiarEstadoFila()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="modalCantidad">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Salida de Material</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-material">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" disabled class="form-control" id="id-salidamaterial" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group col-md-2">
+                                        <label>Fecha de Salida</label>
+                                        <input type="date" class="form-control" id="info-fechasalida" autocomplete="off">
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label>Cantidad Solicitada</label>
+                                            <input type="text" disabled class="form-control" id="info-cantidadsolicitada" autocomplete="off">
+                                        </div>
+
+                                        <div class="form-group" style="margin-left: 15px">
+                                            <label>Cantidad Entregada</label>
+                                            <input type="text" disabled class="form-control" id="info-cantidadentregada" autocomplete="off">
+                                        </div>
+
+                                        <div class="form-group" style="margin-left: 15px">
+                                            <label>Unidad Medida</label>
+                                            <input type="text" disabled class="form-control" id="info-unidadmedida" autocomplete="off">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Producto</label>
+                                        <input type="text" disabled class="form-control" id="info-nombrematerial" autocomplete="off">
+                                    </div>
+
+                                    <hr>
+
+                                    <!-- ** TABLA PARA SALIDAS DE MATERIAL POR DIFERENTE LOTE ** -->
+                                    <!-- ** CARGARA LOS MATERIALES ASIGNADOS Y DISPONIBLES, MAYOR A CERO ** -->
+
+                                    <table class="table" id="matriz" data-toggle="table" style="margin-right: 15px; margin-left: 15px;">
+                                        <thead>
+                                        <tr>
+                                            <th style="width: 3%">#</th>
+                                            <th style="width: 5%">Lote</th>
+                                            <th style="width: 5%">Cantidad Actual</th>
+                                            <th style="width: 5%">Cantidad Salida</th>
+
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="guardarNuevaSalida()">Guardar Salida</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
 </div>
@@ -167,9 +347,6 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            let id = {{ $idsolicitud }};
-            var ruta = "{{ URL::to('/admin/bodega/solicitudpendiente/detalle/tabla') }}/" + id;
-            $('#tablaDatatable').load(ruta);
 
             $('#select-materiallote').select2({
                 theme: "bootstrap-5",
@@ -185,12 +362,6 @@
     </script>
 
     <script>
-
-        function recargar(){
-            let id = {{ $idsolicitud }};
-            var ruta = "{{ URL::to('/admin/bodega/solicitudpendiente/detalle/tabla') }}/" + id;
-            $('#tablaDatatable').load(ruta);
-        }
 
 
         function vistaAsignar(id){
@@ -218,7 +389,331 @@
                 });
         }
 
+        function nuevaAsignacion(){
 
+            // id: bodega_solicitud_detalle
+            var id = document.getElementById('id-referencia').value;
+            var idMaterial = document.getElementById('select-materiallote').value;
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('idmaterial', idMaterial);
+
+            axios.post(url+'/bodega/solicitudpendiente/asignar/referencia', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        // error, ya tenia referencia
+                        errorReferencia()
+                    }
+                    else if(response.data.success === 2){
+                        toastr.success('Actualizado correctamente');
+                        location.reload();
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+        function errorReferencia(){
+            Swal.fire({
+                title: 'Error',
+                text: "La solicitud de material ya tenia un material asignado.",
+                icon: 'info',
+                showCancelButton: false,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Recargar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload();
+                }
+            })
+        }
+
+        function vistaCambiarEstado(id){
+
+            openLoading()
+
+            var formData = new FormData();
+            formData.append('id', id);
+
+            axios.post(url+'/bodega/solicitudpendiente/infobodesolituddetalle', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        $('#id-refestado').val(id);
+
+                        const selectElement = document.getElementById('select-estadoref');
+                        if(response.data.info.estado === 1){
+                            selectElement.selectedIndex = 0;
+                        }else if(response.data.info.estado === 2){
+                            selectElement.selectedIndex = 1;
+                        }else if(response.data.info.estado === 3){
+                            selectElement.selectedIndex = 2;
+                        }else{
+                            selectElement.selectedIndex = 3;
+                        }
+
+                        $('#modalEstado').modal('show');
+                    }
+                    else {
+                        toastr.error('Error');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error');
+                    closeLoading();
+                });
+        }
+
+
+        function cambiarEstadoFila(){
+
+            var id = document.getElementById('id-refestado').value;
+            var idestado = document.getElementById('select-estadoref').value;
+
+            openLoading()
+
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('idestado', idestado);
+
+            axios.post(url+'/bodega/solicitudpendiente/modificar/estadofila', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        location.reload();
+                    }
+                    else {
+                        toastr.error('Error');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error');
+                    closeLoading();
+                });
+        }
+
+        // agregar material directamente por fila
+        function vistaAgregarMaterial(id){
+            openLoading()
+
+            var formData = new FormData();
+            formData.append('id', id);
+            $("#matriz tbody tr").remove();
+
+            axios.post(url+'/bodega/solicitudpendiente/infomaterialsalidalote', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#id-salidamaterial').val(id);
+                        $('#info-cantidadsolicitada').val(response.data.info.cantidad);
+                        $('#info-cantidadentregada').val(response.data.info.cantidad_entregada);
+                        $('#info-nombrematerial').val(response.data.nombreMaterial);
+                        $('#info-unidadmedida').val(response.data.nombreUnidad);
+                        $('#modalCantidad').modal({backdrop: 'static', keyboard: false})
+
+                        $.each(response.data.arrayIngreso, function( key, val ){
+
+                            var nFilas = $('#matriz >tbody >tr').length;
+                            nFilas += 1;
+
+                            var markup = "<tr>" +
+
+                                "<td>" +
+                                "<p id='fila" + (nFilas) + "' class='form-control' style='max-width: 65px'>" + (nFilas) + "</p>" +
+                                "</td>" +
+
+                                "<td>" +
+                                "<input disabled value='" + val.lote + "' class='form-control' type='text'>" +
+                                "</td>" +
+
+                                "<td>" +
+                                "<input name='arrayCantidadActual[]' disabled value='" + val.cantidad + "' class='form-control' type='number'>" +
+                                "</td>" +
+
+                                "<td>" +
+                                "<input " +
+                                "class='form-control' data-idfilaentradadetalle='" + val.id + "' name='arrayCantidadSalida[]' min='0' max='" + val.cantidad + "' " +
+                                "type='number' " +
+                                "onkeydown=\"return validateInput(event);\" " +
+                                "oninput=\"validateCantidadSalida(this, " + val.cantidad + ");\">" +
+                                "</td>" +
+
+                                "</tr>";
+
+                            $("#matriz tbody").append(markup);
+
+                        });
+                    }
+                    else {
+                        toastr.error('Error');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error');
+                    closeLoading();
+                });
+        }
+
+        function validateCantidadSalida(input, maxCantidad) {
+            // Remueve caracteres no numéricos
+            input.value = input.value.replace(/[^0-9]/g, '');
+
+            // Convierte el valor a número y verifica el límite
+            if (Number(input.value) > maxCantidad) {
+                input.value = maxCantidad; // Restringe el valor al máximo permitido
+            }
+        }
+
+        function validateInput(event) {
+            const key = event.key;
+
+            // Permitir teclas de navegación y control
+            if (["Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"].includes(key)) {
+                return true;
+            }
+
+            // Bloquear la tecla "e", signos negativos y todos excepto números
+            if (key === "e" || key === "E" || key === "-" || isNaN(Number(key))) {
+                return false;
+            }
+
+            return true;
+        }
+
+
+        function guardarNuevaSalida(){
+            var fecha = document.getElementById('info-fechasalida').value;
+            var infoCantidadSolicitada = document.getElementById('info-cantidadsolicitada').value;
+            var infoCantidadEntregada = document.getElementById('info-cantidadentregada').value;
+
+            if(fecha === ''){
+                toastr.error('Fecha de Salida es requerida');
+                return
+            }
+
+            // id
+            var arrayIdEntradaDetalle = $("input[name='arrayCantidadSalida[]']").map(function(){return $(this).attr("data-idfilaentradadetalle");}).get();
+            // cantidad salida
+            var arrayCantidadSalida = $("input[name='arrayCantidadSalida[]']").map(function(){return $(this).val();}).get();
+
+            colorBlancoTabla()
+            var cantidadSalida = 0;
+            var habraSalida = true;
+
+            // recorrer y verificar
+            for(var a = 0; a < arrayCantidadSalida.length; a++){
+
+                let filaCantidad = arrayCantidadSalida[a];
+
+                if(filaCantidad !== ''){
+                    if(filaCantidad <= 0){
+                        colorRojoTabla(a);
+                        alertaMensaje('info', 'Error', 'En la Fila #' + (a+1) + " No se permite ingreso de Cero, por favor borrarlo");
+                        return
+                    }
+                    habraSalida = false;
+                    cantidadSalida += Number(filaCantidad);
+                }
+            }
+            let sumaSalida = Number(infoCantidadEntregada) + cantidadSalida;
+            // comprobar que no supere cantidad
+            if(sumaSalida > Number(infoCantidadSolicitada)){
+                Swal.fire({
+                    title: 'Error',
+                    text: "La suma de Cantidad de Salida supera a la Cantidad solicitada con la Cantidad ya Entregada",
+                    icon: 'info',
+                    showCancelButton: false,
+                    allowOutsideClick: false,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Recargar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                    }
+                })
+
+                return
+            }
+
+            if(habraSalida){
+                toastr.error('Registrar mínimo 1 salida');
+                return
+            }
+
+            let formData = new FormData();
+            const contenedorArray = [];
+            //** PASO VALIDACIONES
+            for(var a = 0; a < arrayCantidadSalida.length; a++){
+
+                let filaCantidadSalida = arrayCantidadSalida[a];
+                let infoIdEntradaDetalle = arrayIdEntradaDetalle[a];
+
+                if(filaCantidadSalida !== ''){ // evitar vacios
+                    contenedorArray.push({ infoIdEntradaDetalle, filaCantidadSalida });
+                }
+            }
+            formData.append('fecha', fecha);
+
+            axios.post(url+'/bodega/solicitudpendiente/registrarsalida', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        // cuando va vacio
+                    }
+                    else if(response.data.success === 2){
+                        // cuando supera la cantidad a sacar
+                    }
+                    else if(response.data.success === 3){
+                        // esta sacando mas material del no disponible x fila
+                    }
+                    else{
+                        toastr.error('error al guardar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('error al guardar');
+                    closeLoading();
+                });
+        }
+
+        function colorRojoTabla(index){
+            $("#matriz tr:eq("+(index+1)+")").css('background', '#F1948A');
+        }
+
+        function colorBlancoTabla(){
+            $("#matriz tbody tr").css('background', 'white');
+        }
+
+
+        // solo podra cambiar referencia de material sino tiene ninguna salida
+        function vistaCambiarReferencia(id){
+
+
+
+        }
 
 
     </script>

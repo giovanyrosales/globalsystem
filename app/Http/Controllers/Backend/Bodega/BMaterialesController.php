@@ -248,6 +248,7 @@ class BMaterialesController extends Controller
                 $detalle->cantidad = $filaArray['infoCantidad'];
                 $detalle->precio = $filaArray['infoPrecio'];
                 $detalle->nombre_copia = $infoProducto->nombre;
+                $detalle->cantidad_entregada = 0;
                 $detalle->save();
 
                 // por cada entrada detalle se sumara la cantidad en bodega_materiales a su producto

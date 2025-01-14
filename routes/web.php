@@ -1302,18 +1302,21 @@ Route::get('/admin/bodega/solicitudpendiente/tabla', [BSolicitudesController::cl
 Route::post('/admin/bodega/solicitudpendiente/estadofinalizar', [BSolicitudesController::class, 'cambiarEstadoAFinalizar']);
 
 Route::get('/admin/bodega/solicitudpendiente/detalle/index/{id}', [BSolicitudesController::class,'indexDetalleSolicitudesPendientes']);
-Route::get('/admin/bodega/solicitudpendiente/detalle/tabla/{id}', [BSolicitudesController::class,'tablaDetalleSolicitudesPendientes']);
 
-// informacion de fila bodega_solicitud_detalla
+// informacion de fila bodega_solicitud_detalle
 Route::post('/admin/bodega/solicitudpendiente/infobodesolituddetalle', [BSolicitudesController::class, 'infoBodegaSolitudDetalleFila']);
 
+// asignar referencia a un material de una solicitud.
+Route::post('/admin/bodega/solicitudpendiente/asignar/referencia', [BSolicitudesController::class, 'asignarReferenciaMaterialSolicitado']);
 
+// modificar estado de un material solicitado fila
+Route::post('/admin/bodega/solicitudpendiente/modificar/estadofila', [BSolicitudesController::class, 'modificarEstadoFilaSolicitud']);
 
+// informacion de lista de materiales lote para dar salida final
+Route::post('/admin/bodega/solicitudpendiente/infomaterialsalidalote', [BSolicitudesController::class, 'infoBodegaMaterialLoteDetalleFila']);
 
-
-
-
-
+// registrar salida final de materiales
+Route::post('/admin/bodega/solicitudpendiente/registrarsalida', [BSolicitudesController::class, 'registrarSalidaBodegaSolicitud']);
 
 
 
