@@ -15,8 +15,11 @@ class CreateBodegaSalidasTable extends Migration
     {
         Schema::create('bodega_salidas', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('fecha');
+
+            $table->date('fecha');
             $table->bigInteger('id_usuario')->unsigned(); // quien hizo la salida
+
+            // se manda el id de solicitud unidad
             $table->bigInteger('id_solicitud')->unsigned();
 
             $table->foreign('id_usuario')->references('id')->on('usuario');

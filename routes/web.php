@@ -1322,6 +1322,10 @@ Route::post('/admin/bodega/solicitudpendiente/registrarsalida', [BSolicitudesCon
 
 
 
+
+
+
+
 // ACTUALIZAR TABLA DE COSTOS 11/09/2024
 //Route::post('/admin/actualizartabla', [SolicitudesITController::class, 'actualizarTabla']);
 

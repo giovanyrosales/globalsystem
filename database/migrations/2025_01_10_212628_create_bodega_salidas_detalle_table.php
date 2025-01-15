@@ -16,9 +16,11 @@ class CreateBodegaSalidasDetalleTable extends Migration
         Schema::create('bodega_salidas_detalle', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_salida')->unsigned();
-            $table->bigInteger('id_solidetalle')->unsigned(); // solicitud detalle
 
-            // nunca superara la cantidad a salir con la solicitada
+            // bodega solicitud detalle
+            $table->bigInteger('id_solidetalle')->unsigned();
+
+            // cantidad entregada
             $table->integer('cantidad_salida');
 
             $table->foreign('id_salida')->references('id')->on('bodega_salidas');

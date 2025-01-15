@@ -50,6 +50,7 @@
                                 <tr>
                                     <th style="width: 8%">Nombre</th>
                                     <th style="width: 2%">U/M</th>
+                                    <th style="width: 3%">Estado</th>
                                     <th style="width: 2%">Opciones</th>
                                 </tr>
                                 </thead>
@@ -60,11 +61,35 @@
                                     <td style="width: 3%">{{ $fila->nombre }}</td>
                                     <td style="width: 2%">{{ $fila->unidadMedida }}</td>
                                     <td style="width: 2%">
+                                        @if($fila->estado == 1)
+                                            <span class="badge bg-gray-dark">{{ $fila->nombreEstado }}</span>
+                                        @else
+                                            <span class="badge bg-danger">{{ $fila->nombreEstado }}</span>
+                                        @endif
+                                    </td>
+
+                                    <td style="width: 2%">
+                                        @if($fila->estado == 1)
                                         <button type="button" class="btn btn-success btn-xs"
                                                 onclick="vistaAsignar({{ $fila->id }})">
                                             <i class="fas fa-plus" title="Referencia"></i>&nbsp; Referencia
                                         </button>
+                                        @endif
+
+                                        @if($fila->estado == 1)
+                                            <button type="button" class="btn btn-danger btn-xs"
+                                                    onclick="vistaModalDenegar({{ $fila->id }})">
+                                                <i class="fas fa-edit" title="Denegar"></i>&nbsp; Denegar
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-info btn-xs"
+                                                    onclick="vistaModalPendiente({{ $fila->id }})">
+                                                <i class="fas fa-edit" title="Pendiente"></i>&nbsp; Pendiente
+                                            </button>
+                                        @endif
+
                                     </td>
+
                                 </tr>
                             @endforeach
 
@@ -124,7 +149,7 @@
                                                 <span class="badge bg-danger">{{ $fila->nombreEstado }}</span>
                                             @endif
                                         </td>
-                                        <td style="width: 2%">xx</td>
+                                        <td style="width: 2%">{{ $fila->cantidad_entregada }}</td>
                                         <td style="width: 4%">
                                             <button type="button" class="btn btn-success btn-xs"
                                                     onclick="vistaAgregarMaterial({{ $fila->id }})">
@@ -186,7 +211,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Asignar Material - Lote</label>
+                                        <label>Asignar Material</label>
                                         <select class="form-control" id="select-materiallote">
                                             @foreach($arrayMateriales as $fila)
                                                 <option value="{{ $fila->id }}">{{ $fila->nombre }}</option>
@@ -515,7 +540,7 @@
             openLoading()
 
             var formData = new FormData();
-            formData.append('id', id);
+            formData.append('id', id); // bodega_solicitud_detalle
             $("#matriz tbody tr").remove();
 
             axios.post(url+'/bodega/solicitudpendiente/infomaterialsalidalote', formData, {
@@ -547,7 +572,7 @@
                                 "</td>" +
 
                                 "<td>" +
-                                "<input name='arrayCantidadActual[]' disabled value='" + val.cantidad + "' class='form-control' type='number'>" +
+                                "<input name='arrayCantidadActual[]' disabled  value='" + val.cantidadActual + "' class='form-control' type='number'>" +
                                 "</td>" +
 
                                 "<td>" +
@@ -605,9 +630,15 @@
             var fecha = document.getElementById('info-fechasalida').value;
             var infoCantidadSolicitada = document.getElementById('info-cantidadsolicitada').value;
             var infoCantidadEntregada = document.getElementById('info-cantidadentregada').value;
+            let idBodeSolicitudDetalle = document.getElementById('id-salidamaterial').value;
 
             if(fecha === ''){
                 toastr.error('Fecha de Salida es requerida');
+                return
+            }
+
+            if(idBodeSolicitudDetalle === ''){
+                toastr.error('ID bodega solicitud detalle es requerido');
                 return
             }
 
@@ -646,7 +677,7 @@
                     allowOutsideClick: false,
                     confirmButtonColor: '#28a745',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Recargar'
+                    confirmButtonText: 'Aceptar'
                 }).then((result) => {
                     if (result.isConfirmed) {
 
@@ -661,8 +692,11 @@
                 return
             }
 
+
+
             let formData = new FormData();
             const contenedorArray = [];
+
             //** PASO VALIDACIONES
             for(var a = 0; a < arrayCantidadSalida.length; a++){
 
@@ -673,7 +707,10 @@
                     contenedorArray.push({ infoIdEntradaDetalle, filaCantidadSalida });
                 }
             }
+
+            formData.append('contenedorArray', JSON.stringify(contenedorArray));
             formData.append('fecha', fecha);
+            formData.append('idbodesolidetalle', idBodeSolicitudDetalle); // bodega_solicitud_detalle
 
             axios.post(url+'/bodega/solicitudpendiente/registrarsalida', formData, {
             })
@@ -681,13 +718,19 @@
                     closeLoading();
 
                     if(response.data.success === 1){
-                        // cuando va vacio
+                        // cuando va vacio la salida
+                        toastr.error('Se requiere item de Salida');
                     }
                     else if(response.data.success === 2){
-                        // cuando supera la cantidad a sacar
+                        // VERIFICACION: No superar la cantidad maxima que hay de ese MATERIAL - LOTE
+                        toastr.error('Error, No superar la cantidad maxima que hay de ese MATERIAL - LOTE');
                     }
                     else if(response.data.success === 3){
-                        // esta sacando mas material del no disponible x fila
+                        // VERIFICACION: No superar la cantidad que solicito la UNIDAD
+                        toastr.error('Error, No superar la cantidad que solicito la UNIDAD');
+                    }
+                    else if(response.data.success === 10){
+                        msgActualizado()
                     }
                     else{
                         toastr.error('error al guardar');
@@ -697,6 +740,23 @@
                     toastr.error('error al guardar');
                     closeLoading();
                 });
+        }
+
+        function msgActualizado(){
+            Swal.fire({
+                title: 'Actualizado',
+                text: "",
+                icon: 'success',
+                showCancelButton: false,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Aceptar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload();
+                }
+            })
         }
 
         function colorRojoTabla(index){
@@ -715,6 +775,17 @@
 
         }
 
+
+
+        function vistaModalDenegar(id){
+
+
+        }
+
+        function vistaModalPendiente(id){
+
+
+        }
 
     </script>
 
