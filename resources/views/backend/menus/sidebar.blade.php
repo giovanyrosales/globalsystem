@@ -908,7 +908,7 @@
                             </li>
 
                             <li class="nav-item">
-                                <a href="" target="frameprincipal" class="nav-link">
+                                <a href="{{ route('sidebar.bodega.solicitudes.finalizadas') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Finalizadas</p>
                                 </a>

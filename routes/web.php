@@ -1262,6 +1262,11 @@ Route::post('/admin/bodega/materiales/nuevo', [BMaterialesController::class, 'nu
 Route::post('/admin/bodega/materiales/informacion', [BMaterialesController::class, 'informacionMaterial']);
 Route::post('/admin/bodega/materiales/editar', [BMaterialesController::class, 'editarMaterial']);
 
+// detalle de materiales -> Ver cantidad desglosado actual de cada lote
+Route::get('/admin/bodega/materialesdetalle/vista/index/{id}', [BMaterialesController::class,'indexDetalleMaterialCantidad']);
+Route::get('/admin/bodega/materialesdetalle/tabla/index/{id}', [BMaterialesController::class,'tablaDetalleMaterialCantidad']);
+
+
 // registrar entradas
 Route::get('/admin/bodega/entradasregistro/index', [BMaterialesController::class,'indexEntradasRegistro'])->name('sidebar.bodega.entradasregistro');
 Route::post('/admin/bodega/buscar/producto',  [BMaterialesController::class,'buscarProducto']);
@@ -1309,6 +1314,14 @@ Route::post('/admin/bodega/solicitudpendiente/infobodesolituddetalle', [BSolicit
 // asignar referencia a un material de una solicitud.
 Route::post('/admin/bodega/solicitudpendiente/asignar/referencia', [BSolicitudesController::class, 'asignarReferenciaMaterialSolicitado']);
 
+// cuando alguien solicito algo y no se tenga se puede denegar sin asignar referencia
+Route::post('/admin/bodega/noreferencia/estadodenegado', [BSolicitudesController::class, 'noReferenciaEstadoDenegado']);
+Route::post('/admin/bodega/noreferencia/estadopendiente', [BSolicitudesController::class, 'noReferenciaEstadoPendiente']);
+
+// cambiar la referencia unicamente sino ha entregado nada de producto
+Route::post('/admin/bodega/referencia/cambionuevoid', [BSolicitudesController::class, 'cambiarNuevaReferenciaProducto']);
+
+
 // modificar estado de un material solicitado fila
 Route::post('/admin/bodega/solicitudpendiente/modificar/estadofila', [BSolicitudesController::class, 'modificarEstadoFilaSolicitud']);
 
@@ -1320,6 +1333,10 @@ Route::post('/admin/bodega/solicitudpendiente/registrarsalida', [BSolicitudesCon
 
 
 
+//*** SOLICITUDES FINALIZADAS
+
+Route::get('/admin/bodega/solicitudfinalizadas/index', [BSolicitudesController::class,'indexSolicitudesFinalizadas'])->name('sidebar.bodega.solicitudes.finalizadas');
+Route::get('/admin/bodega/solicitudfinalizadas/tabla', [BSolicitudesController::class,'tablaSolicitudesFinalizadas']);
 
 
 

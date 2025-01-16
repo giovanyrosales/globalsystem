@@ -24,8 +24,8 @@
 
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Bodega</li>
-                    <li class="breadcrumb-item active">Mis Solicitudes</li>
+                    <li class="breadcrumb-item">Materiales</li>
+                    <li class="breadcrumb-item active">Cantidad - Actual</li>
                 </ol>
             </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Listado de Mis Solicitudes</h3>
+                    <h3 class="card-title">Listado</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -65,7 +65,9 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            var ruta = "{{ URL::to('/admin/bodega/missolicitudes/tabla') }}";
+
+            let id = {{ $idmaterial }};
+            var ruta = "{{ URL::to('/admin/bodega/materialesdetalle/tabla/index') }}/" + id;
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -75,13 +77,11 @@
     <script>
 
         function recargar(){
-            var ruta = "{{ url('/admin/bodega/missolicitudes/tabla') }}";
+            let id = {{ $idmaterial }};
+            var ruta = "{{ URL::to('/admin/bodega/materialesdetalle/tabla/index') }}/" + id;
             $('#tablaDatatable').load(ruta);
         }
 
-        function vistaDetalle(idsolicitud){
-            window.location.href="{{ url('/admin/bodega/missolicitudes/detalle/index') }}/" + idsolicitud;
-        }
 
     </script>
 

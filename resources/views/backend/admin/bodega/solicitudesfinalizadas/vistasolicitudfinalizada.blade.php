@@ -25,7 +25,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">Bodega</li>
-                    <li class="breadcrumb-item active">Solicitudes Pendientes</li>
+                    <li class="breadcrumb-item active">Solicitudes Finalizadas</li>
                 </ol>
             </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Listado Solicitudes Pendientes</h3>
+                    <h3 class="card-title">Listado Solicitudes Finalizadas</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -66,7 +66,7 @@
     <script type="text/javascript">
         $(document).ready(function(){
 
-            var ruta = "{{ URL::to('/admin/bodega/solicitudpendiente/tabla') }}";
+            var ruta = "{{ URL::to('/admin/bodega/solicitudfinalizadas/tabla') }}";
             $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -76,12 +76,12 @@
     <script>
 
         function recargar(){
-            var ruta = "{{ url('/admin/bodega/solicitudpendiente/tabla') }}";
+            var ruta = "{{ url('/admin/bodega/solicitudfinalizadas/tabla') }}";
             $('#tablaDatatable').load(ruta);
         }
 
         function vistaDetalle(idsolicitud){
-            window.location.href="{{ url('/admin/bodega/solicitudpendiente/detalle/index') }}/" + idsolicitud;
+            window.location.href="{{ url('/admin/bodega/xxxx') }}/" + xx;
         }
 
         function vistaEstado(id){

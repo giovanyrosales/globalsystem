@@ -160,9 +160,11 @@
                                                 <i class="fas fa-eye" title="Estado" style="color: white;"></i>&nbsp; Estado
                                             </button>
 
-                                            <button type="button" class="btn btn-warning btn-xs" onclick="vistaCambiarReferencia({{ $fila->id }})" style="color: white; margin: 3px">
-                                                <i class="fas fa-edit" title="Referencia" style="color: white;"></i>&nbsp; Referencia
-                                            </button>
+                                            @if($fila->existeSalida == 0)
+                                                <button type="button" class="btn btn-warning btn-xs" onclick="vistaCambiarReferencia({{ $fila->id }})" style="color: black; margin: 3px">
+                                                    <i class="fas fa-edit" title="Referencia" style="color: black;"></i>&nbsp; Referencia
+                                                </button>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -252,13 +254,19 @@
 
                                     <div class="form-group">
                                         <label>Estado</label>
-                                        <select class="form-control" id="select-estadoref">
+                                        <select class="form-control" id="select-estadoref" >
                                             <option value="1">Pendiente</option>
                                             <option value="2">Entregado</option>
                                             <option value="3">Entregado/Parcial</option>
                                             <option value="4">Denegado</option>
                                         </select>
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Nota</label>
+                                        <input type="text" maxlength="300" class="form-control" id="nota-estado" autocomplete="off">
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -271,7 +279,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="modal fade" id="modalCantidad">
         <div class="modal-dialog modal-xl">
@@ -354,6 +361,91 @@
     </div>
 
 
+    <!-- CUANDO UN ITEM ESTA EQUIVOCADO SE PUEDE DENEGAR -->
+
+    <div class="modal fade" id="modalDenegar">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Denegar</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-nuevo">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" disabled class="form-control" id="id-itemdenegar" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Nota</label>
+                                        <input type="text" maxlength="300" class="form-control" id="nota-denegar-v1" autocomplete="off">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white
+                     !important;" class="button button-rounded button-pill button-small" onclick="vistaModalDenegarGuardar()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- SI SE EQUIVOCA AL COLOCAR UNA REFERENCIA DE MATERIAL : SOLO PUEDE HACERLO SINO HA ENTREGADO NADA -->
+
+    <div class="modal fade" id="modalCambioReferencia">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Cambiar Referencia Material</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-cambioreferencia">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <label style="color: red">Solo podrá cambiar la referencia mientras no ha tenido ninguna salida de Producto</label>
+
+                                    <div class="form-group">
+                                        <input type="hidden" disabled class="form-control" id="id-cambioreferencia" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                    <label>Asignar Referencia</label>
+                                        <select class="form-control" id="select-nuevareferencia">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white
+                     !important;" class="button button-rounded button-pill button-small" onclick="guardarNuevaReferencia()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 </div>
 
@@ -374,6 +466,15 @@
         $(document).ready(function(){
 
             $('#select-materiallote').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Búsqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-nuevareferencia').select2({
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
@@ -473,6 +574,8 @@
             var formData = new FormData();
             formData.append('id', id);
 
+            document.getElementById('nota-estado').value = "";
+
             axios.post(url+'/bodega/solicitudpendiente/infobodesolituddetalle', formData, {
             })
                 .then((response) => {
@@ -481,6 +584,7 @@
                     if(response.data.success === 1){
 
                         $('#id-refestado').val(id);
+                        $('#nota-estado').val(response.data.info.nota);
 
                         const selectElement = document.getElementById('select-estadoref');
                         if(response.data.info.estado === 1){
@@ -490,6 +594,7 @@
                         }else if(response.data.info.estado === 3){
                             selectElement.selectedIndex = 2;
                         }else{
+                            // denegado
                             selectElement.selectedIndex = 3;
                         }
 
@@ -510,12 +615,14 @@
 
             var id = document.getElementById('id-refestado').value;
             var idestado = document.getElementById('select-estadoref').value;
+            var nota = document.getElementById('nota-estado').value;
 
             openLoading()
 
             var formData = new FormData();
             formData.append('id', id);
             formData.append('idestado', idestado);
+            formData.append('nota', nota);
 
             axios.post(url+'/bodega/solicitudpendiente/modificar/estadofila', formData, {
             })
@@ -723,11 +830,11 @@
                     }
                     else if(response.data.success === 2){
                         // VERIFICACION: No superar la cantidad maxima que hay de ese MATERIAL - LOTE
-                        toastr.error('Error, No superar la cantidad maxima que hay de ese MATERIAL - LOTE');
+                        mensajeError("Error, No superar la cantidad maxima que hay de ese MATERIAL - LOTE")
                     }
                     else if(response.data.success === 3){
                         // VERIFICACION: No superar la cantidad que solicito la UNIDAD
-                        toastr.error('Error, No superar la cantidad que solicito la UNIDAD');
+                        mensajeError("Error, No superar la cantidad que solicito la UNIDAD")
                     }
                     else if(response.data.success === 10){
                         msgActualizado()
@@ -740,6 +847,23 @@
                     toastr.error('error al guardar');
                     closeLoading();
                 });
+        }
+
+        function mensajeError(mensaje){
+            Swal.fire({
+                title: 'Error',
+                text: mensaje,
+                icon: 'info',
+                showCancelButton: false,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Recargar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    location.reload();
+                }
+            })
         }
 
         function msgActualizado(){
@@ -768,24 +892,160 @@
         }
 
 
-        // solo podra cambiar referencia de material sino tiene ninguna salida
+        // SOLO PODRA CAMBIAR REFERENCIA A MATERIAL SINO TIENE NINGUNA SALIDA
+        // OBTENER INFORMACION DE NUEVO CAMBIO
         function vistaCambiarReferencia(id){
 
+            openLoading();
+            document.getElementById("formulario-cambioreferencia").reset();
+
+            axios.post(url+'/bodega/solicitudpendiente/infobodesolituddetalle',{
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        $('#modalCambioReferencia').modal('show');
+                        $('#id-cambioreferencia').val(id);
+
+                        document.getElementById("select-nuevareferencia").options.length = 0;
+
+                        $.each(response.data.arrayMateriales, function( key, val ){
+                            if(response.data.info.id_referencia == val.id){
+                                $('#select-nuevareferencia').append('<option value="' +val.id +'" selected="selected">'+val.nombre+'</option>');
+                            }else{
+                                $('#select-nuevareferencia').append('<option value="' +val.id +'">'+val.nombre+'</option>');
+                            }
+                        });
+
+                    }else{
+                        toastr.error('Información no encontrada');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Información no encontrada');
+                });
+        }
 
 
+        // Podra cambiar la referencia de material solamente sino ha entregado nada
+        function guardarNuevaReferencia(){
+
+            var idBodeSoliDetalle = document.getElementById('id-cambioreferencia').value; // bodega_solicitud_detalle
+            var idReferencia = document.getElementById('select-nuevareferencia').value;
+
+            if(idReferencia === ''){
+                toastr.error('Referencia Material no encontrada');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('id', idBodeSoliDetalle); // bodega_solicitud_detalle
+            formData.append('idReferencia', idReferencia);
+
+            openLoading();
+            axios.post(url+'/bodega/referencia/cambionuevoid', formData,{
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        mensajeError("Esta solicitud ya tiene una salida de Producto.");
+                    }
+                    else if(response.data.success === 2) {
+                        msgActualizado()
+                    }
+                    else{
+                        toastr.error('Error al actualizar');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Error al actualizar');
+                });
         }
 
 
 
         function vistaModalDenegar(id){
+            $('#id-itemdenegar').val(id); // bodega_solicitud_detalle
+            $('#modalDenegar').modal('show');
+        }
 
+        function vistaModalDenegarGuardar(){
 
+            var id = document.getElementById('id-itemdenegar').value;  // bodega_solicitud_detalle
+            var nota = document.getElementById('nota-denegar-v1').value;
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('nota', nota);
+
+            axios.post(url+'/bodega/noreferencia/estadodenegado', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        msgActualizado()
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
         }
 
         function vistaModalPendiente(id){
-
-
+            Swal.fire({
+                title: 'Cambiar Estado',
+                text: "Se pasara a estado Pendiente",
+                icon: 'info',
+                showCancelButton: true,
+                allowOutsideClick: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: "Cancelar",
+                confirmButtonText: 'Guardar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    vistaModalPendienteGuardar(id)
+                }
+            })
         }
+
+        function vistaModalPendienteGuardar(id){
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+
+            axios.post(url+'/bodega/noreferencia/estadopendiente', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        msgActualizado()
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+
 
     </script>
 

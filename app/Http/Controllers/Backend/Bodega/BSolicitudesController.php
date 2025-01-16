@@ -286,6 +286,7 @@ class BSolicitudesController extends Controller
         }
 
 
+
         // LISTADO QUE YA TIENEN UNA REFERENCIA
         $arrayReferencia = BodegaSolicitudDetalle::where('id_bodesolicitud', $idsolicitud)
             ->where('id_referencia', '!=', null)
@@ -319,6 +320,13 @@ class BSolicitudesController extends Controller
             $fila->nombreEstado = $nombreEstado;
 
 
+            // VERIFICAR QUE SI TIENE ALGUNA SALIDA ESTA SOLICITUD_DETALLE_MATERIAL
+            // PARA OCULTAR EL BOTON DE CAMBIAR REFERENCIA PARA PRODUCTO
+            $existeSalida = 0;
+            if(BodegaSalidaDetalle::where('id_solidetalle', $fila->id)->first()){
+                $existeSalida = 1;
+            }
+            $fila->existeSalida = $existeSalida;
         }
 
 
@@ -344,9 +352,25 @@ class BSolicitudesController extends Controller
         $infoUnidad = P_UnidadMedida::where('id', $info->id_unidad)->first();
         $nombreUnidad = $infoUnidad->nombre;
 
+
+
+
+        $pilaObjEspeci = array();
+        $infoAuth = auth()->user();
+        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
+
+        foreach ($arrayCodigo as $fila){
+            array_push($pilaObjEspeci, $fila->id_objespecifico);
+        }
+        // array de materiales
+        $arrayMateriales = BodegaMateriales::where('id_objespecifico', $pilaObjEspeci)
+        ->orderBy('nombre', 'asc')->get();
+
         return ['success' => 1, 'info' => $info,
             'nombreUnidad' => $nombreUnidad,
-            'nombreMaterial' => $info->nombre];
+            'nombreMaterial' => $info->nombre,
+            'arrayMateriales' => $arrayMateriales,
+        ];
     }
 
     public function asignarReferenciaMaterialSolicitado(Request $request)
@@ -378,11 +402,35 @@ class BSolicitudesController extends Controller
     }
 
 
-    public function modificarEstadoFilaSolicitud(Request $request)
+    public function noReferenciaEstadoDenegado(Request $request)
     {
         $regla = array(
             'id' => 'required',
-            'idestado' => 'required'
+        );
+
+        // nota
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(BodegaSolicitudDetalle::where('id', $request->id)->first()){
+
+            BodegaSolicitudDetalle::where('id', $request->id)->update([
+                'estado' => 4, // denegado
+                'nota' => $request->nota
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 99];
+        }
+    }
+
+    public function noReferenciaEstadoPendiente(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -392,7 +440,69 @@ class BSolicitudesController extends Controller
         if(BodegaSolicitudDetalle::where('id', $request->id)->first()){
 
             BodegaSolicitudDetalle::where('id', $request->id)->update([
-                'estado' => $request->idestado
+                'estado' => 1, // pendiente
+                'nota' => ""
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 99];
+        }
+    }
+
+
+    public function cambiarNuevaReferenciaProducto(Request $request)
+    {
+
+        $regla = array(
+            'id' => 'required', //  bodega_solicitud_detalle
+            'idReferencia' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(BodegaSolicitudDetalle::where('id', $request->id)->first()){
+
+            // NO SE PUEDE CAMBIAR LA REFERENCIA DE PRODUCTO PORQUE YA HIZO UNA SALIDA
+            if(BodegaSalidaDetalle::where('id_solidetalle', $request->id)->first()){
+                return ['success' => 1];
+            }
+
+            BodegaSolicitudDetalle::where('id', $request->id)->update([
+                'id_referencia' => $request->idReferencia,
+            ]);
+
+            return ['success' => 2];
+        }else{
+            return ['success' => 99];
+        }
+    }
+
+
+
+
+
+
+    public function modificarEstadoFilaSolicitud(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+            'idestado' => 'required'
+        );
+
+        // nota
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(BodegaSolicitudDetalle::where('id', $request->id)->first()){
+
+            BodegaSolicitudDetalle::where('id', $request->id)->update([
+                'estado' => $request->idestado,
+                'nota' => $request->nota
             ]);
 
             return ['success' => 1];
@@ -483,12 +593,10 @@ class BSolicitudesController extends Controller
                 // verificar cantidad que hay en la entrada_detalla
                 $infoFilaEntradaDetalle = BodegaEntradasDetalle::where('id', $filaArray['infoIdEntradaDetalle'])->first();
 
-                // cantidad Global que ya ha sido entregada del lote de ese material + todas las salidas que ha tenido
-                $cantidadGlobalEntregada = $infoFilaEntradaDetalle->cantidad_entregada;
 
-
-                // VERIFICACION: No superar la cantidad maxima que hay de ese MATERIAL - LOTE
-                if(($cantidadGlobalEntregada + $filaArray['filaCantidadSalida']) > $infoFilaEntradaDetalle->cantidad){
+                // VERIFICACION:NO SUPERAR LA CANTIDAD_ENTREGADA TOTAL DE ESE MATERIAL-LOTE SEA MAYOR A LA CANTIDAD INGRESADA POR EL BODEGUERO DE ESE MATERIAL-LOTE
+                $suma1 = $infoFilaEntradaDetalle->cantidad_entregada + $filaArray['filaCantidadSalida'];
+                if($suma1 > $infoFilaEntradaDetalle->cantidad){
                     return ['success' => 2];
                 }
 
@@ -496,7 +604,8 @@ class BSolicitudesController extends Controller
                 $infoBodeSoliDetalleUpdate = BodegaSolicitudDetalle::where('id', $request->idbodesolidetalle)->first();
 
                 // VERIFICACION: No superar la cantidad que solicito la UNIDAD
-                if(($infoBodeSoliDetalleUpdate->cantidad_entrega + $filaArray['filaCantidadSalida']) > $infoBodeSoliDetalleUpdate->cantidad){
+                $suma2 = $infoBodeSoliDetalleUpdate->cantidad_entregada + $filaArray['filaCantidadSalida'];
+                if($suma2 > $infoBodeSoliDetalleUpdate->cantidad){
                     return ['success' => 3];
                 }
 
@@ -545,6 +654,28 @@ class BSolicitudesController extends Controller
             return ['success' => 99];
         }
     }
+
+
+
+
+    //*** SOLCIITUDES FINALIZADAS
+
+    public function indexSolicitudesFinalizadas()
+    {
+        return view('backend.admin.bodega.solicitudesfinalizadas.vistasolicitudfinalizada');
+    }
+
+    public function tablaSolicitudesFinalizadas()
+    {
+
+        return "taaf";
+
+        return view('backend.admin.bodega.solicitudesfinalizadas.tablasolicitudfinalizada');
+    }
+
+
+
+
 
 
 }

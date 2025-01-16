@@ -145,6 +145,46 @@ class BMaterialesController extends Controller
 
 
 
+    //********* DETALLE PARA VER CANTIDAD DE CADA MATERIAL EN CADA LOTE ****************
+
+    public function indexDetalleMaterialCantidad($idmaterial)
+    {
+
+        return view('backend.admin.bodega.materiales.detalle.vistadetallematerial', compact('idmaterial'));
+    }
+
+
+    // listado de mateirales que tienen cantidad aun disponible de cada lote
+    public function tablaDetalleMaterialCantidad($idmaterial)
+    {
+
+        $listado = BodegaEntradasDetalle::where('id_material', $idmaterial)
+            ->whereColumn('cantidad_entregada', '<', 'cantidad')
+            ->get();
+
+        foreach ($listado as $fila){
+            $infoEntrada = BodegaEntradas::where('id', $fila->id_entrada)->first();
+            $fila->fecha = date("d-m-Y", strtotime($infoEntrada->fecha));
+            $fila->lote = $infoEntrada->lote;
+            $fila->precio = "$" . $fila->precio;
+
+            $fila->cantidadDisponible = ($fila->cantidad - $fila->cantidad_entregada);
+        }
+
+        return view('backend.admin.bodega.materiales.detalle.tabladetallematerial', compact('listado'));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

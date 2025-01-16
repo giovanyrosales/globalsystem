@@ -7,35 +7,20 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 15%">Descripción</th>
-                                <th style="width: 4%">U/M</th>
-                                <th style="width: 4%">Cantidad Solicitada</th>
-                                <th style="width: 4%">Prioridad</th>
-                                <th style="width: 4%">Cantidad Recibida</th>
-                                <th style="width: 4%">Estado</th>
-                                <th style="width: 6%">Observación</th>
+                                <th style="width: 3%">Fecha Ingreso</th>
+                                <th style="width: 4%">Lote</th>
+                                <th style="width: 4%">Cantidad Disponible</th>
+                                <th style="width: 4%">Precio</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($listado as $dato)
                                 <tr>
-                                    <td style="width: 15%">{{ $dato->nombre }}</td>
-                                    <td style="width: 4%">{{ $dato->unimedida }}</td>
-                                    <td style="width: 4%">{{ $dato->cantidad }}</td>
-                                    <td style="width: 4%">{{ $dato->nombrePrioridad }}</td>
-                                    <td style="width: 4%">{{ $dato->cantidad_entregada }}</td>
-                                    <td style="width: 4%">
-                                        @if($dato->estado == 1)
-                                            <span class="badge bg-gray-dark">{{ $dato->nombreEstado }}</span>
-                                        @elseif($dato->estado == 2)
-                                            <span class="badge bg-success">{{ $dato->nombreEstado }}</span>
-                                        @else
-                                            <span class="badge bg-danger">{{ $dato->nombreEstado }}</span>
-                                        @endif
-                                    </td>
-                                    <td style="width: 6%">{{ $dato->nota }} </td>
-
+                                    <td style="width: 3%">{{ $dato->fecha }}</td>
+                                    <td style="width: 4%">{{ $dato->lote }}</td>
+                                    <td style="width: 4%">{{ $dato->cantidadDisponible }}</td>
+                                    <td style="width: 4%">{{ $dato->precio }}</td>
                                 </tr>
                             @endforeach
 
@@ -60,7 +45,7 @@
         $("#tabla").DataTable({
             "paging": true,
             "lengthChange": true,
-            "order": [[0, 'desc']],
+            "order": [[0, 'asc']],
             "searching": true,
             "ordering": true,
             "info": true,

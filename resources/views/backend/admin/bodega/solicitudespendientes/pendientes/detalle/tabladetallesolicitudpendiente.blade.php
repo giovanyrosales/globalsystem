@@ -34,12 +34,6 @@
                                 </tr>
                             @endforeach
 
-                            <script>
-                                setTimeout(function () {
-                                    closeLoading();
-                                }, 1000);
-                            </script>
-
                             </tbody>
                         </table>
                     </div>

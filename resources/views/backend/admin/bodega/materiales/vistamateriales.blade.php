@@ -318,6 +318,10 @@
                 });
         }
 
+        function infoDetalle(id){
+            window.location.href="{{ url('/admin/bodega/materialesdetalle/vista/index') }}/" + id;
+        }
+
 
     </script>
 
