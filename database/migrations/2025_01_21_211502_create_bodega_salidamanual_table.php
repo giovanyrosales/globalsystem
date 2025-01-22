@@ -15,7 +15,7 @@ class CreateBodegaSalidamanualTable extends Migration
     {
         Schema::create('bodega_salidamanual', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('fecha');
+            $table->date('fecha');
             $table->bigInteger('id_usuario')->unsigned();
             $table->string('observacion', 300)->nullable();
 

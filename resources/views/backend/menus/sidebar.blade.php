@@ -950,7 +950,14 @@
                             <li class="nav-item">
                                 <a href="{{ route('sidebar.bodega.historial.salidas') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Salidas</p>
+                                    <p>Salida Solicitud</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.bodega.historial.salidas.manual') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Salida Manual</p>
                                 </a>
                             </li>
 

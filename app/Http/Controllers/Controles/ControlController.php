@@ -82,6 +82,10 @@ class ControlController extends Controller
              $ruta = 'admin.sindico.registro.index';
          }
 
+         // BODEGA
+         else  if($user->hasRole('bodega')){
+             $ruta = 'sidebar.bodega.materiales';
+         }
 
 
 

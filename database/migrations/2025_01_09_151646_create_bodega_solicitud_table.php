@@ -18,7 +18,7 @@ class CreateBodegaSolicitudTable extends Migration
             $table->bigInteger('id_usuario')->unsigned();
             $table->bigInteger('id_objespecifico')->unsigned();
 
-            $table->dateTime('fecha');
+            $table->date('fecha');
 
             // para cambiar estado final y no salga en pendientes
             // 0- pendiente 1- finalizado

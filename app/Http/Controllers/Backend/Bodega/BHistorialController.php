@@ -8,6 +8,8 @@ use App\Models\BodegaEntradasDetalle;
 use App\Models\BodegaMateriales;
 use App\Models\BodegaSalida;
 use App\Models\BodegaSalidaDetalle;
+use App\Models\BodegaSalidaManual;
+use App\Models\BodegaSalidaManualDetalle;
 use App\Models\BodegaSolicitud;
 use App\Models\BodegaSolicitudDetalle;
 use App\Models\P_Departamento;
@@ -96,6 +98,13 @@ class BHistorialController extends Controller
                 ]);
 
 
+                // SE ELIMINA LAS SALIDAS MANUALES COMPLETAMENTE, SIN DEVOLVER CANTIDAD
+                // YA QUE SE ELIMINA TAMBIEN entrada_detalle
+                BodegaSalidaManualDetalle::whereIn('id_entradadetalle', $pilaIdEntradaDetalle)->delete();
+                // ESTO ELIMINA bodega_salida_manual SINO TIENE YA REFERENCIAS EN DETALLE
+                BodegaSalidaManual::whereNotIn('id', BodegaSalidaManualDetalle::pluck('id_salidamanual'))->delete();
+
+
                 // BORRAR SALIDAS DETALLE
                 BodegaSalidaDetalle::whereIn('id_entradadetalle', $pilaIdEntradaDetalle)->delete();
                 // BORRAR SALIDAS
@@ -160,6 +169,13 @@ class BHistorialController extends Controller
                 BodegaSolicitud::whereIn('id', $pilaIdSolicitud)->update([
                     'estado' => 0, // pasara a pendiente
                 ]);
+
+
+                // SE ELIMINA LAS SALIDAS MANUALES COMPLETAMENTE, SIN DEVOLVER CANTIDAD
+                // YA QUE SE ELIMINA TAMBIEN entrada_detalle
+                BodegaSalidaManualDetalle::where('id_entradadetalle', $infoEntradaDeta->id)->delete();
+                // ESTO ELIMINA bodega_salida_manual SINO TIENE YA REFERENCIAS EN DETALLE
+                BodegaSalidaManual::whereNotIn('id', BodegaSalidaManualDetalle::pluck('id_salidamanual'))->delete();
 
 
                 // BORRAR SALIDAS DETALLE
@@ -337,13 +353,52 @@ class BHistorialController extends Controller
         }else{
             return ['success' => 99];
         }
-
     }
 
 
 
 
+    // ****************** HISTORIAL SALIDAS MANUAL ******************************
 
+    public function indexHistorialSalidasManual()
+    {
+        return view('backend.admin.bodega.historial.salidamanual.vistasalidamanual');
+    }
+
+    public function tablaHistorialSalidasManual()
+    {
+        $usuario = auth()->user();
+        $listado = BodegaSalidaManual::where('id_usuario', $usuario->id)
+            ->orderBy('fecha', 'desc')
+            ->get();
+
+        foreach ($listado as $fila) {
+            $fila->fecha = date("d-m-Y", strtotime($fila->fecha));
+        }
+
+        return view('backend.admin.bodega.historial.salidamanual.tablasalidamanual', compact('listado'));
+    }
+
+
+    public function indexHistorialSalidasManualDetalle($id)
+    {
+        return view('backend.admin.bodega.historial.salidamanual.detalle.vistasalidadetallemanual', compact('id'));
+    }
+
+    public function tablaHistorialSalidasManualDetalle($id){
+
+        $listado = BodegaSalidaManualDetalle::where('id_salidamanual', $id)->get();
+
+        foreach ($listado as $fila){
+
+            $infoEntraDetalle = BodegaEntradasDetalle::where('id', $fila->id_entradadetalle)->first();
+            $infoProducto = BodegaMateriales::where('id', $infoEntraDetalle->id_material)->first();
+
+            $fila->nombreProducto = $infoProducto->nombre;
+        }
+
+        return view('backend.admin.bodega.historial.salidamanual.detalle.tablasalidamanualdetalle', compact('listado'));
+    }
 
 
 

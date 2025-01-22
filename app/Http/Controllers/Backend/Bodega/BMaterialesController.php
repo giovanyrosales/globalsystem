@@ -461,4 +461,49 @@ class BMaterialesController extends Controller
 
 
 
+    public function salidaManualDetalleBorrarItem(Request $request)
+    {
+        $regla = array(
+            'id' => 'required', //tabla: bodega_salidamanual_detalle
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        if($infoSalidaDeta = BodegaSalidaManualDetalle::where('id', $request->id)->first()){
+
+            DB::beginTransaction();
+
+            try {
+
+                $infoBodegaEntraDeta = BodegaEntradasDetalle::where('id', $infoSalidaDeta->id_entradadetalle)->first();
+
+                $resta = $infoBodegaEntraDeta->cantidad_entregada - $infoSalidaDeta->cantidad;
+
+                // RESTAR CANTIDAD ENTREGADA
+                BodegaEntradasDetalle::where('id', $infoBodegaEntraDeta->id)->update([
+                    'cantidad_entregada' => $resta
+                ]);
+
+
+                // BORRAR SALIDA MANUAL DETALLE
+                BodegaSalidaManualDetalle::where('id', $request->id)->delete();
+                BodegaSalidaManual::whereNotIn('id', BodegaSalidaManualDetalle::pluck('id_salidamanual'))->delete();
+
+                DB::commit();
+                return ['success' => 1];
+
+            } catch (\Throwable $e) {
+                Log::info('ee ' . $e);
+                DB::rollback();
+                return ['success' => 99];
+            }
+
+        }else{
+            return ['success' => 99];
+        }
+    }
+
+
 }

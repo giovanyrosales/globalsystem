@@ -1302,18 +1302,26 @@ Route::get('/admin/bodega/historial/entradadetalle/tabla/{id}', [BHistorialContr
 // vista para ingresar nuevo producto al lote existente
 Route::get('/admin/bodega/historial/nuevoingresoentradadetalle/index/{id}', [BHistorialController::class,'indexNuevoIngresoEntradaDetalle']);
 
-// ---- SALIDAS
+// ---- SALIDAS SOLICITUD
 Route::get('/admin/bodega/historial/salidas/index', [BHistorialController::class,'indexHistorialSalidas'])->name('sidebar.bodega.historial.salidas');
 Route::get('/admin/bodega/historial/salidas/tabla', [BHistorialController::class,'tablaHistorialSalidas']);
 Route::get('/admin/bodega/historial/salidadetalle/index/{id}', [BHistorialController::class,'indexHistorialSalidasDetalle']);
 Route::get('/admin/bodega/historial/salidadetalle/tabla/{id}', [BHistorialController::class,'tablaHistorialSalidasDetalle']);
 Route::post('/admin/bodega/historial/salidadetalle/borraritem', [BHistorialController::class,'salidaDetalleBorrarItem']);
 
+// --- HISTORIAL - SALIDAS MANUAL
+Route::get('/admin/bodega/historial/salidasmanual/index', [BHistorialController::class,'indexHistorialSalidasManual'])->name('sidebar.bodega.historial.salidas.manual');
+Route::get('/admin/bodega/historial/salidasmanual/tabla', [BHistorialController::class,'tablaHistorialSalidasManual']);
+Route::get('/admin/bodega/historial/salidamanualdetalle/index/{id}', [BHistorialController::class,'indexHistorialSalidasManualDetalle']);
+Route::get('/admin/bodega/historial/salidamanualdetalle/tabla/{id}', [BHistorialController::class,'tablaHistorialSalidasManualDetalle']);
 
 
-// SALIDAS MANUAL
+
+
+// SALIDAS MANUAL BODEGA
 Route::get('/admin/bodega/salidasmanual/index', [BMaterialesController::class,'indexSalidasManual'])->name('sidebar.bodega.salidasmanual');
 Route::post('/admin/bodega/salidasmanual/registrar',  [BMaterialesController::class,'registrarSalidaManual']);
+Route::post('/admin/bodega/salidasmanual/borraritem', [BMaterialesController::class,'salidaManualDetalleBorrarItem']);
 
 
 
