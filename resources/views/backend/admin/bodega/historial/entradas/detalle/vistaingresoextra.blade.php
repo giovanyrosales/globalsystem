@@ -10,9 +10,9 @@
 @stop
 
 <style>
-    table {
+    table{
         /*Ajustar tablas*/
-        table-layout: fixed;
+        table-layout:fixed;
     }
 
     .cursor-pointer:hover {
@@ -28,180 +28,164 @@
 
 <div id="divcontenedor" style="display: none">
 
-    <section class="content" style="margin-top: 20px">
-        <div class="container-fluid">
-            <div class="card card-gray-dark">
-                <div class="card-header">
-                    <h3 class="card-title">INGRESO DE PRODUCTO A INVENTARIO</h3>
-                </div>
-                <div class="card-body">
-
-                    <section class="content">
-                        <div class="container-fluid">
-
-                            <div class="row">
-                                <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Fecha: </label>
-                                    <div>
-                                        <input type="date" id="fecha" autocomplete="off" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label style="color: #686868">Lote: </label>
-                                    <div>
-                                        <input type="text" id="lote" maxlength="50" autocomplete="off" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form-group col-md-5" style="margin-top: 5px">
-                                    <label style="color: #686868">Observación: </label>
-                                    <div>
-                                        <input type="text" id="observacion" maxlength="300" autocomplete="off" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-
-                    <br>
-
-
-                    <div class="border-box" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
-
-
-                    <section class="content">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="form-group col-md-5" style="margin-top: 5px">
-                                    <h3 class="card-title" style="color: #005eab; font-weight: bold">Buscar Producto</h3>
-                                    <div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </section>
-
-                    <section class="content" style="margin-top: 15px">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="form-group col-md-6">
-                                    <table class="table" id="matriz-busqueda" data-toggle="table">
-                                        <tbody>
-                                        <tr>
-                                            <td>
-                                                <input id="inputBuscador" data-idproducto='0' autocomplete="off" class='form-control' style='width:100%' onkeyup='buscarMaterial(this)' maxlength='300' type='text'>
-                                                <div class='droplista' id="midropmenu" style='position: absolute; z-index: 9; width: 75% !important;'></div>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                        </div>
-                    </section>
-
-                    <section class="content">
-                        <div class="container-fluid">
-
-                            <div class="row">
-
-                                <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Cantidad: </label>
-                                    <div>
-                                        <input type="text" autocomplete="off" class="form-control" id="cantidad" placeholder="0">
-                                    </div>
-                                </div>
-
-                                <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Precio: </label>
-                                    <div>
-                                        <input type="number" min="0" max="1000000" autocomplete="off" class="form-control" id="precio-producto" placeholder="0.00">
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </section>
-
-                    </div>
-
-                    <br>
-
-                    <section class="content">
-                        <div class="container-fluid">
-
-                            <div style="margin-right: 30px">
-                                <button type="button" style="float: right" class="btn btn-success" onclick="agregarFila();">Agregar a Tabla</button>
-
-                            </div>
-
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h2>Detalle de Ingreso</h2>
+
+                <label style="font-size: 18px">LOTE: {{ $info->lote }}</label>
+                <br>
+
+            </div>
+
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">Bodega</li>
+                    <li class="breadcrumb-item active">Detalle - Historial Entradas - Ingreso Extra</li>
+                </ol>
             </div>
         </div>
     </section>
 
-    <section class="content">
-        <div class="container-fluid">
-            <div class="card card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Información de Ingreso</h3>
+
+        <section class="content" style="margin-top: 20px">
+            <div class="container-fluid">
+                <div class="card card-gray-dark">
+                    <div class="card-header">
+                        <h3 class="card-title">INGRESO EXTRA</h3>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="border-box" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
+
+
+                            <section class="content">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="form-group col-md-5" style="margin-top: 5px">
+                                            <h3 class="card-title" style="color: #005eab; font-weight: bold">Buscar Producto</h3>
+                                            <div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </section>
+
+                            <section class="content" style="margin-top: 15px">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <table class="table" id="matriz-busqueda" data-toggle="table">
+                                                <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <input id="inputBuscador" data-idproducto='0' autocomplete="off" class='form-control' style='width:100%' onkeyup='buscarMaterial(this)' maxlength='300' type='text'>
+                                                        <div class='droplista' id="midropmenu" style='position: absolute; z-index: 9; width: 75% !important;'></div>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </section>
+
+                            <section class="content">
+                                <div class="container-fluid">
+
+                                    <div class="row">
+
+                                        <div class="form-group col-md-2" style="margin-top: 5px">
+                                            <label class="control-label" style="color: #686868">Cantidad: </label>
+                                            <div>
+                                                <input type="text" autocomplete="off" class="form-control" id="cantidad" placeholder="0">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-md-2" style="margin-top: 5px">
+                                            <label class="control-label" style="color: #686868">Precio: </label>
+                                            <div>
+                                                <input type="number" min="0" max="1000000" autocomplete="off" class="form-control" id="precio-producto" placeholder="0.00">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </section>
+
+                        </div>
+
+                        <br>
+
+                        <section class="content">
+                            <div class="container-fluid">
+
+                                <div style="margin-right: 30px">
+                                    <button type="button" style="float: right" class="btn btn-success" onclick="agregarFila();">Agregar a Tabla</button>
+
+                                </div>
+
+                            </div>
+                        </section>
+                    </div>
                 </div>
-
-                <table class="table" id="matriz" data-toggle="table" style="margin-right: 15px; margin-left: 15px;">
-                    <thead>
-                    <tr>
-                        <th style="width: 3%">#</th>
-                        <th style="width: 10%">Producto</th>
-                        <th style="width: 6%">Cantidad</th>
-                        <th style="width: 6%">Precio</th>
-                        <th style="width: 5%">Opciones</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-
-                    </tbody>
-                </table>
-
-
-                <table class="table" id="matriz-totales" data-toggle="table" style="float: right">
-                    <thead>
-                    <tr style="float: right">
-                        <th>Precio Total</th>
-                    </tr>
-                    </thead>
-                    <tbody style="float: right">
-                    <td style="width: 125px"> <label type="text" class="form-control" id="precioTotal" >$0.00</label></td>
-
-                    </tbody>
-                </table>
-
             </div>
-        </div>
-    </section>
+        </section>
 
-    <div class="modal-footer justify-content-end" style="margin-top: 25px;">
-        <button type="button" class="btn btn-success" onclick="preguntarGuardar()">Guardar Listado de Productos</button>
-    </div>
+
+
+        <section class="content-header">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h2>Detalle de Ingreso</h2>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Información de Ingreso</h3>
+                    </div>
+
+                    <table class="table" id="matriz" data-toggle="table" style="margin-right: 15px; margin-left: 15px;">
+                        <thead>
+                        <tr>
+                            <th style="width: 3%">#</th>
+                            <th style="width: 10%">Producto</th>
+                            <th style="width: 6%">Cantidad</th>
+                            <th style="width: 6%">Precio</th>
+                            <th style="width: 5%">Opciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+
+
+                    <table class="table" id="matriz-totales" data-toggle="table" style="float: right">
+                        <thead>
+                        <tr style="float: right">
+                            <th>Precio Total</th>
+                        </tr>
+                        </thead>
+                        <tbody style="float: right">
+                        <td style="width: 125px"> <label type="text" class="form-control" id="precioTotal" >$0.00</label></td>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </section>
+
+        <div class="modal-footer justify-content-end" style="margin-top: 25px;">
+            <button type="button" class="btn btn-success" onclick="preguntarGuardar()">Guardar Listado de Productos</button>
+        </div>
+
 
 
 
@@ -240,7 +224,6 @@
 
     <script>
 
-
         function buscarMaterial(e){
 
             // seguro para evitar errores de busqueda continua
@@ -260,17 +243,17 @@
                 axios.post(url+'/bodega/buscar/producto', {
                     'query' : texto
                 })
-                .then((response) => {
+                    .then((response) => {
 
-                    seguroBuscador = true;
-                    $(row).each(function (index, element) {
-                        $(this).find(".droplista").fadeIn();
-                        $(this).find(".droplista").html(response.data);
+                        seguroBuscador = true;
+                        $(row).each(function (index, element) {
+                            $(this).find(".droplista").fadeIn();
+                            $(this).find(".droplista").html(response.data);
+                        });
+                    })
+                    .catch((error) => {
+                        seguroBuscador = true;
                     });
-                })
-                .catch((error) => {
-                    seguroBuscador = true;
-                });
             }
         }
 
@@ -469,23 +452,7 @@
             })
         }
 
-
         function registrarProductos(){
-
-            var fecha = document.getElementById('fecha').value;
-            var lote = document.getElementById('lote').value;
-            var observacion = document.getElementById('observacion').value;
-
-            if(fecha === ''){
-                toastr.error('Fecha es requerido');
-                return;
-            }
-
-            if(lote === ''){
-                toastr.error('Lote es requerido');
-                return;
-            }
-
 
             var nRegistro = $('#matriz > tbody >tr').length;
 
@@ -579,6 +546,8 @@
 
             let formData = new FormData();
 
+            let identrada = {{ $id }};
+
             const contenedorArray = [];
 
             for(var i = 0; i < arrayIdProducto.length; i++){
@@ -591,13 +560,10 @@
                 contenedorArray.push({ infoIdProducto, infoCantidad, infoPrecio });
             }
 
-
             formData.append('contenedorArray', JSON.stringify(contenedorArray));
-            formData.append('fecha', fecha);
-            formData.append('lote', lote);
-            formData.append('observacion', observacion);
+            formData.append('identrada', identrada);
 
-            axios.post(url+'/bodega/registrar/productos', formData, {
+            axios.post(url+'/bodega/registrar/productosextras', formData, {
             })
                 .then((response) => {
                     closeLoading();
@@ -620,9 +586,6 @@
 
             document.getElementById('inputBuscador').value = '';
             document.getElementById('cantidad').value = '';
-            document.getElementById('lote').value = '';
-            document.getElementById('observacion').value = '';
-            document.getElementById('fecha').value = '';
             document.getElementById('precio-producto').value = '';
 
             document.getElementById('precioTotal').innerHTML = "$0.00";
@@ -638,13 +601,6 @@
             $("#matriz tbody tr").css('background', 'white');
         }
 
-
     </script>
 
 @endsection
-
-
-
-
-
-

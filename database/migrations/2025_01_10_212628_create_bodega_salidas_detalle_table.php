@@ -20,11 +20,16 @@ class CreateBodegaSalidasDetalleTable extends Migration
             // bodega solicitud detalle
             $table->bigInteger('id_solidetalle')->unsigned();
 
+            // bodega_entrada_detalle
+            $table->bigInteger('id_entradadetalle')->unsigned();
+
+
             // cantidad entregada
             $table->integer('cantidad_salida');
 
             $table->foreign('id_salida')->references('id')->on('bodega_salidas');
             $table->foreign('id_solidetalle')->references('id')->on('bodega_solicitud_detalle');
+            $table->foreign('id_entradadetalle')->references('id')->on('bodega_entradas_detalle');
         });
     }
 

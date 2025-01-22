@@ -33,6 +33,11 @@
                                                 onclick="infoBorrar({{ $dato->id }})">
                                             <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar
                                         </button>
+
+                                        <button style="margin: 3px" type="button" class="btn btn-warning btn-xs"
+                                                onclick="infoNuevoIngreso({{ $dato->id }})">
+                                            <i class="fas fa-plus" title="Nuevo Ingreso"></i>&nbsp; Nuevo Ingreso
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach

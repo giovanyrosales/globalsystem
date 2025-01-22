@@ -32,7 +32,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">INGRESO DE PRODUCTO A INVENTARIO</h3>
+                    <h3 class="card-title">SALIDA DE PRODUCTOS MANUAL</h3>
                 </div>
                 <div class="card-body">
 
@@ -49,15 +49,6 @@
                             </div>
 
                             <div class="row">
-                                <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label style="color: #686868">Lote: </label>
-                                    <div>
-                                        <input type="text" id="lote" maxlength="50" autocomplete="off" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
                                 <div class="form-group col-md-5" style="margin-top: 5px">
                                     <label style="color: #686868">Observación: </label>
                                     <div>
@@ -68,68 +59,59 @@
                         </div>
                     </section>
 
-
                     <br>
-
 
                     <div class="border-box" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
 
 
-                    <section class="content">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="form-group col-md-5" style="margin-top: 5px">
-                                    <h3 class="card-title" style="color: #005eab; font-weight: bold">Buscar Producto</h3>
-                                    <div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </section>
-
-                    <section class="content" style="margin-top: 15px">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="form-group col-md-6">
-                                    <table class="table" id="matriz-busqueda" data-toggle="table">
-                                        <tbody>
-                                        <tr>
-                                            <td>
-                                                <input id="inputBuscador" data-idproducto='0' autocomplete="off" class='form-control' style='width:100%' onkeyup='buscarMaterial(this)' maxlength='300' type='text'>
-                                                <div class='droplista' id="midropmenu" style='position: absolute; z-index: 9; width: 75% !important;'></div>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                        </div>
-                    </section>
-
-                    <section class="content">
-                        <div class="container-fluid">
-
-                            <div class="row">
-
-                                <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Cantidad: </label>
-                                    <div>
-                                        <input type="text" autocomplete="off" class="form-control" id="cantidad" placeholder="0">
-                                    </div>
-                                </div>
-
-                                <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Precio: </label>
-                                    <div>
-                                        <input type="number" min="0" max="1000000" autocomplete="off" class="form-control" id="precio-producto" placeholder="0.00">
+                        <section class="content">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="form-group col-md-5" style="margin-top: 5px">
+                                        <h3 class="card-title" style="color: #005eab; font-weight: bold">Buscar Producto</h3>
+                                        <div>
+                                        </div>
                                     </div>
                                 </div>
 
                             </div>
-                        </div>
-                    </section>
+                        </section>
+
+                        <section class="content" style="margin-top: 15px">
+                            <div class="container-fluid">
+
+                                <select class="form-control" id="select-material" onchange="productoSeleccionado()">
+                                    <option value="0" selected>Seleccionar Producto</option>
+                                    @foreach($arrayEntraDeta as $item)
+                                        <option value="{{ $item->id }}" data-cantidadActual="{{ $item->cantidadRestante }}">{{ $item->nombreMaterial }}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+                        </section>
+
+                        <section class="content">
+                            <div class="container-fluid">
+
+                                <div class="row">
+
+                                    <div class="form-group col-md-2" style="margin-top: 5px">
+                                        <label class="control-label" style="color: #686868">Cantidad Disponible: </label>
+                                        <div>
+                                            <input type="text" disabled autocomplete="off" class="form-control" id="cantidad-disponible" placeholder="0">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-md-2" style="margin-top: 5px">
+                                        <label class="control-label" style="color: #686868">Cantidad Retirar: </label>
+                                        <div>
+                                            <input type="text" autocomplete="off" class="form-control" id="cantidad-retirar" placeholder="0">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
 
                     </div>
 
@@ -149,8 +131,6 @@
             </div>
         </div>
     </section>
-
-
 
     <section class="content-header">
         <div class="row mb-2">
@@ -173,24 +153,10 @@
                         <th style="width: 3%">#</th>
                         <th style="width: 10%">Producto</th>
                         <th style="width: 6%">Cantidad</th>
-                        <th style="width: 6%">Precio</th>
                         <th style="width: 5%">Opciones</th>
                     </tr>
                     </thead>
                     <tbody>
-
-                    </tbody>
-                </table>
-
-
-                <table class="table" id="matriz-totales" data-toggle="table" style="float: right">
-                    <thead>
-                    <tr style="float: right">
-                        <th>Precio Total</th>
-                    </tr>
-                    </thead>
-                    <tbody style="float: right">
-                    <td style="width: 125px"> <label type="text" class="form-control" id="precioTotal" >$0.00</label></td>
 
                     </tbody>
                 </table>
@@ -200,7 +166,7 @@
     </section>
 
     <div class="modal-footer justify-content-end" style="margin-top: 25px;">
-        <button type="button" class="btn btn-success" onclick="preguntarGuardar()">Guardar Listado de Productos</button>
+        <button type="button" class="btn btn-success" onclick="preguntarGuardar()">Guardar Salida</button>
     </div>
 
 
@@ -220,18 +186,13 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
-            window.seguroBuscador = true;
-            window.txtContenedorGlobal = this;
-
-            $(document).click(function(){
-                $(".droplista").hide();
-            });
-
-            $(document).ready(function() {
-                $('[data-toggle="popover"]').popover({
-                    placement: 'top',
-                    trigger: 'hover'
-                });
+            $('#select-material').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Búsqueda no encontrada";
+                    }
+                },
             });
 
             document.getElementById("divcontenedor").style.display = "block";
@@ -241,68 +202,40 @@
     <script>
 
 
-        function buscarMaterial(e){
+        function productoSeleccionado(){
 
-            // seguro para evitar errores de busqueda continua
-            if(seguroBuscador){
-                seguroBuscador = false;
+            var verificarSelect = document.getElementById('select-material').value;
 
-                var row = $(e).closest('tr');
-                txtContenedorGlobal = e;
-
-                let texto = e.value;
-
-                if(texto === ''){
-                    // si se limpia el input, setear el atributo id
-                    $(e).attr('data-idproducto', 0);
-                }
-
-                axios.post(url+'/bodega/buscar/producto', {
-                    'query' : texto
-                })
-                .then((response) => {
-
-                    seguroBuscador = true;
-                    $(row).each(function (index, element) {
-                        $(this).find(".droplista").fadeIn();
-                        $(this).find(".droplista").html(response.data);
-                    });
-                })
-                .catch((error) => {
-                    seguroBuscador = true;
-                });
+            if(verificarSelect === '0'){
+                // borrar input de informacion
+                document.getElementById('cantidad-disponible').value = '';
+                document.getElementById('cantidad-retirar').value = '';
+                return;
             }
-        }
 
+            // Obtener la opción seleccionada
+            var selectedOption = document.getElementById('select-material').options[document.getElementById('select-material').selectedIndex];
 
-        function modificarValor(edrop){
-
-            // obtener texto del li
-            let texto = $(edrop).text();
-            // setear el input de la descripcion
-            $(txtContenedorGlobal).val(texto);
-
-            // agregar el id al atributo del input descripcion
-            $(txtContenedorGlobal).attr('data-idproducto', edrop.id);
-
-            document.activeElement.blur();
+            document.getElementById('cantidad-disponible').value = selectedOption.getAttribute('data-cantidadActual');
         }
 
 
         function agregarFila(){
 
-            var precioProducto = document.getElementById('precio-producto').value;
-            var cantidad = document.getElementById('cantidad').value;
-            var inputBuscador = document.querySelector('#inputBuscador');
+            var idBodeEntraDeta = document.getElementById('select-material').value;
+            var cantidadDisponible = document.getElementById('cantidad-disponible').value;
 
-            var reglaNumeroEntero = /^[0-9]\d*$/;
-            var reglaNumeroDiesDecimal = /^([0-9]+\.?[0-9]{0,10})$/;
-
-
-            if(inputBuscador.dataset.idproducto == 0){
-                toastr.error("Producto es requerido");
+            if(idBodeEntraDeta === '0'){
+                toastr.error('Seleccionar Producto');
                 return;
             }
+
+            var selectElement = document.getElementById('select-material');
+            var selectedOption = selectElement.options[selectElement.selectedIndex];
+
+            var cantidad = document.getElementById('cantidad-retirar').value;
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
 
             //**************
 
@@ -326,34 +259,10 @@
                 return;
             }
 
-            //**************
-
-            var nomProducto = document.getElementById('inputBuscador').value;
-
-
-            //*************
-
-            if(precioProducto === ''){
-                toastr.error('Precio Producto es requerido');
-                return;
+            if(cantidad > Number(cantidadDisponible)){
+                toastr.error('Cantidad Retirar es mayor a la Disponible');
+                return
             }
-
-            if(!precioProducto.match(reglaNumeroDiesDecimal)) {
-                toastr.error('Precio Producto debe ser número Decimal (10 decimales)');
-                return;
-            }
-
-            if(precioProducto < 0){
-                toastr.error('Precio Producto no debe ser negativo');
-                return;
-            }
-
-            if(precioProducto > 9000000){
-                toastr.error('Precio Producto debe ser máximo 9 millones');
-                return;
-            }
-
-
 
             //**************
 
@@ -369,17 +278,12 @@
                 "</td>" +
 
                 "<td>" +
-                "<input name='arrayNombre[]' disabled data-idproducto='" + inputBuscador.dataset.idproducto + "' value='" + nomProducto + "' class='form-control' type='text'>" +
+                "<input name='arrayNombre[]' disabled data-idproducto='" + idBodeEntraDeta + "' value='" + selectedOption.innerText + "' class='form-control' type='text'>" +
                 "</td>" +
 
                 "<td>" +
                 "<input name='arrayCantidad[]' disabled value='" + cantidad + "' class='form-control' type='text'>" +
                 "</td>" +
-
-                "<td>" +
-                "<input name='arrayPrecio[]' data-precio='" + precioProducto + "' disabled value='$" + precioProducto + "' class='form-control' type='text'>" +
-                "</td>" +
-
 
                 "<td>" +
                 "<button type='button' class='btn btn-block btn-danger' onclick='borrarFila(this)'>Borrar</button>" +
@@ -389,11 +293,6 @@
 
             $("#matriz tbody").append(markup);
 
-
-            // CALCULAR TODAS LAS FILAS
-            calcularFilas();
-
-
             Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -402,11 +301,7 @@
                 timer: 1500
             })
 
-            $(txtContenedorGlobal).attr('data-idproducto', '0');
-
-            document.getElementById('cantidad').value = '';
-            document.getElementById('precio-producto').value = '';
-            document.getElementById('inputBuscador').value = '';
+            document.getElementById('cantidad-retirar').value = '';
         }
 
         function borrarFila(elemento){
@@ -424,36 +319,13 @@
                 var element = table.rows[r].cells[0].children[0];
                 document.getElementById(element.id).innerHTML = ""+conteo;
             }
-
-            calcularFilas();
-        }
-
-        function calcularFilas(){
-
-            var cantidad = $("input[name='arrayCantidad[]']").map(function(){return $(this).val();}).get();
-            var precio = $("input[name='arrayPrecio[]']").map(function(){return $(this).attr("data-precio");}).get();
-            var precioTotal = 0;
-
-            for(var a = 0; a < cantidad.length; a++){
-
-                let infoCantidad = cantidad[a];
-                let infoPrecio = precio[a];
-
-                let multiplicado = infoCantidad * infoPrecio;
-
-                precioTotal += multiplicado;
-            }
-
-            let precioFormat = '$' + Number(precioTotal).toFixed(2);
-
-            document.getElementById('precioTotal').innerHTML = precioFormat;
         }
 
 
         function preguntarGuardar(){
 
             Swal.fire({
-                title: '¿Registrar Productos?',
+                title: '¿Registrar Salida?',
                 text: '',
                 icon: 'info',
                 showCancelButton: true,
@@ -473,19 +345,12 @@
         function registrarProductos(){
 
             var fecha = document.getElementById('fecha').value;
-            var lote = document.getElementById('lote').value;
             var observacion = document.getElementById('observacion').value;
 
             if(fecha === ''){
                 toastr.error('Fecha es requerido');
                 return;
             }
-
-            if(lote === ''){
-                toastr.error('Lote es requerido');
-                return;
-            }
-
 
             var nRegistro = $('#matriz > tbody >tr').length;
 
@@ -494,6 +359,7 @@
                 return;
             }
 
+            // ID BODEGA ENTRADA DETALLE
             var arrayIdProducto = $("input[name='arrayNombre[]']").map(function(){return $(this).attr("data-idproducto");}).get();
             var arrayCantidad = $("input[name='arrayCantidad[]']").map(function(){return $(this).val();}).get();
             var arrayPrecio = $("input[name='arrayPrecio[]']").map(function(){return $(this).attr("data-precio");}).get();
@@ -510,7 +376,6 @@
 
                 let idProducto = arrayIdProducto[a];
                 let cantidadProducto = arrayCantidad[a];
-                let precioProducto = arrayPrecio[a];
 
                 // identifica si el 0 es tipo number o texto
                 if(idProducto == 0){
@@ -544,35 +409,6 @@
                     toastr.error('Fila #' + (a + 1) + ' Cantidad máximo 9 millones. Por favor borrar la Fila y buscar de nuevo el Producto');
                     return;
                 }
-
-
-
-                // **** VALIDAR PRECIO DE PRODUCTO
-
-                if (precioProducto === '') {
-                    colorRojoTabla(a);
-                    toastr.error('Fila #' + (a + 1) + ' Precio de producto es requerida. Por favor borrar la Fila y buscar de nuevo el Producto');
-                    return;
-                }
-
-                if (!precioProducto.match(reglaNumeroDiesDecimal)) {
-                    colorRojoTabla(a);
-                    toastr.error('Fila #' + (a + 1) + ' Precio debe ser decimal (10 decimales) y no negativo. Por favor borrar la Fila y buscar de nuevo el Producto');
-                    return;
-                }
-
-                if (precioProducto < 0) {
-                    colorRojoTabla(a);
-                    toastr.error('Fila #' + (a + 1) + ' Precio no debe ser negativo. Por favor borrar la Fila y buscar de nuevo el Producto');
-                    return;
-                }
-
-                if (precioProducto > 9000000) {
-                    colorRojoTabla(a);
-                    toastr.error('Fila #' + (a + 1) + ' Precio máximo 9 millones. Por favor borrar la Fila y buscar de nuevo el Producto');
-                    return;
-                }
-
             }
 
             openLoading();
@@ -582,27 +418,27 @@
             const contenedorArray = [];
 
             for(var i = 0; i < arrayIdProducto.length; i++){
-
                 let infoIdProducto = arrayIdProducto[i];
                 let infoCantidad = arrayCantidad[i];
-                let infoPrecio = arrayPrecio[i];
 
                 // ESTOS NOMBRES SE UTILIZAN EN CONTROLADOR
-                contenedorArray.push({ infoIdProducto, infoCantidad, infoPrecio });
+                contenedorArray.push({ infoIdProducto, infoCantidad });
             }
-
 
             formData.append('contenedorArray', JSON.stringify(contenedorArray));
             formData.append('fecha', fecha);
-            formData.append('lote', lote);
             formData.append('observacion', observacion);
 
-            axios.post(url+'/bodega/registrar/productos', formData, {
+            axios.post(url+'/bodega/salidasmanual/registrar', formData, {
             })
                 .then((response) => {
                     closeLoading();
 
+                    // REVISAR CANTIDAD PORQUE SUPERA A LAS DISPONIBLES
                     if(response.data.success === 1){
+                        cantidadSuperada(response.data.fila)
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         limpiar();
                     }
@@ -616,16 +452,33 @@
                 });
         }
 
+        function cantidadSuperada(fila){
+
+            let texto = "En la Fila #" + fila + " - Se supera la cantidad disponible, revisar las salidas Similares " +
+                "o verificar cantidad de Producto Disponible";
+
+            Swal.fire({
+                title: 'Cantidad Superada',
+                text: texto,
+                icon: 'error',
+                showCancelButton: false,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                allowOutsideClick: false,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'NO'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                }
+            })
+        }
+
         function limpiar(){
 
-            document.getElementById('inputBuscador').value = '';
-            document.getElementById('cantidad').value = '';
-            document.getElementById('lote').value = '';
+            document.getElementById('cantidad-retirar').value = '';
             document.getElementById('observacion').value = '';
             document.getElementById('fecha').value = '';
-            document.getElementById('precio-producto').value = '';
-
-            document.getElementById('precioTotal').innerHTML = "$0.00";
 
             $("#matriz tbody tr").remove();
         }

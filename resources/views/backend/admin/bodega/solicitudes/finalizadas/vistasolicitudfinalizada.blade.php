@@ -81,13 +81,13 @@
         }
 
         function vistaDetalle(idsolicitud){
-            window.location.href="{{ url('/admin/bodega/xxxx') }}/" + xx;
+            window.location.href="{{ url('/admin/bodega/solicitudfinalizadas/detalle') }}/" + idsolicitud;
         }
 
         function vistaEstado(id){
             Swal.fire({
-                title: 'Finalizar Solicitud?',
-                text: "",
+                title: 'Cambiar Estado?',
+                text: "Esto pasara a Pendiente",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -96,26 +96,23 @@
                 confirmButtonText: 'Si'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    finalizar(id);
+                    guardarEstado(id);
                 }
             })
         }
 
-        function finalizar(id){
+        function guardarEstado(id){
 
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
 
-            axios.post(url+'/bodega/solicitudpendiente/estadofinalizar', formData, {
+            axios.post(url+'/bodega/solicitudpendiente/estadopendiente', formData, {
             })
                 .then((response) => {
                     closeLoading();
 
                     if(response.data.success === 1){
-                        pendiente()
-                    }
-                    else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         recargar();
                     }

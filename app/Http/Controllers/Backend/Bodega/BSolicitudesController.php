@@ -152,6 +152,9 @@ class BSolicitudesController extends Controller
             else if($fila->estado == 2){
                 $estado = "Entregado";
             }
+            else if($fila->estado == 3){
+                $estado = "Entregado/Parcial";
+            }
             else{
                 $estado = "Denegado";
             }
@@ -168,7 +171,7 @@ class BSolicitudesController extends Controller
 
     public function indexSolicitudesPendientes()
     {
-        return view('backend.admin.bodega.solicitudespendientes.pendientes.vistasolicitudpendiente');
+        return view('backend.admin.bodega.solicitudes.pendientes.vistasolicitudpendiente');
     }
 
 
@@ -202,7 +205,7 @@ class BSolicitudesController extends Controller
             $fila->nombreDepartamento = $departamento;
         }
 
-        return view('backend.admin.bodega.solicitudespendientes.pendientes.tablasolicitudpendiente', compact('listado'));
+        return view('backend.admin.bodega.solicitudes.pendientes.tablasolicitudpendiente', compact('listado'));
     }
 
 
@@ -243,6 +246,31 @@ class BSolicitudesController extends Controller
             return ['success' => 99];
         }
     }
+
+    public function cambiarEstadoAPendiente(Request $request)
+    {
+        $regla = array(
+            'id' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+
+        if(BodegaSolicitud::where('id', $request->id)->first()){
+
+            BodegaSolicitud::where('id', $request->id)->update([
+                'estado' => 0, // pendiente
+            ]);
+
+            return ['success' => 1];
+
+        }else{
+            return ['success' => 99];
+        }
+    }
+
 
     public function indexDetalleSolicitudesPendientes($idsolicitud)
     {
@@ -330,7 +358,7 @@ class BSolicitudesController extends Controller
         }
 
 
-        return view('backend.admin.bodega.solicitudespendientes.pendientes.detalle.vistadetallesolicitudpendiente',
+        return view('backend.admin.bodega.solicitudes.pendientes.detalle.vistadetallesolicitudpendiente',
         compact('idsolicitud', 'arraySinReferencia', 'arrayMateriales', 'arrayReferencia'));
     }
 
@@ -616,6 +644,7 @@ class BSolicitudesController extends Controller
                 $detalle->id_salida = $reg->id;
                 $detalle->id_solidetalle = $request->idbodesolidetalle;
                 $detalle->cantidad_salida = $filaArray['filaCantidadSalida'];
+                $detalle->id_entradadetalle = $infoFilaEntradaDetalle->id;
                 $detalle->save();
 
                 // ACTUALIZAR CANTIDADES DE SALIDA
@@ -625,16 +654,6 @@ class BSolicitudesController extends Controller
 
                 BodegaSolicitudDetalle::where('id', $request->idbodesolidetalle)->update([
                     'cantidad_entregada' => ($filaArray['filaCantidadSalida'] + $infoBodeSoliDetalleUpdate->cantidad_entregada)
-                ]);
-
-                // RESTAR CANTIDAD EN bodega_materiales (esto para una revision rapida que se utiliza en otras vistas)
-
-                // cantidad Actual
-                $infoCantiActual = BodegaMateriales::where('id', $infoBodeSoliDetalle->id_referencia)->first();
-                $resta = $infoCantiActual->cantidad - $filaArray['filaCantidadSalida'];
-
-                BodegaMateriales::where('id', $infoBodeSoliDetalle->id_referencia)->update([
-                    'cantidad' => $resta
                 ]);
             }
 
@@ -662,19 +681,86 @@ class BSolicitudesController extends Controller
 
     public function indexSolicitudesFinalizadas()
     {
-        return view('backend.admin.bodega.solicitudesfinalizadas.vistasolicitudfinalizada');
+        return view('backend.admin.bodega.solicitudes.finalizadas.vistasolicitudfinalizada');
     }
 
     public function tablaSolicitudesFinalizadas()
     {
+        $pilaObjEspeci = array();
+        $infoAuth = auth()->user();
+        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
 
-        return "taaf";
+        foreach ($arrayCodigo as $fila){
+            array_push($pilaObjEspeci, $fila->id_objespecifico);
+        }
 
-        return view('backend.admin.bodega.solicitudesfinalizadas.tablasolicitudfinalizada');
+        $listado = BodegaSolicitud::whereIn('id_objespecifico', $pilaObjEspeci)
+            ->where('estado', 1) // finalizadas
+            ->orderBy('fecha', 'asc')->get();
+
+        foreach ($listado as $fila){
+            $fila->fecha = date("d-m-Y", strtotime($fila->fecha));
+
+            $infoUsuario = Usuario::where('id', $fila->id_usuario)->first();
+            $fila->nombreUsuario = $infoUsuario->nombre;
+
+            $departamento = "";
+            // usuario que hizo la solicitud
+            if($infoUDepa = P_UsuarioDepartamento::where('id_usuario', $fila->id_usuario)->first()){
+                $infoDepa = P_Departamento::where('id', $infoUDepa->id_departamento)->first();
+                $departamento = $infoDepa->nombre;
+            }
+
+            $fila->nombreDepartamento = $departamento;
+        }
+
+        return view('backend.admin.bodega.solicitudes.finalizadas.tablasolicitudfinalizada', compact('listado'));
     }
 
 
+    public function indexDetalleSolicitudesFinalizadas($idsolicitud)
+    {
 
+        // AQUI TODOS LAS SOLICITUDES DETALLE, PUEDEN O NO TENER REFERENCIA A MATERIAL
+        $arrayReferencia = BodegaSolicitudDetalle::where('id_bodesolicitud', $idsolicitud)
+            ->orderBy('nombre', 'asc')
+            ->get();
+
+        $contadorFila = 1;
+        foreach ($arrayReferencia as $fila){
+            $fila->numeralFila = $contadorFila;
+            $contadorFila++;
+
+            // PUEDEN NO TENER REFERENCIA, YA QUE FUE DENEGADO ESE PRODUCTO SOLICITADO
+            $nombreReferencia = "";
+            $unidadMedida = "";
+            if($infoMaterial = BodegaMateriales::where('id', $fila->id_referencia)->first()){
+                $nombreReferencia = $infoMaterial->nombre;
+                $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+                $unidadMedida = $infoUnidad->nombre;
+            }
+            $fila->nombreReferencia = $nombreReferencia;
+            $fila->unidadMedida = $unidadMedida;
+
+
+            if($fila->estado == 1){
+                $nombreEstado = "Pendiente";
+            }
+            else if($fila->estado == 2){
+                $nombreEstado = "Entregado";
+            }
+            else if($fila->estado == 3){
+                $nombreEstado = "Entregado/Parcial";
+            }else{
+                $nombreEstado = "Denegado";
+            }
+            $fila->nombreEstado = $nombreEstado;
+        }
+
+
+        return view('backend.admin.bodega.solicitudes.finalizadas.detalle.vistadetallesolicitudfinalizada',
+            compact('idsolicitud',  'arrayReferencia'));
+    }
 
 
 

@@ -679,7 +679,7 @@
                                 "</td>" +
 
                                 "<td>" +
-                                "<input name='arrayCantidadActual[]' disabled  value='" + val.cantidadActual + "' class='form-control' type='number'>" +
+                                "<input name='arrayCantidadActual[]' disabled data-cantidadActualFila='" + val.cantidadActual + "'  value='" + val.cantidadActual + "' class='form-control' type='number'>" +
                                 "</td>" +
 
                                 "<td>" +
@@ -734,6 +734,23 @@
 
 
         function guardarNuevaSalida(){
+            Swal.fire({
+                title: 'Guardar Salida?',
+                text: "",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Si'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    guardarNuevaSalidaFinal();
+                }
+            })
+        }
+
+        function guardarNuevaSalidaFinal(){
             var fecha = document.getElementById('info-fechasalida').value;
             var infoCantidadSolicitada = document.getElementById('info-cantidadsolicitada').value;
             var infoCantidadEntregada = document.getElementById('info-cantidadentregada').value;
@@ -753,6 +770,8 @@
             var arrayIdEntradaDetalle = $("input[name='arrayCantidadSalida[]']").map(function(){return $(this).attr("data-idfilaentradadetalle");}).get();
             // cantidad salida
             var arrayCantidadSalida = $("input[name='arrayCantidadSalida[]']").map(function(){return $(this).val();}).get();
+            // cantidad actual de cada fila
+            var arrayCantidadActual = $("input[name='arrayCantidadActual[]']").map(function(){return $(this).attr("data-cantidadActualFila");}).get();
 
             colorBlancoTabla()
             var cantidadSalida = 0;
@@ -762,6 +781,7 @@
             for(var a = 0; a < arrayCantidadSalida.length; a++){
 
                 let filaCantidad = arrayCantidadSalida[a];
+                let infoFilaCantidadActual = arrayCantidadActual[a];
 
                 if(filaCantidad !== ''){
                     if(filaCantidad <= 0){
@@ -772,8 +792,20 @@
                     habraSalida = false;
                     cantidadSalida += Number(filaCantidad);
                 }
+
+                // VERIFICAR QUE NO SUPERE CANTIDAD SALIDA AL CANTIDAD ACTUAL DE CADA FILA DE LA TABLA
+                if(filaCantidad > Number(infoFilaCantidadActual)){
+                    colorRojoTabla(a);
+                    alertaMensaje('info', 'Error', 'En la Fila #' + (a+1) + " La cantidad de Salida supera a la Cantidad Actual de ese LOTE");
+                    return
+                }
             }
+
+            //
             let sumaSalida = Number(infoCantidadEntregada) + cantidadSalida;
+
+
+
             // comprobar que no supere cantidad
             if(sumaSalida > Number(infoCantidadSolicitada)){
                 Swal.fire({

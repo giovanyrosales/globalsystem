@@ -917,6 +917,11 @@
                         </ul>
                     </li>
 
+                    <a href="{{ route('sidebar.bodega.salidasmanual') }}" target="frameprincipal" class="nav-link">
+                        <i class="fa fa-address-book"></i>
+                        <p>Salida Manual</p>
+                    </a>
+
                     <a href="{{ route('sidebar.bodega.entradasregistro') }}" target="frameprincipal" class="nav-link">
                         <i class="fa fa-chevron-circle-left"></i>
                         <p>Entradas</p>
@@ -939,6 +944,13 @@
                                 <a href="{{ route('sidebar.bodega.historial.entradas') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Entradas</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.bodega.historial.salidas') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Salidas</p>
                                 </a>
                             </li>
 

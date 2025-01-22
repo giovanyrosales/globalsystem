@@ -21,7 +21,7 @@
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->id_unidadmedida }}</td>
                                     <td>{{ $dato->id_objespecifico }}</td>
-                                    <td>{{ $dato->cantidad }}</td>
+                                    <td>{{ $dato->cantidadGlobal }}</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar

@@ -40,9 +40,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <button type="button" class="btn btn-dark" style="margin-bottom: 3px" onclick="ayudaBorrar()">
-                                <i class="fas fa-question-circle"></i>
-                            </button>
+
                             <div id="tablaDatatable">
                             </div>
                         </div>
@@ -88,28 +86,11 @@
             window.location.href="{{ url('/admin/bodega/historial/entradadetalle/index') }}/" + idsolicitud;
         }
 
-        function ayudaBorrar(){
-            Swal.fire({
-                title: 'Información',
-                text: "Solo podrá eliminar un ingreso completo si ningún ítem individual ha tenido salida",
-                icon: 'info',
-                showCancelButton: false,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    recargar()
-                }
-            })
-        }
-
         function infoBorrar(id){
             Swal.fire({
-                title: 'Información',
-                text: "Solo podrá eliminar un ingreso completo si ningún ítem individual ha tenido salida",
-                icon: 'info',
+                title: 'ADVERTENCIA',
+                text: "Esto eliminará todo el ingreso de productos. Si hubo salidas de producto también se eliminarán. Las solicitudes pueden pasar a pendiente, ya que si tuvo salidas, este se eliminará",
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#d33',
@@ -122,6 +103,7 @@
             })
         }
 
+        // BORRAR LOTE DE ENTRADA COMPLETO
         function borrarRegistro(id){
 
             openLoading();
@@ -133,9 +115,6 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
-                        ayudaBorrar()
-                    }
-                    else if(response.data.success === 2){
                         toastr.success('Borrado correctamente');
                         recargar();
                     }
@@ -149,6 +128,10 @@
                 });
         }
 
+
+        function infoNuevoIngreso(id){
+            window.location.href="{{ url('/admin/bodega/historial/nuevoingresoentradadetalle/index') }}/" + id;
+        }
 
     </script>
 

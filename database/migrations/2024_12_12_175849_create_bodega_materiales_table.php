@@ -18,7 +18,6 @@ class CreateBodegaMaterialesTable extends Migration
             $table->bigInteger('id_unidadmedida')->unsigned();
             $table->bigInteger('id_objespecifico')->unsigned();
             $table->string('nombre', 300);
-            $table->integer('cantidad');
 
             $table->foreign('id_unidadmedida')->references('id')->on('p_unidadmedida');
             $table->foreign('id_objespecifico')->references('id')->on('obj_especifico');

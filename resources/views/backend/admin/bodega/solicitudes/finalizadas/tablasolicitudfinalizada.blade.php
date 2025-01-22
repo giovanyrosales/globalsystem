@@ -28,7 +28,7 @@
 
                                         <button type="button" style="margin: 3px" class="btn btn-warning btn-xs"
                                                 onclick="vistaEstado({{ $dato->id }})">
-                                            <i class="fas fa-edit" title="Finalizar"></i>&nbsp; Finalizar
+                                            <i class="fas fa-edit" title="Pendiente"></i>&nbsp; Pendiente
                                         </button>
                                     </td>
                                 </tr>

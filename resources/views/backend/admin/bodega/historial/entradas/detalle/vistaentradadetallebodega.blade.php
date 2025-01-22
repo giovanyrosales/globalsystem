@@ -20,6 +20,9 @@
         <div class="row mb-2">
             <div class="col-sm-6">
 
+                <label>LOTE: {{ $info->lote }}</label>
+                <br>
+
             </div>
 
             <div class="col-sm-6">
@@ -35,14 +38,12 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
+                    <h3 class="card-title">Listado De Entradas</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <button type="button" class="btn btn-dark" style="margin-bottom: 3px" onclick="ayudaBorrar()">
-                                <i class="fas fa-question-circle"></i>
-                            </button>
+
                             <div id="tablaDatatable">
                             </div>
                         </div>
@@ -68,8 +69,6 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-
-
             let id = {{ $id }};
             var ruta = "{{ URL::to('/admin/bodega/historial/entradadetalle/tabla') }}/" + id;
             $('#tablaDatatable').load(ruta);
@@ -86,28 +85,10 @@
             $('#tablaDatatable').load(ruta);
         }
 
-        function ayudaBorrar(){
-            Swal.fire({
-                title: 'Información',
-                text: "Solo podrá eliminar un item sino ha tenido ninguna salida",
-                icon: 'info',
-                showCancelButton: false,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Aceptar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // no hacer nada
-                    recargar()
-                }
-            })
-        }
-
         function infoBorrar(id){
             Swal.fire({
-                title: 'Información',
-                text: "Solo podrá eliminar un item sino ha tenido ninguna salida",
+                title: 'ADVERTENCIA',
+                text: "Esto eliminará todo el ingreso de este producto. Si hubo salidas de producto también se eliminarán. Las solicitudes pueden pasar a pendiente, ya que si tuvo salidas, este se eliminará",
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -131,9 +112,6 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
-                        ayudaBorrar()
-                    }
-                    else if(response.data.success === 2){
                         toastr.success('Borrado correctamente');
                         recargar();
                     }
@@ -146,6 +124,8 @@
                     closeLoading();
                 });
         }
+
+
 
     </script>
 
