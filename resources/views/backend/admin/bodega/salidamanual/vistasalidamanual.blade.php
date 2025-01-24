@@ -49,6 +49,16 @@
                             </div>
 
                             <div class="row">
+                                <div class="form-group col-md-4" style="margin-top: 5px">
+                                    <label class="control-label" style="color: #686868">Tipo de Salida</label>
+                                    <select id="select-salida" class="form-control">
+                                        <option value="0">Salida sin Solicitud</option>
+                                        <option value="1">Salida por Desperfecto</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
                                 <div class="form-group col-md-5" style="margin-top: 5px">
                                     <label style="color: #686868">Observación: </label>
                                     <div>
@@ -346,6 +356,7 @@
 
             var fecha = document.getElementById('fecha').value;
             var observacion = document.getElementById('observacion').value;
+            var tipoSalida = document.getElementById('select-salida').value;
 
             if(fecha === ''){
                 toastr.error('Fecha es requerido');
@@ -362,10 +373,8 @@
             // ID BODEGA ENTRADA DETALLE
             var arrayIdProducto = $("input[name='arrayNombre[]']").map(function(){return $(this).attr("data-idproducto");}).get();
             var arrayCantidad = $("input[name='arrayCantidad[]']").map(function(){return $(this).val();}).get();
-            var arrayPrecio = $("input[name='arrayPrecio[]']").map(function(){return $(this).attr("data-precio");}).get();
 
             var reglaNumeroEntero = /^[0-9]\d*$/;
-            var reglaNumeroDiesDecimal = /^([0-9]+\.?[0-9]{0,10})$/;
 
 
             // VALIDACIONES DE CADA FILA, RECORRER 1 ELEMENTO YA QUE TODOS TIENEN LA MISMA CANTIDAD DE FILAS
@@ -428,6 +437,7 @@
             formData.append('contenedorArray', JSON.stringify(contenedorArray));
             formData.append('fecha', fecha);
             formData.append('observacion', observacion);
+            formData.append('tiposalida', tipoSalida);
 
             axios.post(url+'/bodega/salidasmanual/registrar', formData, {
             })

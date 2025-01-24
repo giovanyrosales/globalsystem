@@ -143,6 +143,10 @@
             })
         }
 
+        function vistaPDF(id){
+            window.open("{{ URL::to('admin/bodega/reporte/encargadobodega/completa') }}/" + id);
+        }
+
     </script>
 
 

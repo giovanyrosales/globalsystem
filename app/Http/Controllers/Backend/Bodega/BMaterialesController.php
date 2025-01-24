@@ -20,6 +20,10 @@ use Illuminate\Support\Facades\Validator;
 
 class BMaterialesController extends Controller
 {
+    public function __construct(){
+        $this->middleware('auth');
+    }
+
     // retorna vista de materiales de la seccion de bodega
     public function indexBodegaMateriales()
     {
@@ -397,6 +401,7 @@ class BMaterialesController extends Controller
     {
         $regla = array(
             'fecha' => 'required',
+            'tiposalida' => 'required',
         );
 
         // observacion
@@ -420,6 +425,7 @@ class BMaterialesController extends Controller
             $nuevoReg->fecha = $request->fecha;
             $nuevoReg->id_usuario = $usuario->id;
             $nuevoReg->observacion = $request->observacion;
+            $nuevoReg->estado = $request->tiposalida;
             $nuevoReg->save();
 
             // infoIdProducto, infoCantidad, infoPrecio

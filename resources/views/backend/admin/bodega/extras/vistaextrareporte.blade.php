@@ -10,7 +10,7 @@
 <section class="content-header">
     <div class="container-fluid">
         <div class="col-sm-12">
-            <h1>Perfil de Usuario</h1>
+            <h1>Configurar Reporte</h1>
         </div>
 
     </div>
@@ -20,27 +20,24 @@
     <div class="container-fluid" style="margin-left: 15px">
         <div class="row">
             <div class="col-md-6">
-                <div class="card card-green">
+                <div class="card card-gray-dark">
                     <div class="card-header">
                         <h3 class="card-title">Formulario</h3>
                     </div>
                     <form>
                         <div class="card-body">
 
+
                             <div class="form-group">
-                                <label>Usuario</label>
-                                <input type="text" class="form-control" disabled value="{{ $usuario->usuario }}">
+                                <label>Nombre Gerente</label>
+                                <input type="text" id="nombre-gerente" maxlength="100" class="form-control" value="{{ $info->nombre_gerente }}">
                             </div>
 
                             <div class="form-group">
-                                <label>Nueva Contraseña</label>
-                                <input type="text" maxlength="16" class="form-control" id="password" placeholder="Contraseña">
+                                <label>Cargo de Gerente</label>
+                                <input type="text" id="nombre-gerentecargo" maxlength="100" class="form-control" value="{{ $info->nombre_gerente_cargo }}">
                             </div>
 
-                            <div class="form-group">
-                                <label>Repetir Contraseña</label>
-                                <input type="text" maxlength="16" class="form-control" id="password1" placeholder="Contraseña">
-                            </div>
 
                         </div>
 
@@ -74,57 +71,21 @@
         }
 
         function actualizar(){
-            var passwordNueva = document.getElementById('password').value;
-            var passwordRepetida = document.getElementById('password1').value;
-
-            if(passwordNueva === ''){
-                toastr.error('Contraseña nueva es requerida');
-                return;
-            }
-
-            if(passwordRepetida === ''){
-                toastr.error('Contraseña repetida es requerida');
-                return;
-            }
-
-            if(passwordNueva.length > 16){
-                toastr.error('Máximo 16 caracteres para contraseña nueva');
-                return;
-            }
-
-            if(passwordNueva.length < 4){
-                toastr.error('Mínimo 4 caracteres para contraseña nueva');
-                return;
-            }
-
-            if(passwordRepetida.length > 16){
-                toastr.error('Máximo 16 caracteres para contraseña repetida');
-                return;
-            }
-
-            if(passwordRepetida.length < 4){
-                toastr.error('Mínimo 4 caracteres para contraseña repetida');
-                return;
-            }
-
-            if(passwordNueva !== passwordRepetida){
-                toastr.error('Las contraseñas no coinciden');
-                return;
-            }
+            var nombreGerente = document.getElementById('nombre-gerente').value;
+            var nombreGerenteCargo = document.getElementById('nombre-gerentecargo').value;
 
             openLoading()
             var formData = new FormData();
-            formData.append('password', passwordNueva);
+            formData.append('nombreGerente', nombreGerente);
+            formData.append('nombreGerenteCargo', nombreGerenteCargo);
 
-            axios.post(url+'/editar-perfil/actualizar', formData, {
+            axios.post(url+'/bodega/extras/actualizarDatos', formData, {
             })
                 .then((response) => {
                     closeLoading()
 
                     if (response.data.success === 1) {
-                        toastr.success('Contraseña Actualizada');
-                        document.getElementById('password').value = '';
-                        document.getElementById('password1').value = '';
+                        toastr.success('Actualizado');
                     }
                     else {
                         toastr.error('Error al actualizar');

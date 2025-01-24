@@ -146,6 +146,58 @@
             })
         }
 
+        function vistaPDF(id){
+            window.open("{{ URL::to('admin/bodega/reporte/encargadobodega/completa') }}/" + id);
+        }
+
+
+
+        function vistaBorrar(id){
+            Swal.fire({
+                title: 'Borrar Solicitud',
+                text: "No podra eliminarse si hay una salida",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                cancelButtonText: 'Cancelar',
+                confirmButtonText: 'Borrar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    borrarSolicitudCompleta(id)
+                }
+            })
+        }
+
+        function borrarSolicitudCompleta(id){
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+
+            axios.post(url+'/bodega/solicitud/eliminarcompleta', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        toastr.error('Se encontraron Salidas');
+                    }
+                    else if(response.data.success === 2){
+                        toastr.success('Borrado');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al borrar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al borrar');
+                    closeLoading();
+                });
+        }
+
+
     </script>
 
 

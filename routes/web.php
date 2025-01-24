@@ -50,6 +50,7 @@ use App\Http\Controllers\Backend\PresupuestoUnidad\Requerimientos\SolicitudesITC
 use App\Http\Controllers\Backend\Bodega\BMaterialesController;
 use App\Http\Controllers\Backend\Bodega\BSolicitudesController;
 use App\Http\Controllers\Backend\Bodega\BHistorialController;
+use App\Http\Controllers\Backend\Bodega\BReportesController;
 
 
 use App\Http\Controllers\Backend\Sindico\SindicoController;
@@ -1316,19 +1317,29 @@ Route::get('/admin/bodega/historial/salidamanualdetalle/index/{id}', [BHistorial
 Route::get('/admin/bodega/historial/salidamanualdetalle/tabla/{id}', [BHistorialController::class,'tablaHistorialSalidasManualDetalle']);
 
 
-
-
 // SALIDAS MANUAL BODEGA
 Route::get('/admin/bodega/salidasmanual/index', [BMaterialesController::class,'indexSalidasManual'])->name('sidebar.bodega.salidasmanual');
 Route::post('/admin/bodega/salidasmanual/registrar',  [BMaterialesController::class,'registrarSalidaManual']);
 Route::post('/admin/bodega/salidasmanual/borraritem', [BMaterialesController::class,'salidaManualDetalleBorrarItem']);
 
 
+// REPORTES
+
+// SOLICITUD DE LA UNIDAD SOLICITANTE
+Route::get('/admin/bodega/reporte/solitudcompleta/{id}', [BReportesController::class,'reporteSolicitudCompleta']);
+// SOLICITUD DE PARTE ENCARGADO BODEGA -> COMPLETO
+Route::get('/admin/bodega/reporte/encargadobodega/completa/{id}', [BReportesController::class,'reporteEncargadoBodegaCompleta']);
+// SOLICITUD DE PARTE ENCARGADO BODEGA -> ITEM
+Route::get('/admin/bodega/reporte/encargadobodega/item/{id}', [BReportesController::class,'reporteEncargadoBodegaItem']);
 
 
+// VISTA PARA MODIFICAR NOMBRE PARA REPORTE
+Route::get('/admin/bodega/extras/nombrereporte', [BReportesController::class,'vistaConfigurarNombreReporte'])->name('sidebar.bodega.extras.reportenombre');
+Route::post('/admin/bodega/extras/actualizarDatos', [BReportesController::class,'actualizarConfigurarNombreReporte']);
 
-
-
+// VISTA REPORTE GENERAL -> VARIOS
+Route::get('/admin/bodega/reportes/generales', [BReportesController::class,'vistaReporteGenerales'])->name('sidebar.bodega.reportes.general');
+Route::get('/admin/bodega/reportes/pdf-existencias', [BReportesController::class,'generarPDFExistencias']);
 
 
 
@@ -1348,6 +1359,8 @@ Route::post('/admin/bodega/solicitudpendiente/estadofinalizar', [BSolicitudesCon
 // cambiar estado completo -> pendiente
 Route::post('/admin/bodega/solicitudpendiente/estadopendiente', [BSolicitudesController::class, 'cambiarEstadoAPendiente']);
 
+// ELIMINAR COMPLETAMENTE UNA SOLICITUD SINO TIENE SALIDAS
+Route::post('/admin/bodega/solicitud/eliminarcompleta', [BSolicitudesController::class, 'eliminarCompletamenteSolicitud']);
 
 Route::get('/admin/bodega/solicitudpendiente/detalle/index/{id}', [BSolicitudesController::class,'indexDetalleSolicitudesPendientes']);
 

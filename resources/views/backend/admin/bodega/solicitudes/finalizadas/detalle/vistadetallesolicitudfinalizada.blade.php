@@ -56,6 +56,7 @@
                                     <th style="width: 2%">Cantidad Solicitado</th>
                                     <th style="width: 3%">Estado</th>
                                     <th style="width: 2%">Cantidad Entregada</th>
+                                    <th style="width: 2%">Opciones</th>
 
                                 </tr>
                                 </thead>
@@ -80,7 +81,12 @@
                                             @endif
                                         </td>
                                         <td style="width: 2%">{{ $fila->cantidad_entregada }}</td>
-
+                                        <td style="width: 2%">
+                                            <button type="button" style="margin: 3px" class="btn btn-success btn-xs"
+                                                    onclick="vistaPDF({{ $fila->id }})">
+                                                <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
+                                            </button>
+                                        </td>
                                     </tr>
                                 @endforeach
 
@@ -123,7 +129,10 @@
 
     <script>
 
-
+        function vistaPDF(id){
+            // bodega_solicitud_detalle
+            window.open("{{ URL::to('admin/bodega/reporte/encargadobodega/item') }}/" + id);
+        }
 
     </script>
 

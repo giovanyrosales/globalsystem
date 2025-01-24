@@ -49,6 +49,7 @@
                                 <thead>
                                 <tr>
                                     <th style="width: 8%">Nombre</th>
+                                    <th style="width: 3%">Prioridad</th>
                                     <th style="width: 2%">U/M</th>
                                     <th style="width: 3%">Estado</th>
                                     <th style="width: 2%">Opciones</th>
@@ -59,6 +60,7 @@
                             @foreach($arraySinReferencia as $fila)
                                 <tr>
                                     <td style="width: 3%">{{ $fila->nombre }}</td>
+                                    <td style="width: 3%">{{ $fila->nombrePrioridad }}</td>
                                     <td style="width: 2%">{{ $fila->unidadMedida }}</td>
                                     <td style="width: 2%">
                                         @if($fila->estado == 1)
@@ -164,7 +166,14 @@
                                                 <button type="button" class="btn btn-warning btn-xs" onclick="vistaCambiarReferencia({{ $fila->id }})" style="color: black; margin: 3px">
                                                     <i class="fas fa-edit" title="Referencia" style="color: black;"></i>&nbsp; Referencia
                                                 </button>
+                                            @else
+                                                <button type="button" style="margin: 3px" class="btn btn-success btn-xs"
+                                                        onclick="vistaPDF({{ $fila->id }})">
+                                                    <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
+                                                </button>
                                             @endif
+
+
                                         </td>
                                     </tr>
                                 @endforeach
@@ -1077,6 +1086,11 @@
                 });
         }
 
+
+        function vistaPDF(id){
+            // bodega_solicitud_detalle
+            window.open("{{ URL::to('admin/bodega/reporte/encargadobodega/item') }}/" + id);
+        }
 
 
     </script>

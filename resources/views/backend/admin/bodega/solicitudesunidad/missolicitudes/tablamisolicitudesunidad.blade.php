@@ -23,6 +23,11 @@
                                                 onclick="vistaDetalle({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
                                         </button>
+
+                                        <button type="button" style="margin: 3px" class="btn btn-success btn-xs"
+                                                onclick="vistaPDF({{ $dato->id }})">
+                                            <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach

@@ -187,7 +187,8 @@ class BSolicitudesController extends Controller
 
         $listado = BodegaSolicitud::whereIn('id_objespecifico', $pilaObjEspeci)
             ->where('estado', 0) // pendientes
-            ->orderBy('fecha', 'asc')->get();
+            ->orderBy('fecha', 'asc')
+            ->get();
 
         foreach ($listado as $fila){
             $fila->fecha = date("d-m-Y", strtotime($fila->fecha));
@@ -203,6 +204,14 @@ class BSolicitudesController extends Controller
             }
 
             $fila->nombreDepartamento = $departamento;
+
+            $puedeBorrar = 0;
+            // SINO TIENE NINGUN REGISTRO PUEDE BORRAR
+            if(BodegaSalida::where('id_solicitud', $fila->id)->first()){
+                $puedeBorrar = 1;
+            }
+
+            $fila->puedeBorrar = $puedeBorrar;
         }
 
         return view('backend.admin.bodega.solicitudes.pendientes.tablasolicitudpendiente', compact('listado'));
@@ -272,9 +281,45 @@ class BSolicitudesController extends Controller
     }
 
 
+    public function eliminarCompletamenteSolicitud(Request $request)
+    {
+        $regla = array(
+            'id' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(BodegaSolicitud::where('id', $request->id)->first()){
+
+            // SE ENCONTRARON SALIDAS
+            if(BodegaSalida::where('id_solicitud', $request->id)->first()){
+                return ['success' => 1];
+            }
+
+            DB::beginTransaction();
+            try {
+
+                BodegaSolicitudDetalle::where('id_bodesolicitud', $request->id)->delete();
+                BodegaSolicitud::where('id', $request->id)->delete();
+
+                DB::commit();
+                return ['success' => 2];
+
+            } catch (\Throwable $e) {
+                Log::info('ee' . $e);
+                DB::rollback();
+                return ['success' => 99];
+            }
+        }else{
+            return ['success' => 99];
+        }
+    }
+
+
     public function indexDetalleSolicitudesPendientes($idsolicitud)
     {
-
         $arraySinReferencia = BodegaSolicitudDetalle::where('id_bodesolicitud', $idsolicitud)
             ->where('id_referencia', null)
             ->orderBy('nombre', 'asc')
@@ -292,6 +337,18 @@ class BSolicitudesController extends Controller
             }
 
             $fila->nombreEstado = $nombreEstado;
+
+
+
+            if($fila->prioridad == 1){
+                $nombrePrioridad = "BAJA";
+            }else if ($fila->prioridad == 2){
+                $nombrePrioridad = "MEDIA";
+            }else{
+                $nombrePrioridad = "ALTA";
+            }
+
+            $fila->nombrePrioridad = $nombrePrioridad;
         }
 
         $pilaObjEspeci = array();
@@ -348,6 +405,10 @@ class BSolicitudesController extends Controller
             $fila->nombreEstado = $nombreEstado;
 
 
+
+
+
+
             // VERIFICAR QUE SI TIENE ALGUNA SALIDA ESTA SOLICITUD_DETALLE_MATERIAL
             // PARA OCULTAR EL BOTON DE CAMBIAR REFERENCIA PARA PRODUCTO
             $existeSalida = 0;
@@ -357,13 +418,9 @@ class BSolicitudesController extends Controller
             $fila->existeSalida = $existeSalida;
         }
 
-
         return view('backend.admin.bodega.solicitudes.pendientes.detalle.vistadetallesolicitudpendiente',
         compact('idsolicitud', 'arraySinReferencia', 'arrayMateriales', 'arrayReferencia'));
     }
-
-
-
 
 
     public function infoBodegaSolitudDetalleFila(Request $request)

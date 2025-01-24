@@ -30,6 +30,12 @@
                                                 onclick="vistaEstado({{ $dato->id }})">
                                             <i class="fas fa-edit" title="Pendiente"></i>&nbsp; Pendiente
                                         </button>
+
+                                        <button type="button" style="margin: 3px" class="btn btn-success btn-xs"
+                                                onclick="vistaPDF({{ $dato->id }})">
+                                            <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
+                                        </button>
+
                                     </td>
                                 </tr>
                             @endforeach

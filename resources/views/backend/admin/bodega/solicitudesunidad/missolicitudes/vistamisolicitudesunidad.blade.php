@@ -83,6 +83,10 @@
             window.location.href="{{ url('/admin/bodega/missolicitudes/detalle/index') }}/" + idsolicitud;
         }
 
+        function vistaPDF(id){
+            window.open("{{ URL::to('admin/bodega/reporte/solitudcompleta') }}/" + id);
+        }
+
     </script>
 
 

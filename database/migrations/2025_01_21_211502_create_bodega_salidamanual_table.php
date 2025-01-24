@@ -19,6 +19,10 @@ class CreateBodegaSalidamanualTable extends Migration
             $table->bigInteger('id_usuario')->unsigned();
             $table->string('observacion', 300)->nullable();
 
+            // 0- SALIDA NORMAL
+            // 1- DESPERFECTO
+            $table->integer('estado');
+
             $table->foreign('id_usuario')->references('id')->on('usuario');
         });
     }

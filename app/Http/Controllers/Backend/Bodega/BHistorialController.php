@@ -27,6 +27,10 @@ use Illuminate\Support\Facades\Validator;
 class BHistorialController extends Controller
 {
 
+    public function __construct(){
+        $this->middleware('auth');
+    }
+
     public function indexHistorialEntradas()
     {
         return view('backend.admin.bodega.historial.entradas.vistaentradabodega');
