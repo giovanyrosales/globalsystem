@@ -53,9 +53,9 @@
                                     <th style="width: 7%">Solicitado</th>
                                     <th style="width: 7%">Referencia</th>
                                     <th style="width: 2%">U/M</th>
-                                    <th style="width: 2%">Cantidad Solicitado</th>
+                                    <th style="width: 2%">C. Solicitado</th>
                                     <th style="width: 3%">Estado</th>
-                                    <th style="width: 2%">Cantidad Entregada</th>
+                                    <th style="width: 2%">C. Entregada</th>
                                     <th style="width: 2%">Opciones</th>
 
                                 </tr>
