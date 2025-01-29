@@ -103,6 +103,47 @@
     @endif
 
 
+    <div class="modal fade" id="modalReportes">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Listado de Salidas</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-reportes">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-5">
+
+                                    <div class="col-md-10">
+                                        <div class="form-group">
+                                            <label>Salidas Registradas</label>
+                                            <select class="form-control" id="select-salidasregistro" >
+
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+                                    <button type="button" onclick="generarPdfSalidas()" class="btn" style="margin-left: 15px; margin-top: 15px; border-color: black; border-radius: 0.1px;">
+                                        <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
+                                        Generar PDF
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 </div>
@@ -130,8 +171,52 @@
     <script>
 
         function vistaPDF(id){
-            // bodega_solicitud_detalle
-            window.open("{{ URL::to('admin/bodega/reporte/encargadobodega/item') }}/" + id);
+            // SE RECIBE ID: bodega_solicitud_detalle
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+
+            axios.post(url+'/bodega/infosalidas/bodegasolidetalle', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+
+                        document.getElementById("select-salidasregistro").options.length = 0;
+
+                        $('#modalReportes').modal('show');
+
+                        // EL ID SERA DE: bodega_salidas_detalle
+
+                        $.each(response.data.arraySalidas, function( key, val ){
+                            $('#select-salidasregistro').append('<option value="' + val.id + '">' + val.nombreCompleto + '</option>');
+                        });
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
+
+        function generarPdfSalidas(){
+
+            var idSelect = document.getElementById('select-salidasregistro').value;
+
+            if(idSelect === ''){
+                toastr.error('Registro de Salida es requerido');
+                return
+            }
+
+            // ID: bodega_salida_detalle
+            window.open("{{ URL::to('admin/bodega/reporte/encargadobodega/item') }}/" + idSelect);
+
         }
 
     </script>
