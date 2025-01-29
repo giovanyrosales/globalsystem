@@ -77,7 +77,7 @@
                         <section class="content">
                             <div class="container-fluid">
                                 <div class="row">
-                                    <div class="form-group col-md-5" style="margin-top: 5px">
+                                    <div class="form-group col-md-8" style="margin-top: 5px">
                                         <h3 class="card-title" style="color: #005eab; font-weight: bold">Buscar Producto</h3>
                                         <div>
                                         </div>

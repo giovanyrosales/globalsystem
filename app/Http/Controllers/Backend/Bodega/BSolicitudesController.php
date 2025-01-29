@@ -359,7 +359,7 @@ class BSolicitudesController extends Controller
             array_push($pilaObjEspeci, $fila->id_objespecifico);
         }
 
-        $arrayMateriales = BodegaMateriales::where('id_objespecifico', $pilaObjEspeci)
+        $arrayMateriales = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
             ->orderBy('nombre', 'asc')
             ->get();
 
@@ -403,9 +403,6 @@ class BSolicitudesController extends Controller
                 $nombreEstado = "Denegado";
             }
             $fila->nombreEstado = $nombreEstado;
-
-
-
 
 
 
