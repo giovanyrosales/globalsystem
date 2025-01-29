@@ -31,13 +31,12 @@
                                                     onclick="vistaBorrar({{ $dato->id }})">
                                                 <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar
                                             </button>
-                                        @else
-                                            <button type="button" style="margin: 3px" class="btn btn-warning btn-xs"
-                                                    onclick="vistaEstado({{ $dato->id }})">
-                                                <i class="fas fa-edit" title="Finalizar"></i>&nbsp; Finalizar
-                                            </button>
                                         @endif
 
+                                        <button type="button" style="margin: 3px" class="btn btn-warning btn-xs"
+                                                onclick="vistaEstado({{ $dato->id }})">
+                                            <i class="fas fa-edit" title="Finalizar"></i>&nbsp; Finalizar
+                                        </button>
 
                                         <button type="button" style="margin: 3px" class="btn btn-success btn-xs"
                                                 onclick="vistaPDF({{ $dato->id }})">

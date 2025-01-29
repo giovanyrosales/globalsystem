@@ -11,6 +11,7 @@
                             <thead>
                             <tr>
                                 <th style="width: 4%">Fecha Salida</th>
+                                <th style="width: 5%">Tipo Salida</th>
                                 <th style="width: 6%">Observación</th>
                                 <th style="width: 6%">Opciones</th>
                             </tr>
@@ -20,6 +21,13 @@
                             @foreach($listado as $dato)
                                 <tr>
                                     <td style="width: 4%">{{ $dato->fecha }}</td>
+                                    <td style="width: 5%">
+                                        @if($dato->estado == 0)
+                                            {{ $dato->tipoEstado }}
+                                        @else
+                                            <small class="badge badge-danger">{{ $dato->tipoEstado }}</small>
+                                        @endif
+                                       </td>
                                     <td style="width: 6%">{{ $dato->observacion }}</td>
                                     <td style="width: 6%">
                                         <button type="button" class="btn btn-info btn-xs"

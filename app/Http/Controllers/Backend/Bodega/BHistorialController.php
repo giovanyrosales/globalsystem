@@ -378,6 +378,13 @@ class BHistorialController extends Controller
 
         foreach ($listado as $fila) {
             $fila->fecha = date("d-m-Y", strtotime($fila->fecha));
+            if($fila->estado == 0){
+                $tipoEstado = "SALIDA MANUAL";
+            }else{
+                $tipoEstado = "DESPERFECTO";
+            }
+
+            $fila->tipoEstado = $tipoEstado;
         }
 
         return view('backend.admin.bodega.historial.salidamanual.tablasalidamanual', compact('listado'));

@@ -979,11 +979,19 @@
 
 
                             <li class="nav-item">
+                                <a href="{{ route('sidebar.bodega.reportes.salidasunidad') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Entrega Unidad</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
                                 <a href="{{ route('sidebar.bodega.reportes.general') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>General</p>
                                 </a>
                             </li>
+
 
                             <li class="nav-item">
                                 <a href="{{ route('sidebar.bodega.extras.reportenombre') }}" target="frameprincipal" class="nav-link">
@@ -991,6 +999,11 @@
                                     <p>Config. Reporte</p>
                                 </a>
                             </li>
+
+
+
+
+
 
                         </ul>
                     </li>

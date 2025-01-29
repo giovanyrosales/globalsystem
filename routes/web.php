@@ -1341,6 +1341,13 @@ Route::post('/admin/bodega/extras/actualizarDatos', [BReportesController::class,
 Route::get('/admin/bodega/reportes/generales', [BReportesController::class,'vistaReporteGenerales'])->name('sidebar.bodega.reportes.general');
 Route::get('/admin/bodega/reportes/pdf-existencias', [BReportesController::class,'generarPDFExistencias']);
 
+// VISTA PARA REPORTE DE UNIDADES DE LO QUE HEMOS ENTREGADO. INDIVIDUAL Y TODAS LAS UNIDADES
+Route::get('/admin/bodega/reportes/entregaunidadesvarios', [BReportesController::class,'vistaReporteEntregadoUnidades'])->name('sidebar.bodega.reportes.salidasunidad');
+Route::get('/admin/bodega/reportes/unidadentrega/pdf/{idusuario}/{desde}/{hasta}', [BReportesController::class,'reporteUnidadPDFEntregas']);
+Route::get('/admin/bodega/reportes/totalentrega/pdf/{desde}/{hasta}', [BReportesController::class,'reportePDFEntregasTotal']);
+
+
+
 
 
 
@@ -1386,6 +1393,12 @@ Route::post('/admin/bodega/solicitudpendiente/infomaterialsalidalote', [BSolicit
 
 // ** REGISTRAR SALIDA DE PRODUCTO
 Route::post('/admin/bodega/solicitudpendiente/registrarsalida', [BSolicitudesController::class, 'registrarSalidaBodegaSolicitud']);
+
+
+// VERIFICAR CUANTAS SALIDAS TIENE ESTE ID: bodega_solicitud_detalle
+Route::post('/admin/bodega/infosalidas/bodegasolidetalle', [BSolicitudesController::class, 'infoCuantasSalidasTieneSoliDetalle']);
+
+
 
 
 //*** SOLICITUDES FINALIZADAS

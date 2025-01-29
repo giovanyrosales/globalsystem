@@ -734,7 +734,48 @@ class BSolicitudesController extends Controller
 
 
 
-    //*** SOLCIITUDES FINALIZADAS
+    public function infoCuantasSalidasTieneSoliDetalle(Request $request)
+    {
+
+        $regla = array(
+            'id' => 'required', // bodega_solicitud_detalle
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+
+        if(BodegaSolicitudDetalle::where('id', $request->id)->first()){
+
+            // OBTENER ARRAY DE TODAS LAS SALIDAS
+            $arraySalidaDeta = BodegaSalidaDetalle::where('id_solidetalle', $request->id)->get();
+
+            foreach ($arraySalidaDeta as $fila) {
+                $infoSalida = BodegaSalida::where('id', $fila->id_salida)->first();
+                $fila->fechaFormat = date("d-m-Y", strtotime($infoSalida->fecha));
+
+                $fechaFormat = date("d-m-Y", strtotime($infoSalida->fecha));
+
+                $fila->nombreCompleto = $fechaFormat . " (Entregado: " . $fila->cantidad_salida . ")";
+            }
+
+            $arraySalidaDetaSort = $arraySalidaDeta->sortBy('fechaFormat');
+
+            return ['success' => 1, 'arraySalidas' => $arraySalidaDetaSort];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+
+
+
+
+
+
+    //*** SOLICITUDES FINALIZADAS
 
     public function indexSolicitudesFinalizadas()
     {
