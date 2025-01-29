@@ -648,11 +648,11 @@ class BReportesController extends Controller
             $multiplicado = $resta * $fila->precio;
             $totalCulumna += $multiplicado;
 
-            $fila->multiplicado = "$" . number_format((float)$multiplicado, 2, '.');
-            $fila->precioFormat = "$" . number_format((float)$fila->precio, 2, '.');
+            $fila->multiplicado = "$" . number_format((float)$multiplicado, 2, '.', ',');
+            $fila->precioFormat = "$" . number_format((float)$fila->precio, 2, '.', ',');
         }
 
-        $totalCulumna = "$" . number_format((float)$totalCulumna, 2, '.');
+        $totalCulumna = "$" . number_format((float)$totalCulumna, 2, '.', ',');
 
         $arrayDetalle = $arrayInfo->sortBy('nombreMaterial');
         $fechaFormat = date("d-m-Y", strtotime(Carbon::now('America/El_Salvador')));
@@ -818,11 +818,11 @@ class BReportesController extends Controller
             $multiplicado = $fila->cantidad_salida * $infoEnDeta->precio;
             $multiplicado = round($multiplicado, 2);
             $columnaTotalMultiplicado += $multiplicado;
-            $fila->multiplicado = '$' . number_format((float)$multiplicado, 2, '.');
+            $fila->multiplicado = '$' . number_format((float)$multiplicado, 2, '.', ',');
         }
 
         $columnaTotalMultiplicado = round($columnaTotalMultiplicado, 2);
-        $columnaTotalMultiplicado = '$' . number_format((float)$columnaTotalMultiplicado, 2, '.');
+        $columnaTotalMultiplicado = '$' . number_format((float)$columnaTotalMultiplicado, 2, '.', ',');
 
         $nombreUnidad = "";
         if($dato = P_UsuarioDepartamento::where('id_usuario', $idusuario)->first()){
@@ -1001,7 +1001,7 @@ class BReportesController extends Controller
                 $multiplicado = $fila->cantidad_salida * $infoEnDeta->precio;
                 $multiplicado = round($multiplicado, 2);
                 $columnaTotalMultiplicado += $multiplicado;
-                $fila->multiplicado = '$' . number_format((float)$multiplicado, 2, '.');
+                $fila->multiplicado = '$' . number_format((float)$multiplicado, 2, '.', ',');
             }
 
             $arraySalidaDetalleSORT = $arraySalidaDetalle->sortBy('fechaFormat');
@@ -1009,7 +1009,7 @@ class BReportesController extends Controller
             $totalTodasLasUnidades += $columnaTotalMultiplicado;
 
             $columnaTotalMultiplicado = round($columnaTotalMultiplicado, 2);
-            $filaP->totalColumnaMultiplicado ='$' . number_format((float)$columnaTotalMultiplicado, 2, '.');
+            $filaP->totalColumnaMultiplicado ='$' . number_format((float)$columnaTotalMultiplicado, 2, '.', ',');
 
             $resultsBloque[$index]->bloque = $arraySalidaDetalleSORT;
             $index++;
@@ -1017,7 +1017,7 @@ class BReportesController extends Controller
 
 
         $totalTodasLasUnidades = round($totalTodasLasUnidades, 2);
-        $totalTodasLasUnidades = '$' . number_format((float)$totalTodasLasUnidades, 2, '.');
+        $totalTodasLasUnidades = '$' . number_format((float)$totalTodasLasUnidades, 2, '.', ',');
 
 
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
