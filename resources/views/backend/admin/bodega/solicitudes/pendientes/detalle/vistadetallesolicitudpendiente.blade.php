@@ -308,7 +308,7 @@
                                         <input type="hidden" disabled class="form-control" id="id-salidamaterial" autocomplete="off">
                                     </div>
 
-                                    <div class="form-group col-md-2">
+                                    <div class="form-group">
                                         <label>Fecha de Salida</label>
                                         <input type="date" class="form-control" id="info-fechasalida" autocomplete="off">
                                     </div>
