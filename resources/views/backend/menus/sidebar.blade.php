@@ -1107,12 +1107,7 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item">
-                                <a href="{{ route('admin.sindico.tiposolicitud.index') }}" target="frameprincipal" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Tipo Solicitud</p>
-                                </a>
-                            </li>
+
 
                             <li class="nav-item">
                                 <a href="{{ route('admin.sindico.tipodeligencia.index') }}" target="frameprincipal" class="nav-link">

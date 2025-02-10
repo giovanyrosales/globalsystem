@@ -609,7 +609,6 @@ class BReportesController extends Controller
 
     public function generarPDFExistencias()
     {
-
         // OBTENER UNICAMENTE LOS MATERIALES ASOCIADOS A MIS CODIGOS
 
         $pilaObjEspeci = array();
