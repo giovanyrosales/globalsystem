@@ -17,6 +17,8 @@ class CreateBodegaSolicitudDetalleTable extends Migration
             $table->id();
             $table->bigInteger('id_bodesolicitud')->unsigned();
             $table->bigInteger('id_unidad')->unsigned();
+
+            // SE ANCLA AL MATERIAL O PRODUCTO
             $table->bigInteger('id_referencia')->unsigned()->nullable();
 
             $table->string('nombre', 300);

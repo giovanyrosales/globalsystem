@@ -209,6 +209,60 @@ class BHistorialController extends Controller
     }
 
 
+    public function informacionItemEntradaDetalle(Request $request)
+    {
+        $regla = array(
+            'id' => 'required', //tabla: bodega_entradas
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        if($info = BodegaEntradasDetalle::where('id', $request->id)->first()){
+            return ['success' => 1, 'info' => $info];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+    public function editarItemEntradaDetalle(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+            'precio' => 'required',
+        );
+
+        // codigo
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        BodegaEntradasDetalle::where('id', $request->id)->update([
+            'precio' => $request->precio,
+            'codigo_producto' => $request->codigo,
+        ]);
+
+        return ['success' => 1];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public function indexHistorialEntradasDetalle($id)
     {
         $info = BodegaEntradas::where('id', $id)->first();
@@ -220,7 +274,7 @@ class BHistorialController extends Controller
 
         $listado = DB::table('bodega_entradas_detalle AS bo')
             ->join('bodega_materiales AS bm', 'bo.id_material', '=', 'bm.id')
-            ->select('bo.id', 'bo.cantidad', 'bo.precio', 'bm.nombre')
+            ->select('bo.id', 'bo.cantidad', 'bo.precio', 'bm.nombre', 'bo.codigo_producto')
             ->where('bo.id_entrada', $id)
             ->get();
 
@@ -231,8 +285,6 @@ class BHistorialController extends Controller
     {
         // id: es de bodega_entrada
         $info = BodegaEntradas::where('id', $id)->first();
-
-
 
         return view('backend.admin.bodega.historial.entradas.detalle.vistaingresoextra', compact('id', 'info'));
     }
@@ -269,6 +321,7 @@ class BHistorialController extends Controller
             $fila->nombreObj = "(" . $infoObj->codigo . ")" . $infoObj->nombre;
             $fila->nombreUser = $infoUserSolicito->nombre;
             $fila->nombreUnidad = $infoDepa->nombre;
+            $fila->numeroSolicitud = $infoSoli->numero_solicitud;
         }
 
         return view('backend.admin.bodega.historial.salidas.tablasalidabodega', compact('listado'));
@@ -290,6 +343,9 @@ class BHistorialController extends Controller
             $infoSoliDetalle = BodegaSolicitudDetalle::where('id', $fila->id_solidetalle)->first();
             $infoProducto = BodegaMateriales::where('id', $infoSoliDetalle->id_referencia)->first();
             $infoObj = ObjEspecifico::where('id', $infoProducto->id_objespecifico)->first();
+
+            $infoEntradaDetalle = BodegaEntradasDetalle::where('id', $fila->id_entradadetalle)->first();
+            $fila->codigoProducto = $infoEntradaDetalle->codigo_producto;
 
             $fila->nombreProducto = $infoProducto->nombre;
             $fila->nombreObj = "(" . $infoObj->codigo . ") " . $infoObj->nombre;

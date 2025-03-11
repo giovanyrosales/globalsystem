@@ -49,6 +49,47 @@
         </div>
     </section>
 
+
+
+    <div class="modal fade" id="modalEditar">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Nombre de Solicitud</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-editar">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" id="id-editar">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Número/Nombre de Solicitud</label>
+                                        <input type="text" class="form-control" maxlength="50" id="nombre-solicitud-editar" autocomplete="off">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                            class="button button-rounded button-pill button-small" onclick="editarSolicitud()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 
@@ -197,6 +238,62 @@
                 });
         }
 
+        // para cambio de solicitud
+        function vistainfoNumeroSolicitud(id){
+            openLoading();
+            document.getElementById("formulario-editar").reset();
+
+            axios.post(url+'/bodega/solicitud/informacion',{
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        $('#modalEditar').modal('show');
+                        $('#id-editar').val(id);
+                        $('#nombre-solicitud-editar').val(response.data.info.numero_solicitud);
+
+                    }else{
+                        toastr.error('Información no encontrada');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Información no encontrada');
+                });
+        }
+
+
+        function editarSolicitud(){
+            var id = document.getElementById('id-editar').value;
+            var nombre = document.getElementById('nombre-solicitud-editar').value;
+
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('nombre', nombre);
+
+            axios.post(url+'/bodega/solicitud/editardatos', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado correctamente');
+                        $('#modalEditar').modal('hide');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
 
     </script>
 

@@ -10,17 +10,19 @@
                                 <th style="width: 3%">Fecha Solicitud</th>
                                 <th style="width: 15%">Solicitante</th>
                                 <th style="width: 15%">Unidad</th>
-                                <th style="width: 6%">Opciones</th>
+                                <th style="width: 8%">Número Solicitud</th>
+                                <th style="width: 8%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($listado as $dato)
                                 <tr>
-                                    <td style="width: 3%">{{ $dato->fecha }}</td>
-                                    <td style="width: 15%">{{ $dato->nombreUsuario }}</td>
-                                    <td style="width: 15%">{{ $dato->nombreDepartamento }}</td>
-                                    <td style="width: 6%">
+                                    <td>{{ $dato->fecha }}</td>
+                                    <td>{{ $dato->nombreUsuario }}</td>
+                                    <td>{{ $dato->nombreDepartamento }}</td>
+                                    <td>{{ $dato->numero_solicitud }}</td>
+                                    <td>
                                         <button type="button" class="btn btn-info btn-xs"
                                                 onclick="vistaDetalle({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle

@@ -124,10 +124,10 @@
                                     <th style="width: 2%">#</th>
                                     <th style="width: 7%">Solicitado</th>
                                     <th style="width: 7%">Referencia</th>
-                                    <th style="width: 2%">U/M</th>
-                                    <th style="width: 2%">C. Solicitado</th>
-                                    <th style="width: 3%">Estado</th>
-                                    <th style="width: 2%">C. Entregada</th>
+                                    <th style="width: 3%">U/M</th>
+                                    <th style="width: 3%">C. Solicitado</th>
+                                    <th style="width: 4%">Estado</th>
+                                    <th style="width: 3%">C. Entregada</th>
                                     <th style="width: 4%">Opciones</th>
                                 </tr>
                                 </thead>
@@ -165,11 +165,6 @@
                                             @if($fila->existeSalida == 0)
                                                 <button type="button" class="btn btn-warning btn-xs" onclick="vistaCambiarReferencia({{ $fila->id }})" style="color: black; margin: 3px">
                                                     <i class="fas fa-edit" title="Referencia" style="color: black;"></i>&nbsp; Referencia
-                                                </button>
-                                            @else
-                                                <button type="button" style="margin: 3px" class="btn btn-success btn-xs"
-                                                        onclick="vistaPDF({{ $fila->id }})">
-                                                    <i class="fas fa-file-pdf" title="PDF"></i>&nbsp; PDF
                                                 </button>
                                             @endif
 
@@ -308,7 +303,7 @@
                                         <input type="hidden" disabled class="form-control" id="id-salidamaterial" autocomplete="off">
                                     </div>
 
-                                    <div class="form-group">
+                                    <div class="form-group col-md-3">
                                         <label>Fecha de Salida</label>
                                         <input type="date" class="form-control" id="info-fechasalida" autocomplete="off">
                                     </div>
@@ -335,6 +330,7 @@
                                         <input type="text" disabled class="form-control" id="info-nombrematerial" autocomplete="off">
                                     </div>
 
+
                                     <hr>
 
                                     <!-- ** TABLA PARA SALIDAS DE MATERIAL POR DIFERENTE LOTE ** -->
@@ -345,6 +341,7 @@
                                         <tr>
                                             <th style="width: 3%">#</th>
                                             <th style="width: 5%">Lote</th>
+                                            <th style="width: 5%">Código Producto</th>
                                             <th style="width: 5%">Cantidad Actual</th>
                                             <th style="width: 5%">Cantidad Salida</th>
 
@@ -727,6 +724,10 @@
 
                                 "<td>" +
                                 "<input disabled value='" + val.lote + "' class='form-control' type='text'>" +
+                                "</td>" +
+
+                                "<td>" +
+                                "<input disabled value='" + val.codigoPro + "' class='form-control' type='text'>" +
                                 "</td>" +
 
                                 "<td>" +

@@ -286,7 +286,7 @@ class BMaterialesController extends Controller
             $nuevoReg->observacion = $request->observacion;
             $nuevoReg->save();
 
-            // infoIdProducto, infoCantidad, infoPrecio
+            // infoIdProducto, infoCantidad, infoPrecio, infoCodigoProducto
 
             foreach ($datosContenedor as $filaArray) {
 
@@ -297,6 +297,7 @@ class BMaterialesController extends Controller
                 $detalle->id_material = $filaArray['infoIdProducto'];
                 $detalle->cantidad = $filaArray['infoCantidad'];
                 $detalle->precio = $filaArray['infoPrecio'];
+                $detalle->codigo_producto = $filaArray['infoCodigoProducto'];
                 $detalle->nombre_copia = $infoProducto->nombre;
                 $detalle->cantidad_entregada = 0;
                 $detalle->save();
@@ -332,8 +333,6 @@ class BMaterialesController extends Controller
             // Obtiene los datos enviados desde el formulario como una cadena JSON y luego decódificala
             $datosContenedor = json_decode($request->contenedorArray, true); // El segundo argumento convierte el resultado en un arreglo
 
-            $usuario = auth()->user();
-
             foreach ($datosContenedor as $filaArray) {
 
                 $infoProducto = BodegaMateriales::where('id', $filaArray['infoIdProducto'])->first();
@@ -343,6 +342,7 @@ class BMaterialesController extends Controller
                 $detalle->id_material = $filaArray['infoIdProducto'];
                 $detalle->cantidad = $filaArray['infoCantidad'];
                 $detalle->precio = $filaArray['infoPrecio'];
+                $detalle->codigo_producto = $filaArray['infoCodigo'];
                 $detalle->nombre_copia = $infoProducto->nombre;
                 $detalle->cantidad_entregada = 0;
                 $detalle->save();

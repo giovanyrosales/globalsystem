@@ -65,6 +65,7 @@ class BSolicitudesController extends Controller
             $nuevoReg->fecha = $fecha;
             $nuevoReg->id_objespecifico = $request->idObjEspeci;
             $nuevoReg->estado = 0;
+            $nuevoReg->numero_solicitud = null;
             $nuevoReg->save();
 
             // infoProducto, infoIdUnidad, infoIdPrioridad, infoCantidad
@@ -597,7 +598,7 @@ class BSolicitudesController extends Controller
     public function infoBodegaMaterialLoteDetalleFila(Request $request)
     {
         $regla = array(
-            'id' => 'required'
+            'id' => 'required' // BodegaSolicitudDetalle
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -627,6 +628,13 @@ class BSolicitudesController extends Controller
 
             $fecha = date("d-m-Y", strtotime($infoPadre->fecha));
             $fila->fechaIngreso = $fecha;
+
+            $codigoPro = "";
+            if($fila->codigo_producto != null){
+                $codigoPro = $fila->codigo_producto;
+            }
+
+            $fila->codigoPro = $codigoPro;
         }
 
         return ['success' => 1, 'info' => $info,
@@ -857,6 +865,47 @@ class BSolicitudesController extends Controller
             compact('idsolicitud',  'arrayReferencia'));
     }
 
+
+
+    public function informacionSolicitud(Request $request)
+    {
+        $regla = array(
+            'id' => 'required', // bodega_solicitud
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+
+        if($info = BodegaSolicitud::where('id', $request->id)->first()){
+
+
+            return ['success' => 1, 'info' => $info];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+    public function editarSolicitudNombre(Request $request)
+    {
+        $regla = array(
+            'id' => 'required', // bodega_solicitud
+        );
+
+        // nombre
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        BodegaSolicitud::where('id', $request->id)->update([
+            'numero_solicitud' => $request->nombre
+        ]);
+
+        return ['success' => 1];
+    }
 
 
 }

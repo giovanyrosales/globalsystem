@@ -36,26 +36,31 @@ class BReportesController extends Controller
             $fechaFormat = date("d-m-Y", strtotime($infoSolicitud->fecha));
 
 
-            $nombreBodeguero = "";
-            if($infoEntrDeta = BodegaUsuarioObjEspecifico::where('id_objespecifico', $infoSolicitud->id_objespecifico)->first()){
-                $infoUs = Usuario::where('id', $infoEntrDeta->id_usuario)->first();
-                $nombreBodeguero = $infoUs->nombre;
-            }
+            // USUARIO QUE INICIO SESION
 
 
             $arrayDetalle = BodegaSolicitudDetalle::where('id_bodesolicitud', $idsolicitud)->get();
             $infoExtra = BodegaExtras::where('id', 1)->first();
-            $infoUsuario = Usuario::where('id', $infoSolicitud->id_usuario)->first();
+
+            // USUARIO DE LA SOLICITUD
+            $infoUsuarioSolicitud = Usuario::where('id', $infoSolicitud->id_usuario)->first();
             $nombreDepartamento = "";
             if($infoUD = P_UsuarioDepartamento::where('id_usuario', $infoSolicitud->id_usuario)->first()){
                 $infoDepa = P_Departamento::where('id', $infoUD->id_departamento)->first();
                 $nombreDepartamento = $infoDepa->nombre;
             }
 
-            //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-            $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+            // NECESITO EL USUARIO A QUIEN VA DIRIGIDO ESTA SOLICITUD
 
-            $mpdf->SetTitle('Solicitudes');
+            $dataEspecifico = BodegaUsuarioObjEspecifico::where('id_objespecifico', $infoSolicitud->id_objespecifico)->first();
+            $infoUsuarioVaDirigido = Usuario::where('id', $dataEspecifico->id_usuario)->first();
+
+
+
+            $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+            //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+            $mpdf->SetTitle('Solicitud de Insumos');
 
             // mostrar errores
             $mpdf->showImageErrors = false;
@@ -73,7 +78,7 @@ class BReportesController extends Controller
                     <!-- Texto centrado -->
                     <td style='width: 60%; text-align: center;'>
                         <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>UNIDAD DE PROVEEDURÍA Y BODEGA</h2>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioVaDirigido->cargo2</h2>
                     </td>
                     <!-- Logo derecho -->
                     <td style='width: 10%; text-align: right;'>
@@ -87,28 +92,39 @@ class BReportesController extends Controller
             $tabla .= "
             <div style='text-align: center; margin-top: 20px;'>
                 <h1 style='font-size: 16px; margin: 0; color: #000;'>SOLICITUD DE INSUMOS EN BODEGA</h1>
-                <p style='font-size: 14px; margin: 5px 0; color: #000;'>N° DE SOLICITUD: $idsolicitud</p>
             </div>
             <div style='text-align: right; margin-top: 10px; padding-right: 80px;'>
             <p style='font-size: 14px; margin: 0; color: #000;'>Fecha: $fechaFormat</p>
             </div>
           ";
 
-
             $tabla .= "
             <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
-                <p style='font-size: 14px; margin: 0; color: #000;'>$infoExtra->nombre_encargado</p>
+                <p style='font-size: 14px; margin: 0; color: #000;'><strong>Encargado:</strong> $infoUsuarioVaDirigido->nombre</p>
+                <p style='font-size: 14px; margin: 0; color: #000;'><strong>Cargo:</strong> $infoUsuarioVaDirigido->cargo</p>
                 <p style='font-size: 14px; margin: 5px 0; color: #000;'>Santa Ana Norte</p>
             </div>
+            ";
+
+
+            // TEXTO SEGUN USUARIO
+            $textoDescripcion = "";
+            if($infoUsuarioVaDirigido->id == 77){ // proveeduria y bodega
+                $textoDescripcion = "materiales y/o papeleria";
+            }else if($infoUsuarioVaDirigido->id == 78){ // informatica
+                $textoDescripcion = "materiales informáticos";
+            }else{ // activo
+                $textoDescripcion = "materiales de oficina";
+            }
+
+            $tabla .= "
                <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
                 <p style='font-size: 14px; margin: 5px 0; color: #000;'>Por medio de la presente, me permito solicitar la entrega de los siguientes materiales,
                 los cuales son necesarios para el desarrollo de nuestras actividades dentro de la municipalidad: </p>
 
                    <p style='font-size: 14px; margin: 5px 0; color: #000;'>
-                        <strong>Descripción general:</strong> (ej. Materiales de oficina, papelería, productos de limpieza, etc)
+                        <strong>Descripción general:</strong> $textoDescripcion
                     </p>
-                    <p style='font-size: 14px; margin: 5px 0; color: #000;'>
-                    <strong>NOTA: el número y estado de la solicitud será completado por la unidad de proveeduría y bodega.</strong>
                 </p>
             </div>
             ";
@@ -117,11 +133,7 @@ class BReportesController extends Controller
             $tabla .= "
 
 
-           <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
-                <p style='font-size: 14px; margin: 5px 0; color: #000;'>
-                    Quedo a la espera de su confirmación sobre la disponibilidad y fecha de entrega.
-                </p>
-           </div>
+
            <br>
         ";
 
@@ -129,10 +141,10 @@ class BReportesController extends Controller
             $tabla .= "<table id='tablaFor' style='width: 100%; border-collapse: collapse;'>
     <tbody>
         <tr>
-            <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>N°</th>
+            <th style='text-align: center; font-size:13px; width: 7%; font-weight: bold; border: 1px solid black;'>N°</th>
             <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>Descripción</th>
-            <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>Unidad de medida</th>
-            <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>Cantidad solicitada</th>
+            <th style='text-align: center; font-size:13px; width: 9%; font-weight: bold; border: 1px solid black;'>Unidad de medida</th>
+            <th style='text-align: center; font-size:13px; width: 10%; font-weight: bold; border: 1px solid black;'>Cantidad solicitada</th>
         </tr>
         ";
 
@@ -155,6 +167,19 @@ class BReportesController extends Controller
 
 
 
+            $tabla .= "
+               <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
+                    <strong>NOTA: el número y estado de la solicitud será completado por la unidad de proveeduría y bodega.</strong>
+                </p>
+                <br>
+                 <p style='font-size: 14px; margin: 5px 0; color: #000;'>
+                Quedo a la espera de su confirmación sobre la disponibilidad y fecha de entrega.
+                </p>
+            </div>
+            ";
+
+
+
 
             $tabla .= "
 <table style='width: 100%; margin-top: 30px; font-family: \"Times New Roman\", Times, serif; font-size: 14px; color: #000;'>
@@ -171,7 +196,7 @@ class BReportesController extends Controller
     <tr>
         <td style='width: 50%; text-align: center; padding: 20px;'>
             <p style='margin: 10px 0;'>f.____________________________</p>
-            <p style='margin: 10px 0;'>$infoUsuario->nombre</p>
+            <p style='margin: 10px 0;'>$infoUsuarioSolicitud->nombre</p>
             <p style='margin: 10px 0;'>Jefe de unidad</p>
             <p style='margin: 10px 0;'>$nombreDepartamento</p>
         </td>
@@ -198,8 +223,8 @@ class BReportesController extends Controller
             <tr>
                 <td style='width: 50%; text-align: center; padding: 20px;'>
                     <p style='margin: 10px 0;'>f.____________________________</p>
-                    <p style='margin: 10px 0;'>$nombreBodeguero</p>
-                    <p style='margin: 10px 0;'>Encargado de proveeduría y bodega</p>
+                    <p style='margin: 10px 0;'>$infoUsuarioVaDirigido->nombre</p>
+                    <p style='margin: 10px 0;'>$infoUsuarioVaDirigido->cargo</p>
                     <p style='margin: 10px 0;'>Fecha: </p>
                     <p style='margin: 10px 0;'>Hora: </p>
                 </td>
@@ -240,7 +265,7 @@ class BReportesController extends Controller
 
     public function reporteEncargadoBodegaCompleta($idsolicitud)
     {
-        if($infoSolicitud = BodegaSolicitud::where('id', $idsolicitud)->first()){
+        if ($infoSolicitud = BodegaSolicitud::where('id', $idsolicitud)->first()) {
             $fechaFormat = date("d-m-Y", strtotime(Carbon::now('America/El_Salvador')));
 
             $arrayDetalle = BodegaSolicitudDetalle::where('id_bodesolicitud', $idsolicitud)
@@ -248,21 +273,25 @@ class BReportesController extends Controller
                 ->orderBy('id', 'ASC')
                 ->get();
 
+            // USUARIO QUE INICIO SESION
             $userAutenticado = Auth::user();
             $infoUserLogin = Usuario::where('id', $userAutenticado->id)->first();
 
             $infoExtra = BodegaExtras::where('id', 1)->first();
-            $infoUsuario = Usuario::where('id', $infoSolicitud->id_usuario)->first();
-            $nombreDepartamento = "";
-            if($infoUD = P_UsuarioDepartamento::where('id_usuario', $infoSolicitud->id_usuario)->first()){
+
+            // USUARIO DE LA SOLICITUD
+            $infoUsuarioSolicitud = Usuario::where('id', $infoSolicitud->id_usuario)->first();
+            $nombreDepartamentoSolicitud = "";
+            if ($infoUD = P_UsuarioDepartamento::where('id_usuario', $infoSolicitud->id_usuario)->first()) {
                 $infoDepa = P_Departamento::where('id', $infoUD->id_departamento)->first();
-                $nombreDepartamento = $infoDepa->nombre;
+                $infoUsuarioSolicitud = $infoDepa->nombre;
             }
 
-            //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-            $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
-            $mpdf->SetTitle('Solicitudes');
+            $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+            //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+            $mpdf->SetTitle('Comprobante Entrega');
 
             // mostrar errores
             $mpdf->showImageErrors = false;
@@ -279,8 +308,8 @@ class BReportesController extends Controller
                     </td>
                     <!-- Texto centrado -->
                     <td style='width: 60%; text-align: center;'>
-                        <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>UNIDAD DE PROVEEDURÍA Y BODEGA</h2>
+                        <h1 style='font-size: 15px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
+                        <h2 style='font-size: 13px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUserLogin->cargo2</h2>
                     </td>
                     <!-- Logo derecho -->
                     <td style='width: 10%; text-align: right;'>
@@ -291,137 +320,134 @@ class BReportesController extends Controller
             <hr style='border: none; border-top: 2px solid #003366; margin: 0;'>
             ";
 
-            $tabla .= "
-            <div style='text-align: center; margin-top: 20px;'>
-                <h1 style='font-size: 16px; margin: 0; color: #000;'>ENTREGA DE INSUMOS DE BODEGA</h1>
-                <p style='font-size: 14px; margin: 5px 0; color: #000;'>N° DE SOLICITUD: $idsolicitud</p>
-            </div>
-            <div style='text-align: right; margin-top: 10px; padding-right: 80px;'>
-            <p style='font-size: 14px; margin: 0; color: #000;'>Fecha: $fechaFormat</p>
-        </div>
-      ";
 
 
             $tabla .= "
-            <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
-                <p style='font-size: 14px; margin: 0; color: #000;'>$infoUserLogin->nombre</p>
-                <p style='font-size: 14px; margin: 5px 0; color: #000;'>Encargado de proveeduría y bodega</p>
-                <p style='font-size: 14px; margin: 5px 0; color: #000;'>Santa Ana Norte</p>
-            </div>
-               <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
-                <p style='font-size: 14px; margin: 5px 0; color: #000;'>Por medio de la presente, me permito solicitar la entrega de los siguientes materiales,
-                los cuales son necesarios para el desarrollo de nuestras actividades dentro de la municipalidad: </p>
-
-                   <p style='font-size: 14px; margin: 5px 0; color: #000;'>
-                        <strong>Descripción general:</strong> (ej. Materiales de oficina, papelería, productos de limpieza, etc)
-                    </p>
-                    <p style='font-size: 14px; margin: 5px 0; color: #000;'>
-                    <strong>NOTA: el número y estado de la solicitud será completado por la unidad de proveeduría y bodega.</strong>
-                </p>
-            </div>
-            ";
+            <table width='100%' cellspacing='0' cellpadding='5' style='margin-top: 30px; border-collapse: collapse; border: none;'>
+                <tr style='height: 20px;'>
+                    <td colspan='2' style='text-align: center; font-size: 14px; font-style: italic; color: #000; padding: 1px; border: none;'>
+                        <strong>COMPROBANTE DE ENTREGA</strong>
+                    </td>
+                </tr>
+            </table>";
 
 
-            $tabla .= "
+            $tabla .= '
+            <div style="text-align: center; margin-top: 15px;">
+                <p style="font-size: 14px; margin: 5px 0; color: #000;"><strong>REF. N° DE SOLICITUD: ' . $infoSolicitud->numero_solicitud . ' </strong></p>
+            </div>';
 
 
-           <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
-                <p style='font-size: 14px; margin: 5px 0; color: #000;'>
-                    Quedo a la espera de su confirmación sobre la disponibilidad y fecha de entrega.
-                </p>
-           </div>
-           <br>
-        ";
+            $tabla .= '<table style="width: 100%; margin-top: 0px; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 60%; vertical-align: middle; text-align: center;">
+                        <table cellpadding="0" cellspacing="0" style="display: inline-table; border-collapse: collapse;">
+                            <tr>
+                                <!-- Grupo PARCIAL -->
+                                <td style="padding-right: 15px; text-align: center;">
+                                    <table cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="font-size: 14px; padding-right: 5px; white-space: nowrap; text-align: center;"><strong>FORMA DE ENTREGA: PARCIAL</strong></td>
+                                            <td style="width: 18px; height: 18px; border: 1px solid #000;"></td>
+                                        </tr>
+                                    </table>
+                                </td>
 
-
-            $tabla .= "<table id='tablaFor' style='width: 100%; border-collapse: collapse;'>
-    <tbody>
-        <tr>
-            <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black; width: 3%'>N°</th>
-            <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>Descripción</th>
-            <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black; width: 4%'>U. Medida</th>
-            <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black; width: 4%'>C. Entregada</th>
-            <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>Estado</th>
-        </tr>
-        ";
-
-            $contaFila = 0;
-            foreach ($arrayDetalle as $fila){
-                $contaFila++;
-
-                $nombreProducto = "";
-                $nombreUnidad = "";
-                if($infoBode = BodegaMateriales::where('id', $fila->id_referencia)->first()){
-                    $nombreProducto = $infoBode->nombre;
-
-                    $infoUnidad = P_UnidadMedida::where('id', $infoBode->id_unidadmedida)->first();
-                    $nombreUnidad = $infoUnidad->nombre;
-                }
-
-                if($fila->estado == 1){
-                    $nombreEstado = "Pendiente";
-                }else if($fila->estado == 2){
-                    $nombreEstado = "Entregado";
-                }else if($fila->estado == 3){
-                    $nombreEstado = "Entregado/Parcial";
-                }else{
-                    $nombreEstado = "Denegado";
-                }
-
-                $tabla .= "<tr>
-                    <td style='text-align: center; font-size:13px; border: 1px solid black;'>$contaFila</td>
-                    <td style='text-align: center; font-size:13px; border: 1px solid black;'>$nombreProducto</td>
-                    <td style='text-align: center; font-size:13px; border: 1px solid black;'>$nombreUnidad</td>
-                    <td style='text-align: center; font-size:13px; border: 1px solid black;'>$fila->cantidad_entregada</td>
-                      <td style='text-align: center; font-size:13px; border: 1px solid black;'>$nombreEstado</td>
-                </tr> ";
-            }
-
-
-            $tabla .= "</tbody></table>";
-
+                                <!-- Grupo TOTAL -->
+                                <td style="text-align: center;">
+                                    <table cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="font-size: 14px; padding-right: 5px; white-space: nowrap; text-align: center;"><strong>TOTAL</strong></td>
+                                            <td style="width: 18px; height: 18px; border: 1px solid #000;"></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>';
 
 
             $tabla .= "
-<table style='width: 100%; margin-top: 30px; font-family: \"Times New Roman\", Times, serif; font-size: 14px; color: #000;'>
-    <!-- Fila para los títulos -->
+                <div style='text-align: left; margin-top: 25px; font-family: \"Times New Roman\", Times, serif;'>
+                    <p style='font-size: 14px; margin: 5px 0; color: #000; font-weight: bold;'>FECHA DE ENTREGA: ________________________________________________________________</p>
+                    <p style='font-size: 14px; margin: 5px 0; color: #000; font-weight: bold;'>RECIBIDO POR: ______________________________________________________________________</p>
+                    <p style='font-size: 14px; margin: 5px 0; color: #000; font-weight: bold;'>CARGO: ______________________________________________________________________________</p>
+                    <p style='font-size: 14px; margin: 5px 0; color: #000; font-weight: bold;'>UNIDAD: _____________________________________________________________________________</p>
+                </div>";
+
+
+            $tabla .= "
+                <div style='text-align: left; margin-top: 25px; font-family: \"Times New Roman\", Times, serif;'>
+                    <p style='font-size: 14px; margin: 5px 0; color: #000;'><strong>ENTREGADO POR: </strong> $infoUserLogin->nombre</p>
+                    <p style='font-size: 14px; margin: 5px 0; color: #000;'><strong>CARGO: </strong> $infoUserLogin->cargo</p>
+                </div>";
+
+
+            $tabla .= '
+<table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+    <!-- Fila de títulos separados -->
     <tr>
-        <td style='width: 50%; text-align: left; padding-bottom: 50px;'>
-            <p style='margin: 0; font-weight: bold; margin-left: 15px'>Solicitado por:</p>
+        <td style="width: 50%; border: none;"></td>
+        <td style="width: 25%; border: 1px solid #000; text-align: center; padding: 8px;">
+            FIRMAR
         </td>
-        <td style='width: 50%; text-align: right; padding-bottom: 50px;'>
-            <p style='margin: 0; font-weight: bold; margin-right: 15px'>Entregado por:</p>
+        <td style="width: 25%; border: 1px solid #000; text-align: center; padding: 8px;">
+            SELLO
         </td>
     </tr>
-    <!-- Fila para los contenidos -->
+
+    <!-- Fila principal -->
     <tr>
-        <td style='width: 50%; text-align: center; padding: 20px;'>
-            <p style='margin: 10px 0;'>f.____________________________</p>
-            <p style='margin: 10px 0;'>$infoUsuario->nombre</p>
-            <p style='margin: 10px 0;'>Jefe de unidad</p>
-            <p style='margin: 10px 0;'>$nombreDepartamento</p>
+        <td style="border: 1px solid #000; padding: 15px; vertical-align: top;">
+            FIRMA DE QUIEN RECIBE:
         </td>
-        <td style='width: 50%; text-align: center; padding: 20px;'>
-            <p style='margin: 10px 0;'>f.____________________________</p>
-            <p style='margin: 10px 0;'>$infoUserLogin->nombre</p>
-            <p style='margin: 10px 0;'>Encargado de Proveeduría y Bodega</p>
-            <p style='margin: 10px 0;'></p>
+        <td style="border: 1px solid #000; text-align: center; padding: 15px;">
+
         </td>
+        <td style="border: 1px solid #000; text-align: center; padding: 15px;">
+
+        </td>
+    </tr>
+
+    <!-- Fila inferior -->
+    <tr>
+        <td style="border: 1px solid #000; padding: 15px; vertical-align: top;">
+            FIRMA DE QUIEN ENTREGA:
+        </td>
+        <td style="border: 1px solid #000; padding: 15px;"></td>
+        <td style="border: 1px solid #000; padding: 15px;"></td>
     </tr>
 </table>
+';
+
+
+            $tabla .= "
+    <div style='text-align: left; margin-top: 25px; font-family: \"Times New Roman\", Times, serif;'>
+        <p style='font-size: 14px; margin: 5px 0; color: #000; line-height: 2;'>
+            <strong>OBSERVACIONES:</strong><br>
+            __________________________________________________________________________________________________________ <br>
+            __________________________________________________________________________________________________________ <br>
+            __________________________________________________________________________________________________________
+        </p>
+    </div>
+    <br>
 ";
 
 
             $stylesheet = file_get_contents('css/cssbodega.css');
-            $mpdf->WriteHTML($stylesheet,1);
+            $mpdf->WriteHTML($stylesheet, 1);
 
-            $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
-            $mpdf->WriteHTML($tabla,2);
+            //$mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+            $mpdf->WriteHTML($tabla, 2);
 
             $mpdf->Output();
-        }else{
+        } else {
             return "Solicitud no encontrado";
         }
+
+
     }
 
 

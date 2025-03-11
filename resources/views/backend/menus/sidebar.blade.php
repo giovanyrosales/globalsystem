@@ -917,14 +917,15 @@
                         </ul>
                     </li>
 
-                    <a href="{{ route('sidebar.bodega.salidasmanual') }}" target="frameprincipal" class="nav-link">
-                        <i class="fa fa-address-book"></i>
-                        <p>Salida Manual</p>
-                    </a>
-
                     <a href="{{ route('sidebar.bodega.entradasregistro') }}" target="frameprincipal" class="nav-link">
                         <i class="fa fa-chevron-circle-left"></i>
                         <p>Entradas</p>
+                    </a>
+
+
+                    <a href="{{ route('sidebar.bodega.salidasmanual') }}" target="frameprincipal" class="nav-link">
+                        <i class="fa fa-address-book"></i>
+                        <p>Salida Manual</p>
                     </a>
 
 

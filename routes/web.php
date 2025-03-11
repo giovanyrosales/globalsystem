@@ -1356,6 +1356,8 @@ Route::get('/admin/bodega/reportes/totalentrega/pdf/{desde}/{hasta}', [BReportes
 // BORRAR ENTRADA COMPLETA DE PRODUCTOS -> ELIMINARA SALIDAS SI HUBIERON
 Route::post('/admin/bodega/historial/entrada/borrarlote', [BHistorialController::class, 'historialEntradaBorrarLote']);
 Route::post('/admin/bodega/historial/entradadetalle/borraritem', [BHistorialController::class, 'historialEntradaDetalleBorrarItem']);
+Route::post('/admin/bodega/historial/entradadetalle/informacion', [BHistorialController::class, 'informacionItemEntradaDetalle']);
+Route::post('/admin/bodega/historial/entradadetalle/editar', [BHistorialController::class, 'editarItemEntradaDetalle']);
 
 
 // ** SOLICITUDES PENDIENTES
@@ -1397,6 +1399,11 @@ Route::post('/admin/bodega/solicitudpendiente/registrarsalida', [BSolicitudesCon
 
 // VERIFICAR CUANTAS SALIDAS TIENE ESTE ID: bodega_solicitud_detalle
 Route::post('/admin/bodega/infosalidas/bodegasolidetalle', [BSolicitudesController::class, 'infoCuantasSalidasTieneSoliDetalle']);
+
+// INFORMACION DE LA SOLICITUD
+Route::post('/admin/bodega/solicitud/informacion', [BSolicitudesController::class, 'informacionSolicitud']);
+Route::post('/admin/bodega/solicitud/editardatos', [BSolicitudesController::class, 'editarSolicitudNombre']);
+
 
 
 

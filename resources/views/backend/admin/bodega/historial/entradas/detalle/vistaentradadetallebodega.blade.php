@@ -53,6 +53,53 @@
         </div>
     </section>
 
+
+    <div class="modal fade" id="modalEditar">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Editar Datos</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-editar">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" id="id-editar">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Código de Producto</label>
+                                        <input type="text" class="form-control" maxlength="100" id="codigoproducto-editar" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Precio</label>
+                                        <input type="text" class="form-control" maxlength="100" id="precio-editar" autocomplete="off">
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                            class="button button-rounded button-pill button-small" onclick="editar()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </div>
 
 
@@ -121,6 +168,91 @@
                 })
                 .catch((error) => {
                     toastr.error('Error al borrar');
+                    closeLoading();
+                });
+        }
+
+
+
+        function infoEditar(id){
+            openLoading();
+            document.getElementById("formulario-editar").reset();
+            var formData = new FormData();
+            formData.append('id', id);
+
+            axios.post(url+'/bodega/historial/entradadetalle/informacion', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+
+                        $('#modalEditar').modal('show');
+                        $('#id-editar').val(response.data.info.id);
+                        $('#codigoproducto-editar').val(response.data.info.codigo_producto);
+                        $('#precio-editar').val(response.data.info.precio);
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
+        }
+
+
+        function editar(){
+
+            var id = document.getElementById('id-editar').value;
+            var codigo = document.getElementById('codigoproducto-editar').value;
+            var precio = document.getElementById('precio-editar').value;
+
+            if(precio === ''){
+                toastr.error('Precio es requerido');
+                return;
+            }
+
+            var reglaNumeroDiesDecimal = /^([0-9]+\.?[0-9]{0,10})$/;
+
+            if (!precio.match(reglaNumeroDiesDecimal)) {
+                toastr.error('Precio debe ser decimal (10 decimales) y no negativo');
+                return;
+            }
+
+            if (precio < 0) {
+                toastr.error('Precio no debe ser negativo');
+                return;
+            }
+
+            if (precio > 9000000) {
+                toastr.error('Precio máximo 9 millones');
+                return;
+            }
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('codigo', codigo);
+            formData.append('precio', precio);
+
+            axios.post(url+'/bodega/historial/entradadetalle/editar', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado correctamente');
+                        $('#modalEditar').modal('hide');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
                     closeLoading();
                 });
         }

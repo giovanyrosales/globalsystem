@@ -7,6 +7,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                <th style="width: 5%">Código Producto</th>
                                 <th style="width: 20%">Producto</th>
                                 <th style="width: 4%">Cantidad Ingresada</th>
                                 <th style="width: 4%">Precio</th>
@@ -17,13 +18,19 @@
 
                             @foreach($listado as $dato)
                                 <tr>
-                                    <td style="width: 20%">{{ $dato->nombre }}</td>
-                                    <td style="width: 4%">{{ $dato->cantidad }}</td>
-                                    <td style="width: 4%">{{ $dato->precio }}</td>
-                                    <td style="width: 6%">
-                                        <button style="margin: 3px" type="button" class="btn btn-danger btn-xs"
+                                    <td>{{ $dato->codigo_producto }}</td>
+                                    <td>{{ $dato->nombre }}</td>
+                                    <td>{{ $dato->cantidad }}</td>
+                                    <td>{{ $dato->precio }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-xs"
                                                 onclick="infoBorrar({{ $dato->id }})">
                                             <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar
+                                        </button>
+
+                                        <button style="margin: 4px" type="button" class="btn btn-info btn-xs"
+                                                onclick="infoEditar({{ $dato->id }})">
+                                            <i class="fas fa-info" title="Editar"></i>&nbsp; Editar
                                         </button>
                                     </td>
                                 </tr>

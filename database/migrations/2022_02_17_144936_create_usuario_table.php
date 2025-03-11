@@ -19,6 +19,13 @@ class CreateUsuarioTable extends Migration
             $table->boolean('activo');
             $table->string('usuario', 50);
             $table->string('password', 255);
+
+            // PARA MODULOS DE BODEGA
+
+            // utlizado en reportes. Ejemplo CARGO: Encargada de la unidad de proveeduría y bodega
+            $table->string('cargo', 200)->nullable();
+            // utilizado en cabecera para establecer el cargo del usuario bodeguero
+            $table->string('cargo2', 200)->nullable();
         });
     }
 

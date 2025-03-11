@@ -20,6 +20,10 @@ class CreateBodegaEntradasDetalleTable extends Migration
             $table->integer('cantidad');
             $table->decimal('precio', 10, 2);
 
+
+            // codigo de producto
+            $table->string('codigo_producto', 100)->nullable();
+
             // solo es un nombre copia de respaldo
             $table->string('nombre_copia', 300);
 

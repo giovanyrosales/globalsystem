@@ -7,6 +7,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                <th style="width: 8%">Código Producto</th>
                                 <th style="width: 16%">Producto Entregado</th>
                                 <th style="width: 8%">Obj. Específico</th>
                                 <th style="width: 4%">Cantidad Entregada</th>
@@ -17,10 +18,11 @@
 
                             @foreach($listado as $dato)
                                 <tr>
-                                    <td style="width: 16%">{{ $dato->nombreProducto }}</td>
-                                    <td style="width: 8%">{{ $dato->nombreObj }}</td>
-                                    <td style="width: 4%">{{ $dato->cantidad_salida }}</td>
-                                    <td style="width: 4%">
+                                    <td>{{ $dato->codigoProducto }}</td>
+                                    <td>{{ $dato->nombreProducto }}</td>
+                                    <td>{{ $dato->nombreObj }}</td>
+                                    <td>{{ $dato->cantidad_salida }}</td>
+                                    <td>
                                         <button style="margin: 3px" type="button" class="btn btn-danger btn-xs"
                                                 onclick="infoBorrar({{ $dato->id }})">
                                             <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar

@@ -10,7 +10,8 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 4%">Fecha Salida</th>
+                                <th style="width: 4%">N° de Solicitud</th>
+                                <th style="width: 5%">Fecha Salida</th>
                                 <th style="width: 6%">Solicitante</th>
                                 <th style="width: 6%">Unidad</th>
                                 <th style="width: 6%">Opciones</th>
@@ -20,10 +21,11 @@
 
                             @foreach($listado as $dato)
                                 <tr>
-                                    <td style="width: 4%">{{ $dato->fecha }}</td>
-                                    <td style="width: 6%">{{ $dato->nombreUser }}</td>
-                                    <td style="width: 6%">{{ $dato->nombreUnidad }}</td>
-                                    <td style="width: 6%">
+                                    <td>{{ $dato->numeroSolicitud }}</td>
+                                    <td>{{ $dato->fecha }}</td>
+                                    <td>{{ $dato->nombreUser }}</td>
+                                    <td>{{ $dato->nombreUnidad }}</td>
+                                    <td>
                                         <button type="button" class="btn btn-info btn-xs"
                                                 onclick="vistaDetalle({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
@@ -36,7 +38,7 @@
                             <script>
                                 setTimeout(function () {
                                     closeLoading();
-                                }, 1000);
+                                }, 500);
                             </script>
 
                             </tbody>

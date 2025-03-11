@@ -25,6 +25,8 @@ class CreateBodegaSolicitudTable extends Migration
             // no nodra cambiar estado si los item asociados estan al menos uno pendiente
             $table->boolean('estado');
 
+            $table->string('numero_solicitud', 50)->nullable();
+
             $table->foreign('id_usuario')->references('id')->on('usuario');
             $table->foreign('id_objespecifico')->references('id')->on('obj_especifico');
         });

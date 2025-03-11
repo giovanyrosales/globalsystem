@@ -114,6 +114,14 @@
                             <div class="row">
 
                                 <div class="form-group col-md-2" style="margin-top: 5px">
+                                    <label class="control-label" style="color: #686868">Código Producto: </label>
+                                    <div>
+                                        <input type="text" maxlength="100" autocomplete="off" class="form-control" id="codigo-producto" placeholder="">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-md-2" style="margin-top: 5px">
                                     <label class="control-label" style="color: #686868">Cantidad: </label>
                                     <div>
                                         <input type="text" autocomplete="off" class="form-control" id="cantidad" placeholder="0">
@@ -171,6 +179,7 @@
                     <thead>
                     <tr>
                         <th style="width: 3%">#</th>
+                        <th style="width: 5%">Código</th>
                         <th style="width: 10%">Producto</th>
                         <th style="width: 6%">Cantidad</th>
                         <th style="width: 6%">Precio</th>
@@ -290,7 +299,7 @@
 
 
         function agregarFila(){
-
+            var codigoProducto = document.getElementById('codigo-producto').value;
             var precioProducto = document.getElementById('precio-producto').value;
             var cantidad = document.getElementById('cantidad').value;
             var inputBuscador = document.querySelector('#inputBuscador');
@@ -366,6 +375,10 @@
 
                 "<td>" +
                 "<p id='fila" + (nFilas) + "' class='form-control' style='max-width: 65px'>" + (nFilas) + "</p>" +
+                "</td>" +
+
+                "<td>" +
+                "<input name='arrayCodigo[]' disabled data-codigoproducto='" + codigoProducto + "' value='" + codigoProducto + "' class='form-control' type='text'>" +
                 "</td>" +
 
                 "<td>" +
@@ -497,6 +510,8 @@
             var arrayIdProducto = $("input[name='arrayNombre[]']").map(function(){return $(this).attr("data-idproducto");}).get();
             var arrayCantidad = $("input[name='arrayCantidad[]']").map(function(){return $(this).val();}).get();
             var arrayPrecio = $("input[name='arrayPrecio[]']").map(function(){return $(this).attr("data-precio");}).get();
+            var arrayCodigoProducto = $("input[name='arrayCodigo[]']").map(function(){return $(this).attr("data-codigoproducto");}).get();
+
 
             var reglaNumeroEntero = /^[0-9]\d*$/;
             var reglaNumeroDiesDecimal = /^([0-9]+\.?[0-9]{0,10})$/;
@@ -586,9 +601,10 @@
                 let infoIdProducto = arrayIdProducto[i];
                 let infoCantidad = arrayCantidad[i];
                 let infoPrecio = arrayPrecio[i];
+                let infoCodigoProducto = arrayCodigoProducto[i];
 
                 // ESTOS NOMBRES SE UTILIZAN EN CONTROLADOR
-                contenedorArray.push({ infoIdProducto, infoCantidad, infoPrecio });
+                contenedorArray.push({ infoIdProducto, infoCantidad, infoPrecio, infoCodigoProducto });
             }
 
 

@@ -24,7 +24,7 @@ class CreateBodegaSalidasDetalleTable extends Migration
             $table->bigInteger('id_entradadetalle')->unsigned();
 
 
-            // cantidad entregada
+            // cantidad salida
             $table->integer('cantidad_salida');
 
             $table->foreign('id_salida')->references('id')->on('bodega_salidas');
