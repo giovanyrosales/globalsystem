@@ -60,12 +60,15 @@ class BSolicitudesController extends Controller
             $datosContenedor = json_decode($request->contenedorArray, true); // El segundo argumento convierte el resultado en un arreglo
             //
 
+            $ultimoId = BodegaSolicitud::max('id') ?? 0; // Si no hay registros, inicia en 0
+
+
             $nuevoReg = new BodegaSolicitud();
             $nuevoReg->id_usuario = $usuario->id;
             $nuevoReg->fecha = $fecha;
             $nuevoReg->id_objespecifico = $request->idObjEspeci;
             $nuevoReg->estado = 0;
-            $nuevoReg->numero_solicitud = null;
+            $nuevoReg->numero_solicitud = $ultimoId + 1;
             $nuevoReg->save();
 
             // infoProducto, infoIdUnidad, infoIdPrioridad, infoCantidad

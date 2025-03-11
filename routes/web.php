@@ -1341,6 +1341,15 @@ Route::post('/admin/bodega/extras/actualizarDatos', [BReportesController::class,
 Route::get('/admin/bodega/reportes/generales', [BReportesController::class,'vistaReporteGenerales'])->name('sidebar.bodega.reportes.general');
 Route::get('/admin/bodega/reportes/pdf-existencias', [BReportesController::class,'generarPDFExistencias']);
 
+// Reporte General de Existencias por Fechas
+Route::get('/admin/bodega/reportes/pdf/existencias-fechas/{desde}/{hasta}/{check}/{arrayproductos}', [BReportesController::class,'generarPDFExistenciasFechas']);
+
+
+
+
+
+
+
 // VISTA PARA REPORTE DE UNIDADES DE LO QUE HEMOS ENTREGADO. INDIVIDUAL Y TODAS LAS UNIDADES
 Route::get('/admin/bodega/reportes/entregaunidadesvarios', [BReportesController::class,'vistaReporteEntregadoUnidades'])->name('sidebar.bodega.reportes.salidasunidad');
 Route::get('/admin/bodega/reportes/unidadentrega/pdf/{idusuario}/{desde}/{hasta}', [BReportesController::class,'reporteUnidadPDFEntregas']);

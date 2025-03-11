@@ -92,6 +92,7 @@ class BReportesController extends Controller
             $tabla .= "
             <div style='text-align: center; margin-top: 20px;'>
                 <h1 style='font-size: 16px; margin: 0; color: #000;'>SOLICITUD DE INSUMOS EN BODEGA</h1>
+                <p style='font-size: 16px; margin: 0; color: #000;'>N° DE SOLICITUD: _______________</p>
             </div>
             <div style='text-align: right; margin-top: 10px; padding-right: 80px;'>
             <p style='font-size: 14px; margin: 0; color: #000;'>Fecha: $fechaFormat</p>
@@ -100,8 +101,8 @@ class BReportesController extends Controller
 
             $tabla .= "
             <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
-                <p style='font-size: 14px; margin: 0; color: #000;'><strong>Encargado:</strong> $infoUsuarioVaDirigido->nombre</p>
-                <p style='font-size: 14px; margin: 0; color: #000;'><strong>Cargo:</strong> $infoUsuarioVaDirigido->cargo</p>
+                <p style='font-size: 14px; margin: 0; color: #000;'>$infoUsuarioVaDirigido->nombre</p>
+                <p style='font-size: 14px; margin: 0; color: #000;'>$infoUsuarioVaDirigido->cargo</p>
                 <p style='font-size: 14px; margin: 5px 0; color: #000;'>Santa Ana Norte</p>
             </div>
             ";
@@ -118,10 +119,10 @@ class BReportesController extends Controller
             }
 
             $tabla .= "
-               <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
-                <p style='font-size: 14px; margin: 5px 0; color: #000;'>Por medio de la presente, me permito solicitar la entrega de los siguientes materiales,
+               <div style='text-align: left; margin-top: 10px; font-family: \"Times New Roman\", Times, serif;'>
+                <p style='font-size: 15px; margin: 5px 0; color: #000;'>Por medio de la presente, me permito solicitar la entrega de los siguientes materiales,
                 los cuales son necesarios para el desarrollo de nuestras actividades dentro de la municipalidad: </p>
-
+                    <br>
                    <p style='font-size: 14px; margin: 5px 0; color: #000;'>
                         <strong>Descripción general:</strong> $textoDescripcion
                     </p>
@@ -130,21 +131,15 @@ class BReportesController extends Controller
             ";
 
 
-            $tabla .= "
-
-
-
-           <br>
-        ";
-
 
             $tabla .= "<table id='tablaFor' style='width: 100%; border-collapse: collapse;'>
     <tbody>
         <tr>
-            <th style='text-align: center; font-size:13px; width: 7%; font-weight: bold; border: 1px solid black;'>N°</th>
-            <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>Descripción</th>
-            <th style='text-align: center; font-size:13px; width: 9%; font-weight: bold; border: 1px solid black;'>Unidad de medida</th>
-            <th style='text-align: center; font-size:13px; width: 10%; font-weight: bold; border: 1px solid black;'>Cantidad solicitada</th>
+            <th style='text-align: center; font-size:11px; width: 4%; font-weight: bold; border: 1px solid black;'>N°</th>
+            <th style='text-align: center; font-size:11px; width: 12%; font-weight: bold; border: 1px solid black;'>Descripción (con especificaciones claras de lo que requieren)</th>
+            <th style='text-align: center; font-size:11px; width: 9%; font-weight: bold; border: 1px solid black;'>Unidad de medida</th>
+            <th style='text-align: center; font-size:11px; width: 10%; font-weight: bold; border: 1px solid black;'>Cantidad solicitada</th>
+            <th style='text-align: center; font-size:11px; width: 8%; font-weight: bold; border: 1px solid black;'>Estado de la solicitud (pendiente o entregado)</th>
         </tr>
         ";
 
@@ -155,10 +150,11 @@ class BReportesController extends Controller
                 $infoUnidad = P_UnidadMedida::where('id', $fila->id_unidad)->first();
 
                 $tabla .= "<tr>
-                    <td style='text-align: center; font-size:13px; border: 1px solid black;'>$contaFila</td>
-                    <td style='text-align: center; font-size:13px; border: 1px solid black;'>$fila->nombre</td>
-                    <td style='text-align: center; font-size:13px; border: 1px solid black;'>$infoUnidad->nombre</td>
-                    <td style='text-align: center; font-size:13px; border: 1px solid black;'>$fila->cantidad</td>
+                    <td style='text-align: center; font-size:12px; border: 1px solid black;'>$contaFila</td>
+                    <td style='text-align: center; font-size:12px; border: 1px solid black;'>$fila->nombre</td>
+                    <td style='text-align: center; font-size:12px; border: 1px solid black;'>$infoUnidad->nombre</td>
+                    <td style='text-align: center; font-size:12px; border: 1px solid black;'>$fila->cantidad</td>
+                     <td style='text-align: center; font-size:12px; border: 1px solid black;'></td>
                 </tr> ";
             }
 
@@ -166,10 +162,12 @@ class BReportesController extends Controller
             $tabla .= "</tbody></table>";
 
 
+            $texto = "NOTA: el número y estado de la solicitud será completado por " . $infoUsuarioVaDirigido->cargo;
+
 
             $tabla .= "
-               <div style='text-align: left; margin-top: 20px; font-family: \"Times New Roman\", Times, serif;'>
-                    <strong>NOTA: el número y estado de la solicitud será completado por la unidad de proveeduría y bodega.</strong>
+               <div style='text-align: left; margin-top: 20px; font-size: 14px; font-family: \"Times New Roman\", Times, serif;'>
+                    <strong>$texto</strong>
                 </p>
                 <br>
                  <p style='font-size: 14px; margin: 5px 0; color: #000;'>
@@ -182,7 +180,7 @@ class BReportesController extends Controller
 
 
             $tabla .= "
-<table style='width: 100%; margin-top: 30px; font-family: \"Times New Roman\", Times, serif; font-size: 14px; color: #000;'>
+<table style='width: 100%; margin-top: 15px; font-family: \"Times New Roman\", Times, serif; font-size: 14px; color: #000;'>
     <!-- Fila para los títulos -->
     <tr>
         <td style='width: 50%; text-align: left; padding-bottom: 15px;'>
@@ -629,7 +627,18 @@ class BReportesController extends Controller
 
     public function vistaReporteGenerales()
     {
-        return view('backend.admin.bodega.reportes.general.vistareportegeneral');
+
+        $pilaObjEspeci = array();
+        $infoAuth = auth()->user();
+        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
+
+        foreach ($arrayCodigo as $fila) {
+            array_push($pilaObjEspeci, $fila->id_objespecifico);
+        }
+
+        $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)->get();
+
+        return view('backend.admin.bodega.reportes.general.vistareportegeneral', compact('arrayProductos'));
     }
 
 
@@ -682,10 +691,18 @@ class BReportesController extends Controller
         $arrayDetalle = $arrayInfo->sortBy('nombreMaterial');
         $fechaFormat = date("d-m-Y", strtotime(Carbon::now('America/El_Salvador')));
 
-        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
-        $mpdf->SetTitle('Existencias');
+        // USUARIO LOGEADO
+        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
+
+
+
+
+
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+        $mpdf->SetTitle('Existencias General');
 
         // mostrar errores
         $mpdf->showImageErrors = false;
@@ -703,7 +720,7 @@ class BReportesController extends Controller
                     <!-- Texto centrado -->
                     <td style='width: 60%; text-align: center;'>
                         <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>UNIDAD DE PROVEEDURÍA Y BODEGA</h2>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
                     </td>
                     <!-- Logo derecho -->
                     <td style='width: 10%; text-align: right;'>
@@ -761,6 +778,322 @@ class BReportesController extends Controller
 
         $mpdf->Output();
     }
+
+    // FECHAS EXISTENCIAS POR FECHAS
+    public function generarPDFExistenciasFechas($desde, $hasta, $checkProductos, $arrayProductos) {
+
+        $start = Carbon::parse($desde)->startOfDay();
+        $end = Carbon::parse($hasta)->endOfDay();
+
+        $desdeFormat = date("d/m/Y", strtotime($desde));
+        $hastaFormat = date("d/m/Y", strtotime($hasta));
+
+
+        // NECESITO TODOS LOS MATERIALES
+
+
+        $pilaObjEspeci = array();
+        $pilaIDMateriales = array();
+        $infoAuth = auth()->user();
+        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
+
+        foreach ($arrayCodigo as $fila) {
+            array_push($pilaObjEspeci, $fila->id_objespecifico);
+        }
+
+
+
+        // OBTENEMOS TODOS LOS PRODUCTOS
+        $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)->get();
+        foreach ($arrayProductos as $fila) {
+            array_push($pilaIDMateriales, $fila->id);
+        }
+
+
+        // NECESITO FILTRAR CADA PRODUCTO Y BUSCAR SUS SALIDAS
+        $arrayProSalidas = DB::table('bodega_salidas AS sa')
+            ->join('bodega_salidas_detalle AS deta', 'deta.id_salida', '=', 'sa.id')
+            ->join('bodega_entradas_detalle AS entradeta', 'deta.id_entradadetalle', '=', 'entradeta.id')
+            ->select('sa.fecha', 'sa.id_solicitud', 'deta.id_entradadetalle', 'deta.cantidad_salida', 'entradeta.id_material')
+            ->whereBetween('sa.fecha', [$start, $end])
+            ->get();
+
+        foreach ($arrayProSalidas as $fila) {
+            $infoEntradaDetalle = BodegaEntradasDetalle::where('id', $fila->id_entradadetalle)->first();
+            $infoMaterial = BodegaMateriales::where('id', $infoEntradaDetalle->id_material)->first();
+            $fila->nombreMaterial = $infoMaterial->nombre;
+        }
+
+        $arrayProSalidasOrdenado = $arrayProSalidas->sortBy('nombreMaterial')->values();
+
+
+        $resultsBloque = array();
+        $index = 0;
+        $correlativo = 0;
+        $saldoTotal = 0;
+        foreach ($arrayProSalidasOrdenado as $fila) {
+            array_push($resultsBloque, $fila);
+
+            $totalBloqueDinero = 0;
+            $correlativo++;
+            $fila->correlativo = $correlativo;
+            $sumaColumnaExistenciaActual = 0;
+            $sumaColumnaSaldoExistenciaDinero = 0;
+
+            // BUSCAR TODAS LAS SALIDAS DE ESTE MATERIAL
+            $arraySalida = BodegaEntradasDetalle::where('id', $fila->id_entradadetalle)->get();
+
+
+            foreach ($arraySalida as $item) {
+
+                $saldoExistencia = $item->cantidad - $item->cantidad_entregada;
+                $item->saldoExistencia = $saldoExistencia;
+                $sumaColumnaExistenciaActual += $saldoExistencia;
+
+                $totalBloqueDinero += ($item->precio * $saldoExistencia);
+                $sumaColumnaSaldoExistenciaDinero += $totalBloqueDinero;
+                $item->precio = "$" . $item->precio;
+                $item->multiplicado = "$" . number_format($totalBloqueDinero, 2, '.', ',');
+
+
+                $infoEntrada = BodegaEntradas::where('id', $item->id_entrada)->first();
+                $item->lote = $infoEntrada->lote;
+
+                $infoMaterial = BodegaMateriales::where('id', $item->id_material)->first();
+                $item->nombreMaterial = $infoMaterial->nombre;
+
+                $infoUnidadMedida = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+                $item->unidadMedida = $infoUnidadMedida->nombre;
+            }
+
+
+            $arraySalida = $arraySalida->sortBy('nombreMaterial')->values();
+            $saldoTotal += $totalBloqueDinero;
+            $fila->totalBloque = "$" . number_format($totalBloqueDinero, 2, '.', ',');
+
+
+            $fila->sumaColumnaExistenciaActual = $sumaColumnaExistenciaActual;
+            $fila->sumaColumnaSaldoExistenciaDinero = "$" . number_format($sumaColumnaSaldoExistenciaDinero, 2, '.', ',');
+
+            $resultsBloque[$index]->detalle = $arraySalida;
+            $index++;
+        }
+
+        $saldoTotal = "$" . number_format($saldoTotal, 2, '.', ',');
+
+
+        //************************************************
+
+
+        $infoAuth = auth()->user();
+        // USUARIO LOGEADO
+        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
+
+        // INFORMACION GERENCIA
+        $infoGerencia = BodegaExtras::where('id', 1)->first();
+
+
+
+
+
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+        $mpdf->SetTitle('Existencias General');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+        $logoalcaldia = 'images/gobiernologo.jpg';
+        $logosantaana = 'images/logo.png';
+
+        $tabla = "
+            <table style='width: 100%; border-collapse: collapse;'>
+                <tr>
+                    <!-- Logo izquierdo -->
+                    <td style='width: 15%; text-align: left;'>
+                        <img src='$logosantaana' alt='Santa Ana Norte' style='max-width: 100px; height: auto;'>
+                    </td>
+                    <!-- Texto centrado -->
+                    <td style='width: 60%; text-align: center;'>
+                        <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
+                    </td>
+                    <!-- Logo derecho -->
+                    <td style='width: 10%; text-align: right;'>
+                        <img src='$logoalcaldia' alt='Gobierno de El Salvador' style='max-width: 60px; height: auto;'>
+                    </td>
+                </tr>
+            </table>
+            <hr style='border: none; border-top: 2px solid #003366; margin: 0;'>
+            ";
+
+        $tabla .= "
+            <div style='text-align: center; margin-top: 20px;'>
+                <h1 style='font-size: 16px; margin: 0; color: #000;'>REPORTE GENERAL DE EXISTENCIAS</h1>
+            </div>
+            <div style='text-align: left; margin-top: 10px;'>
+            <p style='font-size: 14px; margin: 0; color: #000;'>PERÍODO $desdeFormat AL $hastaFormat</p>
+        </div>
+      ";
+
+        // Encabezado de la tabla
+        $tabla .= "<table width='100%' id='tablaFor'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 6%; font-size: 11px; text-align: center;'>CORRELATIVO</th>
+                    <th style='font-weight: bold; width: 22%; font-size: 11px; text-align: center;'>CÓDIGO DEL PRODUCTO</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>UNIDAD DE MEDIDA</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>ARTÍCULO/DESCRIPCIÓN</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>SOLICITUD DE PEDIDO</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>PRECIO UNITARIO</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>EXISTENCIA INICIAL</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALIDAS TOTALES</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>EXISTENCIA ACTUAL</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALDO (EXISTENCIA ACTUAL)</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+        foreach ($arrayProSalidasOrdenado as $item) {
+
+            $vuelta = 0;
+            foreach ($item->detalle as $dato) {
+                $vuelta++;
+
+                if($vuelta == 1){
+                    $tabla .= "<tr>
+                     <td style='font-size: 11px'>$item->correlativo</td>
+                    <td style='font-size: 11px'>$dato->codigo_producto</td>
+                    <td style='font-size: 11px'>$dato->unidadMedida</td>
+                    <td style='font-size: 11px'>$dato->nombreMaterial</td>
+                     <td style='font-size: 11px'>$dato->lote</td>
+                    <td style='font-size: 11px'>$dato->precio</td>
+                    <td style='font-size: 11px'>$dato->cantidad</td>
+                    <td style='font-size: 11px'>$dato->cantidad_entregada</td>
+                    <td style='font-size: 11px'>$dato->saldoExistencia</td>
+                    <td style='font-size: 11px'>$dato->multiplicado</td>
+                </tr>";
+                }else{
+                    $tabla .= "<tr>
+                    <td colspan='4' style='font-size: 11px'></td>
+                    <td style='font-size: 11px'>$dato->lote</td>
+                    <td style='font-size: 11px'>$dato->precio</td>
+                    <td style='font-size: 11px'>$dato->cantidad</td>
+                    <td style='font-size: 11px'>$dato->cantidad_entregada</td>
+                    <td style='font-size: 11px'>$dato->saldoExistencia</td>
+                    <td style='font-size: 11px'>$dato->multiplicado</td>
+                </tr>";
+                }
+            } // END-FOREACH 2
+
+            $tabla .= "<tr>
+                    <td colspan='4' style='font-size: 11px'>EXISTENCIA TOTAL</td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'>$item->sumaColumnaExistenciaActual</td>
+                    <td style='font-size: 11px'>$item->sumaColumnaSaldoExistenciaDinero</td>
+                </tr>";
+
+
+        }// END-FOREACH
+
+
+
+
+
+        $tabla .= "<tr>
+                <td colspan='9' style='font-size: 11px'><strong>SALDO TOTAL</strong></td>
+                <td style='font-size: 11px'><strong>$saldoTotal</strong></td>
+            </tr>";
+
+        $tabla .= "</tbody></table>";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        $tabla .= "
+            <div style='text-align: left; margin-top: 25px; font-family: \"Times New Roman\", Times, serif;'>
+                <p style='font-size: 14px; margin: 5px 0; color: #000; line-height: 2;'>
+                    <strong>OBSERVACIONES:</strong><br>
+                    __________________________________________________________________________________________________________ <br>
+                    __________________________________________________________________________________________________________ <br>
+                    __________________________________________________________________________________________________________
+                </p>
+            </div>
+            <br>
+        ";
+
+
+
+
+        $tabla .= "
+<table style='width: 100%; margin-top: 15px; font-family: \"Times New Roman\", Times, serif; font-size: 14px; color: #000;'>
+    <!-- Fila para los títulos -->
+    <tr>
+        <td style='width: 50%; text-align: left; padding-bottom: 15px;'>
+            <p style='margin: 0; font-weight: bold; margin-left: 15px; font-size: 11px'>REPORTE GENERADO POR:</p>
+        </td>
+        <td style='width: 50%; text-align: right; padding-bottom: 15px; font-size: 11px'>
+            <p style='margin: 0; font-weight: bold; margin-right: 15px'>REVISADO POR:</p>
+        </td>
+    </tr>
+    <!-- Fila para los contenidos -->
+   <tr>
+    <td style='width: 50%; text-align: left; padding: 20px;'>
+        <p style='margin: 10px 0;'>$infoUsuarioLogeado->nombre</p>
+        <p style='margin: 10px 0;'>$infoUsuarioLogeado->cargo</p>
+    </td>
+    <td style='width: 50%; text-align: right; padding: 20px;'>
+        <p style='margin: 10px 0;'>$infoGerencia->nombre_gerente</p>
+        <p style='margin: 10px 0;'>$infoGerencia->nombre_gerente_cargo</p>
+    </td>
+</tr>
+</table>
+";
+
+
+
+
+        $stylesheet = file_get_contents('css/cssbodega.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
