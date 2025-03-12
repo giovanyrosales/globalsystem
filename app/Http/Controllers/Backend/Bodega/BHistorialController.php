@@ -306,6 +306,7 @@ class BHistorialController extends Controller
     {
         $usuario = auth()->user();
         $listado = BodegaSalida::where('id_usuario', $usuario->id)
+            ->where('id_solicitud', '!=', null)
             ->orderBy('fecha', 'desc')
             ->get();
 
@@ -428,16 +429,19 @@ class BHistorialController extends Controller
     public function tablaHistorialSalidasManual()
     {
         $usuario = auth()->user();
-        $listado = BodegaSalidaManual::where('id_usuario', $usuario->id)
+        $listado = BodegaSalida::where('id_usuario', $usuario->id)
+            ->where('id_solicitud', null)// 0: son salidas por solicitud
             ->orderBy('fecha', 'desc')
             ->get();
 
         foreach ($listado as $fila) {
             $fila->fecha = date("d-m-Y", strtotime($fila->fecha));
-            if($fila->estado == 0){
+            if($fila->estado_salida == 1){
                 $tipoEstado = "SALIDA MANUAL";
-            }else{
+            }else if($fila->estado_salida == 2){
                 $tipoEstado = "DESPERFECTO";
+            }else{
+                $tipoEstado = "";
             }
 
             $fila->tipoEstado = $tipoEstado;
@@ -454,7 +458,7 @@ class BHistorialController extends Controller
 
     public function tablaHistorialSalidasManualDetalle($id){
 
-        $listado = BodegaSalidaManualDetalle::where('id_salidamanual', $id)->get();
+        $listado = BodegaSalidaDetalle::where('id_salida', $id)->get();
 
         foreach ($listado as $fila){
 
@@ -462,6 +466,10 @@ class BHistorialController extends Controller
             $infoProducto = BodegaMateriales::where('id', $infoEntraDetalle->id_material)->first();
 
             $fila->nombreProducto = $infoProducto->nombre;
+
+            $fila->precioProducto = $infoEntraDetalle->precio;
+            $fila->codigoProducto = $infoEntraDetalle->codigo_producto;
+
         }
 
         return view('backend.admin.bodega.historial.salidamanual.detalle.tablasalidamanualdetalle', compact('listado'));

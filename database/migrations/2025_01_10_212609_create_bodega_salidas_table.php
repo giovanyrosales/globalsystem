@@ -20,7 +20,16 @@ class CreateBodegaSalidasTable extends Migration
             $table->bigInteger('id_usuario')->unsigned(); // quien hizo la salida
 
             // se manda el id de solicitud unidad
-            $table->bigInteger('id_solicitud')->unsigned();
+            // PERMITO NULL PORQUE PUEDO HACER UNA SALIDA MANUAL
+            $table->bigInteger('id_solicitud')->unsigned()->nullable();
+
+            // OBSERVACION DE SALIDA
+            $table->string('observacion', 300)->nullable();
+
+
+            // 0- SALIDA NORMAL
+            // 1- DESPERFECTO
+            $table->integer('estado_salida');
 
             $table->foreign('id_usuario')->references('id')->on('usuario');
             $table->foreign('id_solicitud')->references('id')->on('bodega_solicitud');

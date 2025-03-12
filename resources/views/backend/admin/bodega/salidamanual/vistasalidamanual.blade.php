@@ -52,8 +52,8 @@
                                 <div class="form-group col-md-4" style="margin-top: 5px">
                                     <label class="control-label" style="color: #686868">Tipo de Salida</label>
                                     <select id="select-salida" class="form-control">
-                                        <option value="0">Salida sin Solicitud</option>
-                                        <option value="1">Salida por Desperfecto</option>
+                                        <option value="1">Salida sin Solicitud</option>
+                                        <option value="2">Salida por Desperfecto</option>
                                     </select>
                                 </div>
                             </div>

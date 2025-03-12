@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\BodegaEntradas;
 use App\Models\BodegaEntradasDetalle;
 use App\Models\BodegaMateriales;
+use App\Models\BodegaSalida;
+use App\Models\BodegaSalidaDetalle;
 use App\Models\BodegaSalidaManual;
 use App\Models\BodegaSalidaManualDetalle;
 use App\Models\BodegaUsuarioObjEspecifico;
@@ -421,11 +423,12 @@ class BMaterialesController extends Controller
 
             $usuario = auth()->user();
 
-            $nuevoReg = new BodegaSalidaManual();
+            $nuevoReg = new BodegaSalida();
             $nuevoReg->fecha = $request->fecha;
             $nuevoReg->id_usuario = $usuario->id;
+            $nuevoReg->id_solicitud = null; // NO LLEVARA
             $nuevoReg->observacion = $request->observacion;
-            $nuevoReg->estado = $request->tiposalida;
+            $nuevoReg->estado_salida = $request->tiposalida;
             $nuevoReg->save();
 
             // infoIdProducto, infoCantidad, infoPrecio
@@ -442,10 +445,11 @@ class BMaterialesController extends Controller
                     return ['success' => 1, 'fila' => $contaFila];
                 }
 
-                $detalle = new BodegaSalidaManualDetalle();
-                $detalle->id_salidamanual = $nuevoReg->id;
+                $detalle = new BodegaSalidaDetalle();
+                $detalle->id_salida = $nuevoReg->id;
+                $detalle->id_solidetalle = null;
                 $detalle->id_entradadetalle = $filaArray['infoIdProducto'];
-                $detalle->cantidad = $filaArray['infoCantidad'];
+                $detalle->cantidad_salida = $filaArray['infoCantidad'];
                 $detalle->save();
 
                 // ACTUALIZAR CANTIDAD
@@ -478,7 +482,7 @@ class BMaterialesController extends Controller
 
         if ($validar->fails()){return ['success' => 0];}
 
-        if($infoSalidaDeta = BodegaSalidaManualDetalle::where('id', $request->id)->first()){
+        if($infoSalidaDeta = BodegaSalidaDetalle::where('id', $request->id)->first()){
 
             DB::beginTransaction();
 
@@ -493,10 +497,9 @@ class BMaterialesController extends Controller
                     'cantidad_entregada' => $resta
                 ]);
 
-
                 // BORRAR SALIDA MANUAL DETALLE
-                BodegaSalidaManualDetalle::where('id', $request->id)->delete();
-                BodegaSalidaManual::whereNotIn('id', BodegaSalidaManualDetalle::pluck('id_salidamanual'))->delete();
+                BodegaSalidaDetalle::where('id', $request->id)->delete();
+                BodegaSalida::whereNotIn('id', BodegaSalidaDetalle::pluck('id_salida'))->delete();
 
                 DB::commit();
                 return ['success' => 1];

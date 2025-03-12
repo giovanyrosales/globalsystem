@@ -654,6 +654,8 @@ class BSolicitudesController extends Controller
             'idbodesolidetalle' => 'required' // bodega_solicitud_detalle
         );
 
+        // observacion
+
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()){ return ['success' => 0];}
@@ -677,6 +679,8 @@ class BSolicitudesController extends Controller
             $reg->fecha = $request->fecha;
             $reg->id_usuario = $usuario->id;
             $reg->id_solicitud = $infoBodeSoliDetalle->id_bodesolicitud;
+            $reg->observacion = $request->observacion;
+            $reg->estado_salida = 0; // salida por solicitud
             $reg->save();
 
             // infoIdEntradaDetalle, filaCantidadSalida

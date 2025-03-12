@@ -18,7 +18,8 @@ class CreateBodegaSalidasDetalleTable extends Migration
             $table->bigInteger('id_salida')->unsigned();
 
             // bodega solicitud detalle
-            $table->bigInteger('id_solidetalle')->unsigned();
+            // PERMITO NULL PORQUE PUEDE SER UNA SALIDA MANUAL
+            $table->bigInteger('id_solidetalle')->unsigned()->nullable();
 
             // bodega_entrada_detalle
             $table->bigInteger('id_entradadetalle')->unsigned();

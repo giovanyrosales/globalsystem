@@ -55,11 +55,16 @@
 
 
 <script>
+    $.fn.dataTable.ext.type.order['date-dd-mm-yyyy-pre'] = function (date) {
+        var parts = date.split('-'); // Dividimos por guiones
+        return new Date(parts[2], parts[1] - 1, parts[0]).getTime(); // Convertimos a timestamp
+    };
+
     $(function () {
         $("#tabla").DataTable({
             "paging": true,
             "lengthChange": true,
-            "order": [[0, 'asc']],
+            "order": [[0, 'desc']], // Orden descendente por fecha
             "searching": true,
             "ordering": true,
             "info": true,
@@ -67,7 +72,6 @@
             "pagingType": "full_numbers",
             "lengthMenu": [[500, -1], [500, "Todo"]],
             "language": {
-
                 "sProcessing": "Procesando...",
                 "sLengthMenu": "Mostrar _MENU_ registros",
                 "sZeroRecords": "No se encontraron resultados",
@@ -75,26 +79,26 @@
                 "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                 "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
                 "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix": "",
                 "sSearch": "Buscar:",
-                "sUrl": "",
-                "sInfoThousands": ",",
-                "sLoadingRecords": "Cargando...",
                 "oPaginate": {
                     "sFirst": "Primero",
                     "sLast": "Último",
                     "sNext": "Siguiente",
                     "sPrevious": "Anterior"
-                },
-                "oAria": {
-                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                 }
-
             },
-            "responsive": true, "lengthChange": true, "autoWidth": false,
+            "columnDefs": [
+                {
+                    "targets": 0,
+                    "type": "date-dd-mm-yyyy" // Usamos el tipo de fecha personalizado
+                }
+            ],
+            "responsive": true,
+            "lengthChange": true,
+            "autoWidth": false,
         });
     });
+
 
 
 </script>

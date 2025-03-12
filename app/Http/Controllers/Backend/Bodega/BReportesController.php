@@ -698,10 +698,8 @@ class BReportesController extends Controller
 
 
 
-
-
-        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
         $mpdf->SetTitle('Existencias General');
 
@@ -803,9 +801,18 @@ class BReportesController extends Controller
         }
 
 
+        if($checkProductos==1){ // TODOS LOS PRODUCTOS
+            // OBTENEMOS TODOS LOS PRODUCTOS
+            $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)->get();
 
-        // OBTENEMOS TODOS LOS PRODUCTOS
-        $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)->get();
+        }else{ // SOLO SELECCIONADOS
+            $porciones = explode("-", $arrayProductos);
+            $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
+                ->whereIn('id', $porciones)
+                ->get();
+        }
+
+
         foreach ($arrayProductos as $fila) {
             array_push($pilaIDMateriales, $fila->id);
         }
@@ -834,20 +841,6 @@ class BReportesController extends Controller
                 ->get();
 
             foreach ($arraySalidas as $item) {
-
-                // FILTRAJE DE SALIDAS MANUAL
-               /* $filtroSalidaManual = DB::table('bodega_salidamanual AS salida')
-                    ->join('bodega_salidamanual_detalle AS detasalida', 'detasalida.id_salidamanual', '=', 'salida.id')
-                    ->whereBetween('sa.fecha', [$start, $end])
-                    ->select('detasalida.id_entradadetalle')*/
-
-
-
-
-
-
-
-
                 $saldoExistencia = $item->cantidad - $item->cantidad_entregada;
                 $item->saldoExistencia = $saldoExistencia;
                 $sumaColumnaExistenciaActual += $saldoExistencia;
@@ -900,8 +893,8 @@ class BReportesController extends Controller
 
 
 
-        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
         $mpdf->SetTitle('Existencias General');
 
@@ -971,7 +964,7 @@ class BReportesController extends Controller
             $correlativo++;
 
             $tabla .= "<tr>
-                     <td style='font-size: 11px'>$correlativo</td>
+                     <td style='font-size: 11px'><strong>$correlativo</strong></td>
                      <td colspan='8' style='font-size: 11px; font-weight: bold'>$item->nombre</td>
                 </tr>";
 
@@ -1139,6 +1132,13 @@ class BReportesController extends Controller
         $hastaFormat = date("d-m-Y", strtotime($hasta));
 
 
+        // USUARIO LOGEADO
+        $infoAuth = auth()->user();
+        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
+
+
+
+
         // ARRAY SOLICITUDES DEL USUARIO DE LA UNIDAD
         $arrayBodeSoli = BodegaSolicitud::where('id_usuario', $idusuario)->get();
         $pilaIdBodeSoli = array();
@@ -1182,6 +1182,11 @@ class BReportesController extends Controller
             $fila->multiplicado = '$' . number_format((float)$multiplicado, 2, '.', ',');
         }
 
+
+        $arraySalidaDetalle = $arraySalidaDetalle->sortBy('fechaFormat');
+
+
+
         $columnaTotalMultiplicado = round($columnaTotalMultiplicado, 2);
         $columnaTotalMultiplicado = '$' . number_format((float)$columnaTotalMultiplicado, 2, '.', ',');
 
@@ -1195,7 +1200,7 @@ class BReportesController extends Controller
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
         $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
-        $mpdf->SetTitle('Salidas');
+        $mpdf->SetTitle('Entregas');
 
         // mostrar errores
         $mpdf->showImageErrors = false;
@@ -1214,7 +1219,7 @@ class BReportesController extends Controller
                     <!-- Texto centrado -->
                     <td style='width: 60%; text-align: center;'>
                         <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>UNIDAD DE PROVEEDURÍA Y BODEGA</h2>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
                     </td>
                     <!-- Logo derecho -->
                     <td style='width: 10%; text-align: right;'>
@@ -1231,8 +1236,7 @@ class BReportesController extends Controller
                 <p style='font-size: 14px; margin: 0; color: #000;'><strong>DESDE: $desdeFormat   HASTA: $hastaFormat</strong></p>
             </div>
             <div style='text-align: left; margin-top: 20px;'>
-            <p style='font-size: 14px; margin: 0; color: #000;'><strong>UNIDAD</strong></p>
-             <p style='font-size: 14px; color: #000; margin-top: 10px;'><strong>$nombreUnidad</strong></p>
+            <p style='font-size: 14px; margin: 0; color: #000;'><strong>UNIDAD: </strong>$nombreUnidad</p>
         </div>
       ";
 
@@ -1288,10 +1292,12 @@ class BReportesController extends Controller
         $hastaFormat = date("d-m-Y", strtotime($hasta));
         $infoAuth = auth()->user();
 
+        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
 
         // TODAS LAS SALIDAS QUE HIZO MI USUARIO BODEGUERO
         $arrayBodegaSalida = BodegaSalida::where('id_usuario', $infoAuth->id)
             ->whereBetween('fecha', [$start, $end])
+            ->where('id_solicitud', '!=', null)
             ->orderBy('fecha', 'ASC')
             ->get();
 
@@ -1384,7 +1390,7 @@ class BReportesController extends Controller
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
         $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
-        $mpdf->SetTitle('Salidas');
+        $mpdf->SetTitle('Entregas');
 
         // mostrar errores
         $mpdf->showImageErrors = false;
@@ -1403,7 +1409,7 @@ class BReportesController extends Controller
                     <!-- Texto centrado -->
                     <td style='width: 60%; text-align: center;'>
                         <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>UNIDAD DE PROVEEDURÍA Y BODEGA</h2>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
                     </td>
                     <!-- Logo derecho -->
                     <td style='width: 10%; text-align: right;'>
