@@ -640,6 +640,7 @@
             document.getElementById('observacion').value = '';
             document.getElementById('fecha').value = '';
             document.getElementById('precio-producto').value = '';
+            document.getElementById('codigo-producto').value = '';
 
             document.getElementById('precioTotal').innerHTML = "$0.00";
 

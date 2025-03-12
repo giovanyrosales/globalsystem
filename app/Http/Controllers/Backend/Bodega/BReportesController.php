@@ -9,6 +9,7 @@ use App\Models\BodegaExtras;
 use App\Models\BodegaMateriales;
 use App\Models\BodegaSalida;
 use App\Models\BodegaSalidaDetalle;
+use App\Models\BodegaSalidaManual;
 use App\Models\BodegaSolicitud;
 use App\Models\BodegaSolicitudDetalle;
 use App\Models\BodegaUsuarioObjEspecifico;
@@ -810,51 +811,52 @@ class BReportesController extends Controller
         }
 
 
-        // NECESITO FILTRAR CADA PRODUCTO Y BUSCAR SUS SALIDAS
-        $arrayProSalidas = DB::table('bodega_salidas AS sa')
-            ->join('bodega_salidas_detalle AS deta', 'deta.id_salida', '=', 'sa.id')
-            ->join('bodega_entradas_detalle AS entradeta', 'deta.id_entradadetalle', '=', 'entradeta.id')
-            ->select('sa.fecha', 'sa.id_solicitud', 'deta.id_entradadetalle', 'deta.cantidad_salida', 'entradeta.id_material')
-            ->whereBetween('sa.fecha', [$start, $end])
-            ->get();
-
-        foreach ($arrayProSalidas as $fila) {
-            $infoEntradaDetalle = BodegaEntradasDetalle::where('id', $fila->id_entradadetalle)->first();
-            $infoMaterial = BodegaMateriales::where('id', $infoEntradaDetalle->id_material)->first();
-            $fila->nombreMaterial = $infoMaterial->nombre;
-        }
-
-        $arrayProSalidasOrdenado = $arrayProSalidas->sortBy('nombreMaterial')->values();
-
-
         $resultsBloque = array();
         $index = 0;
-        $correlativo = 0;
         $saldoTotal = 0;
-        foreach ($arrayProSalidasOrdenado as $fila) {
+
+        // BUSCAR CADA ENTRADA DE ESTOS Y DESPUES SE FILTRARA POR LA FECHA DE SALIDA
+        foreach ($arrayProductos as $fila) {
             array_push($resultsBloque, $fila);
 
             $totalBloqueDinero = 0;
-            $correlativo++;
-            $fila->correlativo = $correlativo;
             $sumaColumnaExistenciaActual = 0;
             $sumaColumnaSaldoExistenciaDinero = 0;
 
-            // BUSCAR TODAS LAS SALIDAS DE ESTE MATERIAL
-            $arraySalida = BodegaEntradasDetalle::where('id', $fila->id_entradadetalle)->get();
+            $arraySalidas = DB::table('bodega_salidas AS sa')
+                ->join('bodega_salidas_detalle AS bodesalideta', 'bodesalideta.id_salida', '=', 'sa.id')
+                ->join('bodega_entradas_detalle AS bodeentradeta', 'bodesalideta.id_entradadetalle', '=', 'bodeentradeta.id')
+                ->select('sa.fecha', 'bodeentradeta.id AS identradadetalle', 'bodeentradeta.id_material',
+                        'bodeentradeta.cantidad', 'bodeentradeta.cantidad_entregada', 'bodeentradeta.precio',
+                        'bodeentradeta.id_material', 'bodeentradeta.id_entrada', 'bodeentradeta.codigo_producto')
+                ->whereBetween('sa.fecha', [$start, $end])
+                ->where('bodeentradeta.id_material', $fila->id)
+                ->get();
+
+            foreach ($arraySalidas as $item) {
+
+                // FILTRAJE DE SALIDAS MANUAL
+               /* $filtroSalidaManual = DB::table('bodega_salidamanual AS salida')
+                    ->join('bodega_salidamanual_detalle AS detasalida', 'detasalida.id_salidamanual', '=', 'salida.id')
+                    ->whereBetween('sa.fecha', [$start, $end])
+                    ->select('detasalida.id_entradadetalle')*/
 
 
-            foreach ($arraySalida as $item) {
+
+
+
+
+
 
                 $saldoExistencia = $item->cantidad - $item->cantidad_entregada;
                 $item->saldoExistencia = $saldoExistencia;
                 $sumaColumnaExistenciaActual += $saldoExistencia;
 
-                $totalBloqueDinero += ($item->precio * $saldoExistencia);
+                $multiplicado = ($item->precio * $saldoExistencia);
+                $totalBloqueDinero += $multiplicado;
                 $sumaColumnaSaldoExistenciaDinero += $totalBloqueDinero;
                 $item->precio = "$" . $item->precio;
-                $item->multiplicado = "$" . number_format($totalBloqueDinero, 2, '.', ',');
-
+                $item->multiplicado = "$" . number_format($multiplicado, 2, '.', ',');
 
                 $infoEntrada = BodegaEntradas::where('id', $item->id_entrada)->first();
                 $item->lote = $infoEntrada->lote;
@@ -867,7 +869,7 @@ class BReportesController extends Controller
             }
 
 
-            $arraySalida = $arraySalida->sortBy('nombreMaterial')->values();
+            $arraySalidas = $arraySalidas->sortBy('nombreMaterial')->values();
             $saldoTotal += $totalBloqueDinero;
             $fila->totalBloque = "$" . number_format($totalBloqueDinero, 2, '.', ',');
 
@@ -875,11 +877,13 @@ class BReportesController extends Controller
             $fila->sumaColumnaExistenciaActual = $sumaColumnaExistenciaActual;
             $fila->sumaColumnaSaldoExistenciaDinero = "$" . number_format($sumaColumnaSaldoExistenciaDinero, 2, '.', ',');
 
-            $resultsBloque[$index]->detalle = $arraySalida;
+            $resultsBloque[$index]->detalle = $arraySalidas;
             $index++;
         }
 
         $saldoTotal = "$" . number_format($saldoTotal, 2, '.', ',');
+
+
 
 
         //************************************************
@@ -933,18 +937,17 @@ class BReportesController extends Controller
                 <h1 style='font-size: 16px; margin: 0; color: #000;'>REPORTE GENERAL DE EXISTENCIAS</h1>
             </div>
             <div style='text-align: left; margin-top: 10px;'>
-            <p style='font-size: 14px; margin: 0; color: #000;'>PERÍODO $desdeFormat AL $hastaFormat</p>
+            <p style='font-size: 12px; margin: 0; color: #000;'>PERÍODO $desdeFormat AL $hastaFormat</p>
         </div>
       ";
 
         // Encabezado de la tabla
-        $tabla .= "<table width='100%' id='tablaFor'>
+        $tabla .= "<table width='100%' id='tablaFor' style='margin-top: 30px'>
             <thead>
                 <tr>
                     <th style='font-weight: bold; width: 6%; font-size: 11px; text-align: center;'>CORRELATIVO</th>
                     <th style='font-weight: bold; width: 22%; font-size: 11px; text-align: center;'>CÓDIGO DEL PRODUCTO</th>
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>UNIDAD DE MEDIDA</th>
-                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>ARTÍCULO/DESCRIPCIÓN</th>
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>SOLICITUD DE PEDIDO</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>PRECIO UNITARIO</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>EXISTENCIA INICIAL</th>
@@ -955,18 +958,28 @@ class BReportesController extends Controller
             </thead>
             <tbody>";
 
-        foreach ($arrayProSalidasOrdenado as $item) {
 
-            $vuelta = 0;
+
+
+        $correlativo = 0;
+        foreach ($arrayProductos as $item) {
+
+            if (empty($item->detalle) || count($item->detalle) === 0) {
+                continue;
+            }
+
+            $correlativo++;
+
+            $tabla .= "<tr>
+                     <td style='font-size: 11px'>$correlativo</td>
+                     <td colspan='8' style='font-size: 11px; font-weight: bold'>$item->nombre</td>
+                </tr>";
+
             foreach ($item->detalle as $dato) {
-                $vuelta++;
-
-                if($vuelta == 1){
                     $tabla .= "<tr>
-                     <td style='font-size: 11px'>$item->correlativo</td>
+                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'>$dato->codigo_producto</td>
                     <td style='font-size: 11px'>$dato->unidadMedida</td>
-                    <td style='font-size: 11px'>$dato->nombreMaterial</td>
                      <td style='font-size: 11px'>$dato->lote</td>
                     <td style='font-size: 11px'>$dato->precio</td>
                     <td style='font-size: 11px'>$dato->cantidad</td>
@@ -974,27 +987,17 @@ class BReportesController extends Controller
                     <td style='font-size: 11px'>$dato->saldoExistencia</td>
                     <td style='font-size: 11px'>$dato->multiplicado</td>
                 </tr>";
-                }else{
-                    $tabla .= "<tr>
-                    <td colspan='4' style='font-size: 11px'></td>
-                    <td style='font-size: 11px'>$dato->lote</td>
-                    <td style='font-size: 11px'>$dato->precio</td>
-                    <td style='font-size: 11px'>$dato->cantidad</td>
-                    <td style='font-size: 11px'>$dato->cantidad_entregada</td>
-                    <td style='font-size: 11px'>$dato->saldoExistencia</td>
-                    <td style='font-size: 11px'>$dato->multiplicado</td>
-                </tr>";
-                }
+
             } // END-FOREACH 2
 
             $tabla .= "<tr>
-                    <td colspan='4' style='font-size: 11px'>EXISTENCIA TOTAL</td>
+                    <td colspan='3' style='font-size: 11px; font-weight: bold'>EXISTENCIA TOTAL</td>
                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'></td>
-                    <td style='font-size: 11px'>$item->sumaColumnaExistenciaActual</td>
-                    <td style='font-size: 11px'>$item->sumaColumnaSaldoExistenciaDinero</td>
+                    <td style='font-size: 11px; font-weight: bold'>$item->sumaColumnaExistenciaActual</td>
+                    <td style='font-size: 11px; font-weight: bold'>$item->sumaColumnaSaldoExistenciaDinero</td>
                 </tr>";
 
 
@@ -1005,7 +1008,7 @@ class BReportesController extends Controller
 
 
         $tabla .= "<tr>
-                <td colspan='9' style='font-size: 11px'><strong>SALDO TOTAL</strong></td>
+                <td colspan='8' style='font-size: 11px'><strong>SALDO TOTAL</strong></td>
                 <td style='font-size: 11px'><strong>$saldoTotal</strong></td>
             </tr>";
 

@@ -449,6 +449,7 @@ class BMaterialesController extends Controller
                 $detalle->save();
 
                 // ACTUALIZAR CANTIDAD
+                Log::info("suma: " . $suma);
 
                 BodegaEntradasDetalle::where('id', $infoBodeEnDeta->id)->update([
                     'cantidad_entregada' => $suma,
