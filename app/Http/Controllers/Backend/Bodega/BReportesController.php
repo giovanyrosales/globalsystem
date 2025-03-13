@@ -9,7 +9,6 @@ use App\Models\BodegaExtras;
 use App\Models\BodegaMateriales;
 use App\Models\BodegaSalida;
 use App\Models\BodegaSalidaDetalle;
-use App\Models\BodegaSalidaManual;
 use App\Models\BodegaSolicitud;
 use App\Models\BodegaSolicitudDetalle;
 use App\Models\BodegaUsuarioObjEspecifico;
@@ -882,15 +881,12 @@ class BReportesController extends Controller
         //************************************************
 
 
-        $infoAuth = auth()->user();
+
         // USUARIO LOGEADO
         $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
 
         // INFORMACION GERENCIA
         $infoGerencia = BodegaExtras::where('id', 1)->first();
-
-
-
 
 
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
@@ -952,8 +948,6 @@ class BReportesController extends Controller
             <tbody>";
 
 
-
-
         $correlativo = 0;
         foreach ($arrayProductos as $item) {
 
@@ -997,29 +991,12 @@ class BReportesController extends Controller
         }// END-FOREACH
 
 
-
-
-
         $tabla .= "<tr>
                 <td colspan='8' style='font-size: 11px'><strong>SALDO TOTAL</strong></td>
                 <td style='font-size: 11px'><strong>$saldoTotal</strong></td>
             </tr>";
 
         $tabla .= "</tbody></table>";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         $tabla .= "
@@ -1062,9 +1039,6 @@ class BReportesController extends Controller
 </table>
 ";
 
-
-
-
         $stylesheet = file_get_contents('css/cssbodega.css');
         $mpdf->WriteHTML($stylesheet,1);
 
@@ -1073,6 +1047,257 @@ class BReportesController extends Controller
 
         $mpdf->Output();
     }
+
+
+
+
+
+
+
+
+    // FECHAS EXISTENCIAS POR FECHAS POR DESGLOSE CARDEX
+    public function generarPDFExistenciasFechasDesglose($desde, $hasta, $idproducto) {
+
+
+        $start = Carbon::parse($desde)->startOfDay();
+        $end = Carbon::parse($hasta)->endOfDay();
+
+        $desdeFormat = date("d/m/Y", strtotime($desde));
+        $hastaFormat = date("d/m/Y", strtotime($hasta));
+
+
+        $infoProducto = BodegaMateriales::where('id', $idproducto)->first();
+        $infoUnidadMedida = P_UnidadMedida::where('id', $infoProducto->id_unidadmedida)->first();
+
+        $saldoTotalEntradas = 0;
+        $saldoTotalSalidas = 0;
+        $saldoTotalExistencias = 0;
+
+
+
+
+        // TODAS LAS UNIDADES QUE SE HA ENTREGADO SALIDAS
+
+        $arrayDepartamentosSalidas = DB::table('bodega_salidas_detalle AS sadeta')
+            ->join('bodega_entradas_detalle AS bodeentradeta', 'sadeta.id_entradadetalle', '=', 'bodeentradeta.id')
+            ->select('bodeentradeta.')
+            ->whereBetween('sa.fecha', [$start, $end])
+            ->where('bodeentradeta.id_material', $idproducto)
+            ->orderBy('sa.fecha', 'ASC')
+            ->get();
+
+
+
+
+
+
+
+        $arraySalidas = DB::table('bodega_salidas AS sa')
+            ->join('bodega_salidas_detalle AS deta', 'deta.id_salida', '=', 'sa.id')
+            ->join('bodega_entradas_detalle AS bodeentradeta', 'deta.id_entradadetalle', '=', 'bodeentradeta.id')
+            ->select('sa.fecha', 'sa.id_solicitud', 'sa.observacion', 'sa.estado_salida',
+                'deta.id_solidetalle', 'deta.id_entradadetalle', 'deta.cantidad_salida', 'bodeentradeta.id_material',
+                'bodeentradeta.codigo_producto', 'bodeentradeta.cantidad', 'bodeentradeta.cantidad_entregada',
+            'bodeentradeta.id_entrada')
+            ->whereBetween('sa.fecha', [$start, $end])
+            ->where('bodeentradeta.id_material', $idproducto)
+            ->orderBy('sa.fecha', 'ASC')
+            ->get();
+
+
+        foreach ($arraySalidas as $item) {
+            $saldoExistencia = $item->cantidad - $item->cantidad_entregada;
+            $item->existencias = $saldoExistencia;
+
+            // SUMA COLUMNAS
+            $saldoTotalEntradas += $item->cantidad;
+            $saldoTotalSalidas += $item->cantidad_salida;
+            $saldoTotalExistencias += $saldoExistencia;
+
+
+            $infoBodegaEntrada = BodegaEntradas::where('id', $item->id_entrada)->first();
+            $item->lote = $infoBodegaEntrada->lote;
+
+            if($dato = BodegaSolicitud::where('id', $item->id_solicitud)->first()){
+                $numeroSolicitud = $dato->numero_solicitud;
+            }else{
+                $numeroSolicitud = "-";
+            }
+
+            $item->numeroSolicitud = $numeroSolicitud;
+
+
+            if($infoSolicitudDeta = BodegaSolicitudDetalle::where('id', $item->id_solidetalle)->first()){
+
+                $infoSolicitud = BodegaSolicitud::where('id', $infoSolicitudDeta->id_bodesolicitud)->first();
+                $infoDeta = P_UsuarioDepartamento::where('id', $infoSolicitud->id_usuario)->first();
+                $infoDepartamento = P_Departamento::where('id', $infoDeta->id_departamento)->first();
+                $unidadSolicitante = $infoDepartamento->nombre;
+            }else{
+                // FUE SALIDA MANUAL
+                // 1- Salida sin Solicitud
+                // 2- Salida por Desperfecto
+                if($item->estado_salida == 1){
+                    $unidadSolicitante = "SALIDA SIN SOLICITUD";
+                }else{
+                    $unidadSolicitante = "SALIDA POR DESPERFECTO";
+                }
+            }
+
+            $item->unidadSolicitante = $unidadSolicitante;
+        }
+
+
+
+
+        //************************************************
+
+
+        $infoAuth = auth()->user();
+        // USUARIO LOGEADO
+        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
+
+        // INFORMACION GERENCIA
+        $infoGerencia = BodegaExtras::where('id', 1)->first();
+
+
+
+
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER', 'orientation' => 'L']);
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER', 'orientation' => 'L']);
+
+        $mpdf->SetTitle('Existencias General - Desglose');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+        $logoalcaldia = 'images/gobiernologo.jpg';
+        $logosantaana = 'images/logo.png';
+
+        $tabla = "
+            <table style='width: 100%; border-collapse: collapse;'>
+                <tr>
+                    <!-- Logo izquierdo -->
+                    <td style='width: 15%; text-align: left;'>
+                        <img src='$logosantaana' alt='Santa Ana Norte' style='max-width: 100px; height: auto;'>
+                    </td>
+                    <!-- Texto centrado -->
+                    <td style='width: 60%; text-align: center;'>
+                        <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
+                    </td>
+                    <!-- Logo derecho -->
+                    <td style='width: 10%; text-align: right;'>
+                        <img src='$logoalcaldia' alt='Gobierno de El Salvador' style='max-width: 60px; height: auto;'>
+                    </td>
+                </tr>
+            </table>
+            <hr style='border: none; border-top: 2px solid #003366; margin: 0;'>
+            ";
+
+        $tabla .= "
+            <div style='text-align: center; margin-top: 20px;'>
+                <h1 style='font-size: 16px; margin: 0; color: #000;'>DESGLOSE DE MOVIMIENTOS DE INVENTARIO</h1>
+            </div>
+            <div style='text-align: left; margin-top: 10px;'>
+            <p style='font-size: 14px; margin: 0; color: #000;'>PERÍODO $desdeFormat AL $hastaFormat</p>
+        </div>
+      ";
+
+
+        $tabla .= "
+            <div style='text-align: left; margin-top: 10px;'>
+            <p style='font-size: 14px; margin: 0; color: #000;'><strong>Producto: </strong>$infoProducto->nombre</p>
+            <p style='font-size: 14px; margin: 0; color: #000;'><strong>U. Medida: </strong>$infoUnidadMedida->nombre</p>
+        </div>
+      ";
+
+
+
+        // Encabezado de la tabla
+        $tabla .= "<table width='100%' id='tablaFor' style='margin-top: 30px'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>CÓDIGO DEL PRODUCTO</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>SOLICITUD DE PEDIDO</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>ENTRADAS</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>N° DE SOLICITUD</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALIDAS</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>UNIDAD SOLICITANTE</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>EXISTENCIAS</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+
+        foreach ($arraySalidas as $dato) {
+            $tabla .= "<tr>
+                    <td style='font-size: 11px'>$dato->codigo_producto</td>
+                    <td style='font-size: 11px'>$dato->lote</td>
+                    <td style='font-size: 11px'>$dato->cantidad</td>
+                    <td style='font-size: 11px'>$dato->numeroSolicitud</td>
+                    <td style='font-size: 11px'>$dato->cantidad_entregada</td>
+                    <td style='font-size: 11px'>$dato->unidadSolicitante</td>
+                     <td style='font-size: 11px'>$dato->existencias</td>
+                </tr>";
+
+        }// END-FOREACH
+
+        $tabla .= "<tr>
+                    <td colspan='2' style='font-size: 11px; font-weight: bold'>EXISTENCIA TOTAL</td>
+                    <td style='font-size: 11px'>$saldoTotalEntradas</td>
+                    <td style='font-size: 11px; font-weight: bold'></td>
+                    <td style='font-size: 11px'>$saldoTotalSalidas</td>
+                    <td style='font-size: 11px; font-weight: bold'></td>
+                    <td style='font-size: 11px; font-weight: bold'>$saldoTotalExistencias</td>
+                </tr>";
+
+
+
+        $tabla .= "</tbody></table>";
+
+
+
+
+
+        $tabla .= "
+            <table style='width: 100%; margin-top: 20px; font-family: \"Times New Roman\", Times, serif; font-size: 14px; color: #000;'>
+                <!-- Fila para los títulos -->
+                <tr>
+                    <td style='width: 50%; text-align: left; padding-bottom: 15px;'>
+                        <p style='margin: 0; font-weight: bold; margin-left: 15px; font-size: 11px'>REPORTE GENERADO POR:</p>
+                    </td>
+                    <td style='width: 50%; text-align: right; padding-bottom: 15px; font-size: 11px'>
+                        <p style='margin: 0; font-weight: bold; margin-right: 15px'>REVISADO POR:</p>
+                    </td>
+                </tr>
+                <!-- Fila para los contenidos -->
+               <tr>
+                <td style='width: 50%; text-align: left; padding: 20px;'>
+                    <p style='margin: 10px 0;'>$infoUsuarioLogeado->nombre</p>
+                    <p style='margin: 10px 0;'>$infoUsuarioLogeado->cargo</p>
+                </td>
+                <td style='width: 50%; text-align: right; padding: 20px;'>
+                    <p style='margin: 10px 0;'>$infoGerencia->nombre_gerente</p>
+                    <p style='margin: 10px 0;'>$infoGerencia->nombre_gerente_cargo</p>
+                </td>
+            </tr>
+            </table>
+            ";
+
+
+
+        $mpdf->setMargins(5, 5, 5);
+        $stylesheet = file_get_contents('css/cssbodega.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+    }
+
+
 
 
 

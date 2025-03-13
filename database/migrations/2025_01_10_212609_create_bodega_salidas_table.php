@@ -28,7 +28,8 @@ class CreateBodegaSalidasTable extends Migration
 
 
             // 0- SALIDA NORMAL
-            // 1- DESPERFECTO
+            // 1- Salida sin Solicitud
+            // 2- Salida por Desperfecto
             $table->integer('estado_salida');
 
             $table->foreign('id_usuario')->references('id')->on('usuario');

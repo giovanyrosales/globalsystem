@@ -1343,6 +1343,8 @@ Route::get('/admin/bodega/reportes/pdf-existencias', [BReportesController::class
 
 // Reporte General de Existencias por Fechas
 Route::get('/admin/bodega/reportes/pdf/existencias-fechas/{desde}/{hasta}/{check}/{arrayproductos}', [BReportesController::class,'generarPDFExistenciasFechas']);
+// Reporte General de Existencia DESGLOSE
+Route::get('/admin/bodega/reportes/pdf/existencias/desglose/{desde}/{hasta}/{idproducto}', [BReportesController::class,'generarPDFExistenciasFechasDesglose']);
 
 
 

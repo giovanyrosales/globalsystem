@@ -104,8 +104,51 @@
                                 @endforeach
                             </select>
 
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
 
 
+
+
+    <section class="content" style="margin-top: 35px">
+        <div class="container-fluid">
+            <div class="card card-gray-dark">
+                <div class="card-header">
+                    <h3 class="card-title">DESGLOSE DE MOVIMIENTOS DE INVENTARIO</h3>
+                </div>
+                <div class="card-body">
+                    <section class="content" style="margin-left: 30px">
+                        <div class="container-fluid">
+
+                            <div class="row">
+
+                                <div class="form-group">
+                                    <label>Desde</label>
+                                    <input type="date"  class="form-control" id="fecha-desde2">
+                                </div>
+
+                                <div class="form-group" style="margin-left: 15px">
+                                    <label>Hasta</label>
+                                    <input type="date" class="form-control" id="fecha-hasta2">
+                                </div>
+
+
+                                <button type="button" onclick="pdfExistenciasFechaDesglose()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
+                                    <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
+                                    Generar PDF
+                                </button>
+                            </div>
+
+                            <label>Productos</label>
+                            <select class="form-control" id="select-productos2" style="height: 150px">
+                                @foreach($arrayProductos as $item)
+                                    <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                @endforeach
+                            </select>
 
                         </div>
                     </section>
@@ -113,6 +156,12 @@
             </div>
         </div>
     </section>
+
+
+
+
+
+
 
 
 </div>
@@ -131,6 +180,16 @@
         $(document).ready(function () {
 
             $('#select-productos').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Búsqueda no encontrada";
+                    }
+                },
+            });
+
+
+            $('#select-productos2').select2({
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
@@ -202,6 +261,35 @@
 
             window.open("{{ URL::to('admin/bodega/reportes/pdf/existencias-fechas') }}/" +
                 fechadesde + "/" + fechahasta + "/" + valorCheckbox + "/" + reemplazo);
+        }
+
+
+        function pdfExistenciasFechaDesglose(){
+            var fechadesde = document.getElementById('fecha-desde2').value;
+            var fechahasta = document.getElementById('fecha-hasta2').value;
+            var idproducto = document.getElementById('select-productos2').value;
+
+            if(fechadesde === ''){
+                toastr.error('Fecha desde es requerido');
+                return;
+            }
+
+            if(fechahasta === ''){
+                toastr.error('Fecha hasta es requerido');
+                return;
+            }
+
+            // Convertir a objetos Date para comparar
+            let dateDesde = new Date(fechadesde);
+            let dateHasta = new Date(fechahasta);
+
+            if (dateHasta < dateDesde) {
+                toastr.error('La Fecha Hasta no puede ser menor que la Fecha Desde');
+                return;
+            }
+
+            window.open("{{ URL::to('admin/bodega/reportes/pdf/existencias/desglose') }}/" +
+                fechadesde + "/" + fechahasta + "/" + idproducto);
         }
 
 
