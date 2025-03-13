@@ -494,10 +494,8 @@ class PermisoController extends Controller
 
         if ($validar->fails()){return ['success' => 0];}
 
-        // NO DEPARTAMENTOS REPETIDOS
-        if(BodegaUsuarioObjEspecifico::where('id_usuario', $request->usuario)
-            ->where('id_objespecifico', $request->objeto)
-            ->first()){
+        // NO OBJETO ESPECIFICO REPETIDO
+        if(BodegaUsuarioObjEspecifico::where('id_objespecifico', $request->objeto)->first()){
             return ['success' => 1];
         }
 

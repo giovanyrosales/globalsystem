@@ -400,6 +400,7 @@
 
             document.getElementById('cantidad').value = '';
             document.getElementById('precio-producto').value = '';
+            document.getElementById('codigo-producto').value = '';
             document.getElementById('inputBuscador').value = '';
         }
 
@@ -600,6 +601,7 @@
             document.getElementById('inputBuscador').value = '';
             document.getElementById('cantidad').value = '';
             document.getElementById('precio-producto').value = '';
+            document.getElementById('codigo-producto').value = '';
 
             document.getElementById('precioTotal').innerHTML = "$0.00";
 

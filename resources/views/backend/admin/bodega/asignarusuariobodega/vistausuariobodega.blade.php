@@ -181,7 +181,7 @@
                     if(response.data.success === 1){
                         Swal.fire({
                             title: 'Registro Repetido',
-                            text: "ya esta registrado",
+                            text: "ya esta registrado el Objeto Específico",
                             icon: 'info',
                             showCancelButton: false,
                             confirmButtonColor: '#28a745',

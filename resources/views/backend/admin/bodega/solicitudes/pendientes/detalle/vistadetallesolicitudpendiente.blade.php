@@ -52,17 +52,17 @@
                                     <th style="width: 3%">Prioridad</th>
                                     <th style="width: 2%">U/M</th>
                                     <th style="width: 3%">Estado</th>
-                                    <th style="width: 2%">Opciones</th>
+                                    <th style="width: 5%">Opciones</th>
                                 </tr>
                                 </thead>
                                 <tbody>
 
                             @foreach($arraySinReferencia as $fila)
                                 <tr>
-                                    <td style="width: 3%">{{ $fila->nombre }}</td>
-                                    <td style="width: 3%">{{ $fila->nombrePrioridad }}</td>
-                                    <td style="width: 2%">{{ $fila->unidadMedida }}</td>
-                                    <td style="width: 2%">
+                                    <td>{{ $fila->nombre }}</td>
+                                    <td>{{ $fila->nombrePrioridad }}</td>
+                                    <td>{{ $fila->unidadMedida }}</td>
+                                    <td>
                                         @if($fila->estado == 1)
                                             <span class="badge bg-gray-dark">{{ $fila->nombreEstado }}</span>
                                         @else
