@@ -72,8 +72,6 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6 col-12 mx-auto">
-
-
                         <div class="p-5 bg-white rounded shadow-lg">
                         <div class="text-center image-size-small position-relative">
                             <img src="{{ asset('images/logo.png') }}" class=" p-2">
@@ -138,7 +136,7 @@
 
         ///comprasalcaldia.com/admin/login
 
-        axios.post('/admin/login', formData, {
+        axios.post('/comprasalcaldia.com/admin/login', formData, {
         })
             .then((response) => {
                 closeLoading();
