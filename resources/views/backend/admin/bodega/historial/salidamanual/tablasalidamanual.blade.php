@@ -13,7 +13,7 @@
                                 <th style="width: 4%">Fecha Salida</th>
                                 <th style="width: 5%">Tipo Salida</th>
                                 <th style="width: 6%">Observación</th>
-                                <th style="width: 6%">Opciones</th>
+                                <th style="width: 3%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
