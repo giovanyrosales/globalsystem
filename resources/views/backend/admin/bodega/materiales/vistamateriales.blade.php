@@ -252,9 +252,9 @@
 
                         $.each(response.data.um, function( key, val ){
                             if(response.data.lista.id_unidadmedida === val.id){
-                                $('#unidadmedida-editar').append('<option value="' +val.id +'" selected="selected">'+val.medida+'</option>');
+                                $('#unidadmedida-editar').append('<option value="' +val.id +'" selected="selected">'+val.nombre+'</option>');
                             }else{
-                                $('#unidadmedida-editar').append('<option value="' +val.id +'">'+val.medida+'</option>');
+                                $('#unidadmedida-editar').append('<option value="' +val.id +'">'+val.nombre+'</option>');
                             }
                         });
                         $.each(response.data.obj, function( key, val ){
