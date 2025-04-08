@@ -13,7 +13,6 @@ use App\Models\P_UnidadMedida;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\ObjEspecifico;
-use App\Models\UnidadMedida;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -27,7 +26,6 @@ class BMaterialesController extends Controller
     // retorna vista de materiales de la seccion de bodega
     public function indexBodegaMateriales()
     {
-
         $pilaObjEspeci = array();
         $infoAuth = auth()->user();
         $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
@@ -62,8 +60,10 @@ class BMaterialesController extends Controller
             ->get();
 
         foreach ($lista as $fila) {
-            $infoUnidadMedida = UnidadMedida::where('id', $fila->id_unidadmedida)->first();
-            $fila->id_unidadmedida = $infoUnidadMedida->medida;
+            $infoUnidadMedida = P_UnidadMedida::where('id', $fila->id_unidadmedida)->first();
+            $fila->id_unidadmedida = $infoUnidadMedida->nombre;
+
+
             $infoObjEspecifico = ObjEspecifico::where('id', $fila->id_objespecifico)->first();
             $fila->id_objespecifico = $infoObjEspecifico->codigo . " - " . $infoObjEspecifico->nombre;
 
@@ -128,7 +128,7 @@ class BMaterialesController extends Controller
 
 
             $objespecifico = ObjEspecifico::whereIn('id', $pilaObjEspeci)->orderBy('codigo')->get();
-            $unidadmedida = UnidadMedida::orderBy('id')->get();
+            $unidadmedida = P_UnidadMedida::orderBy('id')->get();
 
             return ['success' => 1, 'lista' => $lista, 'obj' => $objespecifico, 'um' => $unidadmedida];
         } else {
@@ -207,6 +207,7 @@ class BMaterialesController extends Controller
 
     public function buscarProducto(Request $request)
     {
+
         if ($request->get('query')) {
             $query = $request->get('query');
 
@@ -222,6 +223,9 @@ class BMaterialesController extends Controller
             $data = BodegaMateriales::where('nombre', 'LIKE', "%{$query}%")
                 ->whereIn('id_objespecifico', $pilaObjEspeci)
                 ->get();
+
+            Log::info($data);
+
 
             $output = '<ul class="dropdown-menu" style="display:block; position:relative; overflow: auto; max-height: 300px; width: 550px">';
             $tiene = true;
