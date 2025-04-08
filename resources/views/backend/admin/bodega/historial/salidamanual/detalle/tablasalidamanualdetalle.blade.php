@@ -21,7 +21,7 @@
                                 <tr>
                                     <td>{{ $dato->nombreProducto }}</td>
                                     <td>{{ $dato->codigoProducto }}</td>
-                                    <td>Looo</td>
+                                    <td>{{ $dato->lote }}</td>
                                     <td>${{ $dato->precioProducto }}</td>
                                     <td>{{ $dato->cantidad_salida }}</td>
                                     <td>
