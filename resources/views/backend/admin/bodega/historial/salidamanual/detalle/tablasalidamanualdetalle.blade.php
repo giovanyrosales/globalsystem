@@ -7,8 +7,9 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
-                                <th style="width: 15%">Producto</th>
+                                <th style="width: 15%">Nombre</th>
                                 <th style="width: 10%">Código Producto</th>
+                                <th style="width: 10%">Lote</th>
                                 <th style="width: 8%">Precio</th>
                                 <th style="width: 4%">Cantidad Retirada</th>
                                 <th style="width: 4%">Opciones</th>
@@ -20,6 +21,7 @@
                                 <tr>
                                     <td>{{ $dato->nombreProducto }}</td>
                                     <td>{{ $dato->codigoProducto }}</td>
+                                    <td>Looo</td>
                                     <td>${{ $dato->precioProducto }}</td>
                                     <td>{{ $dato->cantidad_salida }}</td>
                                     <td>

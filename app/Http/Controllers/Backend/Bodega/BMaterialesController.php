@@ -495,7 +495,7 @@ class BMaterialesController extends Controller
 
                 $infoBodegaEntraDeta = BodegaEntradasDetalle::where('id', $infoSalidaDeta->id_entradadetalle)->first();
 
-                $resta = $infoBodegaEntraDeta->cantidad_entregada - $infoSalidaDeta->cantidad;
+                $resta = $infoBodegaEntraDeta->cantidad_entregada - $infoSalidaDeta->cantidad_salida;
 
                 // RESTAR CANTIDAD ENTREGADA
                 BodegaEntradasDetalle::where('id', $infoBodegaEntraDeta->id)->update([

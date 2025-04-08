@@ -436,6 +436,7 @@ class BHistorialController extends Controller
                 $restaSoli = $infoSolicitudDeta->cantidad_entregada - $infoSalidaDeta->cantidad_salida;
 
 
+
                 // CAMBIAR ESTADO A PENDIENTE
                 BodegaSolicitud::where('id', $infoSolicitudDeta->id_bodesolicitud)->update([
                     'estado' => 0, // pasara a pendiente
@@ -515,14 +516,16 @@ class BHistorialController extends Controller
             $infoEntraDetalle = BodegaEntradasDetalle::where('id', $fila->id_entradadetalle)->first();
             $infoProducto = BodegaMateriales::where('id', $infoEntraDetalle->id_material)->first();
 
-            $fila->nombreProducto = $infoProducto->nombre;
+            $infoEntrada = BodegaEntradas::where('id', $infoEntraDetalle->id_entrada)->first();
 
+            $fila->nombreProducto = $infoProducto->nombre;
+            $fila->lote = $infoEntrada->lote;
             $fila->precioProducto = $infoEntraDetalle->precio;
             $fila->codigoProducto = $infoEntraDetalle->codigo_producto;
-
         }
 
-        return view('backend.admin.bodega.historial.salidamanual.detalle.tablasalidamanualdetalle', compact('listado'));
+        return view('backend.admin.bodega.historial.salidamanual.detalle.tablasalidamanualdetalle',
+            compact('listado'));
     }
 
 
