@@ -77,7 +77,7 @@
                                         <label>Unidad de medida</label>
                                         <select id="select-unidadmedida" class="form-control">
                                             @foreach($unidadmedida as $item)
-                                                <option value="{{$item->id}}"> {{ $item->medida }}</option>
+                                                <option value="{{$item->id}}"> {{ $item->nombre }}</option>
                                             @endforeach
                                         </select>
                                     </div>
