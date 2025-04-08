@@ -1268,12 +1268,16 @@ Route::get('/admin/bodega/materialesdetalle/vista/index/{id}', [BMaterialesContr
 Route::get('/admin/bodega/materialesdetalle/tabla/index/{id}', [BMaterialesController::class,'tablaDetalleMaterialCantidad']);
 
 
-// registrar entradas
+// registrar
 Route::get('/admin/bodega/entradasregistro/index', [BMaterialesController::class,'indexEntradasRegistro'])->name('sidebar.bodega.entradasregistro');
 Route::post('/admin/bodega/buscar/producto',  [BMaterialesController::class,'buscarProducto']);
 Route::post('/admin/bodega/registrar/productos',  [BMaterialesController::class,'registrarProductos']);
 // agregar productos extras a un lote
 Route::post('/admin/bodega/registrar/productosextras',  [BMaterialesController::class,'registrarProductosExtras']);
+
+
+
+
 
 
 
@@ -1302,6 +1306,16 @@ Route::get('/admin/bodega/historial/entradadetalle/index/{id}', [BHistorialContr
 Route::get('/admin/bodega/historial/entradadetalle/tabla/{id}', [BHistorialController::class,'tablaHistorialEntradasDetalle']);
 // vista para ingresar nuevo producto al lote existente
 Route::get('/admin/bodega/historial/nuevoingresoentradadetalle/index/{id}', [BHistorialController::class,'indexNuevoIngresoEntradaDetalle']);
+
+// Informacion de la entrada para modificar fecha, etc
+Route::post('/admin/bodega/historial/entrada/datosinformacion', [BHistorialController::class,'informacionDatosEntrada']);
+Route::post('/admin/bodega/historial/entrada/guardarinformacion', [BHistorialController::class,'guardarDatosEntrada']);
+
+
+
+
+
+
 
 // ---- SALIDAS SOLICITUD
 Route::get('/admin/bodega/historial/salidas/index', [BHistorialController::class,'indexHistorialSalidas'])->name('sidebar.bodega.historial.salidas');

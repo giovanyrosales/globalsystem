@@ -50,6 +50,59 @@
         </div>
     </section>
 
+
+    <div class="modal fade" id="modalEditar">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Editar Datos</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-datos">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" id="id-editar">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Fecha</label>
+                                        <input type="date" class="form-control" id="fecha-editar" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Lote</label>
+                                        <input type="text" maxlength="50" class="form-control" id="lote-editar" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Observación</label>
+                                        <input type="text" maxlength="300" class="form-control" id="observacion-editar" autocomplete="off">
+                                    </div>
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
+                            class="button button-rounded button-pill button-small" onclick="editarDatos()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 
@@ -131,6 +184,73 @@
 
         function infoNuevoIngreso(id){
             window.location.href="{{ url('/admin/bodega/historial/nuevoingresoentradadetalle/index') }}/" + id;
+        }
+
+        function vistaDetalle2(id){
+            openLoading();
+            document.getElementById("formulario-datos").reset();
+
+            axios.post(url+'/bodega/historial/entrada/datosinformacion',{
+                'id': id
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+                        $('#modalEditar').modal('show');
+                        $('#id-editar').val(response.data.info.id);
+
+                        $('#fecha-editar').val(response.data.info.fecha);
+                        $('#lote-editar').val(response.data.info.lote);
+                        $('#observacion-editar').val(response.data.info.observacion);
+
+                    }else{
+                        toastr.error('Información no encontrada');
+                    }
+                })
+                .catch((error) => {
+                    closeLoading();
+                    toastr.error('Información no encontrada');
+                });
+        }
+
+
+        function editarDatos(){
+            var id = document.getElementById('id-editar').value;
+            var fecha = document.getElementById('fecha-editar').value;
+            var lote = document.getElementById('lote-editar').value;
+            var observacion = document.getElementById('observacion-editar').value;
+
+            if(fecha === ''){
+                toastr.error('Fecha es requerido');
+                return;
+            }
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('fecha', fecha);
+            formData.append('lote', lote);
+            formData.append('observacion', observacion);
+
+            axios.post(url+'/bodega/historial/entrada/guardarinformacion', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado correctamente');
+                        $('#modalEditar').modal('hide');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
         }
 
     </script>

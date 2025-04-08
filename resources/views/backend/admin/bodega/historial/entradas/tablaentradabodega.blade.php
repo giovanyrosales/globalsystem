@@ -25,6 +25,11 @@
                                     <td style="width: 20%">{{ $dato->observacion }}</td>
                                     <td style="width: 6%">
                                         <button type="button" class="btn btn-info btn-xs"
+                                                onclick="vistaDetalle2({{ $dato->id }})">
+                                            <i class="fas fa-eye" title="Datos"></i>&nbsp; Datos
+                                        </button>
+
+                                        <button type="button" class="btn btn-info btn-xs"
                                                 onclick="vistaDetalle({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
                                         </button>

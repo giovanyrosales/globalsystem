@@ -8,8 +8,6 @@ use App\Models\BodegaEntradasDetalle;
 use App\Models\BodegaMateriales;
 use App\Models\BodegaSalida;
 use App\Models\BodegaSalidaDetalle;
-use App\Models\BodegaSalidaManual;
-use App\Models\BodegaSalidaManualDetalle;
 use App\Models\BodegaUsuarioObjEspecifico;
 use App\Models\P_UnidadMedida;
 use Carbon\Carbon;

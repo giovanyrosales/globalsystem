@@ -8,8 +8,6 @@ use App\Models\BodegaEntradasDetalle;
 use App\Models\BodegaMateriales;
 use App\Models\BodegaSalida;
 use App\Models\BodegaSalidaDetalle;
-use App\Models\BodegaSalidaManual;
-use App\Models\BodegaSalidaManualDetalle;
 use App\Models\BodegaSolicitud;
 use App\Models\BodegaSolicitudDetalle;
 use App\Models\P_Departamento;
@@ -49,6 +47,68 @@ class BHistorialController extends Controller
 
         return view('backend.admin.bodega.historial.entradas.tablaentradabodega', compact('listado'));
     }
+
+
+    function informacionDatosEntrada(Request $request)
+    {
+        $regla = array(
+            'id' => 'required', //tabla: bodega_entradas
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        if($info = BodegaEntradas::where('id', $request->id)->first()){
+            return ['success' => 1, 'info' => $info];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
+    function guardarDatosEntrada(Request $request)
+    {
+        $regla = array(
+            'id' => 'required', //tabla: bodega_entradas
+            'fecha' => 'required',
+        );
+
+        // observacion, lote
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+
+        BodegaEntradas::where('id', $request->id)->update([
+            'fecha' => $request->fecha,
+            'lote' => $request->lote,
+            'observacion' => $request->observacion
+        ]);
+
+
+        return ['success' => 1];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     public function historialEntradaBorrarLote(Request $request)
@@ -102,11 +162,6 @@ class BHistorialController extends Controller
                 ]);
 
 
-                // SE ELIMINA LAS SALIDAS MANUALES COMPLETAMENTE, SIN DEVOLVER CANTIDAD
-                // YA QUE SE ELIMINA TAMBIEN entrada_detalle
-                BodegaSalidaManualDetalle::whereIn('id_entradadetalle', $pilaIdEntradaDetalle)->delete();
-                // ESTO ELIMINA bodega_salida_manual SINO TIENE YA REFERENCIAS EN DETALLE
-                BodegaSalidaManual::whereNotIn('id', BodegaSalidaManualDetalle::pluck('id_salidamanual'))->delete();
 
 
                 // BORRAR SALIDAS DETALLE
@@ -175,11 +230,6 @@ class BHistorialController extends Controller
                 ]);
 
 
-                // SE ELIMINA LAS SALIDAS MANUALES COMPLETAMENTE, SIN DEVOLVER CANTIDAD
-                // YA QUE SE ELIMINA TAMBIEN entrada_detalle
-                BodegaSalidaManualDetalle::where('id_entradadetalle', $infoEntradaDeta->id)->delete();
-                // ESTO ELIMINA bodega_salida_manual SINO TIENE YA REFERENCIAS EN DETALLE
-                BodegaSalidaManual::whereNotIn('id', BodegaSalidaManualDetalle::pluck('id_salidamanual'))->delete();
 
 
                 // BORRAR SALIDAS DETALLE
