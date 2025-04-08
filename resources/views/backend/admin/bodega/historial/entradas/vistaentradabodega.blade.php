@@ -52,7 +52,7 @@
 
 
     <div class="modal fade" id="modalEditar">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Editar Datos</h4>
