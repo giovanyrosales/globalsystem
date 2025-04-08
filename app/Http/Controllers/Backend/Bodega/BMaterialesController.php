@@ -390,7 +390,10 @@ class BMaterialesController extends Controller
 
             $infoMaterial = BodegaMateriales::where('id', $fila->id_material)->first();
             $infoEntrada = BodegaEntradas::where('id', $fila->id_entrada)->first();
-            $fila->nombreMaterial = "LOTE: " . $infoEntrada->lote . " (" . $infoMaterial->nombre . ")";
+
+            $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+
+            $fila->nombreMaterial = "LOTE: " . $infoEntrada->lote . " (" . $infoMaterial->nombre . ") (" .$infoUnidad->nombre . ")";
 
             // CANTIDAD RESTANTE QUE QUEDA DISPONIBLE
             $resta = $fila->cantidad - $fila->cantidad_entregada;
