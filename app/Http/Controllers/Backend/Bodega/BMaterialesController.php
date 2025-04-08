@@ -36,7 +36,7 @@ class BMaterialesController extends Controller
             array_push($pilaObjEspeci, $fila->id_objespecifico);
         }
 
-        $unidadmedida = P_UnidadMedida::orderBy('medida', 'ASC')->get();
+        $unidadmedida = P_UnidadMedida::orderBy('nombre', 'ASC')->get();
         $objespecifico = ObjEspecifico::whereIn('id', $pilaObjEspeci)
             ->orderBy('codigo', 'ASC')
             ->get();
