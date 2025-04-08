@@ -30,7 +30,7 @@ class BSolicitudesController extends Controller
 
         $arrayCodigo = DB::table('bodega_usuario_objespecifico AS bode')
             ->join('obj_especifico AS obj', 'bode.id_objespecifico', '=', 'obj.id')
-            ->select('bode.id', 'obj.nombre', 'obj.codigo')
+            ->select('obj.id', 'obj.nombre', 'obj.codigo')
             ->orderBy('obj.nombre', 'ASC')
             ->get();
 
