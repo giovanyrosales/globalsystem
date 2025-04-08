@@ -27,9 +27,13 @@ class BSolicitudesController extends Controller
     public function indexNuevaSolicitud()
     {
         $arrayMedida = P_UnidadMedida::orderBy('nombre', 'asc')->get();
-        $arrayCodigo = ObjEspecifico::whereIn('id', [24,33,34,81,78])
-            ->orderBy('nombre', 'asc')
+
+        $arrayCodigo = DB::table('bodega_usuario_objespecifico AS bode')
+            ->join('obj_especifico AS obj', 'bode.id_objespecifico', '=', 'obj.id')
+            ->select('bode.id', 'obj.nombre', 'obj.codigo')
+            ->orderBy('obj.nombre', 'ASC')
             ->get();
+
 
         return view('backend.admin.bodega.solicitudesunidad.vistanuevasolicitud',
             compact('arrayMedida', 'arrayCodigo'));
