@@ -1074,7 +1074,6 @@
                 <!-- SINDICATURA -->
                 @can('sidebar.sindico')
 
-
                     <li class="nav-item">
                         <a href="{{ route('admin.sindico.registro.index') }}" target="frameprincipal" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
@@ -1108,8 +1107,6 @@
                                 </a>
                             </li>
 
-
-
                             <li class="nav-item">
                                 <a href="{{ route('admin.sindico.tipodeligencia.index') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
@@ -1119,11 +1116,70 @@
 
                         </ul>
                     </li>
+                @endcan
 
 
+
+                @can('tesoreria.registros')
+
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.tesoreria.nuevo.registro.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Registro Nuevo</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.tesoreria.listado.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Listado</p>
+                    </a>
+                </li>
+
+                <!-- MODULO PARA TESORERIA PARA GARANTIAS -->
+                <li class="nav-item">
+
+                    <a href="#" class="nav-link nav-">
+                        <i class="far fa-edit"></i>
+                        <p>
+                            Configuración
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.tesoreria.proveedores.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Proveedores</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.tesoreria.garantia.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Garantía</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.tesoreria.tipogarantia.index') }}" target="frameprincipal" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Tipo de Garantía</p>
+                            </a>
+                        </li>
+
+
+                    </ul>
+                </li>
 
 
                 @endcan
+
+
+
 
 
             </ul>

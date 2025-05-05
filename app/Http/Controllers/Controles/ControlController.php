@@ -88,6 +88,12 @@ class ControlController extends Controller
          }
 
 
+         // TESORERIA
+         else  if($user->hasRole('tesoreria')){
+             $ruta = 'admin.tesoreria.nuevo.registro.index';
+         }
+
+
 
         else{
             // no tiene ningun permiso de vista, redirigir a pantalla sin permisos

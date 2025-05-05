@@ -52,8 +52,11 @@ use App\Http\Controllers\Backend\Bodega\BSolicitudesController;
 use App\Http\Controllers\Backend\Bodega\BHistorialController;
 use App\Http\Controllers\Backend\Bodega\BReportesController;
 
-
 use App\Http\Controllers\Backend\Sindico\SindicoController;
+
+
+use App\Http\Controllers\Backend\Tesoreria\Config\TesoreriaConfigController;
+
 
 //
 //// --- LOGIN ---
@@ -1492,10 +1495,46 @@ Route::post('/admin/sindico/registrotodos/editar', [SindicoController::class, 'e
 
 
 
+//-------------------- MODULO PARA TESORERIA -> PROVEEDORES ----------------------------------
 
 
+Route::get('/admin/tesoreria/proveedores/index', [TesoreriaConfigController::class,'indexProveedor'])->name('admin.tesoreria.proveedores.index');
+Route::get('/admin/tesoreria/proveedores/tabla', [TesoreriaConfigController::class, 'tablaProveedor']);
+Route::post('/admin/tesoreria/proveedores/nuevo', [TesoreriaConfigController::class, 'nuevoProveedor']);
+Route::post('/admin/tesoreria/proveedores/informacion', [TesoreriaConfigController::class, 'informacionProveedor']);
+Route::post('/admin/tesoreria/proveedores/editar', [TesoreriaConfigController::class, 'actualizarProveedor']);
+
+//-------------------- MODULO PARA TESORERIA -> GARANTIAS ----------------------------------
+
+Route::get('/admin/tesoreria/garantia/index', [TesoreriaConfigController::class,'indexGarantia'])->name('admin.tesoreria.garantia.index');
+Route::get('/admin/tesoreria/garantia/tabla', [TesoreriaConfigController::class, 'tablaGarantia']);
+Route::post('/admin/tesoreria/garantia/nuevo', [TesoreriaConfigController::class, 'nuevoGarantia']);
+Route::post('/admin/tesoreria/garantia/informacion', [TesoreriaConfigController::class, 'informacionGarantia']);
+Route::post('/admin/tesoreria/garantia/editar', [TesoreriaConfigController::class, 'actualizarGarantia']);
+
+//-------------------- MODULO PARA TESORERIA -> TIPO DE GARANTIAS ----------------------------------
+
+Route::get('/admin/tesoreria/tipo/garantia/index', [TesoreriaConfigController::class,'indexTipoGarantia'])->name('admin.tesoreria.tipogarantia.index');
+Route::get('/admin/tesoreria/tipo/garantia/tabla', [TesoreriaConfigController::class, 'tablaTipoGarantia']);
+Route::post('/admin/tesoreria/tipo/garantia/nuevo', [TesoreriaConfigController::class, 'nuevoTipoGarantia']);
+Route::post('/admin/tesoreria/tipo/garantia/informacion', [TesoreriaConfigController::class, 'informacionTipoGarantia']);
+Route::post('/admin/tesoreria/tipo/garantia/editar', [TesoreriaConfigController::class, 'actualizarTipoGarantia']);
 
 
+//-------------------- MODULO PARA TESORERIA -> NUEVO REGISTRO -------------------------------------
+
+Route::get('/admin/tesoreria/registro/index', [TesoreriaConfigController::class,'indexRegistroTesoreria'])->name('admin.tesoreria.nuevo.registro.index');
+Route::post('/admin/tesoreria/registro', [TesoreriaConfigController::class,'nuevoRegistroTesoreria']);
+
+//--- LISTADO
+Route::get('/admin/tesoreria/listado/index', [TesoreriaConfigController::class,'vistaListadoRegistros'])->name('admin.tesoreria.listado.index');
+Route::get('/admin/tesoreria/listado/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistros']);
+
+Route::get('/admin/tesoreria/listado/edicion/index/{id}', [TesoreriaConfigController::class,'vistaListadoEdicion']);
+Route::post('/admin/tesoreria/listado/actualizar', [TesoreriaConfigController::class,'actualizarRegistro']);
+
+Route::post('/admin/tesoreria/registro/borrar', [TesoreriaConfigController::class,'borrarRegistro']);
+Route::post('/admin/tesoreria/registro/informacion', [TesoreriaConfigController::class,'informacionRegistro']);
 
 
 
