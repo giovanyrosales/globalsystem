@@ -18,7 +18,7 @@ class CreateBodegaEntradasDetalleTable extends Migration
             $table->bigInteger('id_entrada')->unsigned();
             $table->bigInteger('id_material')->unsigned();
             $table->integer('cantidad');
-            $table->decimal('precio', 10, 2);
+            $table->decimal('precio', 10, 4);
 
 
             // codigo de producto

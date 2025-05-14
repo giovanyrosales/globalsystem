@@ -65,7 +65,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">REPORTE GENERAL DE EXISTENCIAS</h3>
+                    <h3 class="card-title">REPORTE GENERAL DE EXISTENCIAS (TODOS EN GENERAL)</h3>
                 </div>
                 <div class="card-body">
                     <section class="content" style="margin-left: 30px">
@@ -101,6 +101,51 @@
                             <select class="form-control" id="select-productos" style="height: 150px" multiple="multiple">
                                 @foreach($arrayProductos as $item)
                                     <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                @endforeach
+                            </select>
+
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <section class="content" style="margin-top: 35px">
+        <div class="container-fluid">
+            <div class="card card-gray-dark">
+                <div class="card-header">
+                    <h3 class="card-title">REPORTE GENERAL DE EXISTENCIAS (POR LOTES)</h3>
+                </div>
+                <div class="card-body">
+                    <section class="content" style="margin-left: 30px">
+                        <div class="container-fluid">
+
+                            <div class="row">
+
+                                <div class="form-group">
+                                    <label>Desde</label>
+                                    <input type="date"  class="form-control" id="fecha-desdelote">
+                                </div>
+
+                                <div class="form-group" style="margin-left: 15px">
+                                    <label>Hasta</label>
+                                    <input type="date" class="form-control" id="fecha-hastalote">
+                                </div>
+
+
+                                <button type="button" onclick="pdfExistenciasFechaLote()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
+                                    <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
+                                    Generar PDF
+                                </button>
+                            </div>
+
+                            <label>Lotes</label>
+                            <select class="form-control" id="select-lotes" style="height: 150px" multiple="multiple">
+                                @foreach($arrayLotes as $item)
+                                    <option value="{{$item->id}}">{{$item->lote}}</option>
                                 @endforeach
                             </select>
 
@@ -190,6 +235,15 @@
 
 
             $('#select-productos2').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Búsqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-lotes').select2({
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
@@ -291,6 +345,58 @@
             window.open("{{ URL::to('admin/bodega/reportes/pdf/existencias/desglose') }}/" +
                 fechadesde + "/" + fechahasta + "/" + idproducto);
         }
+
+
+
+        // REPORTE POR LOTES
+
+        function pdfExistenciasFechaLotes(){
+            var fechadesde = document.getElementById('fecha-desdelote').value;
+            var fechahasta = document.getElementById('fecha-hastalote').value;
+
+            if(fechadesde === ''){
+                toastr.error('Fecha desde es requerido');
+                return;
+            }
+
+            if(fechahasta === ''){
+                toastr.error('Fecha hasta es requerido');
+                return;
+            }
+
+            // Convertir a objetos Date para comparar
+            let dateDesde = new Date(fechadesde);
+            let dateHasta = new Date(fechahasta);
+
+            if (dateHasta < dateDesde) {
+                toastr.error('La Fecha Hasta no puede ser menor que la Fecha Desde');
+                return;
+            }
+
+
+            var valores = $('#select-lotes').val();
+            if(valores.length ==  null || valores.length === 0){
+                toastr.error('Seleccionar mínimo 1 LOTE');
+                return;
+            }
+
+            var selected = [];
+            for (var option of document.getElementById('select-lotes').options){
+                if (option.selected) {
+                    selected.push(option.value);
+                }
+            }
+
+            let listado = selected.toString();
+            let reemplazo = listado.replace(/,/g, "-");
+
+
+            window.open("{{ URL::to('admin/bodega/reportes/pdf/existencias-fechas-lotes') }}/" +
+                fechadesde + "/" + fechahasta + "/" + reemplazo);
+        }
+
+
+
 
 
     </script>

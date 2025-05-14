@@ -439,7 +439,7 @@
                 precioTotal += multiplicado;
             }
 
-            let precioFormat = '$' + Number(precioTotal).toFixed(2);
+            let precioFormat = '$' + Number(precioTotal).toFixed(4);
 
             document.getElementById('precioTotal').innerHTML = precioFormat;
         }

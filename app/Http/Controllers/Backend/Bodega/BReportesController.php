@@ -638,7 +638,13 @@ class BReportesController extends Controller
 
         $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)->get();
 
-        return view('backend.admin.bodega.reportes.general.vistareportegeneral', compact('arrayProductos'));
+        // TODOS LOS LOTES REGISTRADOS
+        $arrayLotes = BodegaEntradas::where('id_usuario',$infoAuth->id)
+            ->orderBy('lote', 'ASC')
+            ->get();
+
+        return view('backend.admin.bodega.reportes.general.vistareportegeneral',
+            compact('arrayProductos', 'arrayLotes'));
     }
 
 
@@ -670,6 +676,11 @@ class BReportesController extends Controller
             $infoMaterial = BodegaMateriales::where('id', $fila->id_material)->first();
             $infoObj = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
 
+            $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+
+
+            $fila->unidadMedida = $infoUnidad->nombre;
+
             $fila->nombreMaterial = $infoMaterial->nombre;
             $fila->nombreCodigo = $infoObj->codigo;
             $fila->nombreObjeto = $infoObj->nombre;
@@ -682,11 +693,11 @@ class BReportesController extends Controller
             $multiplicado = $resta * $fila->precio;
             $totalCulumna += $multiplicado;
 
-            $fila->multiplicado = "$" . number_format((float)$multiplicado, 2, '.', ',');
-            $fila->precioFormat = "$" . number_format((float)$fila->precio, 2, '.', ',');
+            $fila->multiplicado = "$" . number_format((float)$multiplicado, 4, '.', ',');
+            $fila->precioFormat = "$" . number_format((float)$fila->precio, 4, '.', ',');
         }
 
-        $totalCulumna = "$" . number_format((float)$totalCulumna, 2, '.', ',');
+        $totalCulumna = "$" . number_format((float)$totalCulumna, 4, '.', ',');
 
         $arrayDetalle = $arrayInfo->sortBy('nombreMaterial');
         $fechaFormat = date("d-m-Y", strtotime(Carbon::now('America/El_Salvador')));
@@ -743,7 +754,8 @@ class BReportesController extends Controller
             <tr>
                 <th style='text-align: center; font-size:13px; width: 8%; font-weight: bold; border: 1px solid black;'>Lote</th>
                 <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>Producto</th>
-                <th style='text-align: center; font-size:13px; width: 8%; font-weight: bold; border: 1px solid black;'>Cantidad</th>
+                 <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>U.M</th>
+                <th style='text-align: center; font-size:13px; width: 9%; font-weight: bold; border: 1px solid black;'>Cantidad</th>
                 <th style='text-align: center; font-size:13px; width: 8%; font-weight: bold; border: 1px solid black;'>Precio</th>
                 <th style='text-align: center; font-size:13px; width: 8%; font-weight: bold; border: 1px solid black;'>Total</th>
                 <th style='text-align: center; font-size:13px; width: 8%; font-weight: bold; border: 1px solid black;'>Obj. Específico</th>
@@ -754,6 +766,7 @@ class BReportesController extends Controller
             $tabla .= "<tr>
                     <td style='text-align: center; font-size:13px; border: 1px solid black;'>$fila->lote</td>
                     <td style='text-align: center; font-size:13px; border: 1px solid black;'>$fila->nombreMaterial</td>
+                    <td style='text-align: center; font-size:13px; border: 1px solid black;'>$fila->unidadMedida</td>
                     <td style='text-align: center; font-size:13px; border: 1px solid black;'>$fila->cantidadActual</td>
                     <td style='text-align: center; font-size:13px; border: 1px solid black;'>$fila->precioFormat</td>
                     <td style='text-align: center; font-size:13px; border: 1px solid black;'>$fila->multiplicado</td>
@@ -864,37 +877,20 @@ class BReportesController extends Controller
 
                 $multiplicado = $itemEntra->precio * $existencias;
                 $columnaExistenciaActualDinero += $multiplicado;
-                $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 2, '.', ',');
+                $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 4, '.', ',');
 
-                $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 2, '.', ',');
+                $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 4, '.', ',');
             }
 
 
             $fila->columnaExistenciaActual = $columnaExistenciaActual;
-            $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 2, '.', ',');
+            $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 4, '.', ',');
 
             $resultsBloque[$index]->detalle = $arrayEntradaDeta;
             $index++;
         }
 
-
-
-
-
-
-       // $saldoTotal = "$" . number_format($saldoTotal, 2, '.', ',');
-
-
-
-
-
-
-
-
-
         //************************************************
-
-
 
         // USUARIO LOGEADO
         $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
@@ -943,11 +939,6 @@ class BReportesController extends Controller
             <p style='font-size: 12px; margin: 0; color: #000;'><strong>PERÍODO: </strong>  $desdeFormat AL $hastaFormat</p>
         </div>
       ";
-
-
-
-
-
 
 
         // Encabezado de la tabla
@@ -1026,25 +1017,7 @@ class BReportesController extends Controller
 
 
 
-
-
         $tabla .= "</tbody></table>";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1096,6 +1069,295 @@ class BReportesController extends Controller
 
         $mpdf->Output();
     }
+
+
+
+
+
+    // FECHAS EXISTENCIAS POR FECHAS
+    public function generarPDFExistenciasFechasLotes($desde, $hasta, $arrayLotes) {
+
+        $start = Carbon::parse($desde)->startOfDay();
+        $end = Carbon::parse($hasta)->endOfDay();
+
+        $desdeFormat = date("d/m/Y", strtotime($desde));
+        $hastaFormat = date("d/m/Y", strtotime($hasta));
+
+
+        // NECESITO TODOS LOS MATERIALES
+
+
+        $pilaObjEspeci = array();
+        $infoAuth = auth()->user();
+        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
+
+        foreach ($arrayCodigo as $fila) {
+            array_push($pilaObjEspeci, $fila->id_objespecifico);
+        }
+
+
+        if($checkProductos==1){ // TODOS LOS PRODUCTOS
+            // OBTENEMOS TODOS LOS PRODUCTOS
+            $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
+                ->orderBy('nombre', 'ASC')
+                ->get();
+
+        }else{ // SOLO SELECCIONADOS
+            $porciones = explode("-", $arrayProductos);
+            $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
+                ->whereIn('id', $porciones)
+                ->orderBy('nombre', 'ASC')
+                ->get();
+        }
+
+
+        // POR CADA ENTRADA SERIA LA VUELTA, SIEMPRE SALDRAN AUNQUE NO HAYA SALIDAS
+        $resultsBloque = array();
+        $index = 0;
+
+
+
+
+        foreach ($arrayProductos as $fila){
+            array_push($resultsBloque, $fila);
+
+            $infoUnidadMedida = P_UnidadMedida::where('id', $fila->id_unidadmedida)->first();
+            $fila->unidadMedida = $infoUnidadMedida->nombre;
+
+
+            // POR CADA PRODUCTO OBTENER TODOS LOS LOTES/ENTRADAS
+            $arraySalidas = DB::table('bodega_salidas AS sa')
+                ->join('bodega_salidas_detalle AS deta', 'deta.id_salida', '=', 'sa.id')
+                ->join('bodega_entradas_detalle AS bodeentradeta', 'deta.id_entradadetalle', '=', 'bodeentradeta.id')
+                ->select('sa.fecha', 'bodeentradeta.id_material', 'bodeentradeta.id_entrada')
+                ->whereBetween('sa.fecha', [$start, $end])
+                ->where('bodeentradeta.id_material', $fila->id)
+                ->get();
+
+
+            // OBTENER LOS LOTES INDIVIDUALES
+            $pilaEntrada = array();
+            foreach ($arraySalidas as $filaItem) {
+                array_push($pilaEntrada, $filaItem->id_entrada);
+            }
+
+            $arrayEntradaDeta = BodegaEntradasDetalle::whereIn('id_entrada', $pilaEntrada)
+                ->where('id_material', $fila->id)
+                ->get();
+
+            $columnaExistenciaActual = 0;
+            $columnaExistenciaActualDinero = 0;
+
+            foreach ($arrayEntradaDeta as $itemEntra){
+
+                $infoEntrada = BodegaEntradas::where('id', $itemEntra->id_entrada)->first();
+                $itemEntra->lote = $infoEntrada->lote;
+
+                $existencias = $itemEntra->cantidad - $itemEntra->cantidad_entregada;
+                $itemEntra->existencias = $existencias;
+
+                $columnaExistenciaActual += $existencias;
+
+
+                $multiplicado = $itemEntra->precio * $existencias;
+                $columnaExistenciaActualDinero += $multiplicado;
+                $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 4, '.', ',');
+
+                $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 4, '.', ',');
+            }
+
+
+            $fila->columnaExistenciaActual = $columnaExistenciaActual;
+            $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 4, '.', ',');
+
+            $resultsBloque[$index]->detalle = $arrayEntradaDeta;
+            $index++;
+        }
+
+        //************************************************
+
+        // USUARIO LOGEADO
+        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
+
+        // INFORMACION GERENCIA
+        $infoGerencia = BodegaExtras::where('id', 1)->first();
+
+
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+        $mpdf->SetTitle('Existencias General');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+        $logoalcaldia = 'images/gobiernologo.jpg';
+        $logosantaana = 'images/logo.png';
+
+        $tabla = "
+            <table style='width: 100%; border-collapse: collapse;'>
+                <tr>
+                    <!-- Logo izquierdo -->
+                    <td style='width: 15%; text-align: left;'>
+                        <img src='$logosantaana' alt='Santa Ana Norte' style='max-width: 100px; height: auto;'>
+                    </td>
+                    <!-- Texto centrado -->
+                    <td style='width: 60%; text-align: center;'>
+                        <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
+                    </td>
+                    <!-- Logo derecho -->
+                    <td style='width: 10%; text-align: right;'>
+                        <img src='$logoalcaldia' alt='Gobierno de El Salvador' style='max-width: 60px; height: auto;'>
+                    </td>
+                </tr>
+            </table>
+            <hr style='border: none; border-top: 2px solid #003366; margin: 0;'>
+            ";
+
+        $tabla .= "
+            <div style='text-align: center; margin-top: 20px;'>
+                <h1 style='font-size: 16px; margin: 0; color: #000;'>REPORTE GENERAL DE EXISTENCIAS</h1>
+            </div>
+            <div style='text-align: left; margin-top: 10px;'>
+            <p style='font-size: 12px; margin: 0; color: #000;'><strong>PERÍODO: </strong>  $desdeFormat AL $hastaFormat</p>
+        </div>
+      ";
+
+
+        // Encabezado de la tabla
+        $tabla .= "<table width='100%' id='tablaFor' style='margin-top: 30px'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 6%; font-size: 11px; text-align: center;'>CORRELATIVO</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>CÓDIGO DEL PRODUCTO</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>UNIDAD MEDIDA</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>ARTÍCULO/DESCRIPCIÓN</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SOLICITUD DE PEDIDO</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>PRECIO UNITARIO</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>EXISTENCIA INICIAL</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALIDAS TOTALES</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>EXISTENCIA ACTUAL</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALDO (EXISTENCIA ACTUAL)</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+
+        $correlativo = 0;
+        foreach ($arrayProductos as $dato) {
+
+            if (empty($dato->detalle) || count($dato->detalle) === 0) {
+                continue;
+            }
+
+            $correlativo++;
+
+
+            $tabla .= "<tr>
+                    <td style='font-size: 11px; font-weight: bold'>$correlativo</td>
+                    <td style='font-size: 11px; font-weight: bold'></td>
+                    <td style='font-size: 11px; font-weight: bold'>$dato->unidadMedida</td>
+                    <td style='font-size: 11px; font-weight: bold'>$dato->nombre</td>
+                    <td style='font-size: 11px; font-weight: bold'></td>
+                    <td style='font-size: 11px;font-weight: bold'></td>
+                    <td style='font-size: 11px; font-weight: bold'></td>
+                    <td style='font-size: 11px; font-weight: bold'></td>
+                    <td style='font-size: 11px; font-weight: bold'></td>
+                    <td style='font-size: 11px; font-weight: bold'></td>
+                </tr>";
+
+
+            foreach ($dato->detalle as $item) {
+                $tabla .= "<tr>
+                     <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'>$item->codigo_producto</td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'>$item->lote</td>
+                    <td style='font-size: 11px'>$item->precioFormat</td>
+                    <td style='font-size: 11px'>$item->cantidad</td>
+                    <td style='font-size: 11px'>$item->cantidad_entregada</td>
+                    <td style='font-size: 11px'>$item->existencias</td>
+                    <td style='font-size: 11px'>$item->saldoExistenciasDinero</td>
+                </tr>";
+
+            } // END-FOREACH 2
+
+
+            $tabla .= "<tr>
+                    <td colspan='4' style='font-size: 11px; font-weight: bold'>EXISTENCIA TOTAL</td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px; font-weight: bold'>$dato->columnaExistenciaActual</td>
+                    <td style='font-size: 11px; font-weight: bold'>$dato->columnaExistenciaActualDinero</td>
+
+                </tr>";
+
+
+        }// END-FOREACH
+
+
+
+        $tabla .= "</tbody></table>";
+
+
+
+        $tabla .= "
+            <div style='text-align: left; margin-top: 25px; font-family: \"Times New Roman\", Times, serif;'>
+                <p style='font-size: 13px; margin: 5px 0; color: #000; line-height: 2;'>
+                    <strong>OBSERVACIONES:</strong><br>
+                    __________________________________________________________________________________________________________________ <br>
+                    __________________________________________________________________________________________________________________ <br>
+                    __________________________________________________________________________________________________________________
+                </p>
+            </div>
+            <br>
+        ";
+
+
+
+
+        $tabla .= "
+            <table style='width: 100%; margin-top: 20px; font-family: \"Times New Roman\", Times, serif; font-size: 14px; color: #000;'>
+                <!-- Fila para los títulos -->
+                <tr>
+                    <td style='width: 50%; text-align: left; padding-bottom: 15px;'>
+                        <p style='margin: 0; font-weight: bold; margin-left: 15px; font-size: 11px'>REPORTE GENERADO POR:</p>
+                    </td>
+                    <td style='width: 50%; padding-bottom: 15px; font-size: 11px; display: flex; flex-direction: column; align-items: flex-end; padding-right: 15px;'>
+                        <p style='margin: 0; font-weight: bold;'>REVISADO POR:</p>
+                    </td>
+                </tr>
+                <!-- Fila para los contenidos -->
+                <tr>
+                    <td style='width: 50%; text-align: left; padding: 20px;'>
+                        <p style='margin: 10px 0;'>$infoUsuarioLogeado->nombre</p>
+                        <p style='margin: 10px 0;'>$infoUsuarioLogeado->cargo</p>
+                    </td>
+                    <td style='width: 50%; padding: 20px; display: flex; flex-direction: column; align-items: flex-end; padding-right: 15px;'>
+                        <p style='margin: 10px 0;'>$infoGerencia->nombre_gerente</p>
+                        <p style='margin: 10px 0;'>$infoGerencia->nombre_gerente_cargo</p>
+                    </td>
+                </tr>
+            </table>
+        ";
+
+        $stylesheet = file_get_contents('css/cssbodega.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+    }
+
+
+
+
+
 
 
 
@@ -1471,7 +1733,8 @@ class BReportesController extends Controller
             $multiplicado = $fila->cantidad_salida * $infoEnDeta->precio;
             $multiplicado = round($multiplicado, 2);
             $columnaTotalMultiplicado += $multiplicado;
-            $fila->multiplicado = '$' . number_format((float)$multiplicado, 2, '.', ',');
+            $fila->multiplicado = '$' . number_format((float)$multiplicado, 4, '.', ',');
+
         }
 
 
@@ -1479,8 +1742,10 @@ class BReportesController extends Controller
 
 
 
-        $columnaTotalMultiplicado = round($columnaTotalMultiplicado, 2);
-        $columnaTotalMultiplicado = '$' . number_format((float)$columnaTotalMultiplicado, 2, '.', ',');
+        $columnaTotalMultiplicado = round($columnaTotalMultiplicado, 4);
+        $columnaTotalMultiplicado = '$' . number_format((float)$columnaTotalMultiplicado, 4, '.', ',');
+
+
 
         $nombreUnidad = "";
         if($dato = P_UsuarioDepartamento::where('id_usuario', $idusuario)->first()){
