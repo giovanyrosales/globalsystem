@@ -76,7 +76,7 @@
                 </div>
                 <div class="form-group">
                     <label for="acompanantes">Número de Acompañantes:</label>
-                    <input type="number" id="acompanantes" name="acompanantes" class="form-control" >
+                    <input type="text" id="acompanantes" name="acompanantes" class="form-control" >
                 </div>
                 <div class="form-group">
                     <label for="lugar">Lugar de Llegada:</label>

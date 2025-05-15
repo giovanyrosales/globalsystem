@@ -80,7 +80,7 @@
                             
                             <div class="form-group">
                                 <label for="acompanantes-editar">Cantidad de Acompañantes:</label>
-                                <input type="number" id="acompanantes-editar" name="acompanantes"  class="form-control" required>
+                                <input type="text" id="acompanantes-editar" name="acompanantes"  class="form-control" required>
                             </div>
 
                             <div class="form-group">
