@@ -638,7 +638,7 @@ class BReportesController extends Controller
 
         $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)->get();
 
-        // TODOS LOS LOTES REGISTRADOS
+        // TODOS LOS LOTES REGISTRADOS - FILTRADOS POR EL USUARIO
         $arrayLotes = BodegaEntradas::where('id_usuario',$infoAuth->id)
             ->orderBy('lote', 'ASC')
             ->get();
@@ -1095,27 +1095,34 @@ class BReportesController extends Controller
             array_push($pilaObjEspeci, $fila->id_objespecifico);
         }
 
+        // ESTO ES ID DE bodega_entradas
+        $porciones = explode("-", $arrayLotes);
 
-        if($checkProductos==1){ // TODOS LOS PRODUCTOS
-            // OBTENEMOS TODOS LOS PRODUCTOS
-            $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
-                ->orderBy('nombre', 'ASC')
-                ->get();
+        $arrayBodeEntra = BodegaEntradas::where('id_usuario', $infoAuth->id)
+            ->whereIn('id', $porciones)
+            ->get();
 
-        }else{ // SOLO SELECCIONADOS
-            $porciones = explode("-", $arrayProductos);
-            $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
-                ->whereIn('id', $porciones)
-                ->orderBy('nombre', 'ASC')
-                ->get();
+        // obtener todos los id de materiales asociados
+        $pilaidMateriales = array();
+        foreach ($arrayBodeEntra as $filaItem) {
+
+            $arrayEntradaDeta = BodegaEntradasDetalle::where('id_entrada', $filaItem->id)->get();
+            foreach ($arrayEntradaDeta as $filaDeta) {
+                array_push($pilaidMateriales, $filaDeta->id_material);
+            }
         }
+
+        // YA FILTRADO LOS MATERIALES DE ESE LOTE
+        $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
+            ->whereIn('id', $pilaidMateriales)
+            ->orderBy('nombre', 'ASC')
+            ->get();
+
 
 
         // POR CADA ENTRADA SERIA LA VUELTA, SIEMPRE SALDRAN AUNQUE NO HAYA SALIDAS
         $resultsBloque = array();
         $index = 0;
-
-
 
 
         foreach ($arrayProductos as $fila){
@@ -1174,6 +1181,8 @@ class BReportesController extends Controller
             $index++;
         }
 
+
+
         //************************************************
 
         // USUARIO LOGEADO
@@ -1217,7 +1226,7 @@ class BReportesController extends Controller
 
         $tabla .= "
             <div style='text-align: center; margin-top: 20px;'>
-                <h1 style='font-size: 16px; margin: 0; color: #000;'>REPORTE GENERAL DE EXISTENCIAS</h1>
+                <h1 style='font-size: 16px; margin: 0; color: #000;'>REPORTE DE SALIDAS</h1>
             </div>
             <div style='text-align: left; margin-top: 10px;'>
             <p style='font-size: 12px; margin: 0; color: #000;'><strong>PERÍODO: </strong>  $desdeFormat AL $hastaFormat</p>
@@ -1242,6 +1251,8 @@ class BReportesController extends Controller
                 </tr>
             </thead>
             <tbody>";
+
+
 
 
         $correlativo = 0;

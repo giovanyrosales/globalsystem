@@ -117,7 +117,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">REPORTE GENERAL DE EXISTENCIAS (POR LOTES)</h3>
+                    <h3 class="card-title">REPORTE SALIDAS DE EXISTENCIAS (POR LOTES)</h3>
                 </div>
                 <div class="card-body">
                     <section class="content" style="margin-left: 30px">
@@ -350,7 +350,7 @@
 
         // REPORTE POR LOTES
 
-        function pdfExistenciasFechaLotes(){
+        function pdfExistenciasFechaLote(){
             var fechadesde = document.getElementById('fecha-desdelote').value;
             var fechahasta = document.getElementById('fecha-hastalote').value;
 
