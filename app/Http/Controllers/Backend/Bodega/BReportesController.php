@@ -693,9 +693,10 @@ class BReportesController extends Controller
             $multiplicado = $resta * $fila->precio;
             $totalCulumna += $multiplicado;
 
-            $fila->multiplicado = "$" . number_format((float)$multiplicado, 4, '.', ',');
+            $fila->multiplicado = "$" . number_format((float)$multiplicado, 2, '.', ',');
             $fila->precioFormat = "$" . number_format((float)$fila->precio, 4, '.', ',');
         }
+
 
         $totalCulumna = "$" . number_format((float)$totalCulumna, 4, '.', ',');
 
@@ -755,7 +756,7 @@ class BReportesController extends Controller
                 <th style='text-align: center; font-size:13px; width: 8%; font-weight: bold; border: 1px solid black;'>Lote</th>
                 <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>Producto</th>
                  <th style='text-align: center; font-size:13px; width: 12%; font-weight: bold; border: 1px solid black;'>U.M</th>
-                <th style='text-align: center; font-size:13px; width: 9%; font-weight: bold; border: 1px solid black;'>Cantidad</th>
+                <th style='text-align: center; font-size:13px; width: 10%; font-weight: bold; border: 1px solid black;'>Cantidad</th>
                 <th style='text-align: center; font-size:13px; width: 8%; font-weight: bold; border: 1px solid black;'>Precio</th>
                 <th style='text-align: center; font-size:13px; width: 8%; font-weight: bold; border: 1px solid black;'>Total</th>
                 <th style='text-align: center; font-size:13px; width: 8%; font-weight: bold; border: 1px solid black;'>Obj. Específico</th>
@@ -775,8 +776,9 @@ class BReportesController extends Controller
         }
 
         $tabla .= "<tr>
-                    <td colspan='4' style='text-align: center; font-size:13px; border: 1px solid black;'><strong>Total</strong></td>
+                    <td colspan='5' style='text-align: center; font-size:13px; border: 1px solid black;'><strong>Total</strong></td>
                     <td style='text-align: center; font-size:13px; border: 1px solid black;'>$totalCulumna</td>
+                      <td style='text-align: center; font-size:13px; border: 1px solid black;'></td>
                 </tr> ";
 
         $tabla .= "</tbody></table>";
@@ -877,7 +879,7 @@ class BReportesController extends Controller
 
                 $multiplicado = $itemEntra->precio * $existencias;
                 $columnaExistenciaActualDinero += $multiplicado;
-                $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 4, '.', ',');
+                $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 2, '.', ',');
 
                 $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 4, '.', ',');
             }
@@ -1102,6 +1104,7 @@ class BReportesController extends Controller
             ->whereIn('id', $porciones)
             ->get();
 
+
         // obtener todos los id de materiales asociados
         $pilaidMateriales = array();
         foreach ($arrayBodeEntra as $filaItem) {
@@ -1139,6 +1142,7 @@ class BReportesController extends Controller
                 ->select('sa.fecha', 'bodeentradeta.id_material', 'bodeentradeta.id_entrada')
                 ->whereBetween('sa.fecha', [$start, $end])
                 ->where('bodeentradeta.id_material', $fila->id)
+                ->whereIn('bodeentradeta.id_entrada', $porciones)
                 ->get();
 
 
@@ -1165,14 +1169,12 @@ class BReportesController extends Controller
 
                 $columnaExistenciaActual += $existencias;
 
-
                 $multiplicado = $itemEntra->precio * $existencias;
                 $columnaExistenciaActualDinero += $multiplicado;
-                $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 4, '.', ',');
+                $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 2, '.', ',');
 
                 $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 4, '.', ',');
             }
-
 
             $fila->columnaExistenciaActual = $columnaExistenciaActual;
             $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 4, '.', ',');
@@ -1242,7 +1244,7 @@ class BReportesController extends Controller
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>CÓDIGO DEL PRODUCTO</th>
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>UNIDAD MEDIDA</th>
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>ARTÍCULO/DESCRIPCIÓN</th>
-                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SOLICITUD DE PEDIDO</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>LOTE</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>PRECIO UNITARIO</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>EXISTENCIA INICIAL</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALIDAS TOTALES</th>
@@ -1696,13 +1698,9 @@ class BReportesController extends Controller
         $desdeFormat = date("d-m-Y", strtotime($desde));
         $hastaFormat = date("d-m-Y", strtotime($hasta));
 
-
         // USUARIO LOGEADO
         $infoAuth = auth()->user();
         $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
-
-
-
 
         // ARRAY SOLICITUDES DEL USUARIO DE LA UNIDAD
         $arrayBodeSoli = BodegaSolicitud::where('id_usuario', $idusuario)->get();
@@ -1743,18 +1741,19 @@ class BReportesController extends Controller
             // TOTAL
             $multiplicado = $fila->cantidad_salida * $infoEnDeta->precio;
             $multiplicado = round($multiplicado, 2);
-            $columnaTotalMultiplicado += $multiplicado;
-            $fila->multiplicado = '$' . number_format((float)$multiplicado, 4, '.', ',');
+            $columnaTotalMultiplicado += $multiplicado; // REDONDEADO A 2 DECIMALES
 
+
+            $fila->multiplicado = '$' . number_format($multiplicado, 2, '.', ',');
         }
 
 
         $arraySalidaDetalle = $arraySalidaDetalle->sortBy('fechaFormat');
 
 
-
-        $columnaTotalMultiplicado = round($columnaTotalMultiplicado, 4);
-        $columnaTotalMultiplicado = '$' . number_format((float)$columnaTotalMultiplicado, 4, '.', ',');
+        // COLUMNA FINAL HASTA ABAJO
+        $columnaTotalMultiplicado = round($columnaTotalMultiplicado, 2);
+        $columnaTotalMultiplicado = '$' . number_format($columnaTotalMultiplicado, 2, '.', ',');
 
 
 

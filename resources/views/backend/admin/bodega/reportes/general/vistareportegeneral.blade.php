@@ -290,8 +290,6 @@
             }
 
 
-
-
             var valores = $('#select-productos').val();
             if(valores.length ==  null || valores.length === 0){
                 if(valorCheckbox === 0){
