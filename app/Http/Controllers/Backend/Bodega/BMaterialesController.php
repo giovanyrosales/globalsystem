@@ -13,6 +13,7 @@ use App\Models\P_UnidadMedida;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\ObjEspecifico;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -91,10 +92,13 @@ class BMaterialesController extends Controller
             return ['success' => 0];
         }
 
+        $idusuario = Auth::id();
+
         $dato = new BodegaMateriales();
         $dato->nombre = $request->nombre;
         $dato->id_unidadmedida = $request->id_unidadmedida;
         $dato->id_objespecifico = $request->id_objespecifico;
+        $dato->id_usuario = $idusuario;
 
         if ($dato->save()) {
             return ['success' => 1];

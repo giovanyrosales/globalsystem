@@ -1361,7 +1361,11 @@ Route::get('/admin/bodega/reportes/pdf-existencias', [BReportesController::class
 // Reporte General de Existencias por Fechas
 Route::get('/admin/bodega/reportes/pdf/existencias-fechas/{desde}/{hasta}/{check}/{arrayproductos}', [BReportesController::class,'generarPDFExistenciasFechas']);
 // Reporte General de Existencia DESGLOSE
-Route::get('/admin/bodega/reportes/pdf/existencias/desglose/{desde}/{hasta}/{idproducto}', [BReportesController::class,'generarPDFExistenciasFechasDesglose']);
+Route::get('/admin/bodega/reportes/pdf/existencias/desglose/{desde}/{hasta}/{idproducto}/{checkproductos}', [BReportesController::class,'generarPDFExistenciasFechasDesglose']);
+// Reporte General de Existencia DESGLOSE - TODOS LOS PRODUCTOS
+Route::get('/admin/bodega/reportes/pdf/existencias/desglosetodos/{desde}/{hasta}', [BReportesController::class,'generarPDFExistenciasFechasDesgloseTodos']);
+
+
 
 // Reporte General de Existencias por Fechas LOTES
 Route::get('/admin/bodega/reportes/pdf/existencias-fechas-lotes/{desde}/{hasta}/{arrayproductos}', [BReportesController::class,'generarPDFExistenciasFechasLotes']);

@@ -159,7 +159,7 @@
 
 
 
-    <section class="content" style="margin-top: 35px">
+    <section class="content" style="margin-top: 35px; margin-bottom: 60px">
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
@@ -171,29 +171,44 @@
 
                             <div class="row">
 
+                                <!-- Fechas -->
                                 <div class="form-group">
                                     <label>Desde</label>
-                                    <input type="date"  class="form-control" id="fecha-desde2">
+                                    <input type="date" class="form-control" id="fecha-desde2">
                                 </div>
 
                                 <div class="form-group" style="margin-left: 15px">
                                     <label>Hasta</label>
                                     <input type="date" class="form-control" id="fecha-hasta2">
                                 </div>
+                            </div>
 
+                            <!-- Checkbox: Todos los Productos -->
+                            <div class="form-group" style="margin-top: 5px">
+                                <label>
+                                    <input type="checkbox" class="checkbox" id="checkboxdesglose-todos">
+                                    Todos los Productos
+                                </label>
+                            </div>
 
+                            <!-- Select de Productos -->
+                            <div class="form-group">
+                                <label>Productos</label>
+                                <select class="form-control" id="select-productos2" style="height: 150px">
+                                    @foreach($arrayProductos as $item)
+                                        <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Botón PDF -->
+                            <div class="form-group" style="margin-top: 10px">
                                 <button type="button" onclick="pdfExistenciasFechaDesglose()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
                                     <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
                                     Generar PDF
                                 </button>
                             </div>
 
-                            <label>Productos</label>
-                            <select class="form-control" id="select-productos2" style="height: 150px">
-                                @foreach($arrayProductos as $item)
-                                    <option value="{{$item->id}}">{{$item->nombre}}</option>
-                                @endforeach
-                            </select>
 
                         </div>
                     </section>
@@ -320,6 +335,8 @@
             var fechadesde = document.getElementById('fecha-desde2').value;
             var fechahasta = document.getElementById('fecha-hasta2').value;
             var idproducto = document.getElementById('select-productos2').value;
+            var checkbox = document.getElementById('checkboxdesglose-todos');
+            var valorCheckbox = checkbox.checked ? 1 : 0;
 
             if(fechadesde === ''){
                 toastr.error('Fecha desde es requerido');
@@ -340,8 +357,13 @@
                 return;
             }
 
-            window.open("{{ URL::to('admin/bodega/reportes/pdf/existencias/desglose') }}/" +
-                fechadesde + "/" + fechahasta + "/" + idproducto);
+            if(checkbox){
+                window.open("{{ URL::to('admin/bodega/reportes/pdf/existencias/desglosetodos') }}/" +
+                    fechadesde + "/" + fechahasta);
+            }else{
+                window.open("{{ URL::to('admin/bodega/reportes/pdf/existencias/desglose') }}/" +
+                    fechadesde + "/" + fechahasta + "/" + idproducto);
+            }
         }
 
 
