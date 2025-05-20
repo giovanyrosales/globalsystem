@@ -264,12 +264,6 @@ class BReportesController extends Controller
     public function reporteEncargadoBodegaCompleta($idsolicitud)
     {
         if ($infoSolicitud = BodegaSolicitud::where('id', $idsolicitud)->first()) {
-            $fechaFormat = date("d-m-Y", strtotime(Carbon::now('America/El_Salvador')));
-
-            $arrayDetalle = BodegaSolicitudDetalle::where('id_bodesolicitud', $idsolicitud)
-                ->where('cantidad_entregada', '>', 0)
-                ->orderBy('id', 'ASC')
-                ->get();
 
             // USUARIO QUE INICIO SESION
             $userAutenticado = Auth::user();
@@ -278,17 +272,11 @@ class BReportesController extends Controller
             $infoExtra = BodegaExtras::where('id', 1)->first();
 
             // USUARIO DE LA SOLICITUD
-            $infoUsuarioSolicitud = Usuario::where('id', $infoSolicitud->id_usuario)->first();
-            $nombreDepartamentoSolicitud = "";
             if ($infoUD = P_UsuarioDepartamento::where('id_usuario', $infoSolicitud->id_usuario)->first()) {
                 $infoDepa = P_Departamento::where('id', $infoUD->id_departamento)->first();
-                $infoUsuarioSolicitud = $infoDepa->nombre;
             }
 
-
-            $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-            //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
-
+            $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
             $mpdf->SetTitle('Comprobante Entrega');
 
             // mostrar errores
@@ -802,7 +790,7 @@ class BReportesController extends Controller
         $hastaFormat = date("d/m/Y", strtotime($hasta));
 
 
-        // NECESITO TODOS LOS MATERIALES
+        // NECESITO TODOS LOS MATERIALES FILTRADOS
 
 
         $pilaObjEspeci = array();
@@ -812,7 +800,6 @@ class BReportesController extends Controller
         foreach ($arrayCodigo as $fila) {
             array_push($pilaObjEspeci, $fila->id_objespecifico);
         }
-
 
         if($checkProductos==1){ // TODOS LOS PRODUCTOS
             // OBTENEMOS TODOS LOS PRODUCTOS
@@ -832,8 +819,6 @@ class BReportesController extends Controller
         // POR CADA ENTRADA SERIA LA VUELTA, SIEMPRE SALDRAN AUNQUE NO HAYA SALIDAS
         $resultsBloque = array();
         $index = 0;
-
-
 
 
         foreach ($arrayProductos as $fila){
@@ -883,7 +868,6 @@ class BReportesController extends Controller
 
                 $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 4, '.', ',');
             }
-
 
             $fila->columnaExistenciaActual = $columnaExistenciaActual;
             $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 4, '.', ',');
@@ -1644,15 +1628,25 @@ class BReportesController extends Controller
 
 
         $idusuario = Auth::id();
-        $arrayProductos = BodegaMateriales::where('id_usuario', $idusuario)->get();
+
+        $pilaObjEspeci = array();
+        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $idusuario)->get();
+
+        foreach ($arrayCodigo as $fila) {
+            array_push($pilaObjEspeci, $fila->id_objespecifico);
+        }
+
+
+        $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
+            ->orderBy('nombre', 'ASC')
+            ->get();
+
 
         $pilaIdProductos = array();
         foreach ($arrayProductos as $fila) {
             array_push($pilaIdProductos, $fila->id);
         }
 
-
-        // POR CADA ENTRADA SERIA LA VUELTA, SIEMPRE SALDRAN AUNQUE NO HAYA SALIDAS
         $resultsBloque = array();
         $index = 0;
 
@@ -1662,18 +1656,17 @@ class BReportesController extends Controller
             array_push($resultsBloque, $fila);
 
 
+            $infoMateriales = BodegaMateriales::where('id', $fila->id_material)->first();
+            $fila->nombreMaterial = $infoMateriales->nombre;
+
             $saldoExistencia = $fila->cantidad - $fila->cantidad_entregada;
             $fila->existencia = $saldoExistencia;
-
 
             $infoEntradaBloque = BodegaEntradas::where('id', $fila->id_entrada)->first();
             $fila->loteProducto = $infoEntradaBloque->lote;
 
-
             // SUMATORIA COLUMNA
             $saldoTotalSalidas = 0;
-
-
 
             // HOY OBTENER TODAS LAS SALIDAS DE ESTA ENTRADA
             $arraySalidas = DB::table('bodega_salidas AS sa')
@@ -1683,7 +1676,7 @@ class BReportesController extends Controller
                     'deta.id_solidetalle', 'deta.id_entradadetalle', 'deta.cantidad_salida', 'bodeentradeta.id_material',
                     'bodeentradeta.codigo_producto', 'bodeentradeta.cantidad', 'bodeentradeta.cantidad_entregada',
                     'bodeentradeta.id_entrada')
-                //->whereBetween('sa.fecha', [$start, $end])
+                ->whereBetween('sa.fecha', [$start, $end])
                 ->where('deta.id_entradadetalle', $fila->id)
                 ->get();
 
@@ -1737,8 +1730,8 @@ class BReportesController extends Controller
 
 
 
-        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER', 'orientation' => 'L']);
-        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER', 'orientation' => 'L']);
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER', 'orientation' => 'L']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER', 'orientation' => 'L']);
 
         $mpdf->SetTitle('Existencias General - Desglose');
 
@@ -1779,21 +1772,14 @@ class BReportesController extends Controller
       ";
 
 
-        $tabla .= "
-            <div style='text-align: left; margin-top: 10px;'>
-            <p style='font-size: 14px; margin: 0; color: #000;'><strong>Producto: </strong></p>
-            <p style='font-size: 14px; margin: 0; color: #000;'><strong>U. Medida: </strong></p>
-        </div>
-      ";
-
-
 
         // Encabezado de la tabla
         $tabla .= "<table width='100%' id='tablaFor' style='margin-top: 30px'>
             <thead>
                 <tr>
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>CÓDIGO DEL PRODUCTO</th>
-                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>SOLICITUD DE PEDIDO</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>PRODUCTO</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>LOTE</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>ENTRADAS</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>N° DE SOLICITUD</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALIDAS</th>
@@ -1807,6 +1793,7 @@ class BReportesController extends Controller
         foreach ($arrayEntradaDetalle as $dato) {
             $tabla .= "<tr>
                     <td style='font-size: 11px; font-weight: bold'>$dato->codigo_producto</td>
+                     <td style='font-size: 11px; font-weight: bold'>$dato->nombreMaterial</td>
                     <td style='font-size: 11px; font-weight: bold'>$dato->loteProducto</td>
                     <td style='font-size: 11px; font-weight: bold'>$dato->cantidad</td>
                     <td style='font-size: 11px'></td>
@@ -1820,6 +1807,7 @@ class BReportesController extends Controller
                 $tabla .= "<tr>
                      <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'></td>
+                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'>$item->numeroSolicitud</td>
                     <td style='font-size: 11px'>$item->cantidad_salida</td>
@@ -1830,7 +1818,7 @@ class BReportesController extends Controller
             } // END-FOREACH 2
 
             $tabla .= "<tr>
-                     <td colspan='2' style='font-size: 11px; font-weight: bold'>TOTALES</td>
+                     <td colspan='3' style='font-size: 11px; font-weight: bold'>TOTALES</td>
                     <td style='font-size: 11px'></td>
                      <td style='font-size: 11px'></td>
                     <td style='font-size: 11px; font-weight: bold'>$dato->saldoTotalSalidas</td>

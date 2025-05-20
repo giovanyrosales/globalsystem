@@ -1340,6 +1340,17 @@ Route::post('/admin/bodega/salidasmanual/registrar',  [BMaterialesController::cl
 Route::post('/admin/bodega/salidasmanual/borraritem', [BMaterialesController::class,'salidaManualDetalleBorrarItem']);
 
 
+
+
+
+
+
+
+
+
+
+
+
 // REPORTES
 
 // SOLICITUD DE LA UNIDAD SOLICITANTE
@@ -1373,11 +1384,21 @@ Route::get('/admin/bodega/reportes/pdf/existencias-fechas-lotes/{desde}/{hasta}/
 
 
 
-
 // VISTA PARA REPORTE DE UNIDADES DE LO QUE HEMOS ENTREGADO. INDIVIDUAL Y TODAS LAS UNIDADES
 Route::get('/admin/bodega/reportes/entregaunidadesvarios', [BReportesController::class,'vistaReporteEntregadoUnidades'])->name('sidebar.bodega.reportes.salidasunidad');
 Route::get('/admin/bodega/reportes/unidadentrega/pdf/{idusuario}/{desde}/{hasta}', [BReportesController::class,'reporteUnidadPDFEntregas']);
 Route::get('/admin/bodega/reportes/totalentrega/pdf/{desde}/{hasta}', [BReportesController::class,'reportePDFEntregasTotal']);
+
+
+
+
+
+
+
+
+
+
+
 
 
 

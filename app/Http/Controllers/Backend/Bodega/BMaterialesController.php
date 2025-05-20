@@ -92,13 +92,10 @@ class BMaterialesController extends Controller
             return ['success' => 0];
         }
 
-        $idusuario = Auth::id();
-
         $dato = new BodegaMateriales();
         $dato->nombre = $request->nombre;
         $dato->id_unidadmedida = $request->id_unidadmedida;
         $dato->id_objespecifico = $request->id_objespecifico;
-        $dato->id_usuario = $idusuario;
 
         if ($dato->save()) {
             return ['success' => 1];
