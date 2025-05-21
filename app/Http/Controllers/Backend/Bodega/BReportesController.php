@@ -686,7 +686,7 @@ class BReportesController extends Controller
         }
 
 
-        $totalCulumna = "$" . number_format((float)$totalCulumna, 4, '.', ',');
+        $totalCulumna = "$" . number_format((float)$totalCulumna, 2, '.', ',');
 
         $arrayDetalle = $arrayInfo->sortBy('nombreMaterial');
         $fechaFormat = date("d-m-Y", strtotime(Carbon::now('America/El_Salvador')));
@@ -801,6 +801,9 @@ class BReportesController extends Controller
             array_push($pilaObjEspeci, $fila->id_objespecifico);
         }
 
+
+        // ARRAY DE PRODUCTOS
+
         if($checkProductos==1){ // TODOS LOS PRODUCTOS
             // OBTENEMOS TODOS LOS PRODUCTOS
             $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
@@ -816,18 +819,17 @@ class BReportesController extends Controller
         }
 
 
-        // POR CADA ENTRADA SERIA LA VUELTA, SIEMPRE SALDRAN AUNQUE NO HAYA SALIDAS
         $resultsBloque = array();
         $index = 0;
-
         $sumaFinalSaldoExisteciaActual = 0;
+
+
 
         foreach ($arrayProductos as $fila){
             array_push($resultsBloque, $fila);
 
             $infoUnidadMedida = P_UnidadMedida::where('id', $fila->id_unidadmedida)->first();
             $fila->unidadMedida = $infoUnidadMedida->nombre;
-
 
             // POR CADA PRODUCTO OBTENER TODOS LOS LOTES/ENTRADAS
             $arraySalidas = DB::table('bodega_salidas AS sa')
@@ -845,45 +847,55 @@ class BReportesController extends Controller
                 array_push($pilaEntrada, $filaItem->id_entrada);
             }
 
-            $arrayEntradaDeta = BodegaEntradasDetalle::whereIn('id_entrada', $pilaEntrada)
-                ->where('id_material', $fila->id)
+
+            $arrayEntradaDeta = BodegaEntradasDetalle::
+                where('id_material', $fila->id)
                 ->get();
+
+
 
             $columnaExistenciaActual = 0;
             $columnaExistenciaActualDinero = 0;
+            $columnaExistenciaInicial = 0;
+            $columnaSalidasTotales = 0;
 
-            foreach ($arrayEntradaDeta as $itemEntra){
 
+            if($fila->id == 95){
+               // return $arrayEntradaDeta;
+            }
+
+            foreach ($arrayEntradaDeta as $itemEntra) {
                 $infoEntrada = BodegaEntradas::where('id', $itemEntra->id_entrada)->first();
                 $itemEntra->lote = $infoEntrada->lote;
 
                 $existencias = $itemEntra->cantidad - $itemEntra->cantidad_entregada;
                 $itemEntra->existencias = $existencias;
 
+                $columnaExistenciaInicial += $itemEntra->cantidad;
+                $columnaSalidasTotales += $itemEntra->cantidad_entregada;
                 $columnaExistenciaActual += $existencias;
-
 
                 $multiplicado = $itemEntra->precio * $existencias;
                 $columnaExistenciaActualDinero += $multiplicado;
 
-                // AQUI SE SUMA SALDO EXISTENCIA ACTUAL EN DINERO PARA COLOCAR HASTA EL FINAL DE PDF
                 $sumaFinalSaldoExisteciaActual += $multiplicado;
 
                 $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 2, '.', ',');
-
-                $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 4, '.', ',');
+                $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 2, '.', ',');
             }
 
+            $fila->columnaExistenciaInicial = $columnaExistenciaInicial;
+            $fila->columnaSalidasTotales = $columnaSalidasTotales;
             $fila->columnaExistenciaActual = $columnaExistenciaActual;
-            $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 4, '.', ',');
+            $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 2, '.', ',');
+
+
 
             $resultsBloque[$index]->detalle = $arrayEntradaDeta;
             $index++;
         }
 
-
-
-        $sumaFinalSaldoExisteciaActual = "$" . number_format($sumaFinalSaldoExisteciaActual, 4, '.', ',');
+        $sumaFinalSaldoExisteciaActual = "$" . number_format($sumaFinalSaldoExisteciaActual, 2, '.', ',');
 
 
         //************************************************
@@ -898,7 +910,7 @@ class BReportesController extends Controller
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
         $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
-        $mpdf->SetTitle('Existencias General');
+        $mpdf->SetTitle('Reporte general de existencias');
 
         // mostrar errores
         $mpdf->showImageErrors = false;
@@ -1197,17 +1209,17 @@ class BReportesController extends Controller
 
                 $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 2, '.', ',');
 
-                $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 4, '.', ',');
+                $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 2, '.', ',');
             }
 
             $fila->columnaExistenciaActual = $columnaExistenciaActual;
-            $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 4, '.', ',');
+            $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 2, '.', ',');
 
             $resultsBloque[$index]->detalle = $arrayEntradaDeta;
             $index++;
         }
 
-        $sumaFinalSaldoExisteciaActual = "$" . number_format($sumaFinalSaldoExisteciaActual, 4, '.', ',');
+        $sumaFinalSaldoExisteciaActual = "$" . number_format($sumaFinalSaldoExisteciaActual, 2, '.', ',');
 
 
         //************************************************
