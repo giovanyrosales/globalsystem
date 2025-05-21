@@ -820,6 +820,7 @@ class BReportesController extends Controller
         $resultsBloque = array();
         $index = 0;
 
+        $sumaFinalSaldoExisteciaActual = 0;
 
         foreach ($arrayProductos as $fila){
             array_push($resultsBloque, $fila);
@@ -864,6 +865,10 @@ class BReportesController extends Controller
 
                 $multiplicado = $itemEntra->precio * $existencias;
                 $columnaExistenciaActualDinero += $multiplicado;
+
+                // AQUI SE SUMA SALDO EXISTENCIA ACTUAL EN DINERO PARA COLOCAR HASTA EL FINAL DE PDF
+                $sumaFinalSaldoExisteciaActual += $multiplicado;
+
                 $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 2, '.', ',');
 
                 $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 4, '.', ',');
@@ -875,6 +880,11 @@ class BReportesController extends Controller
             $resultsBloque[$index]->detalle = $arrayEntradaDeta;
             $index++;
         }
+
+
+
+        $sumaFinalSaldoExisteciaActual = "$" . number_format($sumaFinalSaldoExisteciaActual, 4, '.', ',');
+
 
         //************************************************
 
@@ -1007,6 +1017,28 @@ class BReportesController extends Controller
 
 
 
+        $tabla .= "<table width='100%' id='tablaFor' style='margin-top: 30px'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALDO (EXISTENCIA ACTUAL)</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+
+
+
+        $tabla .= "<tr>
+                    <td style='font-size: 11px; font-weight: bold'>$sumaFinalSaldoExisteciaActual</td>
+
+                </tr>";
+
+
+
+        $tabla .= "</tbody></table>";
+
+
+
         $tabla .= "
             <div style='text-align: left; margin-top: 25px; font-family: \"Times New Roman\", Times, serif;'>
                 <p style='font-size: 12px; margin: 5px 0; color: #000; line-height: 2;'>
@@ -1112,6 +1144,10 @@ class BReportesController extends Controller
         $index = 0;
 
 
+        // SALDO EXISTENCIA ACTUAL
+        $sumaFinalSaldoExisteciaActual = 0;
+
+
         foreach ($arrayProductos as $fila){
             array_push($resultsBloque, $fila);
 
@@ -1155,6 +1191,10 @@ class BReportesController extends Controller
 
                 $multiplicado = $itemEntra->precio * $existencias;
                 $columnaExistenciaActualDinero += $multiplicado;
+
+                // SUNA DE EXISTENCIA ACTUAL QUE VA A FINAL DEL PDF
+                $sumaFinalSaldoExisteciaActual += $multiplicado;
+
                 $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 2, '.', ',');
 
                 $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 4, '.', ',');
@@ -1167,6 +1207,7 @@ class BReportesController extends Controller
             $index++;
         }
 
+        $sumaFinalSaldoExisteciaActual = "$" . number_format($sumaFinalSaldoExisteciaActual, 4, '.', ',');
 
 
         //************************************************
@@ -1299,6 +1340,39 @@ class BReportesController extends Controller
 
 
         $tabla .= "</tbody></table>";
+
+
+
+
+
+        $tabla .= "<table width='100%' id='tablaFor' style='margin-top: 30px'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALDO (EXISTENCIA ACTUAL)</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+
+
+
+        $tabla .= "<tr>
+                    <td style='font-size: 11px; font-weight: bold'>$sumaFinalSaldoExisteciaActual</td>
+
+                </tr>";
+
+
+
+        $tabla .= "</tbody></table>";
+
+
+
+
+
+
+
+
+
 
 
 
