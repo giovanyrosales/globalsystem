@@ -224,15 +224,17 @@ class BHistorialController extends Controller
 
                     // POR CADA FILA SE DEBE OBTENER LA CANTIDAD ENTREGADA A LA UNIDAD
                     // RESTANDOLO CON LA CANTIDAD ENTREGADA EN SALIDA
-                    $infoSoliDeta = BodegaSolicitudDetalle::where('id', $filaSalidaDeta->id_solidetalle)->first();
-                    $restaSoliDeta = $infoSoliDeta->cantidad_entregada - $filaSalidaDeta->cantidad_salida;
+                    // ** ESTO ES SI HAY SALIDAS POR SOLICITUD
+                    if($infoSoliDeta = BodegaSolicitudDetalle::where('id', $filaSalidaDeta->id_solidetalle)->first()){
+                        $restaSoliDeta = $infoSoliDeta->cantidad_entregada - $filaSalidaDeta->cantidad_salida;
 
-                    BodegaSolicitudDetalle::where('id', $filaSalidaDeta->id_solidetalle)->update([
-                        'cantidad_entregada' => $restaSoliDeta,
-                        'estado' => 1 // pendiente
-                    ]);
+                        BodegaSolicitudDetalle::where('id', $filaSalidaDeta->id_solidetalle)->update([
+                            'cantidad_entregada' => $restaSoliDeta,
+                            'estado' => 1 // pendiente
+                        ]);
 
-                    array_push($pilaIdSolicitud, $infoSoliDeta->id_bodesolicitud);
+                        array_push($pilaIdSolicitud, $infoSoliDeta->id_bodesolicitud);
+                    }
                 }
 
 
