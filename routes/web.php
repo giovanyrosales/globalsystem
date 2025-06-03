@@ -1377,11 +1377,8 @@ Route::get('/admin/bodega/reportes/pdf/existencias/desglose/{desde}/{hasta}/{idp
 Route::get('/admin/bodega/reportes/pdf/existencias/desglosetodos/{desde}/{hasta}', [BReportesController::class,'generarPDFExistenciasFechasDesgloseTodos']);
 
 
-
 // Reporte General de Existencias por Fechas LOTES
 Route::get('/admin/bodega/reportes/pdf/existencias-fechas-lotes/{desde}/{hasta}/{arrayproductos}', [BReportesController::class,'generarPDFExistenciasFechasLotes']);
-
-
 
 
 // VISTA PARA REPORTE DE UNIDADES DE LO QUE HEMOS ENTREGADO. INDIVIDUAL Y TODAS LAS UNIDADES
@@ -1389,6 +1386,9 @@ Route::get('/admin/bodega/reportes/entregaunidadesvarios', [BReportesController:
 Route::get('/admin/bodega/reportes/unidadentrega/pdf/{idusuario}/{desde}/{hasta}', [BReportesController::class,'reporteUnidadPDFEntregas']);
 Route::get('/admin/bodega/reportes/totalentrega/pdf/{desde}/{hasta}', [BReportesController::class,'reportePDFEntregasTotal']);
 
+
+// Reporte De objetos especificos
+Route::get('/admin/bodega/reportes/pdf/codigopresupuestario/{desde}/{hasta}/{arraycodigos}', [BReportesController::class,'generarPDFCodigosPresupuestarios']);
 
 
 

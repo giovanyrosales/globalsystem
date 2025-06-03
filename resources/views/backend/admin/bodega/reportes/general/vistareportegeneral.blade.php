@@ -222,6 +222,61 @@
 
 
 
+    <section class="content" style="margin-top: 35px; margin-bottom: 60px">
+        <div class="container-fluid">
+            <div class="card card-gray-dark">
+                <div class="card-header">
+                    <h3 class="card-title">REPORTE DE SALIDAS - CODIGO PRESUPUESTARIO</h3>
+                </div>
+                <div class="card-body">
+                    <section class="content" style="margin-left: 30px">
+                        <div class="container-fluid">
+
+                            <div class="row">
+
+                                <!-- Fechas -->
+                                <div class="form-group">
+                                    <label>Desde</label>
+                                    <input type="date" class="form-control" id="fecha-desdepresupuesto">
+                                </div>
+
+                                <div class="form-group" style="margin-left: 15px">
+                                    <label>Hasta</label>
+                                    <input type="date" class="form-control" id="fecha-hastapresupuesto">
+                                </div>
+                            </div>
+
+
+                            <!-- Select de Productos -->
+                            <div class="form-group">
+                                <label>Código presupuestado</label>
+                                <select class="form-control" id="select-codigopresupuestario" multiple="multiple">
+                                    @foreach($arrayCodigoPresupuestario as $item)
+                                        <option value="{{$item->id}}">{{$item->nombreCodigo}} - {{$item->nombreObjeto}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+
+                            <!-- Botón PDF -->
+                            <div class="form-group" style="margin-top: 10px">
+                                <button type="button" onclick="pdfCodigoPresupuestado()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
+                                    <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
+                                    Generar PDF
+                                </button>
+                            </div>
+
+
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
 
 
 </div>
@@ -259,6 +314,17 @@
             });
 
             $('#select-lotes').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Búsqueda no encontrada";
+                    }
+                },
+            });
+
+
+
+            $('#select-codigopresupuestario').select2({
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
@@ -415,6 +481,54 @@
                 fechadesde + "/" + fechahasta + "/" + reemplazo);
         }
 
+
+
+        function pdfCodigoPresupuestado(){
+            var fechadesde = document.getElementById('fecha-desdepresupuesto').value;
+            var fechahasta = document.getElementById('fecha-hastapresupuesto').value;
+
+            if(fechadesde === ''){
+                toastr.error('Fecha desde es requerido');
+                return;
+            }
+
+            if(fechahasta === ''){
+                toastr.error('Fecha hasta es requerido');
+                return;
+            }
+
+            // Convertir a objetos Date para comparar
+            let dateDesde = new Date(fechadesde);
+            let dateHasta = new Date(fechahasta);
+
+            if (dateHasta < dateDesde) {
+                toastr.error('La Fecha Hasta no puede ser menor que la Fecha Desde');
+                return;
+            }
+
+
+
+
+            var valores = $('#select-codigopresupuestario').val();
+            if(valores.length ==  null || valores.length === 0){
+                toastr.error('Seleccionar mínimo 1 Código');
+                return;
+            }
+
+            var selected = [];
+            for (var option of document.getElementById('select-codigopresupuestario').options){
+                if (option.selected) {
+                    selected.push(option.value);
+                }
+            }
+
+            let listado = selected.toString();
+            let reemplazo = listado.replace(/,/g, "-");
+
+
+            window.open("{{ URL::to('admin/bodega/reportes/pdf/codigopresupuestario') }}/" +
+                fechadesde + "/" + fechahasta + "/" + reemplazo);
+        }
 
 
 
