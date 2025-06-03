@@ -2557,7 +2557,7 @@ class BReportesController extends Controller
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALIDAS TOTALES</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center; background-color: #D6EAF8'>SALDO (SALIDAS)</th>
                     <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>EXISTENCIA ACTUAL</th>
-                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center;'>SALDO (EXISTENCIA ACTUAL)</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 11px; text-align: center; background-color: #D6EAF8'>SALDO (EXISTENCIA ACTUAL)</th>
                 </tr>
             </thead>
             <tbody>";
@@ -2581,7 +2581,7 @@ class BReportesController extends Controller
                     <td style='font-size: 11px'>$item->salidasTotales</td>
                     <td style='font-size: 11px; background-color: #D6EAF8'>$item->saldoSalidas</td>
                     <td style='font-size: 11px'>$item->existenciaActual</td>
-                    <td style='font-size: 11px'>$item->saldoExistenciaActual</td>
+                    <td style='font-size: 11px; background-color: #D6EAF8'>$item->saldoExistenciaActual</td>
                 </tr>";
 
             } // END-FOREACH 2
@@ -2611,7 +2611,7 @@ class BReportesController extends Controller
                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px; background-color: #D6EAF8'></td>
                     <td style='font-size: 11px'></td>
-                    <td style='font-size: 11px'></td>
+                    <td style='font-size: 11px; background-color: #D6EAF8'></td>
                 </tr>";
 
         $tabla .= "<tr style='background-color: #F8CCA2'>
