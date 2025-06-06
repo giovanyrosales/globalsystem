@@ -1124,6 +1124,14 @@
 
 
                 <li class="nav-item">
+                    <a href="{{ route('admin.tesoreria.dashboard.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
                     <a href="{{ route('admin.tesoreria.nuevo.registro.index') }}" target="frameprincipal" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Registro Nuevo</p>
@@ -1131,11 +1139,46 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('admin.tesoreria.listado.index') }}" target="frameprincipal" class="nav-link">
+                    <a href="{{ route('admin.tesoreria.listado.vigentes.index') }}" target="frameprincipal" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Listado</p>
+                        <p>Listado Vigentes</p>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.tesoreria.listado.vencidas.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Listado Vencidas</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.tesoreria.listado.ucp.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Listado UCP</p>
+                    </a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.tesoreria.listado.proveedor.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Listado Proveedor</p>
+                    </a>
+                </li>
+
+
+
+                    <li class="nav-item">
+                    <a href="{{ route('admin.tesoreria.listado.todos.index') }}" target="frameprincipal" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Listado Todos</p>
+                    </a>
+                </li>
+
+
+
+
 
                 <!-- MODULO PARA TESORERIA PARA GARANTIAS -->
                 <li class="nav-item">

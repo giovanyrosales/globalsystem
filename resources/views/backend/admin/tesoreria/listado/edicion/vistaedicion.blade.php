@@ -43,6 +43,12 @@
                     <div class="row">
                         <div class="col-md-12">
 
+                            <div class="form-group">
+                                <label>FECHA REGISTRO</label>
+                                <input type="date" value="{{ $info->fecha_registro }}" class="form-control" id="fecharegistro-nuevo" autocomplete="off">
+                            </div>
+
+                            <hr>
 
                             <div class="form-group">
                                 <label>N° DE CONTROL INTERNO</label>
@@ -225,6 +231,13 @@
                 var garantia = document.getElementById('select-garantia').value;
                 var tipoGarantia = document.getElementById('select-tipogarantia').value;
 
+                var fechaRegistro = document.getElementById('fecharegistro-nuevo').value;
+
+                if(fechaRegistro === ''){
+                    toastr.error('Fecha registro es requerido');
+                    return
+                }
+
                 openLoading();
                 var formData = new FormData();
                 formData.append('id', id);
@@ -241,6 +254,7 @@
                 formData.append('proveedor', proveedor);
                 formData.append('garantia', garantia);
                 formData.append('tipogarantia', tipoGarantia);
+                formData.append('fechaRegistro', fechaRegistro);
 
                 axios.post(url+'/tesoreria/listado/actualizar', formData, {
                 })
@@ -260,11 +274,6 @@
                         closeLoading();
                     });
             }
-
-
-
-
-
 
 
         </script>

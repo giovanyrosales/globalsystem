@@ -1552,16 +1552,45 @@ Route::post('/admin/tesoreria/tipo/garantia/editar', [TesoreriaConfigController:
 Route::get('/admin/tesoreria/registro/index', [TesoreriaConfigController::class,'indexRegistroTesoreria'])->name('admin.tesoreria.nuevo.registro.index');
 Route::post('/admin/tesoreria/registro', [TesoreriaConfigController::class,'nuevoRegistroTesoreria']);
 
-//--- LISTADO
-Route::get('/admin/tesoreria/listado/index', [TesoreriaConfigController::class,'vistaListadoRegistros'])->name('admin.tesoreria.listado.index');
-Route::get('/admin/tesoreria/listado/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistros']);
 
+// EDICION
 Route::get('/admin/tesoreria/listado/edicion/index/{id}', [TesoreriaConfigController::class,'vistaListadoEdicion']);
 Route::post('/admin/tesoreria/listado/actualizar', [TesoreriaConfigController::class,'actualizarRegistro']);
 
 Route::post('/admin/tesoreria/registro/borrar', [TesoreriaConfigController::class,'borrarRegistro']);
 Route::post('/admin/tesoreria/registro/informacion', [TesoreriaConfigController::class,'informacionRegistro']);
 
+//--- LISTADO VIGENTES
+Route::get('/admin/tesoreria/listado-vigentes/index', [TesoreriaConfigController::class,'vistaListadoRegistrosVigentes'])->name('admin.tesoreria.listado.vigentes.index');
+Route::get('/admin/tesoreria/listado-vigentes/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistrosVigentes']);
+
+// ACTUALIZAR ESTADO
+Route::post('/admin/tesoreria/actualizar/estado', [TesoreriaConfigController::class,'actualizarEstado']);
+
+
+//--- LISTADO VENCIDAS
+Route::get('/admin/tesoreria/listado-vencidas/index', [TesoreriaConfigController::class,'vistaListadoRegistrosVencidas'])->name('admin.tesoreria.listado.vencidas.index');
+Route::get('/admin/tesoreria/listado-vencidas/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistrosVencidas']);
+
+
+//--- LISTADO UCP
+Route::get('/admin/tesoreria/listado-ucp/index', [TesoreriaConfigController::class,'vistaListadoRegistrosUcp'])->name('admin.tesoreria.listado.ucp.index');
+Route::get('/admin/tesoreria/listado-ucp/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistrosUcp']);
+
+
+//--- LISTADO PROVEEDOR
+Route::get('/admin/tesoreria/listado-proveedor/index', [TesoreriaConfigController::class,'vistaListadoRegistrosProveedor'])->name('admin.tesoreria.listado.proveedor.index');
+Route::get('/admin/tesoreria/listado-proveedor/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistrosProveedor']);
+
+
+
+//--- LISTADO TODOS
+Route::get('/admin/tesoreria/listado-todos/index', [TesoreriaConfigController::class,'vistaListadoRegistrosTodos'])->name('admin.tesoreria.listado.todos.index');
+Route::get('/admin/tesoreria/listado-todos/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistrosTodos']);
+
+
+// DASHBOARD
+Route::get('/admin/tesoreria/dashboard/index', [TesoreriaConfigController::class,'indexDashboard'])->name('admin.tesoreria.dashboard.index');
 
 
 

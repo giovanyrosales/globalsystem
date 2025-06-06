@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Backend\Tesoreria\Config;
 
 use App\Http\Controllers\Controller;
 use App\Models\P_Departamento;
+use App\Models\TesoreriaEstados;
 use App\Models\TesoreriaGarantia;
 use App\Models\TesoreriaGarantiaPendienteEntrega;
 use App\Models\TesoreriaProveedores;
 use App\Models\TesoreriaTipoGarantia;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -284,19 +286,29 @@ class TesoreriaConfigController extends Controller
         $arrayProveedor = TesoreriaProveedores::orderBy('nombre', 'ASC')->get();
         $arrayGarantia = TesoreriaGarantia::orderBy('nombre', 'ASC')->get();
         $arrayTipoGarantia = TesoreriaTipoGarantia::orderBy('nombre', 'ASC')->get();
+        $arrayEstados = TesoreriaEstados::orderBy('nombre', 'ASC')->get();
+
+        $anioActual = Carbon::now()->year;
+        $conteo = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anioActual)->count();
+
+        $correlativoNumero = str_pad($conteo + 1, 2, '0', STR_PAD_LEFT);
+        $correlativo = $correlativoNumero . '-' . $anioActual;
 
         return view('backend.admin.tesoreria.registro.nuevoregistro', compact('arrayProveedor',
-            'arrayGarantia', 'arrayTipoGarantia'));
+            'arrayGarantia', 'arrayTipoGarantia', 'correlativo', 'arrayEstados'));
     }
 
 
     public function nuevoRegistroTesoreria(Request $request)
     {
-
         DB::beginTransaction();
+
+        // FECHA REGISTRO ES OBLIGATORIA
+
         try {
 
             $registro = new TesoreriaGarantiaPendienteEntrega();
+            $registro->fecha_registro = $request->fechaRegistro;
             $registro->control_interno = $request->numcontrol;
             $registro->referencia = $request->referencia;
             $registro->descripcion_licitacion = $request->descripcion;
@@ -310,6 +322,8 @@ class TesoreriaConfigController extends Controller
             $registro->fecha_recibida = $request->fecharecibida;
             $registro->fecha_entrega = $request->fechaentrega;
             $registro->fecha_entrega_ucp = $request->fechaucp;
+            $registro->id_estado = $request->estados;
+
             $registro->save();
 
             DB::commit();
@@ -324,17 +338,18 @@ class TesoreriaConfigController extends Controller
 
 
 
-    public function vistaListadoRegistros()
+    public function vistaListadoRegistrosVigentes()
     {
-
         $departamentos = P_Departamento::all();
 
-        return view('backend.admin.tesoreria.listado.vistalistado', compact('departamentos'));
+        return view('backend.admin.tesoreria.listado.vigentes.vistalistadovigentes', compact('departamentos'));
     }
 
-    public function tablaListadoRegistros()
+    public function tablaListadoRegistrosVigentes()
     {
-        $listado = TesoreriaGarantiaPendienteEntrega::orderBy('control_interno', 'ASC')->get();
+        $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', 1) // SOLO VIGENTES
+            ->orderBy('control_interno', 'ASC')
+            ->get();
 
         foreach ($listado as $item) {
 
@@ -349,7 +364,6 @@ class TesoreriaConfigController extends Controller
             if($item->monto_garantia != null){
                 $item->monto = '$' . number_format((float)$item->monto_garantia, 2, '.', ',');
             }
-
 
             if($item->vigencia_desde != null){
                 $item->vigencia_desde = date('d-m-Y', strtotime($item->vigencia_desde));
@@ -370,9 +384,22 @@ class TesoreriaConfigController extends Controller
             if($item->fecha_entrega_ucp != null){
                 $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
             }
+
+            $vencida = 0;
+            if($item->vigencia_desde != null && $item->vigencia_hasta != null){
+                $now = Carbon::now('America/El_Salvador');
+                $hasta = Carbon::parse($item->vigencia_hasta, 'America/El_Salvador');
+
+                if ($now->gt($hasta)) {
+                    // Ya te pasaste de la vigencia
+                    $vencida = 1;
+                }
+            }
+
+            $item->vencida = $vencida;
         }
 
-        return view('backend.admin.tesoreria.listado.tablalistado', compact('listado'));
+        return view('backend.admin.tesoreria.listado.vigentes.tablalistadovigentes', compact('listado'));
     }
 
     public function borrarRegistro(Request $request)
@@ -403,7 +430,9 @@ class TesoreriaConfigController extends Controller
 
         $info = TesoreriaGarantiaPendienteEntrega::where('id', $request->id)->first();
 
-        return ['success' => 1, 'info' => $info];
+        $arrayEstados = TesoreriaEstados::orderBy('nombre', 'ASC')->get();
+
+        return ['success' => 1, 'info' => $info, 'arrayEstados' => $arrayEstados];
     }
 
 
@@ -445,10 +474,303 @@ class TesoreriaConfigController extends Controller
             'fecha_recibida' => $request->fecharecibida,
             'fecha_entrega' => $request->fechaentrega,
             'fecha_entrega_ucp' => $request->fechaentregaucp,
+            'fecha_registro' => $request->fechaRegistro,
         ]);
 
         return ['success' => 1];
     }
+
+
+    public function actualizarEstado(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+            'estado' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+
+        TesoreriaGarantiaPendienteEntrega::where('id', $request->id)->update([
+            'id_estado' => $request->estado
+        ]);
+
+        return ['success' => 1];
+    }
+
+
+
+    //**************************************************************************************************
+
+
+
+    public function vistaListadoRegistrosVencidas()
+    {
+        $departamentos = P_Departamento::all();
+
+        return view('backend.admin.tesoreria.listado.vencidas.vistalistadovencidas', compact('departamentos'));
+    }
+
+    public function tablaListadoRegistrosVencidas()
+    {
+        $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', 2) // SOLO VENCIDAS
+        ->orderBy('control_interno', 'ASC')
+            ->get();
+
+        foreach ($listado as $item) {
+
+            $infoProveedor = TesoreriaProveedores::where('id', $item->id_proveedor)->first();
+            $infoGarantia = TesoreriaGarantia::where('id', $item->id_garantia)->first();
+            $infoTipoGarantia = TesoreriaTipoGarantia::where('id', $item->id_tipo_garantia)->first();
+
+            $item->proveedor = $infoProveedor->nombre;
+            $item->garantia = $infoGarantia->nombre;
+            $item->tipoGarantia = $infoTipoGarantia->nombre;
+
+            if($item->monto_garantia != null){
+                $item->monto = '$' . number_format((float)$item->monto_garantia, 2, '.', ',');
+            }
+
+            if($item->vigencia_desde != null){
+                $item->vigencia_desde = date('d-m-Y', strtotime($item->vigencia_desde));
+            }
+
+            if($item->vigencia_hasta != null){
+                $item->vigencia_hasta = date('d-m-Y', strtotime($item->vigencia_hasta));
+            }
+
+            if($item->fecha_recibida != null){
+                $item->fecha_recibida = date('d-m-Y', strtotime($item->fecha_recibida));
+            }
+
+            if($item->fecha_entrega != null){
+                $item->fecha_entrega = date('d-m-Y', strtotime($item->fecha_entrega));
+            }
+
+            if($item->fecha_entrega_ucp != null){
+                $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
+            }
+        }
+
+        return view('backend.admin.tesoreria.listado.vencidas.tablalistadovencidas', compact('listado'));
+    }
+
+
+
+
+
+
+
+    //**************************************************************************************************
+
+
+
+    public function vistaListadoRegistrosUcp()
+    {
+        $departamentos = P_Departamento::all();
+
+        return view('backend.admin.tesoreria.listado.ucp.vistalistadoucp', compact('departamentos'));
+    }
+
+    public function tablaListadoRegistrosUcp()
+    {
+        $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', 3) // SOLO UCP
+        ->orderBy('control_interno', 'ASC')
+            ->get();
+
+        foreach ($listado as $item) {
+
+            $infoProveedor = TesoreriaProveedores::where('id', $item->id_proveedor)->first();
+            $infoGarantia = TesoreriaGarantia::where('id', $item->id_garantia)->first();
+            $infoTipoGarantia = TesoreriaTipoGarantia::where('id', $item->id_tipo_garantia)->first();
+
+            $item->proveedor = $infoProveedor->nombre;
+            $item->garantia = $infoGarantia->nombre;
+            $item->tipoGarantia = $infoTipoGarantia->nombre;
+
+            if($item->monto_garantia != null){
+                $item->monto = '$' . number_format((float)$item->monto_garantia, 2, '.', ',');
+            }
+
+            if($item->vigencia_desde != null){
+                $item->vigencia_desde = date('d-m-Y', strtotime($item->vigencia_desde));
+            }
+
+            if($item->vigencia_hasta != null){
+                $item->vigencia_hasta = date('d-m-Y', strtotime($item->vigencia_hasta));
+            }
+
+            if($item->fecha_recibida != null){
+                $item->fecha_recibida = date('d-m-Y', strtotime($item->fecha_recibida));
+            }
+
+            if($item->fecha_entrega != null){
+                $item->fecha_entrega = date('d-m-Y', strtotime($item->fecha_entrega));
+            }
+
+            if($item->fecha_entrega_ucp != null){
+                $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
+            }
+        }
+
+        return view('backend.admin.tesoreria.listado.ucp.tablalistadoucp', compact('listado'));
+    }
+
+
+
+
+    //**************************************************************************************************
+
+
+
+    public function vistaListadoRegistrosProveedor()
+    {
+        $departamentos = P_Departamento::all();
+
+        return view('backend.admin.tesoreria.listado.proveedor.vistalistadoproveedor', compact('departamentos'));
+    }
+
+    public function tablaListadoRegistrosProveedor()
+    {
+        $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', 4) // SOLO PROVEEDOR
+        ->orderBy('control_interno', 'ASC')
+            ->get();
+
+        foreach ($listado as $item) {
+
+            $infoProveedor = TesoreriaProveedores::where('id', $item->id_proveedor)->first();
+            $infoGarantia = TesoreriaGarantia::where('id', $item->id_garantia)->first();
+            $infoTipoGarantia = TesoreriaTipoGarantia::where('id', $item->id_tipo_garantia)->first();
+
+            $item->proveedor = $infoProveedor->nombre;
+            $item->garantia = $infoGarantia->nombre;
+            $item->tipoGarantia = $infoTipoGarantia->nombre;
+
+            if($item->monto_garantia != null){
+                $item->monto = '$' . number_format((float)$item->monto_garantia, 2, '.', ',');
+            }
+
+            if($item->vigencia_desde != null){
+                $item->vigencia_desde = date('d-m-Y', strtotime($item->vigencia_desde));
+            }
+
+            if($item->vigencia_hasta != null){
+                $item->vigencia_hasta = date('d-m-Y', strtotime($item->vigencia_hasta));
+            }
+
+            if($item->fecha_recibida != null){
+                $item->fecha_recibida = date('d-m-Y', strtotime($item->fecha_recibida));
+            }
+
+            if($item->fecha_entrega != null){
+                $item->fecha_entrega = date('d-m-Y', strtotime($item->fecha_entrega));
+            }
+
+            if($item->fecha_entrega_ucp != null){
+                $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
+            }
+        }
+
+        return view('backend.admin.tesoreria.listado.proveedor.tablalistadoproveedor', compact('listado'));
+    }
+
+
+
+    //**************************************************************************************************
+
+
+
+    public function vistaListadoRegistrosTodos()
+    {
+        $departamentos = P_Departamento::all();
+
+        return view('backend.admin.tesoreria.listado.todas.vistalistadotodas', compact('departamentos'));
+    }
+
+    public function tablaListadoRegistrosTodos()
+    {
+        $listado = TesoreriaGarantiaPendienteEntrega::orderBy('control_interno', 'ASC')->get();
+
+        foreach ($listado as $item) {
+            $infoProveedor = TesoreriaProveedores::where('id', $item->id_proveedor)->first();
+            $infoGarantia = TesoreriaGarantia::where('id', $item->id_garantia)->first();
+            $infoTipoGarantia = TesoreriaTipoGarantia::where('id', $item->id_tipo_garantia)->first();
+
+            $item->proveedor = $infoProveedor->nombre;
+            $item->garantia = $infoGarantia->nombre;
+            $item->tipoGarantia = $infoTipoGarantia->nombre;
+
+            if($item->monto_garantia != null){
+                $item->monto = '$' . number_format((float)$item->monto_garantia, 2, '.', ',');
+            }
+
+            if($item->vigencia_desde != null){
+                $item->vigencia_desde = date('d-m-Y', strtotime($item->vigencia_desde));
+            }
+
+            if($item->vigencia_hasta != null){
+                $item->vigencia_hasta = date('d-m-Y', strtotime($item->vigencia_hasta));
+            }
+
+            if($item->fecha_recibida != null){
+                $item->fecha_recibida = date('d-m-Y', strtotime($item->fecha_recibida));
+            }
+
+            if($item->fecha_entrega != null){
+                $item->fecha_entrega = date('d-m-Y', strtotime($item->fecha_entrega));
+            }
+
+            if($item->fecha_entrega_ucp != null){
+                $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
+            }
+
+            $vencida = 0;
+            if($item->vigencia_desde != null && $item->vigencia_hasta != null){
+                $now = Carbon::now('America/El_Salvador');
+                $hasta = Carbon::parse($item->vigencia_hasta, 'America/El_Salvador');
+
+                if ($now->gt($hasta)) {
+                    // Ya te pasaste de la vigencia
+                    $vencida = 1;
+                }
+            }
+
+            $item->vencida = $vencida;
+        }
+
+        return view('backend.admin.tesoreria.listado.todas.tablalistadotodas', compact('listado'));
+    }
+
+
+
+
+    //****************************************************
+
+    public function indexDashboard()
+    {
+
+        $totalRegistros = TesoreriaGarantiaPendienteEntrega::count();
+        $totalVigentes = TesoreriaGarantiaPendienteEntrega::where('id_estado', 1)->count();
+        $totalVencidas = TesoreriaGarantiaPendienteEntrega::where('id_estado', 2)->count();
+        $totalUcp = TesoreriaGarantiaPendienteEntrega::where('id_estado', 3)->count();
+
+
+        return view('backend.admin.tesoreria.dashboard.vistadashboard', compact('totalRegistros',
+            'totalVigentes', 'totalVencidas', 'totalUcp'));
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

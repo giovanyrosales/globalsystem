@@ -16,24 +16,7 @@
 
 <div id="divcontenedor" style="display: none">
 
-    <section class="content-header">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-
-            </div>
-
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Registro</li>
-                    <li class="breadcrumb-item active">Formulario</li>
-                </ol>
-            </div>
-        </div>
-    </section>
-
-
-
-    <section class="content">
+    <section class="content" style="margin-top: 15px">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
@@ -43,9 +26,18 @@
                             <h3 class="card-title"></h3>
                         </div>
                         <div class="card-body">
+
+                            <div class="form-group col-md-4">
+                                <label>FECHA REGISTRO</label>
+                                <input type="date" class="form-control" id="fecharegistro-nuevo" autocomplete="off">
+                            </div>
+
+                            <hr>
+
+
                             <div class="form-group">
                                 <label>N° DE CONTROL INTERNO</label>
-                                <input type="text" maxlength="50" class="form-control" id="numcontrol-nuevo" autocomplete="off">
+                                <input type="text" maxlength="50" value="{{ $correlativo }}" class="form-control" id="numcontrol-nuevo" autocomplete="off">
                             </div>
 
                             <div class="form-group">
@@ -123,6 +115,15 @@
 
                             <hr>
 
+                            <div class="form-group col-md-4">
+                                <label>Estado</label>
+                                <select class="form-control" id="select-estados">
+                                    @foreach($arrayEstados as $fila)
+                                        <option value="{{ $fila->id }}">{{ $fila->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <div class="form-group">
                                 <label>FECHA DE RECIBIDA</label>
                                 <input type="date" class="form-control col-md-4" id="fecharecibida-nuevo" autocomplete="off">
@@ -138,6 +139,17 @@
                                 <input type="date" class="form-control col-md-4" id="fechaucp-nuevo" autocomplete="off">
                             </div>
 
+
+                            <div class="col-sm-12 d-flex justify-content-end">
+                                <button type="button"
+                                        style="font-weight: bold; background-color: #2156af; color: white !important;"
+                                        onclick="guardarRegistro()"
+                                        class="button button-3d button-rounded button-pill button-small">
+                                    <i class="fas fa-pencil-alt"></i>
+                                    GUARDAR REGISTRO
+                                </button>
+                            </div>
+
                         </div>
                         </form>
                     </div>
@@ -147,13 +159,7 @@
     </section>
 
 
-    <div class="col-sm-6 d-flex justify-content-end">
-        <button type="button" style="font-weight: bold; background-color: #2156af; color: white !important;" onclick="guardarRegistro()"
-                class="button button-3d button-rounded button-pill button-small">
-            <i class="fas fa-pencil-alt"></i>
-            GUARDAR REGISTRO
-        </button>
-    </div>
+
 
 </div>
 
@@ -179,6 +185,7 @@
     <script>
         function guardarRegistro(){
 
+            var fecharegistro = document.getElementById('fecharegistro-nuevo').value; //50
             var numControl = document.getElementById('numcontrol-nuevo').value; //50
             var referencia = document.getElementById('referencia-nuevo').value; //100
             var descripcion = document.getElementById('descripcion-nuevo').value; //300
@@ -188,15 +195,22 @@
             var monto = document.getElementById('monto-nuevo').value;
             var aseguradora = document.getElementById('aseguradora-nuevo').value;
 
+
+            var estados = document.getElementById('select-estados').value;
             var fechaDesde = document.getElementById('fechadesde-nuevo').value;
             var fechaHasta = document.getElementById('fechahasta-nuevo').value;
             var fechaRecibida = document.getElementById('fecharecibida-nuevo').value;
             var fechaEntrega = document.getElementById('fechaentrega-nuevo').value;
             var fechaUcp = document.getElementById('fechaucp-nuevo').value;
 
+            if(fecharegistro === ''){
+                toastr.error('Fecha Registro es requerido');
+                return
+            }
 
             openLoading();
             var formData = new FormData();
+            formData.append('fechaRegistro', fecharegistro);
             formData.append('numcontrol', numControl);
             formData.append('referencia', referencia);
             formData.append('descripcion', descripcion);
@@ -210,6 +224,7 @@
             formData.append('fecharecibida', fechaRecibida);
             formData.append('fechaentrega', fechaEntrega);
             formData.append('fechaucp', fechaUcp);
+            formData.append('estados', estados);
 
             axios.post(url+'/tesoreria/registro', formData, {
             })

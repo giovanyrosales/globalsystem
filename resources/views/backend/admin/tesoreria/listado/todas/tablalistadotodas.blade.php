@@ -24,13 +24,17 @@
                                 <th style="width: 10%">FECHA ENTREGA</th>
                                 <th style="width: 10%">FECHA ENTREGA UCP</th>
 
-                                <th style="width: 4%">Opciones</th>
+                                <th style="width: 12%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
 
                             @foreach($listado as $dato)
-                                <tr>
+                                @if($dato->vencida == 1)
+                                    <tr style="background-color: #d52121;">
+                                @else
+                                    <tr>
+                                        @endif
                                     <td>{{ $dato->control_interno }}</td>
                                     <td>{{ $dato->referencia }}</td>
                                     <td>{{ $dato->descripcion_licitacion }}</td>
@@ -54,7 +58,16 @@
                                             <i class="fas fa-edit" title="Editar"></i>&nbsp;Editar
                                         </button>
 
-                                        <div style="margin: 4px">
+                                        <div style="margin: 7px">
+                                            <button type="button"
+                                                    class="btn btn-success btn-sm py-0 px-2"
+                                                    style="font-size: 0.80rem;"
+                                                    onclick="infoEstado({{ $dato->id }})">
+                                                <i class="fas fa-info" title="Estado"></i>&nbsp; Estado
+                                            </button>
+                                        </div>
+
+                                        <div style="margin: 7px">
                                             <button type="button"
                                                     class="btn btn-danger btn-sm py-0 px-2"
                                                     style="font-size: 0.80rem;"
