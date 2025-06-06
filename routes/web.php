@@ -1593,4 +1593,6 @@ Route::get('/admin/tesoreria/listado-todos/tabla/index', [TesoreriaConfigControl
 Route::get('/admin/tesoreria/dashboard/index', [TesoreriaConfigController::class,'indexDashboard'])->name('admin.tesoreria.dashboard.index');
 
 
+// REPORTES
+Route::get('/admin/tesoreria/reportes/index', [TesoreriaConfigController::class,'indexReportes'])->name('admin.tesoreria.reportes.index');
 

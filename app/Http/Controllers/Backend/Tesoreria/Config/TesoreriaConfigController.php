@@ -763,8 +763,25 @@ class TesoreriaConfigController extends Controller
 
 
 
+    //****************************************************
+    public function indexReportes()
+    {
+        $arrayEstados = TesoreriaEstados::orderBy('nombre', 'ASC')->get();
 
+        $listado = TesoreriaGarantiaPendienteEntrega::all();
 
+        $arrayAnios = $listado->pluck('fecha_registro')
+        ->filter() // Elimina nulos
+        ->map(function ($fecha) {
+            return Carbon::parse($fecha)->year;
+        })
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
+
+        return view('backend.admin.tesoreria.reportes.general.vistareportegeneral', compact('arrayEstados', 'arrayAnios'));
+    }
 
 
 
