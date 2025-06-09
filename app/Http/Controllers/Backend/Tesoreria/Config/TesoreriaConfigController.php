@@ -785,6 +785,179 @@ class TesoreriaConfigController extends Controller
 
 
 
+    public function reportePdfGeneralTesoreria($anio, $tipo, $check)
+    {
+        if ($check == 1) {
+            $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', $tipo)
+                ->orderBy('vigencia_hasta', 'ASC')
+                ->get();
+        } else {
+            $listado = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                ->orderBy('vigencia_hasta', 'ASC')
+                ->get();
+        }
+
+
+        $infoEstado = TesoreriaEstados::where('id', $tipo)->first();
+
+
+        foreach ($listado as $item) {
+
+            $infoProveedor = TesoreriaProveedores::where('id', $item->id_proveedor)->first();
+            $infoGarantia = TesoreriaGarantia::where('id', $item->id_garantia)->first();
+            $infoTipoGarantia = TesoreriaTipoGarantia::where('id', $item->id_tipo_garantia)->first();
+
+            $item->proveedor = $infoProveedor->nombre;
+            $item->garantia = $infoGarantia->nombre;
+            $item->tipoGarantia = $infoTipoGarantia->nombre;
+
+            if ($item->monto_garantia != null) {
+                $item->monto = '$' . number_format((float)$item->monto_garantia, 2, '.', ',');
+            }
+
+            if ($item->vigencia_desde != null) {
+                $item->vigencia_desde = date('d-m-Y', strtotime($item->vigencia_desde));
+            }
+
+            if ($item->vigencia_hasta != null) {
+                $item->vigencia_hasta = date('d-m-Y', strtotime($item->vigencia_hasta));
+            }
+
+            if ($item->fecha_recibida != null) {
+                $item->fecha_recibida = date('d-m-Y', strtotime($item->fecha_recibida));
+            }
+
+            if ($item->fecha_entrega != null) {
+                $item->fecha_entrega = date('d-m-Y', strtotime($item->fecha_entrega));
+            }
+
+            if ($item->fecha_entrega_ucp != null) {
+                $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
+            }
+
+            $vencida = 0;
+            if ($item->vigencia_desde != null && $item->vigencia_hasta != null) {
+                $now = Carbon::now('America/El_Salvador');
+                $hasta = Carbon::parse($item->vigencia_hasta, 'America/El_Salvador');
+
+                if ($now->gt($hasta)) {
+                    // Ya te pasaste de la vigencia
+                    $vencida = 1;
+                }
+            }
+
+            $item->vencida = $vencida;
+        }
+
+
+
+        //**********************************************************************************
+
+
+
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER-L']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER-L']);
+
+       /* $mpdf = new \Mpdf\Mpdf([
+            'tempDir' => sys_get_temp_dir(),
+            'format' => 'Letter-L' // La L al final indica "Landscape"
+        ]);*/
+
+
+        $mpdf->SetTitle('Reporte General');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+        $logoalcaldia = 'images/gobiernologo.jpg';
+        $logosantaana = 'images/logo.png';
+
+        $tabla = "
+            <table style='width: 100%; border-collapse: collapse;'>
+                <tr>
+                    <!-- Logo izquierdo -->
+                    <td style='width: 15%; text-align: left;'>
+                        <img src='$logosantaana' alt='Santa Ana Norte' style='max-width: 100px; height: auto;'>
+                    </td>
+                    <!-- Texto centrado -->
+                    <td style='width: 60%; text-align: center;'>
+                        <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
+                    </td>
+                    <!-- Logo derecho -->
+                    <td style='width: 10%; text-align: right;'>
+                        <img src='$logoalcaldia' alt='Gobierno de El Salvador' style='max-width: 60px; height: auto;'>
+                    </td>
+                </tr>
+            </table>
+            <hr style='border: none; border-top: 2px solid #003366; margin: 0;'>
+            ";
+
+        $tabla .= "
+            <div style='text-align: center; margin-top: 20px;'>
+                <h1 style='font-size: 16px; margin: 0; color: #000;'>REPORTE GARANTIAS</h1>
+            </div>
+            <div style='text-align: left; margin-top: 10px;'>
+        </div>
+      ";
+
+
+        $tabla .= "
+            <div style='text-align: left; margin-top: 10px;'>
+                <p style='font-size: 13px; margin: 0; color: #000;'><strong>Estado:</strong> $infoEstado->nombre</p>
+            </div>
+            <div style='text-align: left; margin-top: 10px;'>
+        </div>
+      ";
+
+
+        // Encabezado de la tabla
+        $tabla .= "<table width='100%' id='tablaFor' style='margin-top: 30px'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 6%; font-size: 10px; text-align: center;'>CONTROL INTERNO</th>
+                    <th style='font-weight: bold; width: 6%; font-size: 10px; text-align: center;'>ESTADO</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 10px; text-align: center;'>REFERENCIA</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 10px; text-align: center;'>PROVEEDOR</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 10px; text-align: center;'>GARANTIA</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 10px; text-align: center;'>TIPO GARANTIA</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 10px; text-align: center;'>MONTO</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 10px; text-align: center;'>ASEGURADORA</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 10px; text-align: center;'>V. DESDE</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 10px; text-align: center;'>V. HASTA</th>
+                    <th style='font-weight: bold; width: 10%; font-size: 10px; text-align: center;'>F. RECIBIDA</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+
+        foreach ($listado as $dato) {
+
+            $tabla .= "<tr>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->control_interno</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->nombreEstado</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->referencia</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->proveedor</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->garantia</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->tipoGarantia</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->monto_garantia</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->aseguradora</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->vigencia_desde</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->vigencia_hasta</td>
+                    <td style='font-size: 10px; font-weight: normal'>$dato->fecha_recibida</td>
+                </tr>";
+        }
+
+
+        $tabla .= "</tbody></table>";
+
+        $stylesheet = file_get_contents('css/cssbodega.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+    }
 
 
 

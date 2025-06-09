@@ -32,13 +32,19 @@
                     <section class="content" style="margin-left: 30px">
                         <div class="container-fluid">
 
-
                             <label>AÑOS</label>
                             <select class="form-control col-md-3" id="select-anios">
                                 @foreach($arrayAnios as $anio)
                                     <option value="{{ $anio }}">{{ $anio }}</option>
                                 @endforeach
                             </select>
+
+                            <div class="form-group" style="margin-top: 15px">
+                                <label>
+                                    <input type="checkbox" class="checkbox" id="checkbox-todos">
+                                    Todos los años
+                                </label>
+                            </div>
 
 
                             <label style="margin-top: 15px">Estado</label>
@@ -48,7 +54,8 @@
                                 @endforeach
                             </select>
 
-                            <button type="button" onclick="pdfExistenciasFecha()" class="btn" style="margin-top: 25px; border-color: black; border-radius: 0.1px;">
+
+                            <button type="button" onclick="pdfEstados()" class="btn" style="margin-top: 25px; border-color: black; border-radius: 0.1px;">
                                 <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
                                 Generar PDF
                             </button>
@@ -80,6 +87,31 @@
 
             document.getElementById("divcontenedor").style.display = "block";
         </script>
+
+
+        <script>
+
+            function pdfEstados(){
+
+                var anios = document.getElementById('select-anios').value;
+                var estado = document.getElementById('select-estado').value;
+                var checkbox = document.getElementById('checkbox-todos');
+                var valorCheckbox = checkbox.checked ? 1 : 0;
+
+                if(anios === ''){
+                    toastr.error('Años es requerido');
+                    return;
+                }
+
+
+                window.open("{{ URL::to('admin/tesoreria/pdf/general') }}/" +
+                    anios + "/" + estado + "/" + valorCheckbox);
+            }
+
+
+        </script>
+
+
 
 
 @endsection

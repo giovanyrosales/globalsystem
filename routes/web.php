@@ -1595,4 +1595,5 @@ Route::get('/admin/tesoreria/dashboard/index', [TesoreriaConfigController::class
 
 // REPORTES
 Route::get('/admin/tesoreria/reportes/index', [TesoreriaConfigController::class,'indexReportes'])->name('admin.tesoreria.reportes.index');
+Route::get('/admin/tesoreria/pdf/general/{anio}/{tipo}/{check}', [TesoreriaConfigController::class,'reportePdfGeneralTesoreria']);
 
