@@ -87,6 +87,27 @@
                         </a>
                     </div>
                 </div>
+
+
+                <div class="col-lg-3 col-6">
+                    <!-- small box -->
+                    <div class="small-box bg-gray">
+                        <div class="inner">
+                            <h3>{{ $totalProveedor }}</h3>
+
+                            <p>Total Proveedor</p>
+                        </div>
+                        <div class="icon">
+                            <i class="ion ion-pie-graph"></i>
+                        </div>
+                        <a href="#" class="small-box-footer" onclick="listadoProveedor(); return false;">
+                            Ver Todos <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+
+
                 <!-- ./col -->
             </div>
 
@@ -134,6 +155,9 @@
             window.location.href="{{ url('/admin/tesoreria/listado-todos/index') }}";
         }
 
+        function listadoProveedor(){
+            window.location.href="{{ url('/admin/tesoreria/listado-proveedor/index') }}";
+        }
 
     </script>
 

@@ -960,15 +960,40 @@ class TesoreriaConfigController extends Controller
 
     public function indexDashboard()
     {
+        $now = Carbon::now('America/El_Salvador');
 
         $totalRegistros = TesoreriaGarantiaPendienteEntrega::count();
-        $totalVigentes = TesoreriaGarantiaPendienteEntrega::where('id_estado', 1)->count();
-        $totalVencidas = TesoreriaGarantiaPendienteEntrega::where('id_estado', 2)->count();
-        $totalUcp = TesoreriaGarantiaPendienteEntrega::where('id_estado', 3)->count();
+        $totalVigentes = TesoreriaGarantiaPendienteEntrega::where('vigencia_hasta', '>', $now)->count();
+        $totalVencidas = TesoreriaGarantiaPendienteEntrega::where('vigencia_hasta', '<', $now)->count();
+
+        //*****************
+
+        $pilaSoloUCP = array();
+        $arrayUcp = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
+
+        foreach ($arrayUcp as $fila) {
+            array_push($pilaSoloUCP, $fila->id_garantia_pendi);
+        }
+
+        $totalUcp = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloUCP)->count();
+
+        //*****************
+
+
+        $pilaSoloProveedor = array();
+        $arrayProveedor = TesoreriaGarantiaEstados::where('id_estado', 2)->get();
+
+        foreach ($arrayProveedor as $fila) {
+            array_push($pilaSoloProveedor, $fila->id_garantia_pendi);
+        }
+
+        //*****************
+
+        $totalProveedor = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloProveedor)->count();
 
 
         return view('backend.admin.tesoreria.dashboard.vistadashboard', compact('totalRegistros',
-            'totalVigentes', 'totalVencidas', 'totalUcp'));
+            'totalVigentes', 'totalVencidas', 'totalUcp', 'totalProveedor'));
     }
 
 
