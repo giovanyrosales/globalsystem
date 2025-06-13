@@ -109,6 +109,24 @@
                                 <input type="number" value="{{ $info->monto_garantia }}" class="form-control" id="monto-nuevo" autocomplete="off">
                             </div>
 
+
+                            <hr>
+
+                            <div class="form-group">
+                                <label>ASEGURADORA</label>
+                                <select class="form-control" id="select-aseguradoras">
+                                    <option value="" selected>Seleccionar Opción</option>
+                                    @foreach($arraySeguros as $item)
+                                        @if($item->id == $info->id_aseguradora)
+                                            <option value="{{$item->id}}" selected>{{ $item->nombre }}</option>
+                                        @else
+                                            <option value="{{$item->id}}">{{ $item->nombre }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+
+
                             <div class="form-group">
                                 <label>ASEGURADORA</label>
                                 <input type="text" maxlength="300" value="{{ $info->aseguradora }}" class="form-control" id="aseguradora-nuevo" autocomplete="off">
@@ -205,6 +223,7 @@
                     },
                 });
 
+
                 document.getElementById("divcontenedor").style.display = "block";
             });
         </script>
@@ -233,14 +252,14 @@
                 var tipoGarantia = document.getElementById('select-tipogarantia').value;
 
                 var fechaRegistro = document.getElementById('fecharegistro-nuevo').value;
+                var idAseguradora = document.getElementById('select-aseguradoras').value;
 
                 if(fechaRegistro === ''){
                     toastr.error('Fecha registro es requerido');
                     return
                 }
 
-                var checkbox = document.getElementById('check-ucp');
-                var valorCheckboxUCP = checkbox.checked ? 1 : 0;
+
 
                 openLoading();
                 var formData = new FormData();
@@ -259,6 +278,8 @@
                 formData.append('garantia', garantia);
                 formData.append('tipogarantia', tipoGarantia);
                 formData.append('fechaRegistro', fechaRegistro);
+                formData.append('idAseguradora', idAseguradora);
+
 
                 axios.post(url+'/tesoreria/listado/actualizar', formData, {
                 })

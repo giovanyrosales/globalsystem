@@ -589,10 +589,11 @@ class TesoreriaConfigController extends Controller
         $arrayProveedor = TesoreriaProveedores::orderBy('nombre', 'ASC')->get();
         $arrayGarantia = TesoreriaGarantia::orderBy('nombre', 'ASC')->get();
         $arrayTipoGarantia = TesoreriaTipoGarantia::orderBy('nombre', 'ASC')->get();
+        $arraySeguros = TesoreriaAseguradora::orderBy('nombre', 'ASC')->get();
 
 
         return view('backend.admin.tesoreria.listado.edicion.vistaedicion', compact('info',
-        'arrayProveedor', 'arrayGarantia', 'arrayTipoGarantia'));
+        'arrayProveedor', 'arrayGarantia', 'arrayTipoGarantia', 'arraySeguros'));
     }
 
 
@@ -622,6 +623,8 @@ class TesoreriaConfigController extends Controller
             'fecha_entrega' => $request->fechaentrega,
             'fecha_entrega_ucp' => $request->fechaentregaucp,
             'fecha_registro' => $request->fechaRegistro,
+            'id_aseguradora' => $request->idAseguradora,
+
         ]);
 
         return ['success' => 1];
