@@ -145,9 +145,10 @@
 
                             <div class="form-group">
                                 <label>ENTREGADA A UCP</label>
-                                <input type="date" class="form-control col-md-4" id="fechaucp-nuevo" value="{{ $info->fecha_entrega_ucp }}" autocomplete="off">
+                                <div class="d-flex align-items-center">
+                                    <input type="date" class="form-control col-md-4" id="fechaucp-nuevo" value="{{ $info->fecha_entrega_ucp }}" autocomplete="off">
+                                </div>
                             </div>
-
 
                         </div>
                     </div>
@@ -237,6 +238,9 @@
                     toastr.error('Fecha registro es requerido');
                     return
                 }
+
+                var checkbox = document.getElementById('check-ucp');
+                var valorCheckboxUCP = checkbox.checked ? 1 : 0;
 
                 openLoading();
                 var formData = new FormData();

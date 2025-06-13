@@ -78,11 +78,24 @@
                                         <input type="hidden" id="id-editar">
                                     </div>
 
-                                    <div class="form-group col-md-8">
-                                        <label>Estado</label>
-                                        <select class="form-control" id="select-estado">
-                                        </select>
+                                    <div class="form-group">
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check ml-3">
+                                                <input class="form-check-input" type="checkbox" id="check-ucp">
+                                                <label class="form-check-label" for="check-ucp">Entregada a UCP</label>
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    <div class="form-group">
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check ml-3">
+                                                <input class="form-check-input" type="checkbox" id="check-proveedor">
+                                                <label class="form-check-label" for="check-proveedor">Entregada a PROVEEDOR</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
 
                                 </div>
                             </div>
@@ -188,15 +201,11 @@
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(id);
 
-                        document.getElementById("select-estado").options.length = 0;
+                        let checkUcp = response.data.checkUcp
+                        let checkProveedor = response.data.checkProveedor
 
-                        $.each(response.data.arrayEstados, function( key, val ){
-                            if(response.data.info.id_estado === val.id){
-                                $('#select-estado').append('<option value="' +val.id +'" selected="selected">'+val.nombre+'</option>');
-                            }else{
-                                $('#select-estado').append('<option value="' +val.id +'">'+val.nombre+'</option>');
-                            }
-                        });
+                        document.getElementById('check-ucp').checked = checkUcp;
+                        document.getElementById('check-proveedor').checked = checkProveedor;
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -208,15 +217,22 @@
         }
 
 
+
         function actualizarEstado(){
 
             var id = document.getElementById('id-editar').value;
-            var estado = document.getElementById('select-estado').value;
+            var checkboxUcp = document.getElementById('check-ucp');
+            var valorCheckboxUCP = checkboxUcp.checked ? 1 : 0;
+
+            var checkboxProveedor = document.getElementById('check-proveedor');
+            var valorCheckboxProveedor = checkboxProveedor.checked ? 1 : 0;
+
 
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
-            formData.append('estado', estado);
+            formData.append('valorCheckboxUCP', valorCheckboxUCP);
+            formData.append('valorCheckboxProveedor', valorCheckboxProveedor);
 
             axios.post(url+'/tesoreria/actualizar/estado', formData, {
             })
@@ -238,6 +254,7 @@
                     closeLoading();
                 });
         }
+
 
 
 

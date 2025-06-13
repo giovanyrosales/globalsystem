@@ -26,11 +26,14 @@ class CreateTesoGarantiaPendiEntregaTable extends Migration
             $table->bigInteger('id_garantia')->unsigned();
             $table->bigInteger('id_tipo_garantia')->unsigned();
 
-            // ESTADO DE GARANTIA, VIGENTE, VENCIDAS, ENTREGADA A UCP
-            $table->bigInteger('id_estado')->unsigned();
 
             $table->decimal('monto_garantia',10,2)->nullable();
+
+            // ASEGURADORA
+            $table->bigInteger('id_aseguradora')->unsigned();
+            // es la descripcion del tipo id_aseguradora
             $table->string('aseguradora',300)->nullable();
+
 
             $table->date('vigencia_desde')->nullable();
             $table->date('vigencia_hasta')->nullable();

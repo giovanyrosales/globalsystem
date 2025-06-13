@@ -17,6 +17,7 @@
                                 <th style="width: 10%">TIPO GARANTIA</th>
                                 <th style="width: 10%">MONTO</th>
                                 <th style="width: 10%">ASEGURADORA</th>
+                                <th style="width: 10%">NOTA ASEGURADORA</th>
 
                                 <th style="width: 10%">VIGENCIA DESDE</th>
                                 <th style="width: 10%">VIGENCIA HASTA</th>
@@ -38,6 +39,7 @@
                                     <td>{{ $dato->garantia }}</td>
                                     <td>{{ $dato->tipoGarantia }}</td>
                                     <td>{{ $dato->monto }}</td>
+                                    <td>{{ $dato->tipoAseguradora }}</td>
                                     <td>{{ $dato->aseguradora }}</td>
 
                                     <td>{{ $dato->vigencia_desde }}</td>

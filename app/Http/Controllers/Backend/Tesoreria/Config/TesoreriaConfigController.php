@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Backend\Tesoreria\Config;
 
 use App\Http\Controllers\Controller;
 use App\Models\P_Departamento;
+use App\Models\TesoreriaAseguradora;
 use App\Models\TesoreriaEstados;
 use App\Models\TesoreriaGarantia;
+use App\Models\TesoreriaGarantiaEstados;
 use App\Models\TesoreriaGarantiaPendienteEntrega;
 use App\Models\TesoreriaProveedores;
 use App\Models\TesoreriaTipoGarantia;
@@ -48,9 +50,14 @@ class TesoreriaConfigController extends Controller
             $registro = new TesoreriaProveedores();
             $registro->nombre = $request->nombre;
             $registro->save();
-
             DB::commit();
-            return ['success' => 1];
+
+
+            // OBTENER LISTADO DE PROVEEDORES NUEVAMENTE
+            $arrayProveedores = TesoreriaProveedores::orderBy('nombre', 'ASC')->get();
+
+
+            return ['success' => 1, 'arrayProveedores' => $arrayProveedores];
 
         }catch(\Throwable $e){
             Log::info('error: ' . $e);
@@ -137,7 +144,11 @@ class TesoreriaConfigController extends Controller
             $registro->save();
 
             DB::commit();
-            return ['success' => 1];
+
+            // OBTENER LISTADO DE GARANTIA NUEVAMENTE
+            $arrayGarantia = TesoreriaGarantia::orderBy('nombre', 'ASC')->get();
+
+            return ['success' => 1, 'arrayGarantia' => $arrayGarantia];
 
         }catch(\Throwable $e){
             Log::info('error: ' . $e);
@@ -278,6 +289,90 @@ class TesoreriaConfigController extends Controller
     }
 
 
+    //*****************  ASEGURADORAS ************************************
+
+
+
+    public function indexAseguradora(){
+        return view('backend.admin.tesoreria.config.aseguradora.vistaaseguradora');
+    }
+
+    public function tablaAseguradora(){
+
+        $listado = TesoreriaAseguradora::orderBy('nombre', 'ASC')->get();
+        return view('backend.admin.tesoreria.config.aseguradora.tablaaseguradora', compact('listado'));
+    }
+
+    public function nuevoAseguradora(Request $request){
+
+        $regla = array(
+            'nombre' => 'required'
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        DB::beginTransaction();
+        try {
+
+            $registro = new TesoreriaAseguradora();
+            $registro->nombre = $request->nombre;
+            $registro->save();
+
+            DB::commit();
+            return ['success' => 1];
+
+        }catch(\Throwable $e){
+            Log::info('error: ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
+    // informacion
+    public function informacionAseguradora(Request $request){
+        $regla = array(
+            'id' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if($lista = TesoreriaAseguradora::where('id', $request->id)->first()){
+
+            return ['success' => 1, 'info' => $lista];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+    // editar
+    public function actualizarAseguradora(Request $request){
+
+        $regla = array(
+            'id' => 'required',
+            'nombre' => 'required',
+        );
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+        if(TesoreriaAseguradora::where('id', $request->id)->first()){
+
+            TesoreriaAseguradora::where('id', $request->id)->update([
+                'nombre' => $request->nombre,
+            ]);
+
+            return ['success' => 1];
+        }else{
+            return ['success' => 2];
+        }
+    }
+
+
 
     //***************** NUEVO REGISTRO TESORERIA *********************************
 
@@ -286,7 +381,7 @@ class TesoreriaConfigController extends Controller
         $arrayProveedor = TesoreriaProveedores::orderBy('nombre', 'ASC')->get();
         $arrayGarantia = TesoreriaGarantia::orderBy('nombre', 'ASC')->get();
         $arrayTipoGarantia = TesoreriaTipoGarantia::orderBy('nombre', 'ASC')->get();
-        $arrayEstados = TesoreriaEstados::orderBy('nombre', 'ASC')->get();
+        $arrayAseguradora = TesoreriaAseguradora::orderBy('nombre', 'ASC')->get();
 
         $anioActual = Carbon::now()->year;
         $conteo = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anioActual)->count();
@@ -295,7 +390,7 @@ class TesoreriaConfigController extends Controller
         $correlativo = $correlativoNumero . '-' . $anioActual;
 
         return view('backend.admin.tesoreria.registro.nuevoregistro', compact('arrayProveedor',
-            'arrayGarantia', 'arrayTipoGarantia', 'correlativo', 'arrayEstados'));
+            'arrayGarantia', 'arrayTipoGarantia', 'correlativo',  'arrayAseguradora'));
     }
 
 
@@ -322,12 +417,27 @@ class TesoreriaConfigController extends Controller
             $registro->fecha_recibida = $request->fecharecibida;
             $registro->fecha_entrega = $request->fechaentrega;
             $registro->fecha_entrega_ucp = $request->fechaucp;
-            $registro->id_estado = $request->estados;
-
+            $registro->id_aseguradora = $request->idaseguradora;
             $registro->save();
 
+            if($request->checkucp == 1){
+                // REGISTRAR EL CHECK UCP
+
+                $detalle = new TesoreriaGarantiaEstados();
+                $detalle->id_garantia_pendi = $registro->id;
+                $detalle->id_estado = 1;
+                $detalle->save();
+            }
+
             DB::commit();
-            return ['success' => 1];
+
+            $anioActual = Carbon::now()->year;
+            $conteo = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anioActual)->count();
+
+            $correlativoNumero = str_pad($conteo + 1, 2, '0', STR_PAD_LEFT);
+            $correlativo = $correlativoNumero . '-' . $anioActual;
+
+            return ['success' => 1, 'correlativo' => $correlativo];
 
         }catch(\Throwable $e){
             Log::info('error: ' . $e);
@@ -347,7 +457,9 @@ class TesoreriaConfigController extends Controller
 
     public function tablaListadoRegistrosVigentes()
     {
-        $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', 1) // SOLO VIGENTES
+        $now = Carbon::now('America/El_Salvador');
+
+        $listado = TesoreriaGarantiaPendienteEntrega::where('vigencia_hasta', '>', $now)
             ->orderBy('control_interno', 'ASC')
             ->get();
 
@@ -364,6 +476,13 @@ class TesoreriaConfigController extends Controller
             if($item->monto_garantia != null){
                 $item->monto = '$' . number_format((float)$item->monto_garantia, 2, '.', ',');
             }
+
+            $tipoAseguradora = "";
+            if($info = TesoreriaAseguradora::where('id', $item->id_aseguradora)->first()){
+                $tipoAseguradora = $info->nombre;
+            }
+            $item->tipoAseguradora = $tipoAseguradora;
+
 
             if($item->vigencia_desde != null){
                 $item->vigencia_desde = date('d-m-Y', strtotime($item->vigencia_desde));
@@ -412,9 +531,21 @@ class TesoreriaConfigController extends Controller
 
         if ($validar->fails()){ return ['success' => 0];}
 
-        TesoreriaGarantiaPendienteEntrega::where('id', $request->id)->delete();
+        DB::beginTransaction();
 
-        return ['success' => 1];
+        try {
+
+            TesoreriaGarantiaEstados::where('id_garantia_pendi', $request->id)->delete();
+            TesoreriaGarantiaPendienteEntrega::where('id', $request->id)->delete();
+
+            DB::commit();
+            return ['success' => 1];
+
+        } catch (\Throwable $e) {
+            Log::info('error ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
     }
 
 
@@ -430,9 +561,24 @@ class TesoreriaConfigController extends Controller
 
         $info = TesoreriaGarantiaPendienteEntrega::where('id', $request->id)->first();
 
-        $arrayEstados = TesoreriaEstados::orderBy('nombre', 'ASC')->get();
+        $checkUcp = 0;
+        $checkProveedor = 0;
 
-        return ['success' => 1, 'info' => $info, 'arrayEstados' => $arrayEstados];
+        if(TesoreriaGarantiaEstados::where('id_garantia_pendi', $request->id)
+            ->where('id_estado', 1) // UCP
+            ->first()){
+            $checkUcp = 1;
+        }
+
+        $checkProveedor = 0;
+        if(TesoreriaGarantiaEstados::where('id_garantia_pendi', $request->id)
+            ->where('id_estado', 2) // PROVEEDOR
+            ->first()){
+            $checkProveedor = 1;
+        }
+
+        return ['success' => 1, 'info' => $info,
+            'checkUcp' => $checkUcp, 'checkProveedor' => $checkProveedor];
     }
 
 
@@ -443,6 +589,7 @@ class TesoreriaConfigController extends Controller
         $arrayProveedor = TesoreriaProveedores::orderBy('nombre', 'ASC')->get();
         $arrayGarantia = TesoreriaGarantia::orderBy('nombre', 'ASC')->get();
         $arrayTipoGarantia = TesoreriaTipoGarantia::orderBy('nombre', 'ASC')->get();
+
 
         return view('backend.admin.tesoreria.listado.edicion.vistaedicion', compact('info',
         'arrayProveedor', 'arrayGarantia', 'arrayTipoGarantia'));
@@ -485,7 +632,8 @@ class TesoreriaConfigController extends Controller
     {
         $regla = array(
             'id' => 'required',
-            'estado' => 'required',
+            'valorCheckboxUCP' =>  'required',
+            'valorCheckboxProveedor' => 'required',
         );
 
         $validar = Validator::make($request->all(), $regla);
@@ -493,11 +641,34 @@ class TesoreriaConfigController extends Controller
         if ($validar->fails()){ return ['success' => 0];}
 
 
-        TesoreriaGarantiaPendienteEntrega::where('id', $request->id)->update([
-            'id_estado' => $request->estado
-        ]);
+        DB::beginTransaction();
 
-        return ['success' => 1];
+        try {
+            TesoreriaGarantiaEstados::where('id_garantia_pendi', $request->id)->delete();
+
+            // REGISTRAR UNICAMENTE VALOR 1
+            if($request->valorCheckboxUCP == 1){
+                $nuevo = new TesoreriaGarantiaEstados();
+                $nuevo->id_garantia_pendi = $request->id;
+                $nuevo->id_estado = 1; // UCP
+                $nuevo->save();
+            }
+
+            if($request->valorCheckboxProveedor == 1){
+                $nuevo = new TesoreriaGarantiaEstados();
+                $nuevo->id_garantia_pendi = $request->id;
+                $nuevo->id_estado = 2; // PROVEEDOR
+                $nuevo->save();
+            }
+
+            DB::commit();
+            return ['success' => 1];
+
+        } catch (\Throwable $e) {
+            Log::info('error ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
     }
 
 
@@ -515,8 +686,14 @@ class TesoreriaConfigController extends Controller
 
     public function tablaListadoRegistrosVencidas()
     {
-        $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', 2) // SOLO VENCIDAS
-        ->orderBy('control_interno', 'ASC')
+
+        // CADA VEZ QUE SE ABRE ESTA VENTANA SE VERIFICA SI ESTAN VENCIDAS YA
+        $now = Carbon::now('America/El_Salvador');
+        $today = $now->toDateString(); // 'YYYY-MM-DD'
+
+        $listado = TesoreriaGarantiaPendienteEntrega::whereDate('vigencia_hasta', $today)
+            ->whereTime('vigencia_hasta', '<', $now->toTimeString())
+            ->orderBy('control_interno', 'ASC')
             ->get();
 
         foreach ($listado as $item) {
@@ -552,6 +729,14 @@ class TesoreriaConfigController extends Controller
             if($item->fecha_entrega_ucp != null){
                 $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
             }
+
+
+            $tipoAseguradora = "";
+            if($info = TesoreriaAseguradora::where('id', $item->id_aseguradora)->first()){
+                $tipoAseguradora = $info->nombre;
+            }
+            $item->tipoAseguradora = $tipoAseguradora;
+
         }
 
         return view('backend.admin.tesoreria.listado.vencidas.tablalistadovencidas', compact('listado'));
@@ -576,9 +761,17 @@ class TesoreriaConfigController extends Controller
 
     public function tablaListadoRegistrosUcp()
     {
-        $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', 3) // SOLO UCP
-        ->orderBy('control_interno', 'ASC')
-            ->get();
+
+        // SOLO REGISTRADOS DE UCP
+        $pilaSoloUCP = array();
+        $arrayUcp = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
+
+        foreach ($arrayUcp as $fila) {
+            array_push($pilaSoloUCP, $fila->id_garantia_pendi);
+        }
+
+        $listado = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloUCP)
+        ->orderBy('control_interno', 'ASC')->get();
 
         foreach ($listado as $item) {
 
@@ -613,6 +806,13 @@ class TesoreriaConfigController extends Controller
             if($item->fecha_entrega_ucp != null){
                 $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
             }
+
+
+            $tipoAseguradora = "";
+            if($info = TesoreriaAseguradora::where('id', $item->id_aseguradora)->first()){
+                $tipoAseguradora = $info->nombre;
+            }
+            $item->tipoAseguradora = $tipoAseguradora;
         }
 
         return view('backend.admin.tesoreria.listado.ucp.tablalistadoucp', compact('listado'));
@@ -634,9 +834,18 @@ class TesoreriaConfigController extends Controller
 
     public function tablaListadoRegistrosProveedor()
     {
-        $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', 4) // SOLO PROVEEDOR
-        ->orderBy('control_interno', 'ASC')
-            ->get();
+
+        // SOLO REGISTRADOS DE PROVEEDOR
+        $pilaSoloProveedor = array();
+        $arrayProveedor = TesoreriaGarantiaEstados::where('id_estado', 2)->get();
+
+        foreach ($arrayProveedor as $fila) {
+            array_push($pilaSoloProveedor, $fila->id_garantia_pendi);
+        }
+
+
+        $listado = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloProveedor) // SOLO PROVEEDOR
+        ->orderBy('control_interno', 'ASC')->get();
 
         foreach ($listado as $item) {
 
@@ -671,6 +880,13 @@ class TesoreriaConfigController extends Controller
             if($item->fecha_entrega_ucp != null){
                 $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
             }
+
+
+            $tipoAseguradora = "";
+            if($info = TesoreriaAseguradora::where('id', $item->id_aseguradora)->first()){
+                $tipoAseguradora = $info->nombre;
+            }
+            $item->tipoAseguradora = $tipoAseguradora;
         }
 
         return view('backend.admin.tesoreria.listado.proveedor.tablalistadoproveedor', compact('listado'));
@@ -726,18 +942,11 @@ class TesoreriaConfigController extends Controller
                 $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
             }
 
-            $vencida = 0;
-            if($item->vigencia_desde != null && $item->vigencia_hasta != null){
-                $now = Carbon::now('America/El_Salvador');
-                $hasta = Carbon::parse($item->vigencia_hasta, 'America/El_Salvador');
-
-                if ($now->gt($hasta)) {
-                    // Ya te pasaste de la vigencia
-                    $vencida = 1;
-                }
+            $tipoAseguradora = "";
+            if($info = TesoreriaAseguradora::where('id', $item->id_aseguradora)->first()){
+                $tipoAseguradora = $info->nombre;
             }
-
-            $item->vencida = $vencida;
+            $item->tipoAseguradora = $tipoAseguradora;
         }
 
         return view('backend.admin.tesoreria.listado.todas.tablalistadotodas', compact('listado'));
@@ -766,8 +975,6 @@ class TesoreriaConfigController extends Controller
     //****************************************************
     public function indexReportes()
     {
-        $arrayEstados = TesoreriaEstados::orderBy('nombre', 'ASC')->get();
-
         $listado = TesoreriaGarantiaPendienteEntrega::all();
 
         $arrayAnios = $listado->pluck('fecha_registro')
@@ -780,28 +987,121 @@ class TesoreriaConfigController extends Controller
             ->values()
             ->toArray();
 
-        return view('backend.admin.tesoreria.reportes.general.vistareportegeneral', compact('arrayEstados', 'arrayAnios'));
+        return view('backend.admin.tesoreria.reportes.general.vistareportegeneral', compact( 'arrayAnios'));
     }
 
 
 
-    public function reportePdfGeneralTesoreria($anio, $tipo, $check)
+    public function reportePdfGeneralTesoreria($anio, $tipo, $checkTodos)
     {
-        if ($check == 1) {
-            $listado = TesoreriaGarantiaPendienteEntrega::where('id_estado', $tipo)
-                ->orderBy('vigencia_hasta', 'ASC')
-                ->get();
-        } else {
-            $listado = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                ->orderBy('vigencia_hasta', 'ASC')
-                ->get();
+
+        $now = Carbon::now('America/El_Salvador');
+
+        //TIPOS
+        // 1- VIGENTES 2-VENCIDAS 3-UCP 4-PROVEEDOR
+        $arrayReporte = [];
+
+        if ($checkTodos == 1) {
+
+            if($tipo == 1){ // VIGENTES
+                $arrayReporte = TesoreriaGarantiaPendienteEntrega::where('vigencia_hasta', '>', $now)
+                    ->orderBy('control_interno', 'ASC')
+                    ->get();
+            }
+            else if($tipo == 2){ // VENCIDAS
+                $today = $now->toDateString(); // 'YYYY-MM-DD'
+                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereDate('vigencia_hasta', $today)
+                    ->whereTime('vigencia_hasta', '<', $now->toTimeString())
+                    ->orderBy('control_interno', 'ASC')
+                    ->get();
+            }
+            else if($tipo == 3){ // UCP
+
+                $pilaUcp = array();
+                $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
+
+                foreach ($listaEstados as $fila) {
+                    array_push($pilaUcp, $fila->id_garantia_pendi);
+                }
+
+                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaUcp)
+                    ->orderBy('control_interno', 'ASC')
+                    ->get();
+
+            }
+            else if($tipo == 4){ // PROVEEDOR
+                $pilaProveedor = array();
+                $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 2)->get();
+
+                foreach ($listaEstados as $fila) {
+                    array_push($pilaProveedor, $fila->id_garantia_pendi);
+                }
+
+                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaProveedor)
+                    ->orderBy('control_interno', 'ASC')
+                    ->get();
+            }
+        } else { //// CHECK TODOS
+
+            if($tipo == 1){ // VIGENTES
+                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                ->where('vigencia_hasta', '>', $now)
+                    ->orderBy('control_interno', 'ASC')
+                    ->get();
+            }
+            else if($tipo == 2){ // VENCIDAS
+                $today = $now->toDateString(); // 'YYYY-MM-DD'
+                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                ->whereDate('vigencia_hasta', $today)
+                    ->whereTime('vigencia_hasta', '<', $now->toTimeString())
+                    ->orderBy('control_interno', 'ASC')
+                    ->get();
+            }
+            else if($tipo == 3){ // UCP
+
+                $pilaUcp = array();
+                $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
+
+                foreach ($listaEstados as $fila) {
+                    array_push($pilaUcp, $fila->id_garantia_pendi);
+                }
+
+                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                    ->whereIn('id', $pilaUcp)
+                    ->orderBy('control_interno', 'ASC')
+                    ->get();
+
+            }
+            else if($tipo == 4){ // PROVEEDOR
+                $pilaProveedor = array();
+                $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 2)->get();
+
+                foreach ($listaEstados as $fila) {
+                    array_push($pilaProveedor, $fila->id_garantia_pendi);
+                }
+
+                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                    ->whereIn('id', $pilaProveedor)
+                    ->orderBy('control_interno', 'ASC')
+                    ->get();
+            }
         }
 
 
-        $infoEstado = TesoreriaEstados::where('id', $tipo)->first();
+        if($tipo == 1){
+            $nombreEstado = 'Vigentes';
+        }
+        else if($tipo == 2){
+            $nombreEstado = 'Vencidas';
+        }
+        else if ($tipo == 3){
+            $nombreEstado = 'Entregados a UCP';
+        }
+        else{
+            $nombreEstado = 'Entregados a Proveedor';
+        }
 
-
-        foreach ($listado as $item) {
+        foreach ($arrayReporte as $item) {
 
             $infoProveedor = TesoreriaProveedores::where('id', $item->id_proveedor)->first();
             $infoGarantia = TesoreriaGarantia::where('id', $item->id_garantia)->first();
@@ -903,7 +1203,7 @@ class TesoreriaConfigController extends Controller
 
         $tabla .= "
             <div style='text-align: left; margin-top: 10px;'>
-                <p style='font-size: 13px; margin: 0; color: #000;'><strong>Estado:</strong> $infoEstado->nombre</p>
+                <p style='font-size: 13px; margin: 0; color: #000;'><strong>Estado:</strong> $nombreEstado</p>
             </div>
             <div style='text-align: left; margin-top: 10px;'>
         </div>
@@ -915,7 +1215,6 @@ class TesoreriaConfigController extends Controller
             <thead>
                 <tr>
                     <th style='font-weight: bold; width: 6%; font-size: 10px; text-align: center;'>CONTROL INTERNO</th>
-                    <th style='font-weight: bold; width: 6%; font-size: 10px; text-align: center;'>ESTADO</th>
                     <th style='font-weight: bold; width: 8%; font-size: 10px; text-align: center;'>REFERENCIA</th>
                     <th style='font-weight: bold; width: 8%; font-size: 10px; text-align: center;'>PROVEEDOR</th>
                     <th style='font-weight: bold; width: 8%; font-size: 10px; text-align: center;'>GARANTIA</th>
@@ -930,11 +1229,10 @@ class TesoreriaConfigController extends Controller
             <tbody>";
 
 
-        foreach ($listado as $dato) {
+        foreach ($arrayReporte as $dato) {
 
             $tabla .= "<tr>
                     <td style='font-size: 10px; font-weight: normal'>$dato->control_interno</td>
-                    <td style='font-size: 10px; font-weight: normal'>$dato->nombreEstado</td>
                     <td style='font-size: 10px; font-weight: normal'>$dato->referencia</td>
                     <td style='font-size: 10px; font-weight: normal'>$dato->proveedor</td>
                     <td style='font-size: 10px; font-weight: normal'>$dato->garantia</td>

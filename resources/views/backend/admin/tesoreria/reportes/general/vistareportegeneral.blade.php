@@ -13,14 +13,10 @@
 <style>
 
 
-
 </style>
 
 
 <div id="divcontenedor" style="display: none">
-
-
-
 
     <section class="content" style="margin-top: 35px">
         <div class="container-fluid">
@@ -46,12 +42,12 @@
                                 </label>
                             </div>
 
-
                             <label style="margin-top: 15px">Estado</label>
                             <select class="form-control col-md-3" id="select-estado">
-                                @foreach($arrayEstados as $item)
-                                    <option value="{{$item->id}}">{{$item->nombre}}</option>
-                                @endforeach
+                                <option value="1">VIGENTES</option>
+                                <option value="2">VENCIDAS</option>
+                                <option value="3">ENTRADAS A UCP</option>
+                                <option value="4">ENTREGADAS A PROVEEDOR</option>
                             </select>
 
 
@@ -69,47 +65,47 @@
 
 </div>
 
-    @extends('backend.menus.footerjs')
-    @section('archivos-js')
+@extends('backend.menus.footerjs')
+@section('archivos-js')
 
-        <script src="{{ asset('js/jquery.dataTables.js') }}" type="text/javascript"></script>
-        <script src="{{ asset('js/dataTables.bootstrap4.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/jquery.dataTables.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/dataTables.bootstrap4.js') }}" type="text/javascript"></script>
 
-        <script src="{{ asset('js/toastr.min.js') }}" type="text/javascript"></script>
-        <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
-        <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
-        <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
-        <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/toastr.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
+    <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
 
-        <script type="text/javascript">
-
-
-
-            document.getElementById("divcontenedor").style.display = "block";
-        </script>
+    <script type="text/javascript">
 
 
-        <script>
 
-            function pdfEstados(){
-
-                var anios = document.getElementById('select-anios').value;
-                var estado = document.getElementById('select-estado').value;
-                var checkbox = document.getElementById('checkbox-todos');
-                var valorCheckbox = checkbox.checked ? 1 : 0;
-
-                if(anios === ''){
-                    toastr.error('Años es requerido');
-                    return;
-                }
+        document.getElementById("divcontenedor").style.display = "block";
+    </script>
 
 
-                window.open("{{ URL::to('admin/tesoreria/pdf/general') }}/" +
-                    anios + "/" + estado + "/" + valorCheckbox);
+    <script>
+
+        function pdfEstados(){
+
+            var anios = document.getElementById('select-anios').value;
+            var estado = document.getElementById('select-estado').value;
+            var checkbox = document.getElementById('checkbox-todos');
+            var valorCheckbox = checkbox.checked ? 1 : 0;
+
+            if(anios === ''){
+                toastr.error('Años es requerido');
+                return;
             }
 
 
-        </script>
+            window.open("{{ URL::to('admin/tesoreria/pdf/general') }}/" +
+                anios + "/" + estado + "/" + valorCheckbox);
+        }
+
+
+    </script>
 
 
 

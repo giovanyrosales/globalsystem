@@ -1546,6 +1546,15 @@ Route::post('/admin/tesoreria/tipo/garantia/nuevo', [TesoreriaConfigController::
 Route::post('/admin/tesoreria/tipo/garantia/informacion', [TesoreriaConfigController::class, 'informacionTipoGarantia']);
 Route::post('/admin/tesoreria/tipo/garantia/editar', [TesoreriaConfigController::class, 'actualizarTipoGarantia']);
 
+//-------------------- MODULO PARA TESORERIA -> ASEGURADORAS ----------------------------------
+
+Route::get('/admin/tesoreria/aseguradora/index', [TesoreriaConfigController::class,'indexAseguradora'])->name('admin.tesoreria.aseguradora.index');
+Route::get('/admin/tesoreria/aseguradora/tabla', [TesoreriaConfigController::class, 'tablaAseguradora']);
+Route::post('/admin/tesoreria/aseguradora/nuevo', [TesoreriaConfigController::class, 'nuevoAseguradora']);
+Route::post('/admin/tesoreria/aseguradora/informacion', [TesoreriaConfigController::class, 'informacionAseguradora']);
+Route::post('/admin/tesoreria/aseguradora/editar', [TesoreriaConfigController::class, 'actualizarAseguradora']);
+
+
 
 //-------------------- MODULO PARA TESORERIA -> NUEVO REGISTRO -------------------------------------
 

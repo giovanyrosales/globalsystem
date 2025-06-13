@@ -17,6 +17,7 @@
                                 <th style="width: 10%">TIPO GARANTIA</th>
                                 <th style="width: 10%">MONTO</th>
                                 <th style="width: 10%">ASEGURADORA</th>
+                                <th style="width: 10%">NOTA ASEGURADORA</th>
 
                                 <th style="width: 10%">VIGENCIA DESDE</th>
                                 <th style="width: 10%">VIGENCIA HASTA</th>
@@ -30,11 +31,9 @@
                             <tbody>
 
                             @foreach($listado as $dato)
-                                @if($dato->vencida == 1)
-                                    <tr style="background-color: #d52121;">
-                                @else
+
                                     <tr>
-                                        @endif
+
                                     <td>{{ $dato->control_interno }}</td>
                                     <td>{{ $dato->referencia }}</td>
                                     <td>{{ $dato->descripcion_licitacion }}</td>
@@ -42,7 +41,8 @@
                                     <td>{{ $dato->garantia }}</td>
                                     <td>{{ $dato->tipoGarantia }}</td>
                                     <td>{{ $dato->monto }}</td>
-                                    <td>{{ $dato->aseguradora }}</td>
+                                        <td>{{ $dato->tipoAseguradora }}</td>
+                                        <td>{{ $dato->aseguradora }}</td>
 
                                     <td>{{ $dato->vigencia_desde }}</td>
                                     <td>{{ $dato->vigencia_hasta }}</td>

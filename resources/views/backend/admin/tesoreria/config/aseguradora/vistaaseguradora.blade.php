@@ -4,38 +4,32 @@
     <link href="{{ asset('css/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-    <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
-    <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
-
 @stop
 
 <style>
-    .dataTables_wrapper .dataTables_info {
-        float: left !important;
-        text-align: left;
-    }
-
-    .dataTables_wrapper .dataTables_paginate {
-        float: left !important;
-        text-align: left;
-        padding-left: 10px;
+    table{
+        /*Ajustar tablas*/
+        table-layout:fixed;
     }
 </style>
-
 
 <div id="divcontenedor" style="display: none">
 
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
-
+                <button type="button" style="font-weight: bold; background-color: #2156af; color: white !important;" onclick="modalAgregar()"
+                        class="button button-3d button-rounded button-pill button-small">
+                    <i class="fas fa-pencil-alt"></i>
+                    Nueva Aseguradora
+                </button>
             </div>
 
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">Registros</li>
-                    <li class="breadcrumb-item active">Listado Todos</li>
+                    <li class="breadcrumb-item">Garantía</li>
+                    <li class="breadcrumb-item active">Listado de Aseguradoras</li>
                 </ol>
             </div>
         </div>
@@ -43,9 +37,9 @@
 
     <section class="content">
         <div class="container-fluid">
-            <div class="card card-gray">
+            <div class="card card-blue">
                 <div class="card-header">
-                        <h3 class="card-title">Todos los Registros</h3>
+                    <h3 class="card-title">Listado</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -59,17 +53,51 @@
         </div>
     </section>
 
-    <div class="modal fade" id="modalEditar">
+    <div class="modal fade" id="modalAgregar">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">MODIFICAR ESTADO</h4>
+                    <h4 class="modal-title">Nueva Aseguradora</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="formulario-estado">
+                    <form id="formulario-nuevo">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <label>Aseguradora</label>
+                                        <input type="text" maxlength="300" class="form-control" id="nombre-nuevo" autocomplete="off">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #2156af; color: white !important;" class="button button-rounded button-pill button-small" onclick="nuevo()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal editar -->
+    <div class="modal fade" id="modalEditar">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Editar Aseguradora</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-editar">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12">
@@ -79,23 +107,9 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <div class="d-flex align-items-center">
-                                            <div class="form-check ml-3">
-                                                <input class="form-check-input" type="checkbox" id="check-ucp">
-                                                <label class="form-check-label" for="check-ucp">Entregada a UCP</label>
-                                            </div>
-                                        </div>
+                                        <label>Aseguradora</label>
+                                        <input type="text" maxlength="300" class="form-control" id="nombre-editar" autocomplete="off">
                                     </div>
-
-                                    <div class="form-group">
-                                        <div class="d-flex align-items-center">
-                                            <div class="form-check ml-3">
-                                                <input class="form-check-input" type="checkbox" id="check-proveedor">
-                                                <label class="form-check-label" for="check-proveedor">Entregada a PROVEEDOR</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
 
                                 </div>
                             </div>
@@ -104,16 +118,16 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="actualizarEstado()">Actualizar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="editar()">Actualizar</button>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 
-
-    @extends('backend.menus.footerjs')
-    @section('archivos-js')
+@extends('backend.menus.footerjs')
+@section('archivos-js')
 
     <script src="{{ asset('js/jquery.dataTables.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/dataTables.bootstrap4.js') }}" type="text/javascript"></script>
@@ -122,90 +136,72 @@
     <script src="{{ asset('js/axios.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
-    <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
 
     <script type="text/javascript">
-
         $(document).ready(function(){
-
-            var ruta = "{{ URL::to('/admin/tesoreria/listado-todos/tabla/index') }}";
+            var ruta = "{{ URL::to('/admin/tesoreria/aseguradora/tabla') }}";
             $('#tablaDatatable').load(ruta);
-
 
             document.getElementById("divcontenedor").style.display = "block";
         });
+    </script>
 
+    <script>
 
         function recargar(){
-            var ruta = "{{ url('/admin/tesoreria/listado-todos/tabla/index') }}";
+            var ruta = "{{ url('/admin/tesoreria/aseguradora/tabla') }}";
             $('#tablaDatatable').load(ruta);
         }
 
-        function informacion(id){
-            window.location.href="{{ url('/admin/tesoreria/listado/edicion/index') }}/"+id;
+        function modalAgregar(){
+            document.getElementById("formulario-nuevo").reset();
+            $('#modalAgregar').modal('show');
         }
 
-        function infoBorrar(id){
-            Swal.fire({
-                title: 'BORRAR REGISTRO',
-                text: "",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Borrar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    borrarRegistro(id)
-                }
-            })
-        }
+        function nuevo(){
+            var nombre = document.getElementById('nombre-nuevo').value;
 
-        // BORRAR LOTE DE ENTRADA COMPLETO
-        function borrarRegistro(id){
+            if(nombre === ''){
+                toastr.error('Aseguradora es requerido');
+                return;
+            }
 
             openLoading();
             var formData = new FormData();
-            formData.append('id', id);
+            formData.append('nombre', nombre);
 
-            axios.post(url+'/tesoreria/registro/borrar', formData, {
+            axios.post(url+'/tesoreria/aseguradora/nuevo', formData, {
             })
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
-                        toastr.success('Borrado correctamente');
+                        toastr.success('Registrado correctamente');
+                        $('#modalAgregar').modal('hide');
                         recargar();
                     }
                     else {
-                        toastr.error('Error al borrar');
+                        toastr.error('Error al registrar');
                     }
                 })
                 .catch((error) => {
-                    toastr.error('Error al borrar');
+                    toastr.error('Error al registrar');
                     closeLoading();
                 });
         }
 
-
-        function infoEstado(id){
+        function informacion(id){
             openLoading();
-            document.getElementById("formulario-estado").reset();
+            document.getElementById("formulario-editar").reset();
 
-            axios.post(url+'/tesoreria/registro/informacion',{
+            axios.post(url+'/tesoreria/aseguradora/informacion',{
                 'id': id
             })
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
                         $('#modalEditar').modal('show');
-                        $('#id-editar').val(id);
-
-                        let checkUcp = response.data.checkUcp
-                        let checkProveedor = response.data.checkProveedor
-
-                        document.getElementById('check-ucp').checked = checkUcp;
-                        document.getElementById('check-proveedor').checked = checkProveedor;
+                        $('#id-editar').val(response.data.info.id);
+                        $('#nombre-editar').val(response.data.info.nombre);
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -216,37 +212,33 @@
                 });
         }
 
-
-        function actualizarEstado(){
-
+        function editar(){
             var id = document.getElementById('id-editar').value;
-            var checkboxUcp = document.getElementById('check-ucp');
-            var valorCheckboxUCP = checkboxUcp.checked ? 1 : 0;
+            var nombre = document.getElementById('nombre-editar').value;
 
-            var checkboxProveedor = document.getElementById('check-proveedor');
-            var valorCheckboxProveedor = checkboxProveedor.checked ? 1 : 0;
-
+            if(nombre === ''){
+                toastr.error('Aseguradora es requerido');
+                return;
+            }
 
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
-            formData.append('valorCheckboxUCP', valorCheckboxUCP);
-            formData.append('valorCheckboxProveedor', valorCheckboxProveedor);
+            formData.append('nombre', nombre);
 
-            axios.post(url+'/tesoreria/actualizar/estado', formData, {
+            axios.post(url+'/tesoreria/aseguradora/editar', formData, {
             })
                 .then((response) => {
                     closeLoading();
 
                     if(response.data.success === 1){
-                        $('#modalEditar').modal('hide');
                         toastr.success('Actualizado correctamente');
-                        recargar()
+                        $('#modalEditar').modal('hide');
+                        recargar();
                     }
                     else {
                         toastr.error('Error al actualizar');
                     }
-
                 })
                 .catch((error) => {
                     toastr.error('Error al actualizar');
