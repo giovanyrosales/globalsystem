@@ -376,6 +376,19 @@
                 return
             }
 
+
+            if (fechaDesde && !fechaHasta) {
+                toastr.error('Fecha Hasta es requerida');
+                return;
+            }
+
+            if (!fechaDesde && fechaHasta) {
+                toastr.error('Fecha Desde es requerida');
+                return;
+            }
+
+
+
             openLoading();
             var formData = new FormData();
             formData.append('fechaRegistro', fecharegistro);
