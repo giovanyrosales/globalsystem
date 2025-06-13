@@ -692,10 +692,8 @@ class TesoreriaConfigController extends Controller
 
         // CADA VEZ QUE SE ABRE ESTA VENTANA SE VERIFICA SI ESTAN VENCIDAS YA
         $now = Carbon::now('America/El_Salvador');
-        $today = $now->toDateString(); // 'YYYY-MM-DD'
 
-        $listado = TesoreriaGarantiaPendienteEntrega::whereDate('vigencia_hasta', $today)
-            ->whereTime('vigencia_hasta', '<', $now->toTimeString())
+        $listado = TesoreriaGarantiaPendienteEntrega::where('vigencia_hasta', '<', $now)
             ->orderBy('control_interno', 'ASC')
             ->get();
 
