@@ -175,6 +175,9 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
+                        toastr.error('Nombre del Proveedor esta Repetido');
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
@@ -198,7 +201,8 @@
             })
                 .then((response) => {
                     closeLoading();
-                    if(response.data.success === 1){
+
+                     if(response.data.success === 1){
                         $('#modalEditar').modal('show');
                         $('#id-editar').val(response.data.info.id);
                         $('#nombre-editar').val(response.data.info.nombre);
@@ -232,6 +236,9 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+                        toastr.error('Nombre del Proveedor esta Repetido');
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Actualizado correctamente');
                         $('#modalEditar').modal('hide');
                         recargar();

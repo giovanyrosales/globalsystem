@@ -47,6 +47,10 @@ class TesoreriaConfigController extends Controller
         DB::beginTransaction();
         try {
 
+            if (TesoreriaProveedores::where('nombre', $request->nombre)->exists()) {
+                return ['success' => 1];
+            }
+
             $registro = new TesoreriaProveedores();
             $registro->nombre = $request->nombre;
             $registro->save();
@@ -57,7 +61,7 @@ class TesoreriaConfigController extends Controller
             $arrayProveedores = TesoreriaProveedores::orderBy('nombre', 'ASC')->get();
 
 
-            return ['success' => 1, 'arrayProveedores' => $arrayProveedores];
+            return ['success' => 2, 'arrayProveedores' => $arrayProveedores];
 
         }catch(\Throwable $e){
             Log::info('error: ' . $e);
@@ -98,11 +102,16 @@ class TesoreriaConfigController extends Controller
 
         if(TesoreriaProveedores::where('id', $request->id)->first()){
 
+            if(TesoreriaProveedores::where('id', '!=', $request->id)
+            ->where('nombre', $request->nombre)->exists()){
+                return ['success' => 1];
+            }
+
             TesoreriaProveedores::where('id', $request->id)->update([
                 'nombre' => $request->nombre,
             ]);
 
-            return ['success' => 1];
+            return ['success' => 2];
         }else{
             return ['success' => 2];
         }
@@ -690,10 +699,21 @@ class TesoreriaConfigController extends Controller
     public function tablaListadoRegistrosVencidas()
     {
 
+        // ENCONTRAR TODOS LOS QUE ESTAN EN UCP Y PROVEEDOR PARA EVITAR COLOCAR AQUI
+        $pilaIdGara = array();
+
+        $arrayGarantiasEstados = TesoreriaGarantiaEstados::all();
+
+        foreach ($arrayGarantiasEstados as $item){
+            array_push($pilaIdGara, $item->id_garantia_pendi);
+        }
+
+
         // CADA VEZ QUE SE ABRE ESTA VENTANA SE VERIFICA SI ESTAN VENCIDAS YA
         $now = Carbon::now('America/El_Salvador');
 
         $listado = TesoreriaGarantiaPendienteEntrega::where('vigencia_hasta', '<', $now)
+            ->whereNotIn('id', $pilaIdGara)
             ->orderBy('control_interno', 'ASC')
             ->get();
 

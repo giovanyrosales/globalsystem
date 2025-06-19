@@ -7,6 +7,7 @@
     <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
+
 @stop
 
 <style>
@@ -340,6 +341,7 @@
             const hoy = new Date();
             const fechaFormateada = hoy.toISOString().split('T')[0];
 
+
             // Asignarla al input date
             document.getElementById("fecharegistro-nuevo").value = fechaFormateada;
         });
@@ -466,7 +468,11 @@
             })
                 .then((response) => {
                     closeLoading();
+
                     if(response.data.success === 1){
+                        toastr.error('Nombre del Proveedor esta Repetido');
+                    }
+                    else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         $('#modalProveedor').modal('hide');
 

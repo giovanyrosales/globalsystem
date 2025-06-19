@@ -238,6 +238,9 @@
                     closeLoading();
 
                     if(response.data.success === 1){
+                        toastr.error('Nombre del Proveedor esta Repetido');
+                    }
+                    else if(response.data.success === 1){
                         $('#modalEditar').modal('hide');
                         toastr.success('Actualizado correctamente');
                         recargar()
