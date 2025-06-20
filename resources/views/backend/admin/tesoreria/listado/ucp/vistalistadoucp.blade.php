@@ -30,6 +30,51 @@
         <div class="row mb-2">
             <div class="col-sm-6">
 
+
+                <div class="form-row">
+                    <!-- Select de Años -->
+                    <div class="form-group col-md-4">
+                        <label class="control-label">Año:</label>
+                        <select id="select-anios" class="form-control">
+                            @foreach($arrayAnios as $item)
+                                <option value="{{ $item }}">{{ $item }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Select de Meses -->
+                    <div class="form-group col-md-4">
+                        <label class="control-label">Mes:</label>
+                        <select id="select-meses" class="form-control">
+                            <option value="0">Todos</option>
+                            <option value="01">Enero</option>
+                            <option value="02">Febrero</option>
+                            <option value="03">Marzo</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Mayo</option>
+                            <option value="06">Junio</option>
+                            <option value="07">Julio</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                    </div>
+
+                    <!-- Botón Buscar -->
+                    <div class="form-group col-md-2 align-self-end">
+                        <button type="button" onclick="buscarTabla()" class="btn btn-primary w-100">Buscar</button>
+                    </div>
+                </div>
+
+                <hr>
+
+                <button type="button" style="margin: 10px" onclick="checkOcultar()" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i>
+                    Completar
+                </button>
+
             </div>
 
             <div class="col-sm-6">
@@ -127,16 +172,66 @@
 
         $(document).ready(function(){
 
-            var ruta = "{{ URL::to('/admin/tesoreria/listado-ucp/tabla/index') }}";
-            $('#tablaDatatable').load(ruta);
+            const anioActual = "{{ $anioActual }}";
 
+        // Selecciona el año actual si está presente
+            const selectAnios = document.getElementById("select-anios");
+
+            for (let i = 0; i < selectAnios.options.length; i++) {
+                if (selectAnios.options[i].value === anioActual) {
+                    selectAnios.selectedIndex = i;
+                    break;
+                }
+            }
+
+            openLoading()
+
+            var ruta = "{{ url('/admin/tesoreria/listado-ucp/tabla/index') }}/" + anioActual + "/" + 0; // 0: TODOS LOS MESES
+            $('#tablaDatatable').load(ruta);
 
             document.getElementById("divcontenedor").style.display = "block";
         });
 
 
-        function recargar(){
-            var ruta = "{{ url('/admin/tesoreria/listado-ucp/tabla/index') }}";
+
+        function buscarTabla(){
+            var anio = document.getElementById('select-anios').value;
+            var meses = document.getElementById('select-meses').value;
+
+            if(anio === ''){
+                toastr.error('Años es requerido');
+                return
+            }
+
+            if(meses === ''){
+                toastr.error('Mes es requerido');
+                return
+            }
+
+            openLoading()
+
+            var ruta = "{{ url('/admin/tesoreria/listado-ucp/tabla/index') }}/" + anio + "/" + meses;
+            $('#tablaDatatable').load(ruta);
+        }
+
+
+        function recargarAnioTodos(){
+
+            const anioActual = "{{ $anioActual }}";
+
+            // Selecciona el año actual si está presente
+            const selectAnios = document.getElementById("select-anios");
+
+            for (let i = 0; i < selectAnios.options.length; i++) {
+                if (selectAnios.options[i].value === anioActual) {
+                    selectAnios.selectedIndex = i;
+                    break;
+                }
+            }
+
+            $('#select-meses').prop('selectedIndex', 0).change();
+
+            var ruta = "{{ url('/admin/tesoreria/listado-ucp/tabla/index') }}/" + anioActual + "/" + 0; // 0: TODOS LOS MESES
             $('#tablaDatatable').load(ruta);
         }
 
@@ -174,7 +269,7 @@
                     closeLoading();
                     if(response.data.success === 1){
                         toastr.success('Borrado correctamente');
-                        recargar();
+                        recargarAnioTodos();
                     }
                     else {
                         toastr.error('Error al borrar');
@@ -240,7 +335,7 @@
                     if(response.data.success === 1){
                         $('#modalEditar').modal('hide');
                         toastr.success('Actualizado correctamente');
-                        recargar()
+                        recargarAnioTodos()
                     }
                     else {
                         toastr.error('Error al actualizar');
@@ -255,6 +350,102 @@
 
 
 
+        function checkOcultar(){
+
+            var tableRows = document.querySelectorAll('#tabla tbody tr');
+            var selected = [];
+
+            if (tableRows.length === 0) {
+                toastr.error('No hay registros');
+                return;
+            }
+
+            tableRows.forEach(function(row) {
+                var checkbox = row.querySelector('.checkbox');
+                if(checkbox != null) {
+                    if (checkbox.checked) {
+                        var dataInfo = row.getAttribute('data-info');
+                        selected.push(dataInfo);
+                    }
+                }
+            });
+
+            if (selected.length <= 0) {
+                toastr.error('Seleccionar Mínimo 1 Fila')
+                return;
+            }
+
+          preguntaOcultar()
+        }
+
+
+        function preguntaOcultar(){
+            Swal.fire({
+                title: 'Completar',
+                text: "Mover registros seleccionados a completados",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Mover',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    completarSeleccionados()
+                }
+            })
+        }
+
+        function completarSeleccionados(){
+            var tableRows = document.querySelectorAll('#tabla tbody tr');
+
+            var selected = [];
+
+            if (tableRows.length === 0) {
+                toastr.error('No hay registros');
+                return;
+            }
+
+            tableRows.forEach(function(row) {
+                var checkbox = row.querySelector('.checkbox');
+                if(checkbox != null) {
+                    if (checkbox.checked) {
+                        var dataInfo = row.getAttribute('data-info');
+                        selected.push(dataInfo);
+                    }
+                }
+            });
+
+            if (selected.length <= 0) {
+                toastr.error('Seleccionar Mínimo 1 Fila')
+                return;
+            }
+
+            let listado = selected.toString();
+            let reemplazo = listado.replace(/,/g, "-");
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('reemplazo', reemplazo);
+
+            axios.post(url+'/tesoreria/general/mover-a-completados', formData, {
+            })
+                .then((response) => {
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado correctamente');
+                        recargarAnioTodos()
+                    }
+                    else {
+                        closeLoading();
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
 
 
     </script>

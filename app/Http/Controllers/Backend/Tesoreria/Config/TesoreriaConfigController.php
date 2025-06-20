@@ -427,6 +427,7 @@ class TesoreriaConfigController extends Controller
             $registro->fecha_entrega = $request->fechaentrega;
             $registro->fecha_entrega_ucp = $request->fechaucp;
             $registro->id_aseguradora = $request->idaseguradora;
+            $registro->completado = 0;
             $registro->save();
 
             if($request->checkucp == 1){
@@ -571,8 +572,6 @@ class TesoreriaConfigController extends Controller
         $info = TesoreriaGarantiaPendienteEntrega::where('id', $request->id)->first();
 
         $checkUcp = 0;
-        $checkProveedor = 0;
-
         if(TesoreriaGarantiaEstados::where('id_garantia_pendi', $request->id)
             ->where('id_estado', 1) // UCP
             ->first()){
@@ -685,6 +684,62 @@ class TesoreriaConfigController extends Controller
 
 
 
+    public function actualizarEstadoCheckbox(Request $request)
+    {
+
+        $regla = array(
+            'valorCheckboxUCP' =>  'required',
+            'valorCheckboxProveedor' => 'required',
+        );
+
+        // reemplazo
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+
+        DB::beginTransaction();
+
+        try {
+
+            // LOS ID
+            $porciones = explode("-", $request->reemplazo);
+
+            // BUSCAR Y ELIMINAR, PARA AGREGAR DE NUEVO SI HUBIERAN
+
+            TesoreriaGarantiaEstados::whereIn('id_garantia_pendi', $porciones)->delete();
+
+            foreach ($porciones as $valor) {
+                // REGISTRAR UNICAMENTE VALOR 1
+                if($request->valorCheckboxUCP == 1){
+                    $nuevo = new TesoreriaGarantiaEstados();
+                    $nuevo->id_garantia_pendi = $valor;
+                    $nuevo->id_estado = 1; // UCP
+                    $nuevo->save();
+                }
+
+                if($request->valorCheckboxProveedor == 1){
+                    $nuevo = new TesoreriaGarantiaEstados();
+                    $nuevo->id_garantia_pendi = $valor;
+                    $nuevo->id_estado = 2; // PROVEEDOR
+                    $nuevo->save();
+                }
+            }
+
+
+            DB::commit();
+            return ['success' => 1];
+
+        } catch (\Throwable $e) {
+            Log::info('error ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
+
+
     //**************************************************************************************************
 
 
@@ -766,9 +821,6 @@ class TesoreriaConfigController extends Controller
 
 
 
-
-
-
     //**************************************************************************************************
 
 
@@ -777,12 +829,22 @@ class TesoreriaConfigController extends Controller
     {
         $departamentos = P_Departamento::all();
 
-        return view('backend.admin.tesoreria.listado.ucp.vistalistadoucp', compact('departamentos'));
+        $anioActual = Carbon::now()->year;
+
+        $arrayAnios = TesoreriaGarantiaPendienteEntrega::all()
+            ->map(function ($item) {
+                return date('Y', strtotime($item->fecha_registro));
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+
+
+        return view('backend.admin.tesoreria.listado.ucp.vistalistadoucp', compact('departamentos', 'arrayAnios', 'anioActual'));
     }
 
-    public function tablaListadoRegistrosUcp()
+    public function tablaListadoRegistrosUcp($anio, $mes)
     {
-
         // SOLO REGISTRADOS DE UCP
         $pilaSoloUCP = array();
         $arrayUcp = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
@@ -791,8 +853,17 @@ class TesoreriaConfigController extends Controller
             array_push($pilaSoloUCP, $fila->id_garantia_pendi);
         }
 
-        $listado = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloUCP)
-        ->orderBy('control_interno', 'ASC')->get();
+        $query = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloUCP)
+            ->whereYear('fecha_registro', $anio);
+
+        if ($mes != '0') {
+            $query->whereMonth('fecha_registro', $mes);
+        }
+
+        $query->where('completado', 0); // MOSTRAR LA NO COMPLETADAS UCP
+
+        $listado = $query->orderBy('control_interno', 'ASC')->get();
+
 
         foreach ($listado as $item) {
 
@@ -841,8 +912,152 @@ class TesoreriaConfigController extends Controller
 
 
 
+    public function moverGeneralaCompletados(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            $porciones = explode("-", $request->reemplazo);
+
+            foreach ($porciones as $item) {
+                TesoreriaGarantiaPendienteEntrega::where('id', $item)->update([
+                    'completado' => 1,
+                ]);
+            }
+
+            DB::commit();
+            return ['success' => 1];
+
+        } catch (\Throwable $e) {
+            Log::info('error ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
+
+    public function moverGeneralaListado(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            $porciones = explode("-", $request->reemplazo);
+
+            foreach ($porciones as $item) {
+                TesoreriaGarantiaPendienteEntrega::where('id', $item)->update([
+                    'completado' => 0,
+                ]);
+            }
+
+            DB::commit();
+            return ['success' => 1];
+
+        } catch (\Throwable $e) {
+            Log::info('error ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
+
+
+    public function vistaListadoRegistrosUcpCompletados()
+    {
+        $departamentos = P_Departamento::all();
+
+        $anioActual = Carbon::now()->year;
+
+        $arrayAnios = TesoreriaGarantiaPendienteEntrega::all()
+            ->map(function ($item) {
+                return date('Y', strtotime($item->fecha_registro));
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+
+
+        return view('backend.admin.tesoreria.listado.ucp.completados.vistalistadoucpcompletados', compact('departamentos', 'arrayAnios', 'anioActual'));
+    }
+
+    public function tablaListadoRegistrosUcpCompletados($anio, $mes)
+    {
+        // SOLO COMPLETADOS DE UCP
+        $pilaSoloUCP = array();
+        $arrayUcp = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
+
+        foreach ($arrayUcp as $fila) {
+            array_push($pilaSoloUCP, $fila->id_garantia_pendi);
+        }
+
+
+        $query = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloUCP)
+            ->whereYear('fecha_registro', $anio);
+
+        if ($mes != '0') {
+            $query->whereMonth('fecha_registro', $mes);
+        }
+
+        $query->where('completado', 1); // MOSTRAR SOLO COMPLETADOS
+
+        $listado = $query->orderBy('control_interno', 'ASC')->get();
+
+
+
+        foreach ($listado as $item) {
+
+            $infoProveedor = TesoreriaProveedores::where('id', $item->id_proveedor)->first();
+            $infoGarantia = TesoreriaGarantia::where('id', $item->id_garantia)->first();
+            $infoTipoGarantia = TesoreriaTipoGarantia::where('id', $item->id_tipo_garantia)->first();
+
+            $item->proveedor = $infoProveedor->nombre;
+            $item->garantia = $infoGarantia->nombre;
+            $item->tipoGarantia = $infoTipoGarantia->nombre;
+
+            if($item->monto_garantia != null){
+                $item->monto = '$' . number_format((float)$item->monto_garantia, 2, '.', ',');
+            }
+
+            if($item->vigencia_desde != null){
+                $item->vigencia_desde = date('d-m-Y', strtotime($item->vigencia_desde));
+            }
+
+            if($item->vigencia_hasta != null){
+                $item->vigencia_hasta = date('d-m-Y', strtotime($item->vigencia_hasta));
+            }
+
+            if($item->fecha_recibida != null){
+                $item->fecha_recibida = date('d-m-Y', strtotime($item->fecha_recibida));
+            }
+
+            if($item->fecha_entrega != null){
+                $item->fecha_entrega = date('d-m-Y', strtotime($item->fecha_entrega));
+            }
+
+            if($item->fecha_entrega_ucp != null){
+                $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
+            }
+
+            $item->fechaRegistroFormat = date('d-m-Y', strtotime($item->fecha_registro));
+
+
+            $tipoAseguradora = "";
+            if($info = TesoreriaAseguradora::where('id', $item->id_aseguradora)->first()){
+                $tipoAseguradora = $info->nombre;
+            }
+            $item->tipoAseguradora = $tipoAseguradora;
+        }
+
+        return view('backend.admin.tesoreria.listado.ucp.completados.tablalistadoucpcompletados', compact('listado'));
+    }
+
+
+
+
+
 
     //**************************************************************************************************
+
 
 
 
@@ -850,10 +1065,21 @@ class TesoreriaConfigController extends Controller
     {
         $departamentos = P_Departamento::all();
 
-        return view('backend.admin.tesoreria.listado.proveedor.vistalistadoproveedor', compact('departamentos'));
+        $anioActual = Carbon::now()->year;
+
+        $arrayAnios = TesoreriaGarantiaPendienteEntrega::all()
+            ->map(function ($item) {
+                return date('Y', strtotime($item->fecha_registro));
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+
+        return view('backend.admin.tesoreria.listado.proveedor.vistalistadoproveedor', compact('departamentos',
+            'arrayAnios', 'anioActual'));
     }
 
-    public function tablaListadoRegistrosProveedor()
+    public function tablaListadoRegistrosProveedor($anio, $mes)
     {
 
         // SOLO REGISTRADOS DE PROVEEDOR
@@ -864,9 +1090,17 @@ class TesoreriaConfigController extends Controller
             array_push($pilaSoloProveedor, $fila->id_garantia_pendi);
         }
 
+        $query = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloProveedor)
+            ->whereYear('fecha_registro', $anio);
 
-        $listado = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloProveedor) // SOLO PROVEEDOR
-        ->orderBy('control_interno', 'ASC')->get();
+        if ($mes != '0') {
+            $query->whereMonth('fecha_registro', $mes);
+        }
+
+        $query->where('completado', 0); // MOSTRAR LA NO COMPLETADAS PROVEEDOR
+
+        $listado = $query->orderBy('control_interno', 'ASC')->get();
+
 
         foreach ($listado as $item) {
 
@@ -915,7 +1149,115 @@ class TesoreriaConfigController extends Controller
 
 
 
+
+    public function vistaListadoRegistrosProveedorCompletados()
+    {
+        $departamentos = P_Departamento::all();
+
+        $anioActual = Carbon::now()->year;
+
+        $arrayAnios = TesoreriaGarantiaPendienteEntrega::all()
+            ->map(function ($item) {
+                return date('Y', strtotime($item->fecha_registro));
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+
+
+        return view('backend.admin.tesoreria.listado.proveedor.completados.vistalistadoproveedorcompletados', compact('departamentos', 'arrayAnios', 'anioActual'));
+    }
+
+    public function tablaListadoRegistrosProveedorCompletados($anio, $mes)
+    {
+        // SOLO COMPLETADOS DE PROVEEDOR
+        $pilaSoloProveedor = array();
+        $arrayProveedor = TesoreriaGarantiaEstados::where('id_estado', 2)->get(); // SOLO PROVEEDOR
+
+        foreach ($arrayProveedor as $fila) {
+            array_push($pilaSoloProveedor, $fila->id_garantia_pendi);
+        }
+
+
+        $query = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaSoloProveedor)
+            ->whereYear('fecha_registro', $anio);
+
+        if ($mes != '0') {
+            $query->whereMonth('fecha_registro', $mes);
+        }
+
+        $query->where('completado', 1); // MOSTRAR SOLO COMPLETADOS
+
+        $listado = $query->orderBy('control_interno', 'ASC')->get();
+
+
+
+        foreach ($listado as $item) {
+
+            $infoProveedor = TesoreriaProveedores::where('id', $item->id_proveedor)->first();
+            $infoGarantia = TesoreriaGarantia::where('id', $item->id_garantia)->first();
+            $infoTipoGarantia = TesoreriaTipoGarantia::where('id', $item->id_tipo_garantia)->first();
+
+            $item->proveedor = $infoProveedor->nombre;
+            $item->garantia = $infoGarantia->nombre;
+            $item->tipoGarantia = $infoTipoGarantia->nombre;
+
+
+            $item->fechaRegistroFormat = date('d-m-Y', strtotime($item->fecha_registro));
+
+
+            if($item->monto_garantia != null){
+                $item->monto = '$' . number_format((float)$item->monto_garantia, 2, '.', ',');
+            }
+
+            if($item->vigencia_desde != null){
+                $item->vigencia_desde = date('d-m-Y', strtotime($item->vigencia_desde));
+            }
+
+            if($item->vigencia_hasta != null){
+                $item->vigencia_hasta = date('d-m-Y', strtotime($item->vigencia_hasta));
+            }
+
+            if($item->fecha_recibida != null){
+                $item->fecha_recibida = date('d-m-Y', strtotime($item->fecha_recibida));
+            }
+
+            if($item->fecha_entrega != null){
+                $item->fecha_entrega = date('d-m-Y', strtotime($item->fecha_entrega));
+            }
+
+            if($item->fecha_entrega_ucp != null){
+                $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
+            }
+
+            $item->fechaRegistroFormat = date('d-m-Y', strtotime($item->fecha_registro));
+
+
+            $tipoAseguradora = "";
+            if($info = TesoreriaAseguradora::where('id', $item->id_aseguradora)->first()){
+                $tipoAseguradora = $info->nombre;
+            }
+            $item->tipoAseguradora = $tipoAseguradora;
+        }
+
+        return view('backend.admin.tesoreria.listado.proveedor.completados.tablalistadoproveedorcompletados', compact('listado'));
+    }
+
+
     //**************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -962,6 +1304,9 @@ class TesoreriaConfigController extends Controller
             if($item->fecha_entrega_ucp != null){
                 $item->fecha_entrega_ucp = date('d-m-Y', strtotime($item->fecha_entrega_ucp));
             }
+
+
+            $item->fechaRegistroFormat = date('d-m-Y', strtotime($item->fecha_registro));
 
             $tipoAseguradora = "";
             if($info = TesoreriaAseguradora::where('id', $item->id_aseguradora)->first()){
@@ -1036,6 +1381,64 @@ class TesoreriaConfigController extends Controller
         return view('backend.admin.tesoreria.reportes.general.vistareportegeneral', compact( 'arrayAnios'));
     }
 
+    public function setearEstadosCompletados(Request $request)
+    {
+        // VIENE SI ES UCP O PROVEEDORES Y SETEAR
+        if($request->estado == 3){ // UCP
+
+            $pilaUcp = array();
+            $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
+
+            foreach ($listaEstados as $fila) {
+                array_push($pilaUcp, $fila->id_garantia_pendi);
+            }
+
+            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaUcp)
+                ->where('completado', 0)
+                ->get();
+
+            $pilaUcpArray = array();
+
+            foreach ($arrayReporte as $fila) {
+                array_push($pilaUcpArray, $fila->id);
+            }
+
+
+            TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaUcpArray)->update([
+                'completado' => 1,
+            ]);
+
+            return ['success' => 1];
+        }
+        else if ($request->estado == 4){ // PROVEEDORES
+
+            $pilaProveedor = array();
+            $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 2)->get(); // SOLO PROVEEDOR
+
+            foreach ($listaEstados as $fila) {
+                array_push($pilaProveedor, $fila->id_garantia_pendi);
+            }
+
+            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaProveedor)
+                ->where('completado', 0)
+                ->get();
+
+            $pilaProveedorArray = array();
+
+            foreach ($arrayReporte as $fila) {
+                array_push($pilaProveedorArray, $fila->id);
+            }
+
+
+            TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaProveedorArray)->update([
+                'completado' => 1,
+            ]);
+
+            return ['success' => 1];
+        }
+
+        return ['success' => 99];
+    }
 
 
     public function reportePdfGeneralTesoreria($anio, $tipo, $checkTodos)
@@ -1071,6 +1474,7 @@ class TesoreriaConfigController extends Controller
                 }
 
                 $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaUcp)
+                    ->where('completado', 0)
                     ->orderBy('control_interno', 'ASC')
                     ->get();
 
@@ -1084,6 +1488,7 @@ class TesoreriaConfigController extends Controller
                 }
 
                 $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaProveedor)
+                    ->where('completado', 0)
                     ->orderBy('control_interno', 'ASC')
                     ->get();
             }
@@ -1114,6 +1519,7 @@ class TesoreriaConfigController extends Controller
 
                 $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
                     ->whereIn('id', $pilaUcp)
+                    ->where('completado', 0)
                     ->orderBy('control_interno', 'ASC')
                     ->get();
 
@@ -1128,6 +1534,7 @@ class TesoreriaConfigController extends Controller
 
                 $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
                     ->whereIn('id', $pilaProveedor)
+                    ->where('completado', 0)
                     ->orderBy('control_interno', 'ASC')
                     ->get();
             }

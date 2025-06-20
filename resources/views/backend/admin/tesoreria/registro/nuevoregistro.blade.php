@@ -379,6 +379,19 @@
             }
 
 
+
+            if (fechaDesde === '') {
+                toastr.error('Fecha Desde es requerida');
+                return;
+            }
+
+            if (fechaHasta === '') {
+                toastr.error('Fecha Hasta es requerida');
+                return;
+            }
+
+
+
             if (fechaDesde && !fechaHasta) {
                 toastr.error('Fecha Hasta es requerida');
                 return;
@@ -388,6 +401,8 @@
                 toastr.error('Fecha Desde es requerida');
                 return;
             }
+
+
 
 
 

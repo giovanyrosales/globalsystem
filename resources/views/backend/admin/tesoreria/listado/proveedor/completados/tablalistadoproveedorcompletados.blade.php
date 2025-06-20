@@ -10,7 +10,7 @@
                             <thead>
                             <tr>
                                 <th style="width: 6%">Opción</th>
-                                <th style="width: 10%">CONTROL INTERNO</th>
+                                <th style="width: 10%">FECHA REGISTRO</th>
                                 <th style="width: 10%">REFERENCIA</th>
                                 <th style="width: 10%">DESCRIPCION</th>
                                 <th style="width: 10%">PROVEEDOR</th>
@@ -38,6 +38,7 @@
                                         <input type="checkbox" class="checkbox" style="width: 40px; height: 20px" />
 
                                     </td>
+                                    <td>{{ $dato->fechaRegistroFormat }}</td>
                                     <td>{{ $dato->control_interno }}</td>
                                     <td>{{ $dato->referencia }}</td>
                                     <td>{{ $dato->descripcion_licitacion }}</td>
@@ -47,40 +48,17 @@
                                     <td>{{ $dato->monto }}</td>
                                     <td>{{ $dato->tipoAseguradora }}</td>
                                     <td>{{ $dato->aseguradora }}</td>
+
                                     <td>{{ $dato->vigencia_desde }}</td>
                                     <td>{{ $dato->vigencia_hasta }}</td>
                                     <td>{{ $dato->fecha_recibida }}</td>
                                     <td>{{ $dato->fecha_entrega }}</td>
                                     <td>{{ $dato->fecha_entrega_ucp }}</td>
 
-                                    <td>
-                                        <button type="button"
-                                                class="btn btn-primary btn-sm py-0 px-2"
-                                                style="font-size: 0.80rem;"
-                                                onclick="informacion({{ $dato->id }})">
-                                            <i class="fas fa-edit" title="Editar"></i>&nbsp;Editar
-                                        </button>
 
-                                        <div style="margin: 7px">
-                                            <button type="button"
-                                                    class="btn btn-success btn-sm py-0 px-2"
-                                                    style="font-size: 0.80rem;"
-                                                    onclick="infoEstado({{ $dato->id }})">
-                                                <i class="fas fa-info" title="Estado"></i>&nbsp; Estado
-                                            </button>
-                                        </div>
-
-                                        <div style="margin: 7px">
-                                            <button type="button"
-                                                    class="btn btn-danger btn-sm py-0 px-2"
-                                                    style="font-size: 0.80rem;"
-                                                    onclick="infoBorrar({{ $dato->id }})">
-                                                <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar
-                                            </button>
-                                        </div>
-                                    </td>
                                 </tr>
                             @endforeach
+
 
                             <script>
                                 setTimeout(function () {

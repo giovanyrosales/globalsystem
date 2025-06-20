@@ -9,6 +9,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                <th style="width: 6%">Opción</th>
                                 <th style="width: 10%">CONTROL INTERNO</th>
                                 <th style="width: 10%">REFERENCIA</th>
                                 <th style="width: 10%">DESCRIPCION</th>
@@ -31,7 +32,10 @@
                             <tbody>
 
                             @foreach($listado as $dato)
-                                <tr>
+                                <tr data-info="{{ $dato->id }}">
+                                    <td style="width: 6%">
+                                        <input type="checkbox" class="checkbox" style="width: 40px; height: 20px" />
+                                    </td>
                                     <td>{{ $dato->control_interno }}</td>
                                     <td>{{ $dato->referencia }}</td>
                                     <td>{{ $dato->descripcion_licitacion }}</td>

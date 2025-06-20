@@ -41,6 +41,10 @@ class CreateTesoGarantiaPendiEntregaTable extends Migration
             $table->date('fecha_entrega')->nullable();
             $table->date('fecha_entrega_ucp')->nullable();
 
+
+            $table->integer('completado');
+
+
             $table->foreign('id_proveedor')->references('id')->on('teso_proveedor');
             $table->foreign('id_garantia')->references('id')->on('teso_garantia');
             $table->foreign('id_tipo_garantia')->references('id')->on('teso_tipo_garantia');

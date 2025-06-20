@@ -7,6 +7,7 @@
     <link href="{{ asset('css/select2.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap-5-theme.min.css') }}" type="text/css" rel="stylesheet">
     <link href="{{ asset('css/buttons_estilo.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/estiloToggle.css') }}" type="text/css" rel="stylesheet" />
 
 @stop
 
@@ -29,6 +30,10 @@
     <section class="content-header">
         <div class="row mb-2">
             <div class="col-sm-6">
+                <button type="button" style="margin: 10px" onclick="checkModificar()" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus-square"></i>
+                    Modificar
+                </button>
 
             </div>
 
@@ -110,6 +115,58 @@
         </div>
     </div>
 
+
+    <!-- UTILIZADO CUANDO SELECCIONAN CHECKBOX DE LA TABLA -->
+    <div class="modal fade" id="modalCheckbox">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">MODIFICAR ESTADO</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="formulario-checkbox">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group">
+                                        <input type="hidden" id="id-editar">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check ml-3">
+                                                <input class="form-check-input" type="checkbox" id="check-ucp-box">
+                                                <label class="form-check-label" for="check-ucp-box">Entregada a UCP</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check ml-3">
+                                                <input class="form-check-input" type="checkbox" id="check-proveedor-box">
+                                                <label class="form-check-label" for="check-proveedor-box">Entregada a PROVEEDOR</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;" class="button button-rounded button-pill button-small" onclick="actualizarCheckBox()">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     @extends('backend.menus.footerjs')
@@ -227,6 +284,11 @@
             var checkboxProveedor = document.getElementById('check-proveedor');
             var valorCheckboxProveedor = checkboxProveedor.checked ? 1 : 0;
 
+            if(valorCheckboxUCP === 0 && valorCheckboxProveedor === 0){
+                toastr.error('Seleccionar una opción');
+                return
+
+            }
 
             openLoading();
             var formData = new FormData();
@@ -256,6 +318,106 @@
         }
 
 
+
+
+        function checkModificar(){
+            var tableRows = document.querySelectorAll('#tabla tbody tr');
+
+            var selected = [];
+
+            if (tableRows.length === 0) {
+                toastr.error('No hay registros seleccionados');
+                return;
+            }
+
+            tableRows.forEach(function(row) {
+                var checkbox = row.querySelector('.checkbox');
+                if(checkbox != null) {
+                    if (checkbox.checked) {
+                        var dataInfo = row.getAttribute('data-info');
+                        selected.push(dataInfo);
+                    }
+                }
+            });
+
+            if (selected.length <= 0) {
+                toastr.error('No hay registros seleccionados');
+                return;
+            }
+
+            // VALIDACION CORRECTA, ABRIR MODAL
+            document.getElementById("formulario-checkbox").reset();
+            $('#modalCheckbox').modal('show');
+        }
+
+
+        function actualizarCheckBox(){
+
+            var tableRows = document.querySelectorAll('#tabla tbody tr');
+
+            var selected = [];
+
+            if (tableRows.length === 0) {
+                toastr.error('No hay registros');
+                return;
+            }
+
+            tableRows.forEach(function(row) {
+                var checkbox = row.querySelector('.checkbox');
+                if(checkbox != null) {
+                    if (checkbox.checked) {
+                        var dataInfo = row.getAttribute('data-info');
+                        selected.push(dataInfo);
+                    }
+                }
+            });
+
+            if (selected.length <= 0) {
+                toastr.error('Seleccionar Mínimo 1 Fila')
+                return;
+            }
+
+            let listado = selected.toString();
+            let reemplazo = listado.replace(/,/g, "-");
+
+
+            var checkboxUcp = document.getElementById('check-ucp-box');
+            var valorCheckboxUCP = checkboxUcp.checked ? 1 : 0;
+
+            var checkboxProveedor = document.getElementById('check-proveedor-box');
+            var valorCheckboxProveedor = checkboxProveedor.checked ? 1 : 0;
+
+            if(valorCheckboxUCP === 0 && valorCheckboxProveedor === 0){
+                toastr.error('Seleccionar una opción');
+                return
+            }
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('valorCheckboxUCP', valorCheckboxUCP);
+            formData.append('valorCheckboxProveedor', valorCheckboxProveedor);
+            formData.append('reemplazo', reemplazo);
+
+            axios.post(url+'/tesoreria/actualizar/estado-checkbox', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        $('#modalCheckbox').modal('hide');
+                        toastr.success('Actualizado correctamente');
+                        recargar()
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
 
 
 

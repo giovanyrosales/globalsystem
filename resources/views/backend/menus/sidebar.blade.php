@@ -1152,20 +1152,10 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{{ route('admin.tesoreria.listado.ucp.index') }}" target="frameprincipal" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Listado UCP</p>
-                    </a>
-                </li>
 
 
-                <li class="nav-item">
-                    <a href="{{ route('admin.tesoreria.listado.proveedor.index') }}" target="frameprincipal" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Listado Proveedor</p>
-                    </a>
-                </li>
+
+
 
 
 
@@ -1184,6 +1174,70 @@
                         <p>Reportes</p>
                     </a>
                 </li>
+
+
+
+
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                UCP
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.tesoreria.listado.ucp.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listado UCP</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.tesoreria.listado.ucp.completados.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listado completadas</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+
+
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link nav-">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                PROVEEDOR
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.tesoreria.listado.proveedor.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listado Proveedor</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="{{ route('admin.tesoreria.listado.proveedor.completados.index') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Listado completadas</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
 
 
 

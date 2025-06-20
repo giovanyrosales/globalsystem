@@ -9,6 +9,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                    <th style="width: 10%">FECHA REGISTRO</th>
                                 <th style="width: 10%">CONTROL INTERNO</th>
                                 <th style="width: 10%">REFERENCIA</th>
                                 <th style="width: 10%">DESCRIPCION</th>
@@ -34,6 +35,7 @@
 
                                     <tr>
 
+                                    <td>{{ $dato->fechaRegistroFormat }}</td>
                                     <td>{{ $dato->control_interno }}</td>
                                     <td>{{ $dato->referencia }}</td>
                                     <td>{{ $dato->descripcion_licitacion }}</td>

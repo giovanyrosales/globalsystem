@@ -1576,20 +1576,51 @@ Route::get('/admin/tesoreria/listado-vigentes/tabla/index', [TesoreriaConfigCont
 // ACTUALIZAR ESTADO
 Route::post('/admin/tesoreria/actualizar/estado', [TesoreriaConfigController::class,'actualizarEstado']);
 
+// ACTUALIZAR ESTADO POR CHECKBOX
+Route::post('/admin/tesoreria/actualizar/estado-checkbox', [TesoreriaConfigController::class,'actualizarEstadoCheckbox']);
+
+
+
 
 //--- LISTADO VENCIDAS
 Route::get('/admin/tesoreria/listado-vencidas/index', [TesoreriaConfigController::class,'vistaListadoRegistrosVencidas'])->name('admin.tesoreria.listado.vencidas.index');
 Route::get('/admin/tesoreria/listado-vencidas/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistrosVencidas']);
 
 
+
+
+
+
 //--- LISTADO UCP
 Route::get('/admin/tesoreria/listado-ucp/index', [TesoreriaConfigController::class,'vistaListadoRegistrosUcp'])->name('admin.tesoreria.listado.ucp.index');
-Route::get('/admin/tesoreria/listado-ucp/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistrosUcp']);
+Route::get('/admin/tesoreria/listado-ucp/tabla/index/{anio}/{mes}', [TesoreriaConfigController::class,'tablaListadoRegistrosUcp']);
+
+// Mover seleccionados a completados GENERAL
+Route::post('/admin/tesoreria/general/mover-a-completados', [TesoreriaConfigController::class,'moverGeneralaCompletados']);
+// Mover de nuevo a listado GENERAL
+Route::post('/admin/tesoreria/general/mover-a-listado', [TesoreriaConfigController::class,'moverGeneralaListado']);
+// unicamente los completados
+Route::get('/admin/tesoreria/listado-ucp-completados/index', [TesoreriaConfigController::class,'vistaListadoRegistrosUcpCompletados'])->name('admin.tesoreria.listado.ucp.completados.index');
+Route::get('/admin/tesoreria/listado-ucp-completados/tabla/index/{anio}/{mes}', [TesoreriaConfigController::class,'tablaListadoRegistrosUcpCompletados']);
+
+
+
 
 
 //--- LISTADO PROVEEDOR
 Route::get('/admin/tesoreria/listado-proveedor/index', [TesoreriaConfigController::class,'vistaListadoRegistrosProveedor'])->name('admin.tesoreria.listado.proveedor.index');
-Route::get('/admin/tesoreria/listado-proveedor/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistrosProveedor']);
+Route::get('/admin/tesoreria/listado-proveedor/tabla/index/{anio}/{mes}', [TesoreriaConfigController::class,'tablaListadoRegistrosProveedor']);
+// unicamente los completados
+Route::get('/admin/tesoreria/listado-proveedor-completados/index', [TesoreriaConfigController::class,'vistaListadoRegistrosProveedorCompletados'])->name('admin.tesoreria.listado.proveedor.completados.index');
+Route::get('/admin/tesoreria/listado-proveedor-completados/tabla/index/{anio}/{mes}', [TesoreriaConfigController::class,'tablaListadoRegistrosProveedorCompletados']);
+
+
+
+
+
+
+
+
 
 
 
@@ -1602,7 +1633,13 @@ Route::get('/admin/tesoreria/listado-todos/tabla/index', [TesoreriaConfigControl
 Route::get('/admin/tesoreria/dashboard/index', [TesoreriaConfigController::class,'indexDashboard'])->name('admin.tesoreria.dashboard.index');
 
 
+Route::post('/admin/tesoreria/setear/segun-checkbox/estado', [TesoreriaConfigController::class,'setearEstadosCompletados']);
+
+
+
 // REPORTES
 Route::get('/admin/tesoreria/reportes/index', [TesoreriaConfigController::class,'indexReportes'])->name('admin.tesoreria.reportes.index');
 Route::get('/admin/tesoreria/pdf/general/{anio}/{tipo}/{check}', [TesoreriaConfigController::class,'reportePdfGeneralTesoreria']);
+
+
 
