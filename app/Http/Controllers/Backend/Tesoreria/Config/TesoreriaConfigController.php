@@ -1520,10 +1520,19 @@ class TesoreriaConfigController extends Controller
         if($tipo == 1){ // VIGENTES
             $nombreEstado = 'Vigentes';
 
-            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+           /* $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
             ->where('vigencia_hasta', '>', $now)
                 ->orderBy('control_interno', 'ASC')
-                ->get();
+                ->get();*/
+
+            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                ->where('vigencia_hasta', '<', $now)
+                ->get()
+                ->sortBy(function($item) {
+                    // Extraer la parte antes del guion y convertir a entero
+                    return (int) explode('-', $item->control_interno)[0];
+                })->values(); // Reindexar
+
         }
         else if($tipo == 2){ // VENCIDAS
             $nombreEstado = 'Vencidas';
@@ -1538,10 +1547,13 @@ class TesoreriaConfigController extends Controller
             $now = Carbon::now('America/El_Salvador');
 
             $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-            ->where('vigencia_hasta', '<', $now)
+                ->where('vigencia_hasta', '<', $now)
                 ->whereNotIn('id', $pilaIdGara)
-                ->orderBy('control_interno', 'ASC')
-                ->get();
+                ->get()
+                ->sortBy(function($item) {
+                    // Extraer la parte antes del guion y convertir a entero
+                    return (int) explode('-', $item->control_interno)[0];
+                })->values(); // Reindexar
 
         }
         else if($tipo == 3){ // UCP
@@ -1554,11 +1566,23 @@ class TesoreriaConfigController extends Controller
                 array_push($pilaUcp, $fila->id_garantia_pendi);
             }
 
-            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+            /*$arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
                 ->whereIn('id', $pilaUcp)
                 ->where('completado', 0)
                 ->orderBy('control_interno', 'ASC')
                 ->get();
+            */
+
+
+            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                ->whereIn('id', $pilaUcp)
+                ->where('completado', 0)
+                ->get()
+                ->sortBy(function ($item) {
+                    // Separar el número y el año
+                    [$numero, $anio] = explode('-', $item->control_interno);
+                    return [(int) $anio, (int) $numero]; // ordena por año y luego por número
+                })->values(); // para reindexar la colección
 
         }
         else{ // PROVEEDOR
@@ -1571,11 +1595,21 @@ class TesoreriaConfigController extends Controller
                 array_push($pilaProveedor, $fila->id_garantia_pendi);
             }
 
-            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+            /*$arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
                 ->whereIn('id', $pilaProveedor)
                 ->where('completado', 0)
                 ->orderBy('control_interno', 'ASC')
-                ->get();
+                ->get();*/
+
+            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                ->whereIn('id', $pilaProveedor)
+                ->where('completado', 0)
+                ->get()
+                ->sortBy(function ($item) {
+                    // Separar el número y el año
+                    [$numero, $anio] = explode('-', $item->control_interno);
+                    return [(int) $anio, (int) $numero]; // ordena por año y luego por número
+                })->values(); // para reindexar la colección
         }
 
 
