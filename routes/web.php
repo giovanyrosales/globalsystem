@@ -1578,6 +1578,7 @@ Route::post('/admin/tesoreria/actualizar/estado', [TesoreriaConfigController::cl
 
 // ACTUALIZAR ESTADO POR CHECKBOX
 Route::post('/admin/tesoreria/actualizar/estado-checkbox', [TesoreriaConfigController::class,'actualizarEstadoCheckbox']);
+Route::post('/admin/tesoreria/actualizar/estado-checkbox-todos', [TesoreriaConfigController::class,'actualizarEstadoCheckboxTodos']);
 
 
 
@@ -1639,7 +1640,7 @@ Route::post('/admin/tesoreria/setear/segun-checkbox/estado', [TesoreriaConfigCon
 
 // REPORTES
 Route::get('/admin/tesoreria/reportes/index', [TesoreriaConfigController::class,'indexReportes'])->name('admin.tesoreria.reportes.index');
-Route::get('/admin/tesoreria/pdf/general/{anio}/{tipo}/{check}', [TesoreriaConfigController::class,'reportePdfGeneralTesoreria']);
+Route::get('/admin/tesoreria/pdf/general/{anio}/{tipo}', [TesoreriaConfigController::class,'reportePdfGeneralTesoreria']);
 
 
 

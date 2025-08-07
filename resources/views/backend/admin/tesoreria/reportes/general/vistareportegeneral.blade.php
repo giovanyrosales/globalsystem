@@ -35,12 +35,6 @@
                             @endforeach
                         </select>
 
-                        <div class="form-group" style="margin-top: 15px">
-                            <label>
-                                <input type="checkbox" class="checkbox" id="checkbox-todos">
-                                Todos los años
-                            </label>
-                        </div>
 
                         <label style="margin-top: 15px">Estado</label>
                         <select class="form-control col-md-3" id="select-estado">
@@ -57,16 +51,6 @@
                         </button>
 
                         <hr>
-
-                        <div class="form-group" id="grupo-checkbox" style="margin-top: 15px; display: none;">
-
-                            <button type="button" style="font-weight: bold; background-color: #2156af; color: white !important;" onclick="setearACompletados()"
-                                    class="button button-3d button-rounded button-pill button-small">
-                                <i class="fas fa-pencil-alt"></i>
-                                Completar
-                            </button>
-
-                        </div>
 
                     </section>
                 </div>
@@ -90,16 +74,6 @@
 
     <script type="text/javascript">
 
-        $('#select-estado').on('change', function () {
-            const selected = $(this).val();
-            if (selected === '3' || selected === '4') {
-                $('#grupo-checkbox').show();
-            } else {
-                $('#grupo-checkbox').hide();
-                $('#checkbox-todos').prop('checked', false); // opcional: desmarcar si se oculta
-            }
-        });
-
         document.getElementById("divcontenedor").style.display = "block";
     </script>
 
@@ -110,8 +84,6 @@
 
             var anios = document.getElementById('select-anios').value;
             var estado = document.getElementById('select-estado').value;
-            var checkbox = document.getElementById('checkbox-todos');
-            var valorCheckbox = checkbox.checked ? 1 : 0;
 
             if(anios === ''){
                 toastr.error('Años es requerido');
@@ -120,39 +92,11 @@
 
             // SE VA A SETEAR EL ESTADO
             window.open("{{ URL::to('admin/tesoreria/pdf/general') }}/" +
-                anios + "/" + estado + "/" + valorCheckbox);
+                anios + "/" + estado);
         }
 
 
-        function setearACompletados(){
 
-            var estado = document.getElementById('select-estado').value;
-
-            if(estado == '3' || estado == '4'){
-                openLoading();
-                var formData = new FormData();
-                formData.append('estado', estado); // SOLO PUEDE IR 3 O 4
-
-                axios.post(url+'/tesoreria/setear/segun-checkbox/estado', formData, {
-                })
-                    .then((response) => {
-                        closeLoading();
-
-                        if(response.data.success === 1){
-                            toastr.success('Actualizado correctamente');
-                        }
-                        else {
-                            toastr.error('Error al actualizar');
-                        }
-                    })
-                    .catch((error) => {
-                        toastr.error('Error al actualizar');
-                        closeLoading();
-                    });
-            }else{
-                toastr.error('Error');
-            }
-        }
 
 
     </script>

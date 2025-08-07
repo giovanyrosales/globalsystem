@@ -686,7 +686,6 @@ class TesoreriaConfigController extends Controller
 
     public function actualizarEstadoCheckbox(Request $request)
     {
-
         $regla = array(
             'valorCheckboxUCP' =>  'required',
             'valorCheckboxProveedor' => 'required',
@@ -738,6 +737,72 @@ class TesoreriaConfigController extends Controller
         }
     }
 
+
+
+    public function actualizarEstadoCheckboxTodos(Request $request){
+
+        $regla = array(
+            'valorCheckboxUCP' =>  'required',
+            'valorCheckboxProveedor' => 'required',
+        );
+
+        // reemplazo
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){ return ['success' => 0];}
+
+
+        DB::beginTransaction();
+
+        try {
+
+            $pilaIdGara = array();
+            $arrayGarantiasEstados = TesoreriaGarantiaEstados::all();
+
+            foreach ($arrayGarantiasEstados as $item){
+                array_push($pilaIdGara, $item->id_garantia_pendi);
+            }
+
+
+            // CADA VEZ QUE SE ABRE ESTA VENTANA SE VERIFICA SI ESTAN VENCIDAS YA
+            $now = Carbon::now('America/El_Salvador');
+
+            $listadoVencidas = TesoreriaGarantiaPendienteEntrega::where('vigencia_hasta', '<', $now)
+                ->whereNotIn('id', $pilaIdGara)
+                ->orderBy('control_interno', 'ASC')
+                ->get();
+
+
+
+            foreach ($listadoVencidas as $item){
+                TesoreriaGarantiaEstados::where('id_garantia_pendi', $item->id)->delete();
+
+                if($request->valorCheckboxUCP == 1){
+                    $nuevo = new TesoreriaGarantiaEstados();
+                    $nuevo->id_garantia_pendi = $item->id;
+                    $nuevo->id_estado = 1; // UCP
+                    $nuevo->save();
+                }
+
+                if($request->valorCheckboxProveedor == 1){
+                    $nuevo = new TesoreriaGarantiaEstados();
+                    $nuevo->id_garantia_pendi = $item->id;
+                    $nuevo->id_estado = 2; // PROVEEDOR
+                    $nuevo->save();
+                }
+            }
+
+
+            DB::commit();
+            return ['success' => 1];
+
+        } catch (\Throwable $e) {
+            Log::info('error ' . $e);
+            DB::rollback();
+            return ['success' => 99];
+        }
+    }
 
 
     //**************************************************************************************************
@@ -1441,7 +1506,7 @@ class TesoreriaConfigController extends Controller
     }
 
 
-    public function reportePdfGeneralTesoreria($anio, $tipo, $checkTodos)
+    public function reportePdfGeneralTesoreria($anio, $tipo)
     {
 
         $now = Carbon::now('America/El_Salvador');
@@ -1450,109 +1515,69 @@ class TesoreriaConfigController extends Controller
         // 1- VIGENTES 2-VENCIDAS 3-UCP 4-PROVEEDOR
         $arrayReporte = [];
 
-        if ($checkTodos == 1) {
-
-            if($tipo == 1){ // VIGENTES
-                $arrayReporte = TesoreriaGarantiaPendienteEntrega::where('vigencia_hasta', '>', $now)
-                    ->orderBy('control_interno', 'ASC')
-                    ->get();
-            }
-            else if($tipo == 2){ // VENCIDAS
-                $today = $now->toDateString(); // 'YYYY-MM-DD'
-                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereDate('vigencia_hasta', $today)
-                    ->whereTime('vigencia_hasta', '<', $now->toTimeString())
-                    ->orderBy('control_interno', 'ASC')
-                    ->get();
-            }
-            else if($tipo == 3){ // UCP
-
-                $pilaUcp = array();
-                $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
-
-                foreach ($listaEstados as $fila) {
-                    array_push($pilaUcp, $fila->id_garantia_pendi);
-                }
-
-                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaUcp)
-                    ->where('completado', 0)
-                    ->orderBy('control_interno', 'ASC')
-                    ->get();
-
-            }
-            else if($tipo == 4){ // PROVEEDOR
-                $pilaProveedor = array();
-                $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 2)->get();
-
-                foreach ($listaEstados as $fila) {
-                    array_push($pilaProveedor, $fila->id_garantia_pendi);
-                }
-
-                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereIn('id', $pilaProveedor)
-                    ->where('completado', 0)
-                    ->orderBy('control_interno', 'ASC')
-                    ->get();
-            }
-        } else { //// CHECK TODOS
-
-            if($tipo == 1){ // VIGENTES
-                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                ->where('vigencia_hasta', '>', $now)
-                    ->orderBy('control_interno', 'ASC')
-                    ->get();
-            }
-            else if($tipo == 2){ // VENCIDAS
-                $today = $now->toDateString(); // 'YYYY-MM-DD'
-                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                ->whereDate('vigencia_hasta', $today)
-                    ->whereTime('vigencia_hasta', '<', $now->toTimeString())
-                    ->orderBy('control_interno', 'ASC')
-                    ->get();
-            }
-            else if($tipo == 3){ // UCP
-
-                $pilaUcp = array();
-                $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
-
-                foreach ($listaEstados as $fila) {
-                    array_push($pilaUcp, $fila->id_garantia_pendi);
-                }
-
-                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                    ->whereIn('id', $pilaUcp)
-                    ->where('completado', 0)
-                    ->orderBy('control_interno', 'ASC')
-                    ->get();
-
-            }
-            else if($tipo == 4){ // PROVEEDOR
-                $pilaProveedor = array();
-                $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 2)->get();
-
-                foreach ($listaEstados as $fila) {
-                    array_push($pilaProveedor, $fila->id_garantia_pendi);
-                }
-
-                $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                    ->whereIn('id', $pilaProveedor)
-                    ->where('completado', 0)
-                    ->orderBy('control_interno', 'ASC')
-                    ->get();
-            }
-        }
 
 
-        if($tipo == 1){
+        if($tipo == 1){ // VIGENTES
             $nombreEstado = 'Vigentes';
+
+            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+            ->where('vigencia_hasta', '>', $now)
+                ->orderBy('control_interno', 'ASC')
+                ->get();
         }
-        else if($tipo == 2){
+        else if($tipo == 2){ // VENCIDAS
             $nombreEstado = 'Vencidas';
+
+            $pilaIdGara = array();
+            $arrayGarantiasEstados = TesoreriaGarantiaEstados::all();
+            foreach ($arrayGarantiasEstados as $item){
+                array_push($pilaIdGara, $item->id_garantia_pendi);
+            }
+
+            // CADA VEZ QUE SE ABRE ESTA VENTANA SE VERIFICA SI ESTAN VENCIDAS YA
+            $now = Carbon::now('America/El_Salvador');
+
+            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+            ->where('vigencia_hasta', '<', $now)
+                ->whereNotIn('id', $pilaIdGara)
+                ->orderBy('control_interno', 'ASC')
+                ->get();
+
         }
-        else if ($tipo == 3){
+        else if($tipo == 3){ // UCP
             $nombreEstado = 'Entregados a UCP';
+
+            $pilaUcp = array();
+            $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 1)->get();
+
+            foreach ($listaEstados as $fila) {
+                array_push($pilaUcp, $fila->id_garantia_pendi);
+            }
+
+            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                ->whereIn('id', $pilaUcp)
+                ->where('completado', 0)
+                ->orderBy('control_interno', 'ASC')
+                ->get();
+
         }
-        else{
+        else{ // PROVEEDOR
             $nombreEstado = 'Entregados a Proveedor';
+
+            $pilaProveedor = array();
+            $listaEstados = TesoreriaGarantiaEstados::where('id_estado', 2)->get();
+
+            foreach ($listaEstados as $fila) {
+                array_push($pilaProveedor, $fila->id_garantia_pendi);
+            }
+
+            $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
+                ->whereIn('id', $pilaProveedor)
+                ->where('completado', 0)
+                ->orderBy('control_interno', 'ASC')
+                ->get();
         }
+
 
         foreach ($arrayReporte as $item) {
 
