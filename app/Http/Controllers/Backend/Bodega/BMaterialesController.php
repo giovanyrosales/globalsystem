@@ -9,6 +9,7 @@ use App\Models\BodegaMateriales;
 use App\Models\BodegaSalida;
 use App\Models\BodegaSalidaDetalle;
 use App\Models\BodegaUsuarioObjEspecifico;
+use App\Models\P_Departamento;
 use App\Models\P_UnidadMedida;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -387,6 +388,10 @@ class BMaterialesController extends Controller
             ->whereColumn('cantidad_entregada', '<', 'cantidad')
             ->get();
 
+
+        $arrayUnidades = P_Departamento::orderBy('nombre', 'ASC')->get();
+
+
         foreach ($arrayEntraDeta as $fila){
 
             $infoMaterial = BodegaMateriales::where('id', $fila->id_material)->first();
@@ -401,7 +406,7 @@ class BMaterialesController extends Controller
             $fila->cantidadRestante = $resta;
         }
 
-        return view('backend.admin.bodega.salidamanual.vistasalidamanual', compact('arrayEntraDeta'));
+        return view('backend.admin.bodega.salidamanual.vistasalidamanual', compact('arrayEntraDeta', 'arrayUnidades'));
     }
 
 
@@ -412,7 +417,7 @@ class BMaterialesController extends Controller
             'tiposalida' => 'required',
         );
 
-        // observacion
+        // observacion, selectUnidad
 
         $validar = Validator::make($request->all(), $regla);
 
@@ -435,6 +440,7 @@ class BMaterialesController extends Controller
             $nuevoReg->id_solicitud = null; // NO LLEVARA
             $nuevoReg->observacion = $request->observacion;
             $nuevoReg->estado_salida = $request->tiposalida;
+            $nuevoReg->id_unidad_manual = $request->selectUnidad; // DEPARTAMENTO PARA UNA SALIDA MANUAL
             $nuevoReg->save();
 
             // infoIdProducto, infoCantidad, infoPrecio

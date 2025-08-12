@@ -510,6 +510,14 @@ class BHistorialController extends Controller
             }
 
             $fila->tipoEstado = $tipoEstado;
+
+
+            $nombreUnidad = "";
+            if($depa = P_Departamento::where('id', $fila->id_unidad_manual)->first()){
+                $nombreUnidad = $depa->nombre;
+            }
+
+            $fila->nombreUnidad = $nombreUnidad;
         }
 
         return view('backend.admin.bodega.historial.salidamanual.tablasalidamanual', compact('listado'));

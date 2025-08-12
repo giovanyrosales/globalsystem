@@ -12,6 +12,7 @@
                             <tr>
                                 <th style="width: 4%">Fecha Salida</th>
                                 <th style="width: 5%">Tipo Salida</th>
+                                <th style="width: 5%">Unidad Seleccionada</th>
                                 <th style="width: 6%">Observación</th>
                                 <th style="width: 3%">Opciones</th>
                             </tr>
@@ -28,6 +29,9 @@
                                             <small class="badge badge-danger">{{ $dato->tipoEstado }}</small>
                                         @endif
                                        </td>
+
+                                    <td style="width: 6%">{{ $dato->nombreUnidad }}</td>
+
                                     <td style="width: 6%">{{ $dato->observacion }}</td>
                                     <td style="width: 6%">
                                         <button type="button" class="btn btn-info btn-xs"

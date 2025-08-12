@@ -32,6 +32,9 @@ class CreateBodegaSalidasTable extends Migration
             // 2- Salida por Desperfecto
             $table->integer('estado_salida');
 
+            // PARA UNA SALIDA MANUAL LE ASIGNAMOS LA UNIDAD SI FUERA NECESARIO
+            $table->bigInteger('id_unidad_manual')->nullable();
+
             $table->foreign('id_usuario')->references('id')->on('usuario');
             $table->foreign('id_solicitud')->references('id')->on('bodega_solicitud');
         });
