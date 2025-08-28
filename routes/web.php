@@ -1332,6 +1332,12 @@ Route::get('/admin/bodega/historial/salidasmanual/index', [BHistorialController:
 Route::get('/admin/bodega/historial/salidasmanual/tabla', [BHistorialController::class,'tablaHistorialSalidasManual']);
 Route::get('/admin/bodega/historial/salidamanualdetalle/index/{id}', [BHistorialController::class,'indexHistorialSalidasManualDetalle']);
 Route::get('/admin/bodega/historial/salidamanualdetalle/tabla/{id}', [BHistorialController::class,'tablaHistorialSalidasManualDetalle']);
+Route::post('/admin/bodega/historial/salidamanualdetalle/datosinformacion', [BHistorialController::class,'informacionDatosSalidaManual']);
+Route::post('/admin/bodega/historial/salidamanualdetalle/actualizar', [BHistorialController::class,'actualizarDatosSalidaManual']);
+
+
+
+
 
 
 // SALIDAS MANUAL BODEGA

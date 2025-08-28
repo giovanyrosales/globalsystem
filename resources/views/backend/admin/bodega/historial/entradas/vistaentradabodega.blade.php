@@ -158,7 +158,6 @@
 
         // BORRAR LOTE DE ENTRADA COMPLETO
         function borrarRegistro(id){
-
             openLoading();
             var formData = new FormData();
             formData.append('id', id);

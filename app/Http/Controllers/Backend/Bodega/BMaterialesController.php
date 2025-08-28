@@ -419,6 +419,8 @@ class BMaterialesController extends Controller
 
         // observacion, selectUnidad
 
+        // numeroSolicitud
+
         $validar = Validator::make($request->all(), $regla);
 
         if ($validar->fails()) {
@@ -441,6 +443,7 @@ class BMaterialesController extends Controller
             $nuevoReg->observacion = $request->observacion;
             $nuevoReg->estado_salida = $request->tiposalida;
             $nuevoReg->id_unidad_manual = $request->selectUnidad; // DEPARTAMENTO PARA UNA SALIDA MANUAL
+            $nuevoReg->numero_solicitud = $request->numeroSolicitud;
             $nuevoReg->save();
 
             // infoIdProducto, infoCantidad, infoPrecio
@@ -465,7 +468,6 @@ class BMaterialesController extends Controller
                 $detalle->save();
 
                 // ACTUALIZAR CANTIDAD
-                Log::info("suma: " . $suma);
 
                 BodegaEntradasDetalle::where('id', $infoBodeEnDeta->id)->update([
                     'cantidad_entregada' => $suma,

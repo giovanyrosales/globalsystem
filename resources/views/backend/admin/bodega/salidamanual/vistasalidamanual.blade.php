@@ -39,36 +39,45 @@
                     <section class="content">
                         <div class="container-fluid">
 
-                            <div class="row">
+
                                 <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Fecha: </label>
+                                    <label class="control-label" style="color: #686868">Fecha de Salida: </label>
                                     <div>
                                         <input type="date" id="fecha" autocomplete="off" class="form-control">
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="row">
+
+
                                 <div class="form-group col-md-4" style="margin-top: 5px">
                                     <label class="control-label" style="color: #686868">Tipo de Salida</label>
                                     <select id="select-salida" class="form-control">
-                                        <option value="1">Salida sin Solicitud</option>
+                                        <option value="1">Salida con Solicitud</option>
                                         <option value="2">Salida por Desperfecto</option>
                                     </select>
                                 </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label>Asignar Unidad (Opcional):</label>
+
+                            <div class="form-group col-md-6">
+                                <label style="color: #686868">Asignar Unidad (Opcional):</label>
                                 <br>
-                                <select width="100%" class="form-control" id="select-unidad">
-                                    <option value="">Seleccionar Opción</option>
+                                <select class="form-control" id="select-unidad">
+                                    <option value="" >Seleccionar Opción</option>
                                     @foreach($arrayUnidades as $sel)
-                                        <option value="{{ $sel->id }}">{{ $sel->nombre }}</option>
+                                        <option  value="{{ $sel->id }}">{{ $sel->nombre }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
+
+                            <div class="form-group col-md-4" style="margin-top: 10px">
+                                <label class="control-label" style="color: #686868">Número de Solicitud (Opcional): </label>
+                                <div>
+                                    <input type="text" id="numero-solicitud-nuevo" maxlength="300" autocomplete="off" class="form-control">
+                                </div>
+                            </div>
+
+                            <hr>
 
 
                             <div class="row">
@@ -380,6 +389,7 @@
             var observacion = document.getElementById('observacion').value;
             var tipoSalida = document.getElementById('select-salida').value;
             var selectUnidad = document.getElementById('select-unidad').value;
+            var numeroSolicitud = document.getElementById('numero-solicitud-nuevo').value;
 
             if(fecha === ''){
                 toastr.error('Fecha es requerido');
@@ -461,6 +471,7 @@
             formData.append('fecha', fecha);
             formData.append('observacion', observacion);
             formData.append('tiposalida', tipoSalida);
+            formData.append('numeroSolicitud', numeroSolicitud);
             formData.append('selectUnidad', selectUnidad);
 
             axios.post(url+'/bodega/salidasmanual/registrar', formData, {

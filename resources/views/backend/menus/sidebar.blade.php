@@ -888,6 +888,11 @@
                         <p>Materiales</p>
                     </a>
 
+
+
+                <!-- SE DEJARA SOLO SALIDAS MANUALES
+                    MODIFICADO: 22/8/2025
+
                     <li class="nav-item">
 
                         <a href="#" class="nav-link">
@@ -917,6 +922,10 @@
                         </ul>
                     </li>
 
+                -->
+
+
+
                     <a href="{{ route('sidebar.bodega.entradasregistro') }}" target="frameprincipal" class="nav-link">
                         <i class="fa fa-chevron-circle-left"></i>
                         <p>Entradas</p>
@@ -925,7 +934,7 @@
 
                     <a href="{{ route('sidebar.bodega.salidasmanual') }}" target="frameprincipal" class="nav-link">
                         <i class="fa fa-address-book"></i>
-                        <p>Salida Manual</p>
+                        <p>Salidas</p>
                     </a>
 
 
@@ -948,6 +957,10 @@
                                 </a>
                             </li>
 
+                            <!--
+                            SE DEJARA SOLO SALIDAS MANUALES
+                            MODIFICADO: 22/8/2025
+
                             <li class="nav-item">
                                 <a href="{{ route('sidebar.bodega.historial.salidas') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
@@ -955,10 +968,13 @@
                                 </a>
                             </li>
 
+                            -->
+
+
                             <li class="nav-item">
                                 <a href="{{ route('sidebar.bodega.historial.salidas.manual') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Salida Manual</p>
+                                    <p>Salidas</p>
                                 </a>
                             </li>
 
@@ -979,12 +995,18 @@
                         <ul class="nav nav-treeview">
 
 
+
+                            <!--
+                            NO SE USARA
+                            MODIFICADO: 22/8/2025
                             <li class="nav-item">
                                 <a href="{{ route('sidebar.bodega.reportes.salidasunidad') }}" target="frameprincipal" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Entrega Unidad</p>
                                 </a>
                             </li>
+
+                            -->
 
                             <li class="nav-item">
                                 <a href="{{ route('sidebar.bodega.reportes.general') }}" target="frameprincipal" class="nav-link">

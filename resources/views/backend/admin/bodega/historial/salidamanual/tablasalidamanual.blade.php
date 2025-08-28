@@ -13,6 +13,7 @@
                                 <th style="width: 4%">Fecha Salida</th>
                                 <th style="width: 5%">Tipo Salida</th>
                                 <th style="width: 5%">Unidad Seleccionada</th>
+                                <th style="width: 5%">Número Solicitud</th>
                                 <th style="width: 6%">Observación</th>
                                 <th style="width: 3%">Opciones</th>
                             </tr>
@@ -31,10 +32,15 @@
                                        </td>
 
                                     <td style="width: 6%">{{ $dato->nombreUnidad }}</td>
-
+                                    <td style="width: 6%">{{ $dato->numero_solicitud }}</td>
                                     <td style="width: 6%">{{ $dato->observacion }}</td>
                                     <td style="width: 6%">
-                                        <button type="button" class="btn btn-info btn-xs"
+                                        <button type="button" class="btn btn-warning btn-xs"
+                                                onclick="modalInformacion({{ $dato->id }})">
+                                            <i class="fas fa-edit" title="Datos"></i>&nbsp; Datos
+                                        </button>
+
+                                        <button type="button" style="margin: 5px" class="btn btn-info btn-xs"
                                                 onclick="vistaDetalle({{ $dato->id }})">
                                             <i class="fas fa-eye" title="Detalle"></i>&nbsp; Detalle
                                         </button>

@@ -552,6 +552,48 @@ class BHistorialController extends Controller
 
 
 
+    public function informacionDatosSalidaManual(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+        );
+
+        // codigo
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        $infoSalida = BodegaSalida::where('id', $request->id)->first();
+        $arrayUnidades = P_Departamento::orderBy('nombre', 'asc')->get();
+
+        return ['success' => 1, 'info' => $infoSalida, 'arrayUnidades' => $arrayUnidades];
+    }
+
+
+    public function actualizarDatosSalidaManual(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+            'fecha' => 'required',
+        );
+
+        //numeroSolicitud, idunidad, observacion, idtiposolicitud
+
+        $validar = Validator::make($request->all(), $regla);
+
+        if ($validar->fails()){return ['success' => 0];}
+
+        BodegaSalida::where('id', $request->id)->update([
+            'fecha' => $request->fecha,
+            'observacion' => $request->observacion,
+            'estado_salida' => $request->idtiposolicitud,
+            'id_unidad_manual' => $request->idunidad,
+            'numero_solicitud' => $request->numeroSolicitud,
+        ]);
+
+        return ['success' => 1];
+    }
 
 
 

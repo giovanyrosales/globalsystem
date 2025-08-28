@@ -116,7 +116,7 @@
     <section class="content" style="margin-top: 35px">
         <div class="container-fluid">
             <div class="card card-gray-dark">
-                <div class="card-header">
+                <div class="card-header" title="MODIFICADO: 22/8/2025 PARA PROVEEDURIA">
                     <h3 class="card-title">REPORTE SALIDAS DE EXISTENCIAS (POR LOTES)</h3>
                 </div>
                 <div class="card-body">
@@ -279,6 +279,52 @@
 
 
 
+    <section class="content" style="margin-top: 35px">
+        <div class="container-fluid">
+            <div class="card card-gray-dark">
+                <div class="card-header" title="MODIFICADO: 22/8/2025 PARA PROVEEDURIA">
+                    <h3 class="card-title">ENTREGADO A UNA UNIDAD</h3>
+                </div>
+                <div class="card-body">
+                    <section class="content" style="margin-left: 30px">
+                        <div class="container-fluid">
+
+                            <div class="row">
+
+                                <div class="form-group">
+                                    <label>Desde</label>
+                                    <input type="date"  class="form-control" id="fecha-entregatotal-desde">
+                                </div>
+
+                                <div class="form-group" style="margin-left: 15px">
+                                    <label>Hasta</label>
+                                    <input type="date" class="form-control" id="fecha-entregatotal-hasta">
+                                </div>
+
+
+                                <button type="button" onclick="pdfReporteEntregaTotal()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
+                                    <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
+                                    Generar PDF
+                                </button>
+                            </div>
+
+                            <label>Unidades</label>
+                            <select class="form-control" id="select-unidades-entregatotal">
+                                @foreach($arrayUnidades as $item)
+                                    <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                @endforeach
+                            </select>
+
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
 </div>
 
 
@@ -325,6 +371,15 @@
 
 
             $('#select-codigopresupuestario').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Búsqueda no encontrada";
+                    }
+                },
+            });
+
+            $('#select-unidades-entregatotal').select2({
                 theme: "bootstrap-5",
                 "language": {
                     "noResults": function(){
