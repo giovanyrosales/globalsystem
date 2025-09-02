@@ -1218,9 +1218,10 @@ class BReportesController extends Controller
             ->get();
 
 // Si no hay salidas en el período, retorna vacío (o ajusta a tu necesidad)
-        if ($salidasPeriodo->isEmpty()) {
+       /* if ($salidasPeriodo->isEmpty()) {
+            return "vacio";
             return collect();
-        }
+        }*/
 
 // 4) Combinar y calcular existencias/saldos por material+lote
         $items = [];
