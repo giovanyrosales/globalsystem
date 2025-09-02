@@ -1130,146 +1130,178 @@ class BReportesController extends Controller
         $porciones = explode("-", $arrayLotes);
         $arrayBodegaEntradas = BodegaEntradas::whereIn('id', $porciones)->get();
 
+        $pilaArrayBodegaEntradas = array();
+        foreach ($arrayBodegaEntradas as $fila) {
+            array_push($pilaArrayBodegaEntradas, $fila->id);
+        }
 
-        $pila_array_SalidasTodos = array();
 
-        // TODOS LOS ID DE SALIDAS DE MI BODEGA UNICAMENTE
-        $array_SalidasTodos = DB::table('bodega_salidas AS bs')
+
+
+
+
+
+
+
+
+
+// 0) Salidas tempranas y helpers
+        if (empty($pilaObjEspeci) || empty($pilaArrayBodegaEntradas)) {
+            return collect(); // nada que procesar
+        }
+
+// Clave compuesta material|lote normalizada para evitar "30" vs 30
+        $makeKey = function ($idEntrada, $idMaterial) {
+            return (int)$idEntrada . '|' . (int)$idMaterial;
+        };
+
+// 1) ENTRADAS por lote (precio unitario por lote)
+        $entradasPorLote = DB::table('bodega_entradas_detalle AS bed')
+            ->join('bodega_materiales AS bm', 'bed.id_material', '=', 'bm.id')
+            ->select(
+                'bed.id_entrada',
+                'bed.id_material',
+                'bm.id_objespecifico',
+                'bm.nombre AS nombre_material',
+                DB::raw('SUM(bed.cantidad) AS cantidad_entrada'),
+                DB::raw('MAX(bed.precio) AS precio_unitario') // ajusta si tu campo se llama distinto
+            )
+            ->whereIn('bm.id_objespecifico', $pilaObjEspeci)
+            ->whereIn('bed.id_entrada', $pilaArrayBodegaEntradas)
+            ->groupBy('bed.id_entrada', 'bed.id_material', 'bm.id_objespecifico', 'bm.nombre')
+            ->get();
+
+        $entradasMap = [];
+        foreach ($entradasPorLote as $e) {
+            $entradasMap[$makeKey($e->id_entrada, $e->id_material)] = $e;
+        }
+
+// 2) SALIDAS previas al inicio (para existencia inicial)
+        $salidasPrevias = DB::table('bodega_salidas AS bs')
             ->join('bodega_salidas_detalle AS bsd', 'bsd.id_salida', '=', 'bs.id')
             ->join('bodega_entradas_detalle AS bed', 'bsd.id_entradadetalle', '=', 'bed.id')
             ->join('bodega_materiales AS bm', 'bed.id_material', '=', 'bm.id')
-            ->select('bs.id', 'bm.id_objespecifico', 'bs.fecha', 'bed.id_entrada', 'bed.id_material')
-            ->whereIn('bm.id_objespecifico', $pilaObjEspeci) // FILTRADO POR OBJ ESPECIFICO
-            ->get();
-        foreach ($array_SalidasTodos as $fila) {
-            array_push($pila_array_SalidasTodos, $fila->id);
-        }
-
-        // OBTENER LOS MATERIALES POR LOTE, QUE HAN SALIDO EN EL RANGO DE FECHAS
-        // OBTENER LAS SALIDAS TOTALES DE ESE PRODUCTO DE ESE LOTE DE LA FECHA INICIO HACIA ATRAS, NO SON SALIDAS GLOBALES
-
-        $resultsBloque = array();
-        $index = 0;
-
-        foreach ($arrayBodegaEntradas as $fila) { // CADA RECORRIDO ES UN LOTE
-            array_push($resultsBloque,$fila);
-
-
-            // OBTENER CADA MATERIAL UNICO CON SUS TOTAL DE SALIDAS
-
-            $arraySalidasDetallePila = DB::table('bodega_salidas AS bs')
-                ->join('bodega_salidas_detalle AS bsd', 'bsd.id_salida', '=', 'bs.id')
-                ->join('bodega_entradas_detalle AS bed', 'bsd.id_entradadetalle', '=', 'bed.id')
-                ->select('bs.fecha', 'bed.id_entrada', 'bed.id_material')
-                ->where('bed.id_entrada', $fila->id) // FILTRANDO POR LOTE
-                ->whereBetween('bs.fecha', [$start, $end])
-                ->get();
-
-            // YA FILTRADO POR LOTE, YA MATERIALES POR OBJ ESPECIFICO, YA POR LA FECHA
-            $resultsBloque[$index]->detalle = $arraySalidasDetallePila;
-            $index++;
-        }
-
-
-        return $arrayBodegaEntradas;
-
-
-
-
-
-
-
-        $arrayBodeEntra = BodegaEntradas::where('id_usuario', $infoAuth->id)
-            ->whereIn('id', $porciones) // VIENE EL ID DE bodega_entregas
+            ->select(
+                'bed.id_entrada',
+                'bed.id_material',
+                DB::raw('SUM(bsd.cantidad_salida) AS cantidad_previa')
+            )
+            ->whereIn('bm.id_objespecifico', $pilaObjEspeci)
+            ->whereIn('bed.id_entrada', $pilaArrayBodegaEntradas)
+            ->where('bs.fecha', '<', $start)
+            ->groupBy('bed.id_entrada', 'bed.id_material')
             ->get();
 
-        // FILTRADO: TODOS LOS MATERIALES POR LOTE QUE HAN TENIDO SALIDA DEL USUARIO CORRESPONDIENTE
-        $pilaidMateriales = array();
-        foreach ($arrayBodeEntra as $filaItem) {
-
-            $arrayEntradaDeta = BodegaEntradasDetalle::where('id_entrada', $filaItem->id)->get();
-            foreach ($arrayEntradaDeta as $filaDeta) {
-                array_push($pilaidMateriales, $filaDeta->id_material);
-            }
+        $previasMap = [];
+        foreach ($salidasPrevias as $s) {
+            $previasMap[$makeKey($s->id_entrada, $s->id_material)] = (float) $s->cantidad_previa;
         }
 
-        // FILTRANDO LOS MATERIALES DE LOS LOTES QUE HAN TENIDO SALIDA
-        // LOS MATERIALES UNICAMENTE DEL USUARIO
-        $arrayProductos = BodegaMateriales::whereIn('id', $pilaidMateriales)
-            ->orderBy('nombre', 'ASC')
+// 3) SALIDAS del período (para "salidas totales")
+// Nota: LEFT JOIN a obj_especifico para no perder filas si no hay match
+        $salidasPeriodo = DB::table('bodega_salidas AS bs')
+            ->join('bodega_salidas_detalle AS bsd', 'bsd.id_salida', '=', 'bs.id')
+            ->join('bodega_entradas_detalle AS bed', 'bsd.id_entradadetalle', '=', 'bed.id')
+            ->join('bodega_materiales AS bm', 'bed.id_material', '=', 'bm.id')
+            ->leftJoin('obj_especifico AS obj', 'bm.id_objespecifico', '=', 'obj.id') // opcional
+            ->select(
+                'bm.id_objespecifico',
+                'bed.id_entrada',
+                'bed.id_material',
+                'obj.codigo AS codigo_obj',
+                DB::raw('SUM(bsd.cantidad_salida) AS salidas_totales')
+            )
+            ->whereIn('bm.id_objespecifico', $pilaObjEspeci)
+            ->whereIn('bed.id_entrada', $pilaArrayBodegaEntradas)
+            ->whereBetween('bs.fecha', [$start, $end])
+            ->groupBy('bm.id_objespecifico', 'bed.id_entrada', 'bed.id_material', 'obj.codigo')
             ->get();
 
-
-
-        // POR CADA ENTRADA SERIA LA VUELTA, SIEMPRE SALDRAN AUNQUE NO HAYA SALIDAS
-        $resultsBloque = array();
-        $index = 0;
-
-
-        // SALDO EXISTENCIA ACTUAL
-        $sumaFinalSaldoExisteciaActual = 0;
-
-
-        foreach ($arrayProductos as $fila){
-            array_push($resultsBloque, $fila);
-
-            $infoUnidadMedida = P_UnidadMedida::where('id', $fila->id_unidadmedida)->first();
-            $fila->unidadMedida = $infoUnidadMedida->nombre;
-
-
-            // POR CADA PRODUCTO OBTENER TODOS LOS LOTES/ENTRADAS
-            $arraySalidas = DB::table('bodega_salidas AS sa')
-                ->join('bodega_salidas_detalle AS deta', 'deta.id_salida', '=', 'sa.id')
-                ->join('bodega_entradas_detalle AS bodeentradeta', 'deta.id_entradadetalle', '=', 'bodeentradeta.id')
-                ->select('sa.fecha', 'bodeentradeta.id_material', 'bodeentradeta.id_entrada')
-                ->whereBetween('sa.fecha', [$start, $end])
-                ->where('bodeentradeta.id_material', $fila->id)
-                ->whereIn('bodeentradeta.id_entrada', $porciones)
-                ->get();
-
-
-            // OBTENER LOS LOTES INDIVIDUALES
-            $pilaEntrada = array();
-            foreach ($arraySalidas as $filaItem) {
-                array_push($pilaEntrada, $filaItem->id_entrada);
-            }
-
-            $arrayEntradaDeta = BodegaEntradasDetalle::whereIn('id_entrada', $pilaEntrada)
-                ->where('id_material', $fila->id)
-                ->get();
-
-            $columnaExistenciaActual = 0;
-            $columnaExistenciaActualDinero = 0;
-
-            foreach ($arrayEntradaDeta as $itemEntra){
-
-                $infoEntrada = BodegaEntradas::where('id', $itemEntra->id_entrada)->first();
-                $itemEntra->lote = $infoEntrada->lote;
-
-                $existencias = $itemEntra->cantidad - $itemEntra->cantidad_entregada;
-                $itemEntra->existencias = $existencias;
-
-                $columnaExistenciaActual += $existencias;
-
-                $multiplicado = $itemEntra->precio * $existencias;
-                $columnaExistenciaActualDinero += $multiplicado;
-
-                // SUNA DE EXISTENCIA ACTUAL QUE VA A FINAL DEL PDF
-                $sumaFinalSaldoExisteciaActual += $multiplicado;
-
-                $itemEntra->saldoExistenciasDinero = "$" . number_format($multiplicado, 2, '.', ',');
-
-                $itemEntra->precioFormat = "$" . number_format($itemEntra->precio, 2, '.', ',');
-            }
-
-            $fila->columnaExistenciaActual = $columnaExistenciaActual;
-            $fila->columnaExistenciaActualDinero = "$" . number_format($columnaExistenciaActualDinero, 2, '.', ',');
-
-            $resultsBloque[$index]->detalle = $arrayEntradaDeta;
-            $index++;
+// Si no hay salidas en el período, retorna vacío (o ajusta a tu necesidad)
+        if ($salidasPeriodo->isEmpty()) {
+            return collect();
         }
 
-        $sumaFinalSaldoExisteciaActual = "$" . number_format($sumaFinalSaldoExisteciaActual, 2, '.', ',');
+// 4) Combinar y calcular existencias/saldos por material+lote
+        $items = [];
+        foreach ($salidasPeriodo as $sp) {
+            $key = $makeKey($sp->id_entrada, $sp->id_material);
+            if (!isset($entradasMap[$key])) {
+                // No hay entrada para ese lote/material → no podemos calcular existencia inicial
+                continue;
+            }
+
+            $e            = $entradasMap[$key];
+            $cantEntrada  = (float) $e->cantidad_entrada;
+            $cantPrevias  = (float) ($previasMap[$key] ?? 0);
+            $existInicial = max(0, $cantEntrada - $cantPrevias);
+            $salidasTot   = (float) $sp->salidas_totales;
+            $existActual  = max(0, $existInicial - $salidasTot);
+            $precio       = (float) $e->precio_unitario;
+
+            $items[] = [
+                'id_objespecifico' => $e->id_objespecifico,
+                'codigo'           => $sp->codigo_obj, // puede ser null si no hay match en obj_especifico
+
+                'detalle_item' => [
+                    'id_entrada'               => (int) $sp->id_entrada, // LOTE
+                    'id_material'              => (int) $sp->id_material,
+                    'nombre_material'          => $e->nombre_material,
+                    'precio_unitario'          => $precio,
+                    'existencia_inicial'       => $existInicial,
+                    'salidas_totales'          => $salidasTot,
+                    'saldo_salidas'            => round($salidasTot * $precio, 2),
+                    'existencia_actual'        => $existActual,
+                    'saldo_existencia_actual'  => round($existActual * $precio, 2),
+                ],
+            ];
+        }
+
+// 5) Reagrupar por id_objespecifico, ordenar dentro de cada grupo y
+//    asignar correlativo 1..N por grupo (se reinicia en cada array)
+        $resultado = collect($items)
+            ->groupBy('id_objespecifico')
+            ->map(function ($regs, $obj) {
+                // (Opcional) si guardaste "codigo" en $items, tómalo del primero
+                $codigo = null;
+                $primero = $regs->first();
+                if (is_array($primero) && array_key_exists('codigo', $primero)) {
+                    $codigo = $primero['codigo'];
+                } elseif (is_object($primero) && property_exists($primero, 'codigo')) {
+                    $codigo = $primero->codigo;
+                }
+
+                // Orden dentro del grupo (ajústalo si prefieres otro criterio)
+                $detalle = $regs->pluck('detalle_item')
+                    ->sortBy(function ($it) {
+                        $nom  = $it['nombre_material'];
+                        $lote = str_pad((string)$it['id_entrada'], 10, '0', STR_PAD_LEFT);
+                        return $nom . '|' . $lote;
+                    })
+                    ->values();
+
+                // Correlativo por grupo (reinicia en 1)
+                $i = 0;
+                $detalle = $detalle->map(function ($item) use (&$i) {
+                    $i++;
+                    $item['correlativo'] = $i;   // 👈 sin correlativo_str
+                    return $item;
+                })->values();
+
+                return [
+                    'id_objespecifico' => $obj,
+                    'codigo'           => $codigo,   // opcional
+                    'detalle'          => $detalle,  // cada item trae su correlativo 1..N
+                ];
+            })
+            ->values();
+
+        //return $resultado;
+
+
+
+
+
 
 
         //************************************************
@@ -1351,60 +1383,72 @@ class BReportesController extends Controller
             <tbody>";
 
 
+        foreach ($resultado as $dato) {
+
+            $idObj = $dato['id_objespecifico'];
+            $codigo = $dato['codigo'];
+            $sumaSaldoSalidasColumna = 0;
+            $sumaSaldoExistenciaActual = 0;
+
+            foreach ($dato['detalle'] as $item) {
+
+                $correlativo       = $item['correlativo'] ?? null;
+                $lote              = $item['id_entrada'];
+                $idMaterial        = $item['id_material'];
+                $nombreMaterial    = $item['nombre_material'];
+                $precio            = $item['precio_unitario'];
+                $existInicial      = $item['existencia_inicial'];
+                $salidasTotales    = $item['salidas_totales'];
+                $saldoSalidas      = $item['saldo_salidas'];
+                $existActual       = $item['existencia_actual'];
+                $saldoExistActual  = $item['saldo_existencia_actual'];
+
+                $sumaSaldoSalidasColumna += $saldoSalidas;
+                $sumaSaldoExistenciaActual += $saldoExistActual;
 
 
-        $correlativo = 0;
-        foreach ($arrayProductos as $dato) {
+                $precio = "$" . number_format((float)$precio, 2, '.', ',');
+                $saldoSalidas = "$" . number_format((float)$saldoSalidas, 2, '.', ',');
+                $saldoExistActual = "$" . number_format((float)$saldoExistActual, 2, '.', ',');
 
-            if (empty($dato->detalle) || count($dato->detalle) === 0) {
-                continue;
-            }
+                $infoMaterial = BodegaMateriales::where('id', $idMaterial)->first();
+                $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+                $nombreUnidadMedida = $infoUnidad->nombre;
 
-            $correlativo++;
+                $infoEntrada = BodegaEntradas::where('id', $lote)->first();
+                $nombreEntradaLote = $infoEntrada->nombre;
 
-
-            $tabla .= "<tr>
-                    <td style='font-size: 11px; font-weight: bold'>$correlativo</td>
-                    <td style='font-size: 11px; font-weight: bold'></td>
-                    <td style='font-size: 11px; font-weight: bold'>$dato->unidadMedida</td>
-                    <td style='font-size: 11px; font-weight: bold'>$dato->nombre</td>
-                    <td style='font-size: 11px; font-weight: bold'></td>
-                    <td style='font-size: 11px;font-weight: bold'></td>
-                    <td style='font-size: 11px; font-weight: bold'></td>
-                    <td style='font-size: 11px; font-weight: bold'></td>
-                    <td style='font-size: 11px; font-weight: bold'></td>
-                    <td style='font-size: 11px; font-weight: bold'></td>
-                      <td style='font-size: 11px; font-weight: bold'></td>
-                </tr>";
-
-
-            foreach ($dato->detalle as $item) {
                 $tabla .= "<tr>
-                     <td style='font-size: 11px'></td>
-                    <td style='font-size: 11px'>$item->codigo_producto</td>
-                    <td style='font-size: 11px'></td>
-                    <td style='font-size: 11px'></td>
-                    <td style='font-size: 11px'>$item->lote</td>
-                    <td style='font-size: 11px'>$item->precioFormat</td>
-                    <td style='font-size: 11px'>$item->cantidad</td>
-                    <td style='font-size: 11px'>$item->cantidad_entregada</td>
-                    <td style='font-size: 11px'>$item->existencias</td>
-                    <td style='font-size: 11px'>$item->saldoExistenciasDinero</td>
-                      <td style='font-size: 11px; font-weight: bold'></td>
+                     <td style='font-size: 11px'>$correlativo</td>
+                    <td style='font-size: 11px'>$codigo</td>
+                    <td style='font-size: 11px'>$nombreUnidadMedida</td>
+                    <td style='font-size: 11px'>$nombreMaterial</td>
+                    <td style='font-size: 11px'>$nombreEntradaLote</td>
+                    <td style='font-size: 11px'>$precio</td>
+                    <td style='font-size: 11px'>$existInicial</td>
+                    <td style='font-size: 11px'>$salidasTotales</td>
+                    <td style='font-size: 11px'>$saldoSalidas</td>
+                    <td style='font-size: 11px'>$existActual</td>
+                    <td style='font-size: 11px; font-weight: bold'>$saldoExistActual</td>
                 </tr>";
 
             } // END-FOREACH 2
 
 
+            $sumaSaldoSalidasColumna = "$" . number_format((float)$sumaSaldoSalidasColumna, 2, '.', ',');
+            $sumaSaldoExistenciaActual = "$" . number_format((float)$sumaSaldoExistenciaActual, 2, '.', ',');
+
+
+
             $tabla .= "<tr>
-                    <td colspan='4' style='font-size: 11px; font-weight: bold'>EXISTENCIA TOTAL</td>
+                    <td colspan='4' style='font-size: 11px; font-weight: bold'>TOTALES $codigo</td>
                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'></td>
-                    <td style='font-size: 11px; font-weight: bold'>$dato->columnaExistenciaActual</td>
-                    <td style='font-size: 11px; font-weight: bold'>$dato->columnaExistenciaActualDinero</td>
-                      <td style='font-size: 11px; font-weight: bold'></td>
+                    <td style='font-size: 11px; font-weight: bold'>$sumaSaldoSalidasColumna</td>
+                    <td style='font-size: 11px; font-weight: bold'></td>
+                      <td style='font-size: 11px; font-weight: bold'>$sumaSaldoExistenciaActual</td>
 
                 </tr>";
 
