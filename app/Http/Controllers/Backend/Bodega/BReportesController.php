@@ -1441,7 +1441,7 @@ class BReportesController extends Controller
 
 
 
-            $tabla .= "<tr>
+            $tabla .= "<tr style='background-color: #F8CCA2'>
                     <td colspan='4' style='font-size: 11px; font-weight: bold'>TOTALES $codigo</td>
                     <td style='font-size: 11px'></td>
                     <td style='font-size: 11px'></td>
@@ -1470,7 +1470,7 @@ class BReportesController extends Controller
 
 
         $tabla .= "
-            <table style='width: 100%; margin-top: 20px; font-family: \"Times New Roman\", Times, serif; font-size: 14px; color: #000;'>
+            <table style='width: 100%; margin-top: 40px; font-family: \"Times New Roman\", Times, serif; font-size: 14px; color: #000;'>
                 <!-- Fila para los títulos -->
                 <tr>
                     <td style='width: 50%; text-align: left; padding-bottom: 15px;'>
