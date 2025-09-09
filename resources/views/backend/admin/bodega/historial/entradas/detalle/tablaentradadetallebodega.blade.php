@@ -11,6 +11,7 @@
                                 <th style="width: 20%">Producto</th>
                                 <th style="width: 4%">Cantidad Ingresada</th>
                                 <th style="width: 4%">Precio</th>
+                                <th style="width: 4%">Número ITEM</th>
                                 <th style="width: 4%">Opciones</th>
                             </tr>
                             </thead>
@@ -22,6 +23,7 @@
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->cantidad }}</td>
                                     <td>{{ $dato->precio }}</td>
+                                    <td>{{ $dato->numero_item }}</td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-xs"
                                                 onclick="infoBorrar({{ $dato->id }})">

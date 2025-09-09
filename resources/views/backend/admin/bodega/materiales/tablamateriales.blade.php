@@ -7,6 +7,7 @@
                         <table id="tabla" class="table table-bordered table-striped">
                             <thead>
                             <tr>
+                                <th style="width: 1%">ID</th>
                                 <th style="width: 15%">Nombre</th>
                                 <th style="width: 4%">U. Medida</th>
                                 <th style="width: 12%">Objeto Especif.</th>
@@ -18,6 +19,7 @@
 
                             @foreach($lista as $dato)
                                 <tr>
+                                    <td>{{ $dato->id }}</td>
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->id_unidadmedida }}</td>
                                     <td>{{ $dato->id_objespecifico }}</td>

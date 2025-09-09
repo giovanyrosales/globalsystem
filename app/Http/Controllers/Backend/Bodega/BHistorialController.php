@@ -338,7 +338,7 @@ class BHistorialController extends Controller
 
         $listado = DB::table('bodega_entradas_detalle AS bo')
             ->join('bodega_materiales AS bm', 'bo.id_material', '=', 'bm.id')
-            ->select('bo.id', 'bo.cantidad', 'bo.precio', 'bm.nombre', 'bo.codigo_producto')
+            ->select('bo.id', 'bo.cantidad', 'bo.precio', 'bm.nombre', 'bo.codigo_producto', 'bo.numero_item')
             ->where('bo.id_entrada', $id)
             ->get();
 

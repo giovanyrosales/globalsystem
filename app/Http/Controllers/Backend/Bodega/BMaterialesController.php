@@ -306,6 +306,7 @@ class BMaterialesController extends Controller
                 $detalle->codigo_producto = $filaArray['infoCodigoProducto'];
                 $detalle->nombre_copia = $infoProducto->nombre;
                 $detalle->cantidad_entregada = 0;
+                $detalle->numero_item = $filaArray['infoNumeroItem'];
                 $detalle->save();
             }
 

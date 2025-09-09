@@ -135,6 +135,13 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group col-md-2" style="margin-top: 5px">
+                                    <label class="control-label" style="color: #686868"># de ITEM (opcional): </label>
+                                    <div>
+                                        <input type="text" autocomplete="off" class="form-control" id="numeroItem" placeholder="0">
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </section>
@@ -302,6 +309,8 @@
             var cantidad = document.getElementById('cantidad').value;
             var inputBuscador = document.querySelector('#inputBuscador');
 
+            var numeroItem = document.getElementById('numeroItem').value;
+
             var reglaNumeroEntero = /^[0-9]\d*$/;
             var reglaNumeroDiesDecimal = /^([0-9]+\.?[0-9]{0,10})$/;
 
@@ -362,6 +371,24 @@
 
 
 
+            if(numeroItem !== ''){
+                if(!numeroItem.match(reglaNumeroEntero)) {
+                    toastr.error('numeroItem es requerido');
+                    return;
+                }
+
+                if(numeroItem < 0){
+                    toastr.error('numeroItem Mínima no debe tener negativos');
+                    return;
+                }
+
+                if(numeroItem > 9000000){
+                    toastr.error('numeroItem máximo debe ser 9 millones');
+                    return;
+                }
+            }
+
+
             //**************
 
             // Crear un objeto Date a partir del valor del input
@@ -385,6 +412,8 @@
 
                 "<td>" +
                 "<input name='arrayCantidad[]' disabled value='" + cantidad + "' class='form-control' type='text'>" +
+                "<input name='arrayNumeroItem[]' disabled value='" + numeroItem + "' class='form-control' type='hidden'>" +
+
                 "</td>" +
 
                 "<td>" +
@@ -511,6 +540,8 @@
             var arrayPrecio = $("input[name='arrayPrecio[]']").map(function(){return $(this).attr("data-precio");}).get();
             var arrayCodigoProducto = $("input[name='arrayCodigo[]']").map(function(){return $(this).attr("data-codigoproducto");}).get();
 
+            var arrayNumeroItem = $("input[name='arrayNumeroItem[]']").map(function(){return $(this).val();}).get();
+
 
             var reglaNumeroEntero = /^[0-9]\d*$/;
             var reglaNumeroDiesDecimal = /^([0-9]+\.?[0-9]{0,10})$/;
@@ -601,9 +632,10 @@
                 let infoCantidad = arrayCantidad[i];
                 let infoPrecio = arrayPrecio[i];
                 let infoCodigoProducto = arrayCodigoProducto[i];
+                let infoNumeroItem = arrayNumeroItem[i];
 
                 // ESTOS NOMBRES SE UTILIZAN EN CONTROLADOR
-                contenedorArray.push({ infoIdProducto, infoCantidad, infoPrecio, infoCodigoProducto });
+                contenedorArray.push({ infoIdProducto, infoCantidad, infoPrecio, infoCodigoProducto, infoNumeroItem });
             }
 
 

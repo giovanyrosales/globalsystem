@@ -29,6 +29,8 @@ class CreateBodegaEntradasDetalleTable extends Migration
 
             $table->integer('cantidad_entregada');
 
+            $table->integer('numero_item')->nullable();
+
             $table->foreign('id_entrada')->references('id')->on('bodega_entradas');
             $table->foreign('id_material')->references('id')->on('bodega_materiales');
         });
