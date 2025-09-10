@@ -298,7 +298,7 @@ class BHistorialController extends Controller
             'precio' => 'required',
         );
 
-        // codigo
+        // codigo, numeroitem
 
         $validar = Validator::make($request->all(), $regla);
 
@@ -307,6 +307,7 @@ class BHistorialController extends Controller
         BodegaEntradasDetalle::where('id', $request->id)->update([
             'precio' => $request->precio,
             'codigo_producto' => $request->codigo,
+            'numero_item' => $request->numeroitem
         ]);
 
         return ['success' => 1];

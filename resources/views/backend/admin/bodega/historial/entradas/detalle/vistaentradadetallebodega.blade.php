@@ -83,6 +83,11 @@
                                         <input type="text" class="form-control" maxlength="100" id="precio-editar" autocomplete="off">
                                     </div>
 
+                                    <div class="form-group">
+                                        <label>Número ITEM (opcional)</label>
+                                        <input type="number" class="form-control" id="numeroItem-editar" autocomplete="off">
+                                    </div>
+
 
                                 </div>
                             </div>
@@ -190,6 +195,7 @@
                         $('#id-editar').val(response.data.info.id);
                         $('#codigoproducto-editar').val(response.data.info.codigo_producto);
                         $('#precio-editar').val(response.data.info.precio);
+                        $('#numeroItem-editar').val(response.data.info.numero_item);
                     }
                     else {
                         toastr.error('Error al buscar');
@@ -207,6 +213,7 @@
             var id = document.getElementById('id-editar').value;
             var codigo = document.getElementById('codigoproducto-editar').value;
             var precio = document.getElementById('precio-editar').value;
+            var numeroItem = document.getElementById('numeroItem-editar').value;
 
             if(precio === ''){
                 toastr.error('Precio es requerido');
@@ -230,11 +237,35 @@
                 return;
             }
 
+            var reglaNumeroEntero = /^[0-9]\d*$/;
+
+            if(numeroItem != ''){
+                if(!numeroItem.match(reglaNumeroEntero)) {
+                    toastr.error('Cantidad es requerido');
+                    return;
+                }
+
+                if(numeroItem < 0){
+                    toastr.error('Número Item no debe tener negativos');
+                    return;
+                }
+
+                if(numeroItem > 9000000){
+                    toastr.error('Número Item máximo debe ser 9 millones');
+                    return;
+                }
+
+            }
+
+
+
+
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
             formData.append('codigo', codigo);
             formData.append('precio', precio);
+            formData.append('numeroitem', numeroItem);
 
             axios.post(url+'/bodega/historial/entradadetalle/editar', formData, {
             })
