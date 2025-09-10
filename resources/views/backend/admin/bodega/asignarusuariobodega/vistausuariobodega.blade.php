@@ -33,7 +33,7 @@
         <div class="container-fluid">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Listado de Unidades asignadas a Consolidador</h3>
+                    <h3 class="card-title">Listado de Unidades asignadas a código para Bodeguero</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -179,20 +179,6 @@
                 .then((response) => {
                     closeLoading();
                     if(response.data.success === 1){
-                        Swal.fire({
-                            title: 'Registro Repetido',
-                            text: "ya esta registrado el Objeto Específico",
-                            icon: 'info',
-                            showCancelButton: false,
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'Aceptar',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-
-                            }
-                        })
-                    }
-                    else if(response.data.success === 2){
                         toastr.success('Registrado correctamente');
                         $('#modalAgregar').modal('hide');
                         recargar();
