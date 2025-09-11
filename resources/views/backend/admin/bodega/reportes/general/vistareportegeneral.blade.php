@@ -457,7 +457,6 @@
             var fechahasta = document.getElementById('fecha-hasta2').value;
             var idproducto = document.getElementById('select-productos2').value;
             var checkbox = document.getElementById('checkboxdesglose-todos');
-            var valorCheckbox = checkbox.checked ? 1 : 0;
 
             if(fechadesde === ''){
                 toastr.error('Fecha desde es requerido');

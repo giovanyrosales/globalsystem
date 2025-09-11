@@ -26,6 +26,13 @@ class CreateUsuarioTable extends Migration
             $table->string('cargo', 200)->nullable();
             // utilizado en cabecera para establecer el cargo del usuario bodeguero
             $table->string('cargo2', 200)->nullable();
+
+            // EL USUARIO TIENE ASIGNADO UN ID BODEGA
+            // 1: BODEGA INFORMATICA
+            // 2: BODEGA PROVEEDURIA
+            $table->integer('tipo_bodega')->nullable();
+
+
         });
     }
 

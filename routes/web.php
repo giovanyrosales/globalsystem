@@ -1257,6 +1257,10 @@ Route::get('/admin/solicitudit/administracion/tablafinal/{idfila}', [Solicitudes
 Route::post('/admin/solicitudesit/fechalimite', [SolicitudesITController::class, 'guardarFechaLimiteSolicitudIT']);
 
 
+
+
+
+
 // ** BODEGA ***
 
 // Administrar Materiales de bodega

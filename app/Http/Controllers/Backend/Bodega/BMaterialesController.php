@@ -11,6 +11,7 @@ use App\Models\BodegaSalidaDetalle;
 use App\Models\BodegaUsuarioObjEspecifico;
 use App\Models\P_Departamento;
 use App\Models\P_UnidadMedida;
+use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\ObjEspecifico;
@@ -48,23 +49,16 @@ class BMaterialesController extends Controller
     public function tablaMateriales()
     {
 
-        // solo puedo ver los codigos de mi usuario asignado
-        $pilaObjEspeci = array();
-        $infoAuth = auth()->user();
-        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
+        $idusuario = Auth::id();
+        $infoUsuario = Usuario::where('id', $idusuario)->first();
 
-        foreach ($arrayCodigo as $fila) {
-            array_push($pilaObjEspeci, $fila->id_objespecifico);
-        }
-
-        $lista = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
+        $lista = BodegaMateriales::whereIn('tipo_bodega', [$infoUsuario->tipo_bodega])
             ->orderBy('nombre', 'ASC')
             ->get();
 
         foreach ($lista as $fila) {
             $infoUnidadMedida = P_UnidadMedida::where('id', $fila->id_unidadmedida)->first();
             $fila->id_unidadmedida = $infoUnidadMedida->nombre;
-
 
             $infoObjEspecifico = ObjEspecifico::where('id', $fila->id_objespecifico)->first();
             $fila->id_objespecifico = $infoObjEspecifico->codigo . " - " . $infoObjEspecifico->nombre;
@@ -82,7 +76,6 @@ class BMaterialesController extends Controller
     // registrar un nuevo material // No incluye cantidad ni precio porque esta no se si ira aqui aun
     public function nuevoMaterial(Request $request)
     {
-
         $regla = array(
             'nombre' => 'required'
         );
@@ -93,15 +86,27 @@ class BMaterialesController extends Controller
             return ['success' => 0];
         }
 
-        $dato = new BodegaMateriales();
-        $dato->nombre = $request->nombre;
-        $dato->id_unidadmedida = $request->id_unidadmedida;
-        $dato->id_objespecifico = $request->id_objespecifico;
+        DB::beginTransaction();
 
-        if ($dato->save()) {
+        try {
+
+            $idusuario = Auth::id();
+            $infoUsuario = Usuario::where('id', $idusuario)->first();
+
+            $dato = new BodegaMateriales();
+            $dato->nombre = $request->nombre;
+            $dato->id_unidadmedida = $request->id_unidadmedida;
+            $dato->id_objespecifico = $request->id_objespecifico;
+            $dato->tipo_bodega = $infoUsuario->tipo_bodega;
+            $dato->save();
+
+            DB::commit();
             return ['success' => 1];
-        } else {
-            return ['success' => 2];
+
+        } catch (\Throwable $e) {
+            Log::info('ee ' . $e);
+            DB::rollback();
+            return ['success' => 99];
         }
     }
 
@@ -127,7 +132,6 @@ class BMaterialesController extends Controller
             foreach ($arrayCodigo as $fila) {
                 array_push($pilaObjEspeci, $fila->id_objespecifico);
             }
-
 
             $objespecifico = ObjEspecifico::whereIn('id', $pilaObjEspeci)->orderBy('codigo')->get();
             $unidadmedida = P_UnidadMedida::orderBy('id')->get();
@@ -203,7 +207,6 @@ class BMaterialesController extends Controller
 
     public function indexEntradasRegistro(Request $request)
     {
-
         return view('backend.admin.bodega.entradasregistro.vistaentradasregistro');
     }
 
@@ -213,21 +216,12 @@ class BMaterialesController extends Controller
         if ($request->get('query')) {
             $query = $request->get('query');
 
-            $pilaObjEspeci = array();
-            $infoAuth = auth()->user();
-            $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
-
-            foreach ($arrayCodigo as $fila) {
-                array_push($pilaObjEspeci, $fila->id_objespecifico);
-            }
-
+            $idusuario = Auth::id();
+            $infoUsuario = Usuario::where('id', $idusuario)->first();
 
             $data = BodegaMateriales::where('nombre', 'LIKE', "%{$query}%")
-                ->whereIn('id_objespecifico', $pilaObjEspeci)
+                ->whereIn('tipo_bodega', [$infoUsuario->tipo_bodega])
                 ->get();
-
-            Log::info($data);
-
 
             $output = '<ul class="dropdown-menu" style="display:block; position:relative; overflow: auto; max-height: 300px; width: 550px">';
             $tiene = true;
@@ -371,15 +365,13 @@ class BMaterialesController extends Controller
     public function indexSalidasManual()
     {
         // LISTADO DE PRODUCTOS QUE TIENEN CANTIDAD DISPONIBLE DE SALIDA
-        $pilaObjEspeci = array();
-        $infoAuth = auth()->user();
-        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
 
-        foreach ($arrayCodigo as $fila){
-            array_push($pilaObjEspeci, $fila->id_objespecifico);
-        }
 
-        $arrayMateriales = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)->get();
+        $idusuario = Auth::id();
+        $infoUsuario = Usuario::where('id', $idusuario)->first();
+
+
+        $arrayMateriales = BodegaMateriales::whereIn('tipo_bodega', [$infoUsuario->tipo_bodega])->get();
         $pilaIdMaterial = array();
         foreach ($arrayMateriales as $fila){
             array_push($pilaIdMaterial, $fila->id);

@@ -618,22 +618,29 @@ class BReportesController extends Controller
     public function vistaReporteGenerales()
     {
 
-        $pilaObjEspeci = array();
-        $infoAuth = auth()->user();
-        $arrayCodigoPresupuestario = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
+        $idusuario = Auth::id();
+        $infoUsuario = Usuario::where('id', $idusuario)->first();
+
+        $arrayCodigoPresupuestario = BodegaUsuarioObjEspecifico::where('id_usuario', $idusuario)->get();
 
         foreach ($arrayCodigoPresupuestario as $fila) {
-            array_push($pilaObjEspeci, $fila->id_objespecifico);
-
             $infoObjeto = ObjEspecifico::where('id', $fila->id_objespecifico)->first();
             $fila->nombreObjeto = $infoObjeto->nombre;
             $fila->nombreCodigo = $infoObjeto->codigo;
         }
 
-        $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)->get();
+
+        $arrayProductos = BodegaMateriales::whereIn('tipo_bodega', [$infoUsuario->tipo_bodega])->get();
+
+        foreach ($arrayProductos as $fila) {
+            $infoObjeto = ObjEspecifico::where('id', $fila->id_objespecifico)->first();
+            $fila->nombreObjeto = $infoObjeto->nombre;
+            $fila->nombreCodigo = $infoObjeto->codigo;
+        }
+
 
         // TODOS LOS LOTES REGISTRADOS - FILTRADOS POR EL USUARIO
-        $arrayLotes = BodegaEntradas::where('id_usuario',$infoAuth->id)
+        $arrayLotes = BodegaEntradas::where('id_usuario',$infoUsuario->id)
             ->orderBy('lote', 'ASC')
             ->get();
 
@@ -648,19 +655,13 @@ class BReportesController extends Controller
     public function generarPDFExistencias()
     {
         // OBTENER UNICAMENTE LOS MATERIALES ASOCIADOS A MIS CODIGOS
-
-        $pilaObjEspeci = array();
         $pilaMaterialValido = array();
-        $infoAuth = auth()->user();
-        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
-
         $totalCulumna = 0;
 
-        foreach ($arrayCodigo as $fila) {
-            array_push($pilaObjEspeci, $fila->id_objespecifico);
-        }
+        $idusuario = Auth::id();
+        $infoUsuario = Usuario::where('id', $idusuario)->first();
 
-        $arrayMisMaterieales = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)->get();
+        $arrayMisMaterieales = BodegaMateriales::whereIn('tipo_bodega', [$infoUsuario->tipo_bodega])->get();
         foreach ($arrayMisMaterieales as $fila) {
             array_push($pilaMaterialValido, $fila->id);
         }
@@ -702,7 +703,6 @@ class BReportesController extends Controller
 
 
         // USUARIO LOGEADO
-        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
 
 
 
@@ -727,7 +727,7 @@ class BReportesController extends Controller
                     <!-- Texto centrado -->
                     <td style='width: 60%; text-align: center;'>
                         <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuario->cargo2</h2>
                     </td>
                     <!-- Logo derecho -->
                     <td style='width: 10%; text-align: right;'>
@@ -801,27 +801,21 @@ class BReportesController extends Controller
 
         // NECESITO TODOS LOS MATERIALES FILTRADOS
 
-
-        $pilaObjEspeci = array();
-        $infoAuth = auth()->user();
-        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
-
-        foreach ($arrayCodigo as $fila) {
-            array_push($pilaObjEspeci, $fila->id_objespecifico);
-        }
+        $idusuario = Auth::id();
+        $infoUsuario = Usuario::where('id', $idusuario)->first();
 
 
         // ARRAY DE PRODUCTOS
 
         if($checkProductos==1){ // TODOS LOS PRODUCTOS
             // OBTENEMOS TODOS LOS PRODUCTOS
-            $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
+            $arrayProductos = BodegaMateriales::whereIn('tipo_bodega', [$infoUsuario->tipo_bodega])
                 ->orderBy('nombre', 'ASC')
                 ->get();
 
         }else{ // SOLO SELECCIONADOS
             $porciones = explode("-", $arrayProductos);
-            $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
+            $arrayProductos = BodegaMateriales::whereIn('tipo_bodega', [$infoUsuario->tipo_bodega])
                 ->whereIn('id', $porciones)
                 ->orderBy('nombre', 'ASC')
                 ->get();
@@ -903,8 +897,6 @@ class BReportesController extends Controller
 
         //************************************************
 
-        // USUARIO LOGEADO
-        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
 
         // INFORMACION GERENCIA
         $infoGerencia = BodegaExtras::where('id', 1)->first();
@@ -931,7 +923,7 @@ class BReportesController extends Controller
                     <!-- Texto centrado -->
                     <td style='width: 60%; text-align: center;'>
                         <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuario->cargo2</h2>
                     </td>
                     <!-- Logo derecho -->
                     <td style='width: 10%; text-align: right;'>
@@ -1083,8 +1075,8 @@ class BReportesController extends Controller
                 <!-- Fila para los contenidos -->
                 <tr>
                     <td style='width: 50%; text-align: left; padding: 20px;'>
-                        <p style='margin: 10px 0;'>$infoUsuarioLogeado->nombre</p>
-                        <p style='margin: 10px 0;'>$infoUsuarioLogeado->cargo</p>
+                        <p style='margin: 10px 0;'>$infoUsuario->nombre</p>
+                        <p style='margin: 10px 0;'>$infoUsuario->cargo</p>
                     </td>
                     <td style='width: 50%; padding: 20px; display: flex; flex-direction: column; align-items: flex-end; padding-right: 15px;'>
                         <p style='margin: 10px 0;'>$infoGerencia->nombre_gerente</p>
@@ -1118,13 +1110,11 @@ class BReportesController extends Controller
 
 
         // FILTRANDO SOLO OBJ ESPECIFICO DEL USUARIO
-        $pilaObjEspeci = array();
-        $infoAuth = auth()->user();
-        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $infoAuth->id)->get();
 
-        foreach ($arrayCodigo as $fila) {
-            array_push($pilaObjEspeci, $fila->id_objespecifico);
-        }
+        $idusuario = Auth::id();
+        $infoUsuario = Usuario::where('id', $idusuario)->first();
+
+
 
         // ESTO ES ID DE bodega_entradas
         $porciones = explode("-", $arrayLotes);
@@ -1138,17 +1128,6 @@ class BReportesController extends Controller
 
 
 
-
-
-
-
-
-
-
-// 0) Salidas tempranas y helpers
-        if (empty($pilaObjEspeci) || empty($pilaArrayBodegaEntradas)) {
-            return collect(); // nada que procesar
-        }
 
 // Clave compuesta material|lote normalizada para evitar "30" vs 30
         $makeKey = function ($idEntrada, $idMaterial) {
@@ -1166,7 +1145,7 @@ class BReportesController extends Controller
                 DB::raw('SUM(bed.cantidad) AS cantidad_entrada'),
                 DB::raw('MAX(bed.precio) AS precio_unitario') // ajusta si tu campo se llama distinto
             )
-            ->whereIn('bm.id_objespecifico', $pilaObjEspeci)
+            ->whereIn('bm.tipo_bodega', [$infoUsuario->tipo_bodega])
             ->whereIn('bed.id_entrada', $pilaArrayBodegaEntradas)
             ->groupBy('bed.id_entrada', 'bed.id_material', 'bm.id_objespecifico', 'bm.nombre')
             ->get();
@@ -1186,7 +1165,7 @@ class BReportesController extends Controller
                 'bed.id_material',
                 DB::raw('SUM(bsd.cantidad_salida) AS cantidad_previa')
             )
-            ->whereIn('bm.id_objespecifico', $pilaObjEspeci)
+            ->whereIn('bm.tipo_bodega', [$infoUsuario->tipo_bodega])
             ->whereIn('bed.id_entrada', $pilaArrayBodegaEntradas)
             ->where('bs.fecha', '<', $start)
             ->groupBy('bed.id_entrada', 'bed.id_material')
@@ -1211,7 +1190,7 @@ class BReportesController extends Controller
                 'obj.codigo AS codigo_obj',
                 DB::raw('SUM(bsd.cantidad_salida) AS salidas_totales')
             )
-            ->whereIn('bm.id_objespecifico', $pilaObjEspeci)
+            ->whereIn('bm.tipo_bodega', [$infoUsuario->tipo_bodega])
             ->whereIn('bed.id_entrada', $pilaArrayBodegaEntradas)
             ->whereBetween('bs.fecha', [$start, $end])
             ->groupBy('bm.id_objespecifico', 'bed.id_entrada', 'bed.id_material', 'obj.codigo')
@@ -1307,14 +1286,12 @@ class BReportesController extends Controller
 
         //************************************************
 
-        // USUARIO LOGEADO
-        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
 
         // INFORMACION GERENCIA
         $infoGerencia = BodegaExtras::where('id', 1)->first();
 
 
-        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+       // $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
         $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
         $mpdf->SetTitle('Existencias General');
@@ -1335,7 +1312,7 @@ class BReportesController extends Controller
                     <!-- Texto centrado -->
                     <td style='width: 60%; text-align: center;'>
                         <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuario->cargo2</h2>
                     </td>
                     <!-- Logo derecho -->
                     <td style='width: 10%; text-align: right;'>
@@ -1386,7 +1363,6 @@ class BReportesController extends Controller
 
         foreach ($resultado as $dato) {
 
-            $idObj = $dato['id_objespecifico'];
             $codigo = $dato['codigo'];
             $sumaSaldoSalidasColumna = 0;
             $sumaSaldoExistenciaActual = 0;
@@ -1440,7 +1416,6 @@ class BReportesController extends Controller
             $sumaSaldoExistenciaActual = "$" . number_format((float)$sumaSaldoExistenciaActual, 2, '.', ',');
 
 
-
             $tabla .= "<tr style='background-color: #F8CCA2'>
                     <td colspan='4' style='font-size: 11px; font-weight: bold'>TOTALES $codigo</td>
                     <td style='font-size: 11px'></td>
@@ -1459,13 +1434,6 @@ class BReportesController extends Controller
 
 
         $tabla .= "</tbody></table>";
-
-
-
-
-
-
-
 
 
 
@@ -1492,8 +1460,8 @@ class BReportesController extends Controller
             <tr>
                 <!-- Fila para los contenidos -->
                     <td style='width: 50%; text-align: left; padding: 20px;'>
-                        <p style='margin: 10px 0; font-size: 11px'>$infoUsuarioLogeado->nombre</p>
-                        <p style='margin: 10px 0; font-size: 11px'>$infoUsuarioLogeado->cargo</p>
+                        <p style='margin: 10px 0; font-size: 11px'>$infoUsuario->nombre</p>
+                        <p style='margin: 10px 0; font-size: 11px'>$infoUsuario->cargo</p>
                     </td>
                     <td style='width: 50%; padding: 20px; display: flex; flex-direction: column; align-items: flex-end; padding-right: 15px;'>
                         <p style='margin: 10px 0; font-size: 11px'>$infoGerencia->nombre_gerente</p>
@@ -1790,16 +1758,9 @@ class BReportesController extends Controller
 
 
         $idusuario = Auth::id();
+        $infoUsuario = Usuario::where('id', $idusuario)->first();
 
-        $pilaObjEspeci = array();
-        $arrayCodigo = BodegaUsuarioObjEspecifico::where('id_usuario', $idusuario)->get();
-
-        foreach ($arrayCodigo as $fila) {
-            array_push($pilaObjEspeci, $fila->id_objespecifico);
-        }
-
-
-        $arrayProductos = BodegaMateriales::whereIn('id_objespecifico', $pilaObjEspeci)
+        $arrayProductos = BodegaMateriales::whereIn('tipo_bodega', [$infoUsuario->tipo_bodega])
             ->orderBy('nombre', 'ASC')
             ->get();
 
@@ -1882,14 +1843,8 @@ class BReportesController extends Controller
         //************************************************
 
 
-
-        // USUARIO LOGEADO
-        $infoUsuarioLogeado = Usuario::where('id', $idusuario)->first();
-
         // INFORMACION GERENCIA
         $infoGerencia = BodegaExtras::where('id', 1)->first();
-
-
 
 
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER', 'orientation' => 'L']);
@@ -1913,7 +1868,7 @@ class BReportesController extends Controller
                     <!-- Texto centrado -->
                     <td style='width: 60%; text-align: center;'>
                         <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuario->cargo2</h2>
                     </td>
                     <!-- Logo derecho -->
                     <td style='width: 10%; text-align: right;'>
@@ -2014,8 +1969,8 @@ class BReportesController extends Controller
                 <!-- Fila para los contenidos -->
                 <tr>
                     <td style='width: 50%; text-align: left; padding: 20px;'>
-                        <p style='margin: 10px 0;'>$infoUsuarioLogeado->nombre</p>
-                        <p style='margin: 10px 0;'>$infoUsuarioLogeado->cargo</p>
+                        <p style='margin: 10px 0;'>$infoUsuario->nombre</p>
+                        <p style='margin: 10px 0;'>$infoUsuario->cargo</p>
                     </td>
                     <td style='width: 50%; padding: 20px; display: flex; flex-direction: column; align-items: flex-end; padding-right: 15px;'>
                         <p style='margin: 10px 0;'>$infoGerencia->nombre_gerente</p>
@@ -2475,7 +2430,6 @@ class BReportesController extends Controller
 
 
         $idusuario = Auth::id();
-        // USUARIO LOGEADO
         $infoUsuarioLogeado = Usuario::where('id', $idusuario)->first();
 
 
@@ -2499,7 +2453,9 @@ class BReportesController extends Controller
 
             // OBTENER TODOS LOS MATERIALES ASOCIADOS A ESE OBJ ESPECIFICO, QUE OTRO USUARIO BODEGA
             // NO PUEDE TENER EL MISMO OBJ ESPECIFICO
-            $arrayMaterialesMios = BodegaMateriales::where('id_objespecifico', $filaItem->id_objespecifico)->get();
+            $arrayMaterialesMios = BodegaMateriales::where('id_objespecifico', $filaItem->id_objespecifico)
+                ->where('tipo_bodega', $infoUsuarioLogeado->tipo_bodega)
+                ->get();
 
             $infoObjeEspecifico = ObjEspecifico::where('id', $filaItem->id_objespecifico)->first();
             $filaItem->codigo = $infoObjeEspecifico->codigo;
