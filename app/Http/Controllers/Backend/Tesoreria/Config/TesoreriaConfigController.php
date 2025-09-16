@@ -1539,7 +1539,7 @@ class TesoreriaConfigController extends Controller
             $now = Carbon::now('America/El_Salvador');
 
             $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                ->where('vigencia_hasta', '>=', $now)
+                ->where('vigencia_hasta', '<', $now)
                 ->whereNotIn('id', $pilaIdGara)
                 ->get()
                 ->sortBy(function($item) {
