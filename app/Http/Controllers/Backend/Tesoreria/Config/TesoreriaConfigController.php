@@ -469,7 +469,16 @@ class TesoreriaConfigController extends Controller
     {
         $now = Carbon::now('America/El_Salvador');
 
+        // NO MOSTRAR LOS QUE YA ESTAN ENTREGADAS  A UCP Y PROVEEDOR
+        $pilaArrayEstados = array();
+        $arrayTesoGarantiasEstados = TesoreriaGarantiaEstados::all();
+
+        foreach ($arrayTesoGarantiasEstados as $fila){
+            array_push($pilaArrayEstados, $fila->id_garantia_pendi);
+        }
+
         $listado = TesoreriaGarantiaPendienteEntrega::where('vigencia_hasta', '>', $now)
+            ->whereNotIn('id', $pilaArrayEstados)
             ->orderBy('control_interno', 'ASC')
             ->get();
 
@@ -1515,10 +1524,22 @@ class TesoreriaConfigController extends Controller
         // 1- VIGENTES 2-VENCIDAS 3-UCP 4-PROVEEDOR
 
         if($tipo == 1){ // VIGENTES
+
+
+            // NO MOSTRAR LOS QUE YA ESTAN ENTREGADAS  A UCP Y PROVEEDOR
+            $pilaArrayEstados = array();
+            $arrayTesoGarantiasEstados = TesoreriaGarantiaEstados::all();
+
+            foreach ($arrayTesoGarantiasEstados as $fila){
+                array_push($pilaArrayEstados, $fila->id_garantia_pendi);
+            }
+
+
             $nombreEstado = 'Vigentes';
 
             $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
                 ->where('vigencia_hasta', '>=', $now)
+                ->whereNotIn('id', $pilaArrayEstados)
                 ->get()
                 ->sortBy(function($item) {
                     // Extraer la parte antes del guion y convertir a entero
