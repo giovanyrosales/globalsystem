@@ -1531,6 +1531,24 @@ Route::post('/admin/sindico/registrotodos/editar', [SindicoController::class, 'e
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //-------------------- MODULO PARA TESORERIA -> PROVEEDORES ----------------------------------
 
 

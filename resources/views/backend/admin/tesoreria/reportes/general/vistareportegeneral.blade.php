@@ -40,7 +40,7 @@
                         <select class="form-control col-md-3" id="select-estado">
                             <option value="1">VIGENTES</option>
                             <option value="2">VENCIDAS</option>
-                            <option value="3">ENTRADAS A UCP</option>
+                            <option value="3">ENTREGADAS A UCP</option>
                             <option value="4">ENTREGADAS A PROVEEDOR</option>
                         </select>
 

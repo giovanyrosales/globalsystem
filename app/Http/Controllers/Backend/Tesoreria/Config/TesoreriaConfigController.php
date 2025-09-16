@@ -1513,20 +1513,12 @@ class TesoreriaConfigController extends Controller
 
         //TIPOS
         // 1- VIGENTES 2-VENCIDAS 3-UCP 4-PROVEEDOR
-        $arrayReporte = [];
-
-
 
         if($tipo == 1){ // VIGENTES
             $nombreEstado = 'Vigentes';
 
-           /* $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-            ->where('vigencia_hasta', '>', $now)
-                ->orderBy('control_interno', 'ASC')
-                ->get();*/
-
             $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                ->where('vigencia_hasta', '<', $now)
+                ->where('vigencia_hasta', '>=', $now)
                 ->get()
                 ->sortBy(function($item) {
                     // Extraer la parte antes del guion y convertir a entero
@@ -1547,7 +1539,7 @@ class TesoreriaConfigController extends Controller
             $now = Carbon::now('America/El_Salvador');
 
             $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                ->where('vigencia_hasta', '<', $now)
+                ->where('vigencia_hasta', '>=', $now)
                 ->whereNotIn('id', $pilaIdGara)
                 ->get()
                 ->sortBy(function($item) {
@@ -1565,14 +1557,6 @@ class TesoreriaConfigController extends Controller
             foreach ($listaEstados as $fila) {
                 array_push($pilaUcp, $fila->id_garantia_pendi);
             }
-
-            /*$arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                ->whereIn('id', $pilaUcp)
-                ->where('completado', 0)
-                ->orderBy('control_interno', 'ASC')
-                ->get();
-            */
-
 
             $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
                 ->whereIn('id', $pilaUcp)
@@ -1594,12 +1578,6 @@ class TesoreriaConfigController extends Controller
             foreach ($listaEstados as $fila) {
                 array_push($pilaProveedor, $fila->id_garantia_pendi);
             }
-
-            /*$arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
-                ->whereIn('id', $pilaProveedor)
-                ->where('completado', 0)
-                ->orderBy('control_interno', 'ASC')
-                ->get();*/
 
             $arrayReporte = TesoreriaGarantiaPendienteEntrega::whereYear('fecha_registro', $anio)
                 ->whereIn('id', $pilaProveedor)
