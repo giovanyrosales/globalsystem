@@ -560,9 +560,6 @@
                 return;
             }
 
-
-
-
             var valores = $('#select-codigopresupuestario').val();
             if(valores.length ==  null || valores.length === 0){
                 toastr.error('Seleccionar mínimo 1 Código');
@@ -583,6 +580,43 @@
             window.open("{{ URL::to('admin/bodega/reportes/pdf/codigopresupuestario') }}/" +
                 fechadesde + "/" + fechahasta + "/" + reemplazo);
         }
+
+
+
+        function pdfReporteEntregaTotal(){
+
+            var fechadesde = document.getElementById('fecha-entregatotal-desde').value;
+            var fechahasta = document.getElementById('fecha-entregatotal-hasta').value;
+            var idunidad  = document.getElementById('select-unidades-entregatotal').value;
+
+            if(fechadesde === ''){
+                toastr.error('Fecha desde es requerido');
+                return;
+            }
+
+            if(idunidad === ''){
+                toastr.error('Unidad es requerido');
+                return;
+            }
+
+            if(fechahasta === ''){
+                toastr.error('Fecha hasta es requerido');
+                return;
+            }
+
+            // Convertir a objetos Date para comparar
+            let dateDesde = new Date(fechadesde);
+            let dateHasta = new Date(fechahasta);
+
+            if (dateHasta < dateDesde) {
+                toastr.error('La Fecha Hasta no puede ser menor que la Fecha Desde');
+                return;
+            }
+
+            window.open("{{ URL::to('admin/bodega/reportes/pdf/entragadosaunidad') }}/" +
+                fechadesde + "/" + fechahasta + "/" + idunidad);
+        }
+
 
 
 

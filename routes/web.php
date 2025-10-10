@@ -1475,8 +1475,17 @@ Route::post('/admin/bodega/solicitud/editardatos', [BSolicitudesController::clas
 //*** SOLICITUDES FINALIZADAS
 Route::get('/admin/bodega/solicitudfinalizadas/index', [BSolicitudesController::class,'indexSolicitudesFinalizadas'])->name('sidebar.bodega.solicitudes.finalizadas');
 Route::get('/admin/bodega/solicitudfinalizadas/tabla', [BSolicitudesController::class,'tablaSolicitudesFinalizadas']);
-
 Route::get('/admin/bodega/solicitudfinalizadas/detalle/{id}', [BSolicitudesController::class,'indexDetalleSolicitudesFinalizadas']);
+
+Route::get('/admin/bodega/reportes/pdf/entragadosaunidad/{desde}/{hasta}/{idunidad}', [BSolicitudesController::class,'reporteEntregadosAUnidad']);
+
+
+
+
+
+
+
+
 
 
 

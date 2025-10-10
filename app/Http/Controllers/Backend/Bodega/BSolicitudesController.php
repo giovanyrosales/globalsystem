@@ -919,4 +919,187 @@ class BSolicitudesController extends Controller
     }
 
 
+
+
+
+
+    public function reporteEntregadosAUnidad($desde, $hasta, $idunidad)
+    {
+        $start = Carbon::parse($desde)->startOfDay();
+        $end = Carbon::parse($hasta)->endOfDay();
+
+        $desdeFormat = date("d-m-Y", strtotime($desde));
+        $hastaFormat = date("d-m-Y", strtotime($hasta));
+        $infoAuth = auth()->user();
+
+        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
+        $infoDepartamento = P_Departamento::where('id', $idunidad)->first();
+
+        // TODAS LAS SALIDAS QUE HIZO MI USUARIO BODEGUERO
+        $arrayBodegaSalida = BodegaSalida::where('id_usuario', $infoUsuarioLogeado->id)
+            ->whereBetween('fecha', [$start, $end])
+            ->where('id_unidad_manual', $idunidad)
+            ->orderBy('fecha', 'ASC')
+            ->get();
+
+        $resultsBloque = array();
+        $index = 0;
+        $totalTodasLasUnidades = 0;
+
+        foreach ($arrayBodegaSalida as $filaP) {
+            array_push($resultsBloque, $filaP);
+
+            // AQUI SE OBTIENE TODAS LAS SALIDAS DE DEPARTAMENTO EN DEPARTAMENTO
+            $arraySalidaDetalle = BodegaSalidaDetalle::whereIn('id_salida', $filaP)->get();
+            $filaP->fechaFormat = date("d-m-Y", strtotime($filaP->fecha));
+
+
+
+            $columnaTotalMultiplicado = 0;
+            foreach ($arraySalidaDetalle as $fila) {
+
+                $infoEnDeta = BodegaEntradasDetalle::where('id', $fila->id_entradadetalle)->first();
+                $infoMaterial = BodegaMateriales::where('id', $infoEnDeta->id_material)->first();
+
+                $fila->nombreMaterial = $infoMaterial->nombre;
+                $fila->precioFormat = "$" . $infoEnDeta->precio;
+
+
+
+                // UNIDADMEDIDA
+                $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
+                $fila->unidadMedida = $infoUnidad->nombre;
+
+                // TOTAL
+                $multiplicado = $fila->cantidad_salida * $infoEnDeta->precio;
+                $columnaTotalMultiplicado += $multiplicado;
+                $fila->multiplicado = '$' . number_format((float)$multiplicado, 2, '.', ',');
+            }
+
+            $totalTodasLasUnidades += $columnaTotalMultiplicado;
+
+            $resultsBloque[$index]->bloque = $arraySalidaDetalle;
+            $index++;
+        }
+
+
+        $totalTodasLasUnidades = '$' . number_format((float)$totalTodasLasUnidades, 2, '.', ',');
+
+
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+        $mpdf->SetTitle('Entregas');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+
+        $logoalcaldia = 'images/gobiernologo.jpg';
+        $logosantaana = 'images/logo.png';
+
+        $tabla = "
+            <table style='width: 100%; border-collapse: collapse;'>
+                <tr>
+                    <!-- Logo izquierdo -->
+                    <td style='width: 15%; text-align: left;'>
+                        <img src='$logosantaana' alt='Santa Ana Norte' style='max-width: 100px; height: auto;'>
+                    </td>
+                    <!-- Texto centrado -->
+                    <td style='width: 60%; text-align: center;'>
+                        <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
+                    </td>
+                    <!-- Logo derecho -->
+                    <td style='width: 10%; text-align: right;'>
+                        <img src='$logoalcaldia' alt='Gobierno de El Salvador' style='max-width: 60px; height: auto;'>
+                    </td>
+                </tr>
+            </table>
+            <hr style='border: none; border-top: 2px solid #003366; margin: 0;'>
+            ";
+
+        $tabla .= "
+            <div style='text-align: center; margin-top: 20px;'>
+                <h1 style='font-size: 16px; margin: 0; color: #000;'>ENTREGADO A UNIDAD: $infoDepartamento->nombre</h1>
+                <p style='font-size: 14px; margin: 0; color: #000;'><strong>DESDE: $desdeFormat   HASTA: $hastaFormat</strong></p>
+            </div>
+      ";
+
+
+
+        // COLOCAR CADA UNIDAD ENCONTRADA
+        foreach ($arrayBodegaSalida as $fila){
+
+            if (empty($fila->bloque)) {
+                continue; // Saltar esta iteración si el bloque está vacío
+            }
+
+
+            $tabla .= "<table width='100%' id='tablaFor'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 6%; font-size: 11px; text-align: center;'>F. Salida</th>
+                    <th style='font-weight: bold; width: 22%; font-size: 11px; text-align: center;'>Descripción</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Número Solicitud</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+            $tabla .= "<tr>
+                    <td style='font-size: 11px'>$fila->fechaFormat</td>
+                    <td style='font-size: 11px'>$fila->observacion</td>
+                    <td style='font-size: 11px'>$fila->numero_solicitud</td>
+                </tr>";
+
+            $tabla .= "</tbody></table>";
+
+
+            $tabla .= "<table width='100%' id='tablaFor'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 22%; font-size: 11px; text-align: center;'>ITEM</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Unidad Medida</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Precio</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Total</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+            foreach ($fila->bloque as $dato) {
+                $tabla .= "<tr>
+                    <td style='font-size: 11px'>$dato->nombreMaterial</td>
+                    <td style='font-size: 11px'>$dato->unidadMedida</td>
+                    <td style='font-size: 11px'>$dato->precioFormat</td>
+                    <td style='font-size: 11px'>$dato->multiplicado</td>
+                </tr>";
+            }
+
+
+            $tabla .= "</tbody></table>";
+        }
+
+        $tabla .= "<br>";
+
+
+
+
+        $stylesheet = file_get_contents('css/cssbodega.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+    }
+
+
+
+
+
+
+
+
+
+
 }
