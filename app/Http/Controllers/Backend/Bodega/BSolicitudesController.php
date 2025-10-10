@@ -1061,6 +1061,7 @@ class BSolicitudesController extends Controller
                     <th style='font-weight: bold; width: 22%; font-size: 11px; text-align: center;'>ITEM</th>
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Unidad Medida</th>
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Precio</th>
+                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Entregado</th>
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Total</th>
                 </tr>
             </thead>
@@ -1071,6 +1072,7 @@ class BSolicitudesController extends Controller
                     <td style='font-size: 11px'>$dato->nombreMaterial</td>
                     <td style='font-size: 11px'>$dato->unidadMedida</td>
                     <td style='font-size: 11px'>$dato->precioFormat</td>
+                    <td style='font-size: 11px'>$dato->cantidad_salida</td>
                     <td style='font-size: 11px'>$dato->multiplicado</td>
                 </tr>";
             }
