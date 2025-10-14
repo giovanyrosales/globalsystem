@@ -1318,6 +1318,11 @@ Route::get('/admin/bodega/historial/nuevoingresoentradadetalle/index/{id}', [BHi
 Route::post('/admin/bodega/historial/entrada/datosinformacion', [BHistorialController::class,'informacionDatosEntrada']);
 Route::post('/admin/bodega/historial/entrada/guardarinformacion', [BHistorialController::class,'guardarDatosEntrada']);
 
+// Todos los registros de entrada, los materiales
+Route::get('/admin/bodega/historial/entradatodos/index', [BHistorialController::class,'indexHistorialEntradasMateriales'])->name('sidebar.bodega.historial.entradasmateriales');
+Route::get('/admin/bodega/historial/entradatodos/tabla', [BHistorialController::class,'tablaHistorialEntradasMateriales']);
+
+
 
 
 

@@ -93,6 +93,52 @@ class BHistorialController extends Controller
 
 
 
+    public function indexHistorialEntradasMateriales()
+    {
+        return view('backend.admin.bodega.historial.todosmaterial.vistatodomaterialentradas');
+    }
+
+
+
+    public function tablaHistorialEntradasMateriales()
+    {
+
+        $usuario = auth()->user();
+        $arrayEntradas = BodegaEntradas::where('id_usuario', $usuario->id)
+            ->orderBy('fecha', 'desc')
+            ->get();
+        $pilaIDEntradas = array();
+        foreach ($arrayEntradas as $fila) {
+            array_push($pilaIDEntradas, $fila->id);
+        }
+
+
+        $arrayEntradasDetalle = BodegaEntradasDetalle::whereIn('id_entrada', $pilaIDEntradas)->get();
+
+        foreach ($arrayEntradasDetalle as $fila) {
+
+            $infoEntrada = BodegaEntradas::where('id', $fila->id_entrada)->first();
+            $infoMaterial = BodegaMateriales::where('id', $fila->id_material)->first();
+            $fila->fechaFormat = date("d-m-Y", strtotime($infoEntrada->fecha));
+
+
+            $fila->lote = $infoEntrada->lote;
+            $fila->observacion = $infoEntrada->observacion;
+            $fila->nombreMaterial = $infoMaterial->nombre;
+
+        }
+
+
+        return view('backend.admin.bodega.historial.todosmaterial.tablatodomaterialentradas', compact('arrayEntradasDetalle'));
+    }
+
+
+
+
+
+
+
+
 
 
 

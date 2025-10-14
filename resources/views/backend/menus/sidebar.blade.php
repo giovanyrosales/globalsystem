@@ -957,6 +957,14 @@
                                 </a>
                             </li>
 
+
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.bodega.historial.entradasmateriales') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Entradas - Materiales</p>
+                                </a>
+                            </li>
+
                             <!--
                             SE DEJARA SOLO SALIDAS MANUALES
                             MODIFICADO: 22/8/2025
