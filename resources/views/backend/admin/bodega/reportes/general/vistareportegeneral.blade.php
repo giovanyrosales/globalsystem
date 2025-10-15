@@ -323,7 +323,37 @@
     </section>
 
 
+    <section class="content" style="margin-top: 35px; margin-bottom: 250px">
+        <div class="container-fluid">
+            <div class="card card-gray-dark">
+                <div class="card-header" title="MODIFICADO: 14/10/2025">
+                    <h3 class="card-title">ENTREGADO POR MATERIAL</h3>
+                </div>
+                <div class="card-body">
+                    <section class="content" style="margin-left: 30px">
+                        <div class="container-fluid">
 
+                            <div class="row">
+
+                                <button type="button" onclick="pdfReportePorMaterial()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
+                                    <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
+                                    Generar PDF
+                                </button>
+                            </div>
+
+                            <label>Materiales</label>
+                            <select class="form-control" id="select-reporte-pormaterial">
+                                @foreach($arrayProductos as $item)
+                                    <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                @endforeach
+                            </select>
+
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
 
 </div>
 
@@ -387,6 +417,16 @@
                     }
                 },
             });
+
+            $('#select-reporte-pormaterial').select2({
+                theme: "bootstrap-5",
+                "language": {
+                    "noResults": function(){
+                        return "Búsqueda no encontrada";
+                    }
+                },
+            });
+
 
             document.getElementById("divcontenedor").style.display = "block";
         });
@@ -618,6 +658,15 @@
         }
 
 
+
+        function pdfReportePorMaterial(){
+
+            var idmaterial  = document.getElementById('select-reporte-pormaterial').value;
+
+
+            window.open("{{ URL::to('admin/bodega/reportes/pdf/entregadopormaterial') }}/" +
+                idmaterial);
+        }
 
 
 

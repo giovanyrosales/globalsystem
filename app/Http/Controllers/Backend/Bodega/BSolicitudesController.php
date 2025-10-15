@@ -1098,6 +1098,115 @@ class BSolicitudesController extends Controller
 
 
 
+    //TODAS LAS SALIDAS DE UN MATERIAL PARA VER A QUE UNIDAD SE ENTREGO
+    public function reporteEntregadoPorMaterial($idmaterial)
+    {
+        $infoAuth = auth()->user();
+        $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
+
+
+        $arraySalidas = BodegaSalida::where('id_usuario', $infoUsuarioLogeado->id)->get();
+        $pilaIdBodegaSalida = array();
+
+        foreach ($arraySalidas as $filaP) {
+            array_push($pilaIdBodegaSalida, $filaP->id);
+        }
+
+        $infoMaterial = BodegaMateriales::where('id', $idmaterial)->first();
+
+        $arrayBodegaSalidaDetalle = DB::table('bodega_salidas_detalle AS salideta')
+            ->join('bodega_salidas AS bodesalida', 'bodesalida.id', '=', 'salideta.id_salida')
+            ->join('bodega_entradas_detalle AS boentradadetalle', 'salideta.id_entradadetalle', '=', 'boentradadetalle.id')
+            ->select('boentradadetalle.id_material', 'bodesalida.id_unidad_manual', 'bodesalida.fecha',
+            'salideta.cantidad_salida')
+            ->where('boentradadetalle.id_material', $idmaterial)
+            ->get();
+
+        foreach ($arrayBodegaSalidaDetalle as $filaP) {
+
+            $filaP->fechaFormat = date('d-m-Y', strtotime($filaP->fecha));
+
+            $unidad = "";
+            if($filaP->id_unidad_manual != null){
+                $infoDepartamento = P_Departamento::where('id', $filaP->id_unidad_manual)->first();
+                $unidad = $infoDepartamento->nombre;
+            }
+
+            $filaP->unidad = $unidad;
+        }
+
+
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+        $mpdf->SetTitle('Salidas');
+
+        // mostrar errores
+        $mpdf->showImageErrors = false;
+
+
+        $logoalcaldia = 'images/gobiernologo.jpg';
+        $logosantaana = 'images/logo.png';
+
+        $tabla = "
+            <table style='width: 100%; border-collapse: collapse;'>
+                <tr>
+                    <!-- Logo izquierdo -->
+                    <td style='width: 15%; text-align: left;'>
+                        <img src='$logosantaana' alt='Santa Ana Norte' style='max-width: 100px; height: auto;'>
+                    </td>
+                    <!-- Texto centrado -->
+                    <td style='width: 60%; text-align: center;'>
+                        <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
+                        <h2 style='font-size: 14px; margin: 0; color: #003366; text-transform: uppercase;'>$infoUsuarioLogeado->cargo2</h2>
+                    </td>
+                    <!-- Logo derecho -->
+                    <td style='width: 10%; text-align: right;'>
+                        <img src='$logoalcaldia' alt='Gobierno de El Salvador' style='max-width: 60px; height: auto;'>
+                    </td>
+                </tr>
+            </table>
+            <hr style='border: none; border-top: 2px solid #003366; margin: 0;'>
+            ";
+
+
+
+        $tabla .= "<p>Material: <strong>$infoMaterial->nombre</strong></p>";
+
+
+        $tabla .= "<table width='100%' id='tablaFor' style='margin-top: 15px'>
+            <thead>
+                <tr>
+                    <th style='font-weight: bold; width: 6%; font-size: 11px; text-align: center;'>F. Salida</th>
+                    <th style='font-weight: bold; width: 22%; font-size: 11px; text-align: center;'>Unidad</th>
+                    <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Cantidad Entregada</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+        foreach ($arrayBodegaSalidaDetalle as $fila){
+                $tabla .= "<tr>
+                    <td style='font-size: 11px'>$fila->fechaFormat</td>
+                    <td style='font-size: 11px'>$fila->unidad</td>
+                    <td style='font-size: 11px'>$fila->cantidad_salida</td>
+                </tr>";
+        }
+
+        $tabla .= "</tbody></table>";
+
+
+
+        $stylesheet = file_get_contents('css/cssbodega.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        $mpdf->setFooter("Página: " . '{PAGENO}' . "/" . '{nb}');
+        $mpdf->WriteHTML($tabla,2);
+
+        $mpdf->Output();
+
+    }
+
+
 
 
 

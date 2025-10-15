@@ -1486,7 +1486,9 @@ Route::get('/admin/bodega/reportes/pdf/entragadosaunidad/{desde}/{hasta}/{idunid
 
 
 
+// REPORTE ENTREGADO POR MATERIAL
 
+Route::get('/admin/bodega/reportes/pdf/entregadopormaterial/{idmaterial}', [BSolicitudesController::class,'reporteEntregadoPorMaterial']);
 
 
 
