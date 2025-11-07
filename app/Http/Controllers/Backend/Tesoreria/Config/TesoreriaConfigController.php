@@ -1666,8 +1666,8 @@ class TesoreriaConfigController extends Controller
 
 
 
-        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER-L']);
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER-L']);
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER-L']);
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER-L']);
 
        /* $mpdf = new \Mpdf\Mpdf([
             'tempDir' => sys_get_temp_dir(),
@@ -1684,32 +1684,72 @@ class TesoreriaConfigController extends Controller
         $logosantaana = 'images/logo.png';
 
         $tabla = "
-            <table style='width: 100%; border-collapse: collapse;'>
+<table width='100%' style='border-collapse:collapse; font-family: Arial, sans-serif;'>
+    <tr>
+        <!-- Bloque izquierdo: logo + texto -->
+        <td style='width:25%; border:0.8px solid #000; padding:6px 8px;'>
+            <table width='100%' style='border-collapse:collapse;'>
                 <tr>
-                    <!-- Logo izquierdo -->
-                    <td style='width: 15%; text-align: left;'>
-                        <img src='$logosantaana' alt='Santa Ana Norte' style='max-width: 100px; height: auto;'>
+                    <td style='width:30%; text-align:left;'>
+                        <img src='$logoalcaldia' alt='Santa Ana Norte' style='height:38px;'>
                     </td>
-                    <!-- Texto centrado -->
-                    <td style='width: 60%; text-align: center;'>
-                        <h1 style='font-size: 16px; margin: 0; color: #003366; text-transform: uppercase;'>ALCALDÍA MUNICIPAL DE SANTA ANA NORTE</h1>
-                    </td>
-                    <!-- Logo derecho -->
-                    <td style='width: 10%; text-align: right;'>
-                        <img src='$logoalcaldia' alt='Gobierno de El Salvador' style='max-width: 60px; height: auto;'>
+                    <td style='width:70%; text-align:left; color: #104e8c; font-size:13px; font-weight:bold; line-height:1.3;'>
+                        SANTA ANA NORTE<br>EL SALVADOR
                     </td>
                 </tr>
             </table>
-            <hr style='border: none; border-top: 2px solid #003366; margin: 0;'>
-            ";
+        </td>
 
-        $tabla .= "
-            <div style='text-align: center; margin-top: 20px;'>
-                <h1 style='font-size: 16px; margin: 0; color: #000;'>REPORTE GARANTIAS</h1>
-            </div>
-            <div style='text-align: left; margin-top: 10px;'>
-        </div>
-      ";
+        <!-- Centro: título -->
+        <td style='width:50%; border-top:0.8px solid #000; border-bottom:0.8px solid #000;
+                   padding:6px 8px; text-align:center; font-size:15px; font-weight:bold;'>
+            CONTROL DE GARANTIAS
+        </td>
+
+        <!-- Derecha: cuadro Código / Versión / Fecha de vigencia (2 columnas) -->
+        <td style='width:25%; border:0.8px solid #000; padding:0; vertical-align:top;'>
+            <table width='100%' border='0' cellspacing='0' cellpadding='0'
+                   style='border-collapse:collapse; font-size:10px;'>
+                <tr>
+                    <td width='40%'
+                        style='border-right:0.8px solid #000; border-bottom:0.8px solid #000; padding:4px 6px;'>
+                        <strong>Código:</strong>
+                    </td>
+                    <td width='60%'
+                        style='border-bottom:0.8px solid #000; padding:4px 6px; text-align:center;'>
+                        TESO-003-CONT
+                    </td>
+                </tr>
+                <tr>
+                    <td
+                        style='border-right:0.8px solid #000; border-bottom:0.8px solid #000; padding:4px 6px;'>
+                        <strong>Versión:</strong>
+                    </td>
+                    <td
+                        style='border-bottom:0.8px solid #000; padding:4px 6px; text-align:center;'>
+                        000
+                    </td>
+                </tr>
+                <tr>
+                    <td
+                        style='border-right:0.8px solid #000; padding:4px 6px;'>
+                        <strong>Fecha de vigencia:</strong>
+                    </td>
+                    <td
+                        style='padding:4px 6px; text-align:center;'>
+
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<br>
+";
+
+
+
+
 
 
         $tabla .= "
