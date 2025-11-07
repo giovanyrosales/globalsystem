@@ -1737,7 +1737,7 @@ class TesoreriaConfigController extends Controller
                     </td>
                     <td
                         style='padding:4px 6px; text-align:center;'>
-
+                           22/10/2025
                     </td>
                 </tr>
             </table>
@@ -1748,7 +1748,13 @@ class TesoreriaConfigController extends Controller
 ";
 
 
-
+                    $tabla .= "
+                <div style='text-align:center; margin-top:12px;'>
+                    <p style='font-size:14px; font-weight:bold; color:#000; margin:0;'>
+                        REPORTE DE GARANTÍAS
+                    </p>
+                </div>
+            ";
 
 
 
