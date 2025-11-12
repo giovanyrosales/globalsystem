@@ -36,16 +36,8 @@ class CreateBodegaSalidasTable extends Migration
             // UNION DE TABLA p_departamento
             $table->bigInteger('id_unidad_manual')->nullable();
 
-
-
             // CAMPO NUEVO 22/8/2025
             $table->string('numero_solicitud', 300)->nullable();
-
-
-
-
-
-
 
             $table->foreign('id_usuario')->references('id')->on('usuario');
             $table->foreign('id_solicitud')->references('id')->on('bodega_solicitud');

@@ -1023,6 +1023,13 @@
                                 </a>
                             </li>
 
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.bodega.reportes.entregas') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Entregas</p>
+                                </a>
+                            </li>
+
 
                             <li class="nav-item">
                                 <a href="{{ route('sidebar.bodega.extras.reportenombre') }}" target="frameprincipal" class="nav-link">
@@ -1031,15 +1038,8 @@
                                 </a>
                             </li>
 
-
-
-
-
-
                         </ul>
                     </li>
-
-
 
 
                 @endcan

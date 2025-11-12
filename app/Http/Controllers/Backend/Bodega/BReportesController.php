@@ -902,8 +902,8 @@ class BReportesController extends Controller
         $infoGerencia = BodegaExtras::where('id', 1)->first();
 
 
-        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
         $mpdf->SetTitle('Reporte general de existencias');
 
@@ -1196,13 +1196,13 @@ class BReportesController extends Controller
             ->groupBy('bm.id_objespecifico', 'bed.id_entrada', 'bed.id_material', 'obj.codigo')
             ->get();
 
-// Si no hay salidas en el período, retorna vacío (o ajusta a tu necesidad)
+    // Si no hay salidas en el período, retorna vacío (o ajusta a tu necesidad)
        /* if ($salidasPeriodo->isEmpty()) {
             return "vacio";
             return collect();
         }*/
 
-// 4) Combinar y calcular existencias/saldos por material+lote
+    // 4) Combinar y calcular existencias/saldos por material+lote
         $items = [];
         foreach ($salidasPeriodo as $sp) {
             $key = $makeKey($sp->id_entrada, $sp->id_material);
@@ -1237,8 +1237,8 @@ class BReportesController extends Controller
             ];
         }
 
-// 5) Reagrupar por id_objespecifico, ordenar dentro de cada grupo y
-//    asignar correlativo 1..N por grupo (se reinicia en cada array)
+    // 5) Reagrupar por id_objespecifico, ordenar dentro de cada grupo y
+    //    asignar correlativo 1..N por grupo (se reinicia en cada array)
         $resultado = collect($items)
             ->groupBy('id_objespecifico')
             ->map(function ($regs, $obj) {
@@ -2730,6 +2730,322 @@ class BReportesController extends Controller
 
         $mpdf->Output();
     }
+
+
+
+    public function vistaReporteEntregas()
+    {
+        return view('backend.admin.bodega.reportes.entregables.vistareporteentregables');
+    }
+
+
+    public function reportePDFInicialFinal($desde, $hasta)
+    {
+        $start = Carbon::parse($desde)->startOfDay();
+        $end   = Carbon::parse($hasta)->endOfDay();
+
+        $desdeFormat = Carbon::parse($desde)->format('d/m/Y');
+        $hastaFormat = Carbon::parse($hasta)->format('d/m/Y');
+
+        $tipoBodega = Auth::user()->tipo_bodega; // número que coincide con bodega_materiales.tipo_bodega
+
+        // ----- Consulta base (por lote/entradadetalle) -----
+        $rows = DB::select("
+    WITH entradas AS (
+        SELECT
+            ed.id              AS id_entradadetalle,
+            ed.id_material,
+            ed.precio,
+            ed.codigo_producto,
+            ed.nombre_copia,
+            e.lote             AS lote,              -- ✅ lote desde bodega_entradas
+            ed.cantidad        AS cantidad_entrada,
+            e.fecha            AS fecha_entrada
+        FROM bodega_entradas_detalle ed
+        JOIN bodega_entradas e ON e.id = ed.id_entrada
+        WHERE EXISTS (
+            SELECT 1
+            FROM bodega_materiales bm
+            WHERE bm.id = ed.id_material
+              AND bm.tipo_bodega = ?
+        )
+    ),
+    salidas AS (
+        SELECT
+            sd.id_entradadetalle,
+            sd.cantidad_salida,
+            s.fecha AS fecha_salida
+        FROM bodega_salidas_detalle sd
+        JOIN bodega_salidas s ON s.id = sd.id_salida
+    ),
+    in_before AS (
+        SELECT id_entradadetalle, SUM(cantidad_entrada) AS qty_in_before
+        FROM entradas
+        WHERE fecha_entrada < ?
+        GROUP BY id_entradadetalle
+    ),
+    out_before AS (
+        SELECT id_entradadetalle, SUM(cantidad_salida) AS qty_out_before
+        FROM salidas
+        WHERE fecha_salida < ?
+        GROUP BY id_entradadetalle
+    ),
+    in_period AS (
+        SELECT id_entradadetalle, SUM(cantidad_entrada) AS qty_in_period
+        FROM entradas
+        WHERE fecha_entrada >= ? AND fecha_entrada <= ?
+        GROUP BY id_entradadetalle
+    ),
+    out_period AS (
+        SELECT id_entradadetalle, SUM(cantidad_salida) AS qty_out_period
+        FROM salidas
+        WHERE fecha_salida >= ? AND fecha_salida <= ?
+        GROUP BY id_entradadetalle
+    )
+
+    SELECT
+        en.id_entradadetalle,
+        en.id_material,
+        COALESCE(m.nombre, en.nombre_copia) AS descripcion,
+        en.precio,
+        en.codigo_producto,
+        en.lote,
+
+        -- Cantidades
+        COALESCE(ib.qty_in_before, 0) - COALESCE(ob.qty_out_before, 0) AS saldo_inicial_cant,
+        COALESCE(ip.qty_in_period,  0)                                 AS entradas_mes_cant,
+        COALESCE(op.qty_out_period, 0)                                  AS salidas_mes_cant,
+        (COALESCE(ib.qty_in_before, 0) - COALESCE(ob.qty_out_before, 0)
+         + COALESCE(ip.qty_in_period, 0)
+         - COALESCE(op.qty_out_period, 0))                              AS saldo_final_cant,
+
+        -- Dinero
+        ((COALESCE(ib.qty_in_before, 0) - COALESCE(ob.qty_out_before, 0)) * en.precio) AS saldo_inicial_money,
+        (COALESCE(ip.qty_in_period,  0) * en.precio)                                    AS entradas_mes_money,
+        (COALESCE(op.qty_out_period, 0) * en.precio)                                    AS salidas_mes_money,
+        ((COALESCE(ib.qty_in_before, 0) - COALESCE(ob.qty_out_before, 0)
+          + COALESCE(ip.qty_in_period, 0) - COALESCE(op.qty_out_period, 0)) * en.precio) AS saldo_final_money
+
+    FROM entradas en
+    LEFT JOIN bodega_materiales m ON m.id = en.id_material
+    LEFT JOIN in_before  ib ON ib.id_entradadetalle  = en.id_entradadetalle
+    LEFT JOIN out_before ob ON ob.id_entradadetalle  = en.id_entradadetalle
+    LEFT JOIN in_period  ip ON ip.id_entradadetalle  = en.id_entradadetalle
+    LEFT JOIN out_period op ON op.id_entradadetalle  = en.id_entradadetalle
+
+    ORDER BY COALESCE(m.nombre, en.nombre_copia), en.codigo_producto, en.lote
+", [
+            $tipoBodega,             // bm.tipo_bodega = ?
+            $start->toDateString(),  // in_before:   fecha_entrada < ?
+            $start->toDateString(),  // out_before:  fecha_salida  < ?
+            $start->toDateString(),  // in_period:   fecha_entrada >= ?
+            $end->toDateString(),    //              fecha_entrada <= ?
+            $start->toDateString(),  // out_period:  fecha_salida  >= ?
+            $end->toDateString(),    //              fecha_salida  <= ?
+        ]);
+
+
+
+
+        // ----- Totales del período -----
+        $totales = [
+            'entradas_cant' => 0,
+            'salidas_cant'  => 0,
+            'final_cant'    => 0,
+            'entradas_money'=> 0.0,
+            'salidas_money' => 0.0,
+            'final_money'   => 0.0,
+            'inicial_cant'  => 0,
+            'inicial_money' => 0.0,
+        ];
+
+        foreach ($rows as $r) {
+            $totales['inicial_cant']   += (int) ($r->saldo_inicial_cant ?? 0);
+            $totales['entradas_cant']  += (int) ($r->entradas_mes_cant  ?? 0);
+            $totales['salidas_cant']   += (int) ($r->salidas_mes_cant   ?? 0);
+            $totales['final_cant']     += (int) ($r->saldo_final_cant   ?? 0);
+
+            $totales['inicial_money']  += (float) ($r->saldo_inicial_money ?? 0);
+            $totales['entradas_money'] += (float) ($r->entradas_mes_money  ?? 0);
+            $totales['salidas_money']  += (float) ($r->salidas_mes_money   ?? 0);
+            $totales['final_money']    += (float) ($r->saldo_final_money   ?? 0);
+        }
+
+        // ========== Render PDF ==========
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER-L']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+
+
+        $mpdf->SetTitle('Reporte Mensual de Bodega');
+        $mpdf->showImageErrors = false;
+
+        $logoalcaldia = 'images/gobiernologo.jpg';
+        $logosantaana = 'images/logo.png';
+
+        $encabezado = "
+        <table width='100%' style='border-collapse:collapse; font-family: Arial, sans-serif;'>
+            <tr>
+                <td style='width:25%; border:0.8px solid #000; padding:6px 8px;'>
+                    <table width='100%'>
+                        <tr>
+                            <td style='width:30%; text-align:left;'>
+                                <img src='{$logoalcaldia}' style='height:38px'>
+                            </td>
+                            <td style='width:70%; text-align:left; color:#104e8c; font-size:13px; font-weight:bold; line-height:1.3;'>
+                                SANTA ANA NORTE<br>EL SALVADOR
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style='width:50%; border-top:0.8px solid #000; border-bottom:0.8px solid #000; padding:6px 8px; text-align:center; font-size:15px; font-weight:bold;'>
+                    CONTROL DE ENTRADAS/SALIDAS<br>
+                    <span style='font-weight:normal'>Del {$desdeFormat} al {$hastaFormat}</span>
+                </td>
+                <td style='width:25%; border:0.8px solid #000; padding:0; vertical-align:top;'>
+                    <table width='100%' style='font-size:10px;'>
+                        <tr>
+                            <td width='40%' style='border-right:0.8px solid #000; border-bottom:0.8px solid #000; padding:4px 6px;'><strong>Código:</strong></td>
+                            <td width='60%' style='border-bottom:0.8px solid #000; padding:4px 6px; text-align:center;'></td>
+                        </tr>
+                        <tr>
+                            <td style='border-right:0.8px solid #000; border-bottom:0.8px solid #000; padding:4px 6px;'><strong>Versión:</strong></td>
+                            <td style='border-bottom:0.8px solid #000; padding:4px 6px; text-align:center;'></td>
+                        </tr>
+                        <tr>
+                            <td style='border-right:0.8px solid #000; padding:4px 6px;'><strong>Fecha de vigencia:</strong></td>
+                            <td style='padding:4px 6px; text-align:center;'>".now()->format('d/m/Y')."</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <br>
+    ";
+
+        // Estilos opcionales externos
+        if (file_exists(public_path('css/cssbodega.css'))) {
+            $stylesheet = file_get_contents(public_path('css/cssbodega.css'));
+            $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
+        }
+
+        // Tabla detalle
+        $html = $encabezado;
+        $html .= "
+        <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px'>
+            <thead style='background:#f2f4f8'>
+                <tr>
+                    <th>#</th>
+                    <th>Descripción / Nombre</th>
+                    <th>Código</th>
+                    <th>Lote</th>
+                    <th style='text-align:right'>Precio</th>
+                    <th style='text-align:right'>Saldo Inicial</th>
+                    <th style='text-align:right'>Entró Mes</th>
+                    <th style='text-align:right'>Salió Mes</th>
+                    <th style='text-align:right'>Saldo Final</th>
+                    <th style='text-align:right'>$ Inicial</th>
+                    <th style='text-align:right'>$ Entradas</th>
+                    <th style='text-align:right'>$ Salidas</th>
+                    <th style='text-align:right'>$ Final</th>
+                </tr>
+            </thead>
+            <tbody>
+    ";
+
+        $i = 1;
+        foreach ($rows as $r) {
+            $desc = $r->descripcion; // m.nombre o nombre_copia
+
+            $html .= "
+            <tr>
+                <td>{$i}</td>
+                <td>".e($desc)."</td>
+                <td>".e($r->codigo_producto ?? '')."</td>
+                <td>".e($r->lote ?? '')."</td>
+                <td style='text-align:right'>".number_format($r->precio ?? 0, 4)."</td>
+                <td style='text-align:right'>".number_format($r->saldo_inicial_cant ?? 0)."</td>
+                <td style='text-align:right'>".number_format($r->entradas_mes_cant  ?? 0)."</td>
+                <td style='text-align:right'>".number_format($r->salidas_mes_cant   ?? 0)."</td>
+                <td style='text-align:right'>".number_format($r->saldo_final_cant   ?? 0)."</td>
+                <td style='text-align:right'>".number_format($r->saldo_inicial_money ?? 0, 2)."</td>
+                <td style='text-align:right'>".number_format($r->entradas_mes_money  ?? 0, 2)."</td>
+                <td style='text-align:right'>".number_format($r->salidas_mes_money   ?? 0, 2)."</td>
+                <td style='text-align:right'>".number_format($r->saldo_final_money   ?? 0, 2)."</td>
+            </tr>
+        ";
+            $i++;
+        }
+
+        if (!$rows) {
+            $html .= "<tr><td colspan='13' style='text-align:center; color:#888;'>Sin registros en el rango seleccionado.</td></tr>";
+        }
+
+        $html .= "
+            </tbody>
+            <tfoot>
+                <tr style='font-weight:bold; background:#f9fafb'>
+                    <td colspan='5' style='text-align:right'>Totales:</td>
+                    <td style='text-align:right'>".number_format($totales['inicial_cant'])."</td>
+                    <td style='text-align:right'>".number_format($totales['entradas_cant'])."</td>
+                    <td style='text-align:right'>".number_format($totales['salidas_cant'])."</td>
+                    <td style='text-align:right'>".number_format($totales['final_cant'])."</td>
+                    <td style='text-align:right'>".number_format($totales['inicial_money'], 2)."</td>
+                    <td style='text-align:right'>".number_format($totales['entradas_money'], 2)."</td>
+                    <td style='text-align:right'>".number_format($totales['salidas_money'], 2)."</td>
+                    <td style='text-align:right'>".number_format($totales['final_money'], 2)."</td>
+                </tr>
+            </tfoot>
+        </table>
+    ";
+
+        // Resumen del período
+        $html .= "
+        <br>
+        <table width='60%' border='1' cellspacing='0' cellpadding='6' style='border-collapse:collapse; font-size:12px'>
+            <tr style='background:#eef3ff; font-weight:bold; text-align:center'>
+                <td colspan='3'>Resumen del período {$desdeFormat} - {$hastaFormat}</td>
+            </tr>
+            <tr style='font-weight:bold; background:#f9fafb'>
+                <td></td>
+                <td style='text-align:right'>Cantidad</td>
+                <td style='text-align:right'>Dinero ($)</td>
+            </tr>
+            <tr>
+                <td>Ingresó (Entradas del mes)</td>
+                <td style='text-align:right'>".number_format($totales['entradas_cant'])."</td>
+                <td style='text-align:right'>".number_format($totales['entradas_money'], 2)."</td>
+            </tr>
+            <tr>
+                <td>Salió (Salidas del mes)</td>
+                <td style='text-align:right'>".number_format($totales['salidas_cant'])."</td>
+                <td style='text-align:right'>".number_format($totales['salidas_money'], 2)."</td>
+            </tr>
+            <tr>
+                <td>Disponible al cierre (Saldo final)</td>
+                <td style='text-align:right'>".number_format($totales['final_cant'])."</td>
+                <td style='text-align:right'>".number_format($totales['final_money'], 2)."</td>
+            </tr>
+        </table>
+    ";
+
+        $mpdf->setFooter("Página {PAGENO} de {nb}");
+        $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
+        $mpdf->Output(); // stream
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

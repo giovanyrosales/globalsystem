@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateBodegaSolicitudTable extends Migration
 {
     /**
-     * SOLICITUD DE BODEGA POR PARTE DE USUARIO UNIDAD
+     * NO SE USARA YA
      *
      * @return void
      */

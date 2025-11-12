@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateBodegaSolicitudDetalleTable extends Migration
 {
     /**
-     * DETALLE - SOLICITUD DE BODEGA POR PARTE DE USUARIO UNIDAD
+     * NO SE USARA YAP
      *
      * @return void
      */
