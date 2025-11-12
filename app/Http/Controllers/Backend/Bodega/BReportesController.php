@@ -2872,8 +2872,8 @@ class BReportesController extends Controller
         }
 
         // ========== Render PDF ==========
-        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER-L']);
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER-L']);
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
 
         $mpdf->SetTitle('Reporte Mensual de Bodega');
@@ -2931,72 +2931,72 @@ class BReportesController extends Controller
         // Tabla detalle
         $html = $encabezado;
         $html .= "
-        <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px'>
-            <thead style='background:#f2f4f8'>
-                <tr>
-                    <th>#</th>
-                    <th>Descripción / Nombre</th>
-                    <th>Código</th>
-                    <th>Lote</th>
-                    <th style='text-align:right'>Precio</th>
-                    <th style='text-align:right'>Saldo Inicial</th>
-                    <th style='text-align:right'>Entró Mes</th>
-                    <th style='text-align:right'>Salió Mes</th>
-                    <th style='text-align:right'>Saldo Final</th>
-                    <th style='text-align:right'>$ Inicial</th>
-                    <th style='text-align:right'>$ Entradas</th>
-                    <th style='text-align:right'>$ Salidas</th>
-                    <th style='text-align:right'>$ Final</th>
-                </tr>
-            </thead>
-            <tbody>
-    ";
+    <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px'>
+        <thead style='background:#f2f4f8'>
+            <tr>
+                <th>#</th>
+                <th>Descripción / Nombre</th>
+                <th>Lote</th>
+                <th style='text-align:right'>Precio</th>
+                <th style='text-align:right'>Saldo Inicial</th>
+                <th style='text-align:right'>Entró Mes</th>
+                <th style='text-align:right'>Salió Mes</th>
+                <th style='text-align:right'>Saldo Final</th>
+                <th style='text-align:right'>$ Inicial</th>
+                <th style='text-align:right'>$ Entradas</th>
+                <th style='text-align:right'>$ Salidas</th>
+                <th style='text-align:right'>$ Final</th>
+            </tr>
+        </thead>
+        <tbody>
+";
 
         $i = 1;
         foreach ($rows as $r) {
             $desc = $r->descripcion; // m.nombre o nombre_copia
 
             $html .= "
-            <tr>
-                <td>{$i}</td>
-                <td>".e($desc)."</td>
-                <td>".e($r->codigo_producto ?? '')."</td>
-                <td>".e($r->lote ?? '')."</td>
-                <td style='text-align:right'>".number_format($r->precio ?? 0, 4)."</td>
-                <td style='text-align:right'>".number_format($r->saldo_inicial_cant ?? 0)."</td>
-                <td style='text-align:right'>".number_format($r->entradas_mes_cant  ?? 0)."</td>
-                <td style='text-align:right'>".number_format($r->salidas_mes_cant   ?? 0)."</td>
-                <td style='text-align:right'>".number_format($r->saldo_final_cant   ?? 0)."</td>
-                <td style='text-align:right'>".number_format($r->saldo_inicial_money ?? 0, 2)."</td>
-                <td style='text-align:right'>".number_format($r->entradas_mes_money  ?? 0, 2)."</td>
-                <td style='text-align:right'>".number_format($r->salidas_mes_money   ?? 0, 2)."</td>
-                <td style='text-align:right'>".number_format($r->saldo_final_money   ?? 0, 2)."</td>
-            </tr>
-        ";
+        <tr>
+            <td>{$i}</td>
+            <td>".e($desc)."</td>
+            <td>".e($r->lote ?? '')."</td>
+            <td style='text-align:right'>".number_format($r->precio ?? 0, 4)."</td>
+            <td style='text-align:right'>".number_format($r->saldo_inicial_cant ?? 0)."</td>
+            <td style='text-align:right'>".number_format($r->entradas_mes_cant  ?? 0)."</td>
+            <td style='text-align:right'>".number_format($r->salidas_mes_cant   ?? 0)."</td>
+            <td style='text-align:right'>".number_format($r->saldo_final_cant   ?? 0)."</td>
+            <td style='text-align:right'>".number_format($r->saldo_inicial_money ?? 0, 2)."</td>
+            <td style='text-align:right'>".number_format($r->entradas_mes_money  ?? 0, 2)."</td>
+            <td style='text-align:right'>".number_format($r->salidas_mes_money   ?? 0, 2)."</td>
+            <td style='text-align:right'>".number_format($r->saldo_final_money   ?? 0, 2)."</td>
+        </tr>
+    ";
             $i++;
         }
 
+
         if (!$rows) {
-            $html .= "<tr><td colspan='13' style='text-align:center; color:#888;'>Sin registros en el rango seleccionado.</td></tr>";
+            $html .= "<tr><td colspan='12' style='text-align:center; color:#888;'>Sin registros en el rango seleccionado.</td></tr>";
         }
 
+
         $html .= "
-            </tbody>
-            <tfoot>
-                <tr style='font-weight:bold; background:#f9fafb'>
-                    <td colspan='5' style='text-align:right'>Totales:</td>
-                    <td style='text-align:right'>".number_format($totales['inicial_cant'])."</td>
-                    <td style='text-align:right'>".number_format($totales['entradas_cant'])."</td>
-                    <td style='text-align:right'>".number_format($totales['salidas_cant'])."</td>
-                    <td style='text-align:right'>".number_format($totales['final_cant'])."</td>
-                    <td style='text-align:right'>".number_format($totales['inicial_money'], 2)."</td>
-                    <td style='text-align:right'>".number_format($totales['entradas_money'], 2)."</td>
-                    <td style='text-align:right'>".number_format($totales['salidas_money'], 2)."</td>
-                    <td style='text-align:right'>".number_format($totales['final_money'], 2)."</td>
-                </tr>
-            </tfoot>
-        </table>
-    ";
+        </tbody>
+        <tfoot>
+            <tr style='font-weight:bold; background:#f9fafb'>
+                <td colspan='4' style='text-align:right'>Totales:</td>
+                <td style='text-align:right'>".number_format($totales['inicial_cant'])."</td>
+                <td style='text-align:right'>".number_format($totales['entradas_cant'])."</td>
+                <td style='text-align:right'>".number_format($totales['salidas_cant'])."</td>
+                <td style='text-align:right'>".number_format($totales['final_cant'])."</td>
+                <td style='text-align:right'>".number_format($totales['inicial_money'], 2)."</td>
+                <td style='text-align:right'>".number_format($totales['entradas_money'], 2)."</td>
+                <td style='text-align:right'>".number_format($totales['salidas_money'], 2)."</td>
+                <td style='text-align:right'>".number_format($totales['final_money'], 2)."</td>
+            </tr>
+        </tfoot>
+    </table>
+";
 
         // Resumen del período
         $html .= "
