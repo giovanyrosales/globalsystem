@@ -2899,7 +2899,6 @@ class BReportesController extends Controller
                 </td>
                 <td style='width:50%; border-top:0.8px solid #000; border-bottom:0.8px solid #000; padding:6px 8px; text-align:center; font-size:15px; font-weight:bold;'>
                     CONTROL DE ENTRADAS/SALIDAS<br>
-                    <span style='font-weight:normal'>Del {$desdeFormat} al {$hastaFormat}</span>
                 </td>
                 <td style='width:25%; border:0.8px solid #000; padding:0; vertical-align:top;'>
                     <table width='100%' style='font-size:10px;'>
@@ -2909,11 +2908,11 @@ class BReportesController extends Controller
                         </tr>
                         <tr>
                             <td style='border-right:0.8px solid #000; border-bottom:0.8px solid #000; padding:4px 6px;'><strong>Versión:</strong></td>
-                            <td style='border-bottom:0.8px solid #000; padding:4px 6px; text-align:center;'></td>
+                            <td style='border-bottom:0.8px solid #000; padding:4px 6px; text-align:center;'>000</td>
                         </tr>
                         <tr>
                             <td style='border-right:0.8px solid #000; padding:4px 6px;'><strong>Fecha de vigencia:</strong></td>
-                            <td style='padding:4px 6px; text-align:center;'>".now()->format('d/m/Y')."</td>
+                            <td style='padding:4px 6px; text-align:center;'></td>
                         </tr>
                     </table>
                 </td>
@@ -2921,6 +2920,11 @@ class BReportesController extends Controller
         </table>
         <br>
     ";
+
+        $encabezado .= "<span style='font-weight:bold;'>Del {$desdeFormat} al {$hastaFormat} <br>";
+
+
+
 
         // Estilos opcionales externos
         if (file_exists(public_path('css/cssbodega.css'))) {
@@ -2931,7 +2935,7 @@ class BReportesController extends Controller
         // Tabla detalle
         $html = $encabezado;
         $html .= "
-    <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px'>
+    <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px; margin-top: 8px'>
         <thead style='background:#f2f4f8'>
             <tr>
                 <th>#</th>
