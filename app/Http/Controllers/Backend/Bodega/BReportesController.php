@@ -2884,6 +2884,8 @@ class BReportesController extends Controller
         // 👉 Nuevo: sumatorias por código (sin descripción)
         $sumPorCodigo = [];
 
+        $totalSaldoFinalCodigos = 0;
+
         foreach ($rows as $r) {
             // ======================
             // 1) TOTALES GENERALES
@@ -2929,8 +2931,8 @@ class BReportesController extends Controller
         }
 
         // ========== Render PDF ==========
-        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER-L']);
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        $mpdf = new \Mpdf\Mpdf(['format' => 'LETTER-L']);
+        //$mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
         $mpdf->SetTitle('Reporte Mensual de Bodega');
         $mpdf->showImageErrors = false;
 
@@ -2988,25 +2990,29 @@ class BReportesController extends Controller
         $html .= "
         <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px; margin-top: 8px'>
             <thead style='background:#f2f4f8'>
-                <tr>
-                    <th>#</th>
-                    <th>Código</th>
-                    <th>Descripción / Nombre</th>
-                    <th style='text-align:right'>PRECIO</th>
+               <tr>
+                <th>#</th>
+                <th>Código</th>
+                <th>Descripción / Nombre</th>
 
-                    <!-- ORDEN NUEVO SEGÚN IMAGEN -->
-                    <th style='text-align:right'>INICIAL</th>
-                    <th style='text-align:right'>$ INICIAL</th>
+                <!-- PRECIO → columna monetaria → ancho 10% -->
+                <th style='text-align:right; width:10%'>PRECIO</th>
 
-                    <th style='text-align:right'>ENTRADAS</th>
-                    <th style='text-align:right'>$ ENTRADAS</th>
+                <!-- ORDEN NUEVO SEGÚN IMAGEN -->
+                <th style='text-align:right; width:6%'>INICIAL</th>
 
-                    <th style='text-align:right'>SALIDAS</th>
-                    <th style='text-align:right'>$ SALIDAS</th>
+                <!-- columnas $ → 10% -->
+                <th style='text-align:right; width:10%'>$ INICIAL</th>
 
-                    <th style='text-align:right'>SALDO</th>
-                    <th style='text-align:right'>$ SALDO</th>
-                </tr>
+                <th style='text-align:right; width:8%'>ENTRADAS</th>
+                <th style='text-align:right; width:10%'>$ ENTRADAS</th>
+
+                <th style='text-align:right; width:8%'>SALIDAS</th>
+                <th style='text-align:right; width:10%'>$ SALIDAS</th>
+
+                <th style='text-align:right; width:6%'>SALDO</th>
+                <th style='text-align:right; width:10%'>$ SALDO</th>
+            </tr>
             </thead>
             <tbody>
     ";
@@ -3097,27 +3103,31 @@ class BReportesController extends Controller
     ";
 
         // 👉 Cuadro adicional: sumatorias por código (sin descripción)
+        // 👉 Cuadro adicional: sumatorias por código (sin descripción)
         if (!empty($sumPorCodigo)) {
+
+            // SUMA SOLO EL $ SALDO
+            $totalSaldoFinalCodigos = 0;
+
             $html .= "
     <br><br>
     <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px'>
         <thead style='background:#f2f4f8'>
             <tr>
-                <th>#</th>
-                <th>Código</th>
+                <th style='width:4%'>#</th>
+                <th style='width:10%'>Código</th>
 
-                <!-- ORDEN NUEVO -->
-                <th style='text-align:right'>INICIAL</th>
-                <th style='text-align:right'>$ INICIAL</th>
+                <th style='text-align:right; width:6%'>INICIAL</th>
+                <th style='text-align:right; width:10%'>$ INICIAL</th>
 
-                <th style='text-align:right'>ENTRADAS</th>
-                <th style='text-align:right'>$ ENTRADAS</th>
+                <th style='text-align:right; width:6%'>ENTRADAS</th>
+                <th style='text-align:right; width:10%'>$ ENTRADAS</th>
 
-                <th style='text-align:right'>SALIDAS</th>
-                <th style='text-align:right'>$ SALIDAS</th>
+                <th style='text-align:right; width:6%'>SALIDAS</th>
+                <th style='text-align:right; width:10%'>$ SALIDAS</th>
 
-                <th style='text-align:right'>SALDO</th>
-                <th style='text-align:right'>$ SALDO</th>
+                <th style='text-align:right; width:6%'>SALDO</th>
+                <th style='text-align:right; width:10%'>$ SALDO</th>
             </tr>
         </thead>
         <tbody>
@@ -3125,12 +3135,15 @@ class BReportesController extends Controller
 
             $j = 1;
             foreach ($sumPorCodigo as $cod => $s) {
+
+                // SUMA SOLO EL SALDO FINAL EN $
+                $totalSaldoFinalCodigos += (float) $s['final_money'];
+
                 $html .= "
         <tr>
             <td>{$j}</td>
             <td>".e($s['codigo'])."</td>
 
-            <!-- ORDEN NUEVO -->
             <td style='text-align:right'>".number_format($s['inicial_cant'])."</td>
             <td style='text-align:right'>$".number_format($s['inicial_money'], 2)."</td>
 
@@ -3147,11 +3160,20 @@ class BReportesController extends Controller
                 $j++;
             }
 
+            // 👉 FILA TOTAL SOLO SUMA $ SALDO
+            $html .= "
+        <tr style='font-weight:bold; background:#f9fafb'>
+            <td colspan='9' style='text-align:right'>TOTAL</td>
+            <td style='text-align:right'>$".number_format($totalSaldoFinalCodigos, 2)."</td>
+        </tr>
+    ";
+
             $html .= "
         </tbody>
     </table>
     ";
         }
+
 
 
         $mpdf->setFooter("Página {PAGENO} de {nb}");
