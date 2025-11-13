@@ -2993,14 +2993,14 @@ class BReportesController extends Controller
                     <th>Código</th>
                     <th>Descripción / Nombre</th>
                     <th style='text-align:right'>Precio</th>
-                    <th style='text-align:right'>Saldo Inicial</th>
-                    <th style='text-align:right'>Entró Mes</th>
-                    <th style='text-align:right'>Salió Mes</th>
-                    <th style='text-align:right'>Saldo Final</th>
-                    <th style='text-align:right'>$ Inicial</th>
-                    <th style='text-align:right'>$ Entradas</th>
-                    <th style='text-align:right'>$ Salidas</th>
-                    <th style='text-align:right'>$ Final</th>
+                    <th style='text-align:right'>INICIAL</th>
+                    <th style='text-align:right'>ENTRADAS</th>
+                    <th style='text-align:right'>SALIDAS</th>
+                    <th style='text-align:right'>SALDO</th>
+                    <th style='text-align:right'>$ INICIAL</th>
+                    <th style='text-align:right'>$ ENTRADAS</th>
+                    <th style='text-align:right'>$ SALIDAS</th>
+                    <th style='text-align:right'>$ SALDO</th>
                 </tr>
             </thead>
             <tbody>
@@ -3091,13 +3091,13 @@ class BReportesController extends Controller
                     <th>#</th>
                     <th>Código</th>
                     <th style='text-align:right'>Saldo Inicial</th>
-                    <th style='text-align:right'>Entró Mes</th>
-                    <th style='text-align:right'>Salió Mes</th>
-                    <th style='text-align:right'>Saldo Final</th>
-                    <th style='text-align:right'>$ Inicial</th>
-                    <th style='text-align:right'>$ Entradas</th>
-                    <th style='text-align:right'>$ Salidas</th>
-                    <th style='text-align:right'>$ Final</th>
+                    <th style='text-align:right'>ENTRADAS</th>
+                    <th style='text-align:right'>SALIDAS</th>
+                    <th style='text-align:right'>SALDO</th>
+                    <th style='text-align:right'>$ INICIAL</th>
+                    <th style='text-align:right'>$ ENTRADAS</th>
+                    <th style='text-align:right'>$ SALIDAS</th>
+                    <th style='text-align:right'>$ SALDO</th>
                 </tr>
             </thead>
             <tbody>
