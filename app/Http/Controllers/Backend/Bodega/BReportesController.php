@@ -3180,7 +3180,7 @@ class BReportesController extends Controller
         $html .= "
 <br><br><br>
 <div style='text-align:center; font-size:13px; margin-top:40px;'>
-    F.__________________<br>
+    F._____________________________<br>
     <span style='font-weight:bold; font-size:12px;'>Unidad de Tecnologías de la Información</span>
 </div>
 ";
