@@ -3003,16 +3003,16 @@ class BReportesController extends Controller
                 <th style='text-align:right; width:6%'>INICIAL</th>
 
                 <!-- columnas $ → 10% -->
-                <th style='text-align:right; width:10%'>$ INICIAL</th>
+                <th style='text-align:right; width:6%'>$ INICIAL</th>
 
                 <th style='text-align:right; width:8%'>ENTRADAS</th>
-                <th style='text-align:right; width:10%'>$ ENTRADAS</th>
+                <th style='text-align:right; width:8%'>$ ENTRADAS</th>
 
                 <th style='text-align:right; width:8%'>SALIDAS</th>
-                <th style='text-align:right; width:10%'>$ SALIDAS</th>
+                <th style='text-align:right; width:8%'>$ SALIDAS</th>
 
                 <th style='text-align:right; width:6%'>SALDO</th>
-                <th style='text-align:right; width:10%'>$ SALDO</th>
+                <th style='text-align:right; width:8%'>$ SALDO</th>
             </tr>
             </thead>
             <tbody>
