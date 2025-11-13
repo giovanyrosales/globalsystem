@@ -2931,8 +2931,9 @@ class BReportesController extends Controller
         }
 
         // ========== Render PDF ==========
-        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER-L']);
-        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
+        //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER', 'orientation' => 'L']);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER', 'orientation' => 'L']);
+
         $mpdf->SetTitle('Reporte Mensual de Bodega');
         $mpdf->showImageErrors = false;
 
@@ -2996,7 +2997,7 @@ class BReportesController extends Controller
                 <th>Descripción / Nombre</th>
 
                 <!-- PRECIO → columna monetaria → ancho 10% -->
-                <th style='text-align:right; width:10%'>PRECIO</th>
+                <th style='text-align:right; width:8%'>PRECIO</th>
 
                 <!-- ORDEN NUEVO SEGÚN IMAGEN -->
                 <th style='text-align:right; width:6%'>INICIAL</th>
