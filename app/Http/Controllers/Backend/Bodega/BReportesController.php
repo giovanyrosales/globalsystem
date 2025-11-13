@@ -2992,14 +2992,19 @@ class BReportesController extends Controller
                     <th>#</th>
                     <th>Código</th>
                     <th>Descripción / Nombre</th>
-                    <th style='text-align:right'>Precio</th>
+                    <th style='text-align:right'>PRECIO</th>
+
+                    <!-- ORDEN NUEVO SEGÚN IMAGEN -->
                     <th style='text-align:right'>INICIAL</th>
-                    <th style='text-align:right'>ENTRADAS</th>
-                    <th style='text-align:right'>SALIDAS</th>
-                    <th style='text-align:right'>SALDO</th>
                     <th style='text-align:right'>$ INICIAL</th>
+
+                    <th style='text-align:right'>ENTRADAS</th>
                     <th style='text-align:right'>$ ENTRADAS</th>
+
+                    <th style='text-align:right'>SALIDAS</th>
                     <th style='text-align:right'>$ SALIDAS</th>
+
+                    <th style='text-align:right'>SALDO</th>
                     <th style='text-align:right'>$ SALDO</th>
                 </tr>
             </thead>
@@ -3016,14 +3021,20 @@ class BReportesController extends Controller
                 <td>".e($r->codigo ?? '')."</td>
                 <td>".e($desc)."</td>
                 <td style='text-align:right'>".number_format($r->precio ?? 0, 4)."</td>
+
+                <!-- ORDEN NUEVO -->
+
                 <td style='text-align:right'>".number_format($r->saldo_inicial_cant ?? 0)."</td>
-                <td style='text-align:right'>".number_format($r->entradas_mes_cant  ?? 0)."</td>
-                <td style='text-align:right'>".number_format($r->salidas_mes_cant   ?? 0)."</td>
-                <td style='text-align:right'>".number_format($r->saldo_final_cant   ?? 0)."</td>
                 <td style='text-align:right'>".number_format($r->saldo_inicial_money ?? 0, 2)."</td>
-                <td style='text-align:right'>".number_format($r->entradas_mes_money  ?? 0, 2)."</td>
-                <td style='text-align:right'>".number_format($r->salidas_mes_money   ?? 0, 2)."</td>
-                <td style='text-align:right'>".number_format($r->saldo_final_money   ?? 0, 2)."</td>
+
+                <td style='text-align:right'>".number_format($r->entradas_mes_cant ?? 0)."</td>
+                <td style='text-align:right'>".number_format($r->entradas_mes_money ?? 0, 2)."</td>
+
+                <td style='text-align:right'>".number_format($r->salidas_mes_cant ?? 0)."</td>
+                <td style='text-align:right'>".number_format($r->salidas_mes_money ?? 0, 2)."</td>
+
+                <td style='text-align:right'>".number_format($r->saldo_final_cant ?? 0)."</td>
+                <td style='text-align:right'>".number_format($r->saldo_final_money ?? 0, 2)."</td>
             </tr>
         ";
             $i++;
@@ -3037,14 +3048,18 @@ class BReportesController extends Controller
             </tbody>
             <tfoot>
                 <tr style='font-weight:bold; background:#f9fafb'>
-                    <td colspan='4' style='text-align:right'>Totales:</td>
+                     <td colspan='4' style='text-align:right'>Totales:</td>
+
                     <td style='text-align:right'>".number_format($totales['inicial_cant'])."</td>
-                    <td style='text-align:right'>".number_format($totales['entradas_cant'])."</td>
-                    <td style='text-align:right'>".number_format($totales['salidas_cant'])."</td>
-                    <td style='text-align:right'>".number_format($totales['final_cant'])."</td>
                     <td style='text-align:right'>".number_format($totales['inicial_money'], 2)."</td>
+
+                    <td style='text-align:right'>".number_format($totales['entradas_cant'])."</td>
                     <td style='text-align:right'>".number_format($totales['entradas_money'], 2)."</td>
+
+                    <td style='text-align:right'>".number_format($totales['salidas_cant'])."</td>
                     <td style='text-align:right'>".number_format($totales['salidas_money'], 2)."</td>
+
+                    <td style='text-align:right'>".number_format($totales['final_cant'])."</td>
                     <td style='text-align:right'>".number_format($totales['final_money'], 2)."</td>
                 </tr>
             </tfoot>
@@ -3084,49 +3099,60 @@ class BReportesController extends Controller
         // 👉 Cuadro adicional: sumatorias por código (sin descripción)
         if (!empty($sumPorCodigo)) {
             $html .= "
-        <br><br>
-        <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px'>
-            <thead style='background:#f2f4f8'>
-                <tr>
-                    <th>#</th>
-                    <th>Código</th>
-                    <th style='text-align:right'>Saldo Inicial</th>
-                    <th style='text-align:right'>ENTRADAS</th>
-                    <th style='text-align:right'>SALIDAS</th>
-                    <th style='text-align:right'>SALDO</th>
-                    <th style='text-align:right'>$ INICIAL</th>
-                    <th style='text-align:right'>$ ENTRADAS</th>
-                    <th style='text-align:right'>$ SALIDAS</th>
-                    <th style='text-align:right'>$ SALDO</th>
-                </tr>
-            </thead>
-            <tbody>
-        ";
+    <br><br>
+    <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px'>
+        <thead style='background:#f2f4f8'>
+            <tr>
+                <th>#</th>
+                <th>Código</th>
+
+                <!-- ORDEN NUEVO -->
+                <th style='text-align:right'>INICIAL</th>
+                <th style='text-align:right'>$ INICIAL</th>
+
+                <th style='text-align:right'>ENTRADAS</th>
+                <th style='text-align:right'>$ ENTRADAS</th>
+
+                <th style='text-align:right'>SALIDAS</th>
+                <th style='text-align:right'>$ SALIDAS</th>
+
+                <th style='text-align:right'>SALDO</th>
+                <th style='text-align:right'>$ SALDO</th>
+            </tr>
+        </thead>
+        <tbody>
+    ";
 
             $j = 1;
             foreach ($sumPorCodigo as $cod => $s) {
                 $html .= "
-                <tr>
-                    <td>{$j}</td>
-                    <td>".e($s['codigo'])."</td>
-                    <td style='text-align:right'>".number_format($s['inicial_cant'])."</td>
-                    <td style='text-align:right'>".number_format($s['entradas_cant'])."</td>
-                    <td style='text-align:right'>".number_format($s['salidas_cant'])."</td>
-                    <td style='text-align:right'>".number_format($s['final_cant'])."</td>
-                    <td style='text-align:right'>".number_format($s['inicial_money'], 2)."</td>
-                    <td style='text-align:right'>".number_format($s['entradas_money'], 2)."</td>
-                    <td style='text-align:right'>".number_format($s['salidas_money'], 2)."</td>
-                    <td style='text-align:right'>".number_format($s['final_money'], 2)."</td>
-                </tr>
-            ";
+        <tr>
+            <td>{$j}</td>
+            <td>".e($s['codigo'])."</td>
+
+            <!-- ORDEN NUEVO -->
+            <td style='text-align:right'>".number_format($s['inicial_cant'])."</td>
+            <td style='text-align:right'>".number_format($s['inicial_money'], 2)."</td>
+
+            <td style='text-align:right'>".number_format($s['entradas_cant'])."</td>
+            <td style='text-align:right'>".number_format($s['entradas_money'], 2)."</td>
+
+            <td style='text-align:right'>".number_format($s['salidas_cant'])."</td>
+            <td style='text-align:right'>".number_format($s['salidas_money'], 2)."</td>
+
+            <td style='text-align:right'>".number_format($s['final_cant'])."</td>
+            <td style='text-align:right'>".number_format($s['final_money'], 2)."</td>
+        </tr>
+        ";
                 $j++;
             }
 
             $html .= "
-            </tbody>
-        </table>
-        ";
+        </tbody>
+    </table>
+    ";
         }
+
 
         $mpdf->setFooter("Página {PAGENO} de {nb}");
         $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
