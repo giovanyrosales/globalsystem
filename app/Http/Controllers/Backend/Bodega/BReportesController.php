@@ -2881,7 +2881,13 @@ class BReportesController extends Controller
             'inicial_money' => 0.0,
         ];
 
+        // 👉 Nuevo: sumatorias por código (sin descripción)
+        $sumPorCodigo = [];
+
         foreach ($rows as $r) {
+            // ======================
+            // 1) TOTALES GENERALES
+            // ======================
             $totales['inicial_cant']   += (int) ($r->saldo_inicial_cant ?? 0);
             $totales['entradas_cant']  += (int) ($r->entradas_mes_cant  ?? 0);
             $totales['salidas_cant']   += (int) ($r->salidas_mes_cant   ?? 0);
@@ -2891,6 +2897,35 @@ class BReportesController extends Controller
             $totales['entradas_money'] += (float) ($r->entradas_mes_money  ?? 0);
             $totales['salidas_money']  += (float) ($r->salidas_mes_money   ?? 0);
             $totales['final_money']    += (float) ($r->saldo_final_money   ?? 0);
+
+            // ======================
+            // 2) SUMAS POR CÓDIGO
+            // ======================
+            $codigo = $r->codigo ?? 'SIN-CODIGO';
+
+            if (!isset($sumPorCodigo[$codigo])) {
+                $sumPorCodigo[$codigo] = [
+                    'codigo'          => $codigo,
+                    'inicial_cant'    => 0,
+                    'entradas_cant'   => 0,
+                    'salidas_cant'    => 0,
+                    'final_cant'      => 0,
+                    'inicial_money'   => 0.0,
+                    'entradas_money'  => 0.0,
+                    'salidas_money'   => 0.0,
+                    'final_money'     => 0.0,
+                ];
+            }
+
+            $sumPorCodigo[$codigo]['inicial_cant']   += (int) ($r->saldo_inicial_cant ?? 0);
+            $sumPorCodigo[$codigo]['entradas_cant']  += (int) ($r->entradas_mes_cant  ?? 0);
+            $sumPorCodigo[$codigo]['salidas_cant']   += (int) ($r->salidas_mes_cant   ?? 0);
+            $sumPorCodigo[$codigo]['final_cant']     += (int) ($r->saldo_final_cant   ?? 0);
+
+            $sumPorCodigo[$codigo]['inicial_money']  += (float) ($r->saldo_inicial_money ?? 0);
+            $sumPorCodigo[$codigo]['entradas_money'] += (float) ($r->entradas_mes_money  ?? 0);
+            $sumPorCodigo[$codigo]['salidas_money']  += (float) ($r->salidas_mes_money   ?? 0);
+            $sumPorCodigo[$codigo]['final_money']    += (float) ($r->saldo_final_money   ?? 0);
         }
 
         // ========== Render PDF ==========
@@ -3045,6 +3080,53 @@ class BReportesController extends Controller
             </tr>
         </table>
     ";
+
+        // 👉 Cuadro adicional: sumatorias por código (sin descripción)
+        if (!empty($sumPorCodigo)) {
+            $html .= "
+        <br><br>
+        <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px'>
+            <thead style='background:#f2f4f8'>
+                <tr>
+                    <th>#</th>
+                    <th>Código</th>
+                    <th style='text-align:right'>Saldo Inicial</th>
+                    <th style='text-align:right'>Entró Mes</th>
+                    <th style='text-align:right'>Salió Mes</th>
+                    <th style='text-align:right'>Saldo Final</th>
+                    <th style='text-align:right'>$ Inicial</th>
+                    <th style='text-align:right'>$ Entradas</th>
+                    <th style='text-align:right'>$ Salidas</th>
+                    <th style='text-align:right'>$ Final</th>
+                </tr>
+            </thead>
+            <tbody>
+        ";
+
+            $j = 1;
+            foreach ($sumPorCodigo as $cod => $s) {
+                $html .= "
+                <tr>
+                    <td>{$j}</td>
+                    <td>".e($s['codigo'])."</td>
+                    <td style='text-align:right'>".number_format($s['inicial_cant'])."</td>
+                    <td style='text-align:right'>".number_format($s['entradas_cant'])."</td>
+                    <td style='text-align:right'>".number_format($s['salidas_cant'])."</td>
+                    <td style='text-align:right'>".number_format($s['final_cant'])."</td>
+                    <td style='text-align:right'>".number_format($s['inicial_money'], 2)."</td>
+                    <td style='text-align:right'>".number_format($s['entradas_money'], 2)."</td>
+                    <td style='text-align:right'>".number_format($s['salidas_money'], 2)."</td>
+                    <td style='text-align:right'>".number_format($s['final_money'], 2)."</td>
+                </tr>
+            ";
+                $j++;
+            }
+
+            $html .= "
+            </tbody>
+        </table>
+        ";
+        }
 
         $mpdf->setFooter("Página {PAGENO} de {nb}");
         $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
