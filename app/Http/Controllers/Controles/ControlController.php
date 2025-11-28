@@ -101,6 +101,12 @@ class ControlController extends Controller
         }
 
         $titulo = "Alcaldía de Metapán";
+
+        // CAMBIARA PARA ESTPS USUARIOS
+        if($user->id == 78 || $user->id == 79){
+            $titulo = $user->cargo2;
+        }
+
         if($infoUsuario = P_UsuarioDepartamento::where('id_usuario', $user->id)->first()){
             $infoDepartamento = P_Departamento::where('id', $infoUsuario->id_departamento)->first();
             $titulo = $titulo . " - " . $infoDepartamento->nombre;

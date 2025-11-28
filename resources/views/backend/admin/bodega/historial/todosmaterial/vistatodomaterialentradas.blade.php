@@ -25,7 +25,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">Bodega</li>
-                    <li class="breadcrumb-item active">Historial de Entradas</li>
+                    <li class="breadcrumb-item active">Todo Historial de Entradas</li>
                 </ol>
             </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Historial de Entradas</h3>
+                    <h3 class="card-title">Historial de Todas las Entradas de los Materiales</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">

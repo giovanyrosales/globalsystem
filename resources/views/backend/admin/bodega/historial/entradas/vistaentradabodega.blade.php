@@ -52,7 +52,7 @@
 
 
     <div class="modal fade" id="modalEditar">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Editar Datos</h4>
@@ -71,22 +71,19 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Fecha</label>
+                                        <label>Fecha <span style="color: red">*</span></label>
                                         <input type="date" class="form-control" id="fecha-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Lote</label>
+                                        <label>Lote (Opcional)</label>
                                         <input type="text" maxlength="50" class="form-control" id="lote-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Observación</label>
+                                        <label>Observación (Opcional)</label>
                                         <input type="text" maxlength="300" class="form-control" id="observacion-editar" autocomplete="off">
                                     </div>
-
-
-
 
                                 </div>
                             </div>

@@ -74,7 +74,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Fecha de Salida</label>
+                                        <label>Fecha de Salida <span style="color: red">*</span></label>
                                         <input type="date" class="form-control" id="fecha-editar" autocomplete="off">
                                     </div>
 
@@ -85,7 +85,7 @@
 
 
                                     <div class="form-group col-md-4" style="margin-top: 5px">
-                                        <label class="control-label" style="color: #686868">Tipo de Salida</label>
+                                        <label class="control-label">Tipo de Salida <span style="color: red">*</span></label>
                                         <select id="select-tiposalida-editar" class="form-control">
                                             <option value="1">Salida con Solicitud</option>
                                             <option value="2">Salida por Desperfecto</option>
@@ -100,7 +100,6 @@
                                             </select>
                                         </div>
                                     </div>
-
 
                                     <hr>
 

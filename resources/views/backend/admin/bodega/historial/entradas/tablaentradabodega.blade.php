@@ -24,9 +24,9 @@
                                     <td style="width: 4%">{{ $dato->lote }}</td>
                                     <td style="width: 20%">{{ $dato->observacion }}</td>
                                     <td style="width: 6%">
-                                        <button type="button" class="btn btn-warning btn-xs"
+                                        <button type="button" class="btn btn-success btn-xs"
                                                 onclick="vistaDetalle2({{ $dato->id }})">
-                                            <i class="fas fa-edit" title="Datos"></i>&nbsp; Datos
+                                            <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
                                         </button>
 
                                         <button type="button" style="margin: 3px"  class="btn btn-info btn-xs"
@@ -39,10 +39,11 @@
                                             <i class="fas fa-trash" title="Borrar"></i>&nbsp; Borrar
                                         </button>
 
-                                        <button style="margin: 3px" type="button" class="btn btn-warning btn-xs"
+                                        <button style="margin: 3px" type="button" class="btn btn-dark btn-xs"
                                                 onclick="infoNuevoIngreso({{ $dato->id }})">
                                             <i class="fas fa-plus" title="Nuevo Ingreso"></i>&nbsp; Nuevo Ingreso
                                         </button>
+
                                     </td>
                                 </tr>
                             @endforeach

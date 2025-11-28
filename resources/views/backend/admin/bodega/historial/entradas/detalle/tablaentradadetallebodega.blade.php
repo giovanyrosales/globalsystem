@@ -19,7 +19,7 @@
 
                             @foreach($listado as $dato)
                                 <tr>
-                                    <td>{{ $dato->codigo_producto }}</td>
+                                    <td>{{ $dato->codigoobj }}</td>
                                     <td>{{ $dato->nombre }}</td>
                                     <td>{{ $dato->cantidad }}</td>
                                     <td>{{ $dato->precio }}</td>

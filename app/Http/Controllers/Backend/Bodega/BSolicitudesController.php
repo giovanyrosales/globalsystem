@@ -935,27 +935,28 @@ class BSolicitudesController extends Controller
         $infoUsuarioLogeado = Usuario::where('id', $infoAuth->id)->first();
         $infoDepartamento = P_Departamento::where('id', $idunidad)->first();
 
+
+
         // TODAS LAS SALIDAS QUE HIZO MI USUARIO BODEGUERO
-        $arrayBodegaSalida = BodegaSalida::where('id_usuario', $infoUsuarioLogeado->id)
+        $arrayBodegaSalida = BodegaSalida::where('id_usuario', $infoAuth->id)
             ->whereBetween('fecha', [$start, $end])
             ->where('id_unidad_manual', $idunidad)
             ->orderBy('fecha', 'ASC')
             ->get();
 
+
+
+
         $resultsBloque = array();
         $index = 0;
-        $totalTodasLasUnidades = 0;
 
         foreach ($arrayBodegaSalida as $filaP) {
             array_push($resultsBloque, $filaP);
 
             // AQUI SE OBTIENE TODAS LAS SALIDAS DE DEPARTAMENTO EN DEPARTAMENTO
-            $arraySalidaDetalle = BodegaSalidaDetalle::whereIn('id_salida', $filaP)->get();
+            $arraySalidaDetalle = BodegaSalidaDetalle::where('id_salida', $filaP->id)->get();
             $filaP->fechaFormat = date("d-m-Y", strtotime($filaP->fecha));
 
-
-
-            $columnaTotalMultiplicado = 0;
             foreach ($arraySalidaDetalle as $fila) {
 
                 $infoEnDeta = BodegaEntradasDetalle::where('id', $fila->id_entradadetalle)->first();
@@ -964,27 +965,17 @@ class BSolicitudesController extends Controller
                 $fila->nombreMaterial = $infoMaterial->nombre;
                 $fila->precioFormat = "$" . $infoEnDeta->precio;
 
-
-
                 // UNIDADMEDIDA
                 $infoUnidad = P_UnidadMedida::where('id', $infoMaterial->id_unidadmedida)->first();
                 $fila->unidadMedida = $infoUnidad->nombre;
 
                 // TOTAL
                 $multiplicado = $fila->cantidad_salida * $infoEnDeta->precio;
-                $columnaTotalMultiplicado += $multiplicado;
                 $fila->multiplicado = '$' . number_format((float)$multiplicado, 2, '.', ',');
             }
-
-            $totalTodasLasUnidades += $columnaTotalMultiplicado;
-
             $resultsBloque[$index]->bloque = $arraySalidaDetalle;
             $index++;
         }
-
-
-        $totalTodasLasUnidades = '$' . number_format((float)$totalTodasLasUnidades, 2, '.', ',');
-
 
         //$mpdf = new \Mpdf\Mpdf(['format' => 'LETTER']);
         $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
@@ -1120,6 +1111,7 @@ class BSolicitudesController extends Controller
             ->select('boentradadetalle.id_material', 'bodesalida.id_unidad_manual', 'bodesalida.fecha',
             'salideta.cantidad_salida')
             ->where('boentradadetalle.id_material', $idmaterial)
+            ->orderBy('bodesalida.fecha', 'ASC')
             ->get();
 
         foreach ($arrayBodegaSalidaDetalle as $filaP) {
@@ -1178,7 +1170,7 @@ class BSolicitudesController extends Controller
             <thead>
                 <tr>
                     <th style='font-weight: bold; width: 6%; font-size: 11px; text-align: center;'>F. Salida</th>
-                    <th style='font-weight: bold; width: 22%; font-size: 11px; text-align: center;'>Unidad</th>
+                    <th style='font-weight: bold; width: 22%; font-size: 11px; text-align: center;'>Unidad Alcaldía</th>
                     <th style='font-weight: bold; width: 8%; font-size: 11px; text-align: center;'>Cantidad Entregada</th>
                 </tr>
             </thead>

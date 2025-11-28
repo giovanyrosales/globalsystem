@@ -38,7 +38,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Listado De Entradas</h3>
+                    <h3 class="card-title">Listado De Entradas - Detalle</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -74,18 +74,18 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Código de Producto</label>
+                                        <label>Código de Producto (Opcional)</label>
                                         <input type="text" class="form-control" maxlength="100" id="codigoproducto-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Precio</label>
+                                        <label>Precio (Opcional)</label>
                                         <input type="text" class="form-control" maxlength="100" id="precio-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
                                         <label>Número ITEM (opcional)</label>
-                                        <input type="number" class="form-control" id="numeroItem-editar" autocomplete="off">
+                                        <input type="text" maxlength="100" class="form-control" id="numeroItem-editar" autocomplete="off">
                                     </div>
 
 
@@ -140,7 +140,7 @@
         function infoBorrar(id){
             Swal.fire({
                 title: 'ADVERTENCIA',
-                text: "Esto eliminará todo el ingreso de este producto. Si hubo salidas de producto también se eliminarán. Las solicitudes pueden pasar a pendiente, ya que si tuvo salidas, este se eliminará",
+                text: "Esto eliminará todo el ingreso de este producto. Si hubo salidas de producto también se eliminarán",
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -236,27 +236,6 @@
                 toastr.error('Precio máximo 9 millones');
                 return;
             }
-
-            var reglaNumeroEntero = /^[0-9]\d*$/;
-
-            if(numeroItem != ''){
-                if(!numeroItem.match(reglaNumeroEntero)) {
-                    toastr.error('Cantidad es requerido');
-                    return;
-                }
-
-                if(numeroItem < 0){
-                    toastr.error('Número Item no debe tener negativos');
-                    return;
-                }
-
-                if(numeroItem > 9000000){
-                    toastr.error('Número Item máximo debe ser 9 millones');
-                    return;
-                }
-
-            }
-
 
 
 

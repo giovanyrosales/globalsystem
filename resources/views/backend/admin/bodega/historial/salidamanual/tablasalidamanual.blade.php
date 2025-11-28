@@ -35,9 +35,9 @@
                                     <td style="width: 6%">{{ $dato->numero_solicitud }}</td>
                                     <td style="width: 6%">{{ $dato->observacion }}</td>
                                     <td style="width: 6%">
-                                        <button type="button" class="btn btn-warning btn-xs"
+                                        <button type="button" class="btn btn-success btn-xs"
                                                 onclick="modalInformacion({{ $dato->id }})">
-                                            <i class="fas fa-edit" title="Datos"></i>&nbsp; Datos
+                                            <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
                                         </button>
 
                                         <button type="button" style="margin: 5px" class="btn btn-info btn-xs"

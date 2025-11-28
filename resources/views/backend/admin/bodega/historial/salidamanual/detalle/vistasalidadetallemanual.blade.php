@@ -25,7 +25,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">Bodega</li>
-                    <li class="breadcrumb-item active">Detalle - Historial Salidas Manual</li>
+                    <li class="breadcrumb-item active">Detalle - Historial Salidas</li>
                 </ol>
             </div>
         </div>
@@ -87,7 +87,7 @@
         function infoBorrar(id){
             Swal.fire({
                 title: 'ADVERTENCIA',
-                text: "Esto eliminará la salida manual de este producto.",
+                text: "Esto eliminará la salida de este material.",
                 icon: 'info',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',

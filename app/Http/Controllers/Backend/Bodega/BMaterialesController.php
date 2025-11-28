@@ -182,10 +182,9 @@ class BMaterialesController extends Controller
     }
 
 
-    // listado de mateirales que tienen cantidad aun disponible de cada lote
+    // listado de materiales que tienen cantidad aun disponible de cada lote
     public function tablaDetalleMaterialCantidad($idmaterial)
     {
-
         $listado = BodegaEntradasDetalle::where('id_material', $idmaterial)
             ->whereColumn('cantidad_entregada', '<', 'cantidad')
             ->get();

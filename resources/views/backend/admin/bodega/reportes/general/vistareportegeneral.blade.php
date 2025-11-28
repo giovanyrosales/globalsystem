@@ -60,7 +60,7 @@
     </section>
 
 
-
+<!--
     <section class="content" style="margin-top: 35px">
         <div class="container-fluid">
             <div class="card card-gray-dark">
@@ -110,9 +110,9 @@
             </div>
         </div>
     </section>
+-->
 
-
-
+<!--
     <section class="content" style="margin-top: 35px">
         <div class="container-fluid">
             <div class="card card-gray-dark">
@@ -155,10 +155,10 @@
             </div>
         </div>
     </section>
+-->
 
 
-
-
+<!--
     <section class="content" style="margin-top: 35px; margin-bottom: 60px">
         <div class="container-fluid">
             <div class="card card-gray-dark">
@@ -171,7 +171,7 @@
 
                             <div class="row">
 
-                                <!-- Fechas -->
+
                                 <div class="form-group">
                                     <label>Desde</label>
                                     <input type="date" class="form-control" id="fecha-desde2">
@@ -183,7 +183,6 @@
                                 </div>
                             </div>
 
-                            <!-- Checkbox: Todos los Productos -->
                             <div class="form-group" style="margin-top: 5px">
                                 <label>
                                     <input type="checkbox" class="checkbox" id="checkboxdesglose-todos">
@@ -191,7 +190,6 @@
                                 </label>
                             </div>
 
-                            <!-- Select de Productos -->
                             <div class="form-group">
                                 <label>Productos</label>
                                 <select class="form-control" id="select-productos2" style="height: 150px">
@@ -201,7 +199,6 @@
                                 </select>
                             </div>
 
-                            <!-- Botón PDF -->
                             <div class="form-group" style="margin-top: 10px">
                                 <button type="button" onclick="pdfExistenciasFechaDesglose()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
                                     <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
@@ -216,7 +213,7 @@
             </div>
         </div>
     </section>
-
+-->
 
 
 
@@ -439,7 +436,6 @@
             window.open("{{ URL::to('admin/bodega/reportes/pdf-existencias') }}");
         }
 
-
         function pdfExistenciasFecha(){
             var fechadesde = document.getElementById('fecha-desde').value;
             var fechahasta = document.getElementById('fecha-hasta').value;
@@ -618,6 +614,8 @@
             let reemplazo = listado.replace(/,/g, "-");
 
 
+            // YA FILTRADO POR TIPO DE BODEGA
+
             window.open("{{ URL::to('admin/bodega/reportes/pdf/codigopresupuestario') }}/" +
                 fechadesde + "/" + fechahasta + "/" + reemplazo);
         }
@@ -654,16 +652,15 @@
                 return;
             }
 
+            // AQUI FILTRADO POR EL USUARIO LOGUEADO
+
             window.open("{{ URL::to('admin/bodega/reportes/pdf/entragadosaunidad') }}/" +
                 fechadesde + "/" + fechahasta + "/" + idunidad);
         }
 
-
-
         function pdfReportePorMaterial(){
 
             var idmaterial  = document.getElementById('select-reporte-pormaterial').value;
-
 
             window.open("{{ URL::to('admin/bodega/reportes/pdf/entregadopormaterial') }}/" +
                 idmaterial);

@@ -25,7 +25,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">Materiales</li>
-                    <li class="breadcrumb-item active">Cantidad - Actual</li>
+                    <li class="breadcrumb-item active">Cantidad - Actual Solo Disponible</li>
                 </ol>
             </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
+                    <h3 class="card-title">Solo Aparece Cantidad Disponible del Material</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">

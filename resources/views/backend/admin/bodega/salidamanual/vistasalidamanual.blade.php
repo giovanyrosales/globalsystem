@@ -32,7 +32,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">SALIDA DE PRODUCTOS MANUAL</h3>
+                    <h3 class="card-title">SALIDA DE MATERIALES</h3>
                 </div>
                 <div class="card-body">
 
@@ -41,7 +41,7 @@
 
 
                                 <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Fecha de Salida: </label>
+                                    <label class="control-label" style="color: #686868">Fecha de Salida: <span style="color: red">*</span></label>
                                     <div>
                                         <input type="date" id="fecha" autocomplete="off" class="form-control">
                                     </div>
@@ -50,7 +50,7 @@
 
 
                                 <div class="form-group col-md-4" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Tipo de Salida</label>
+                                    <label class="control-label" style="color: #686868">Tipo de Salida <span style="color: red">*</span></label>
                                     <select id="select-salida" class="form-control">
                                         <option value="1">Salida con Solicitud</option>
                                         <option value="2">Salida por Desperfecto</option>
@@ -62,16 +62,15 @@
                                 <label style="color: #686868">Asignar Unidad (Opcional):</label>
                                 <br>
                                 <select class="form-control" id="select-unidad">
-                                    <option value="" >Seleccionar Opción</option>
+                                    <option value="">Seleccionar Opción</option>
                                     @foreach($arrayUnidades as $sel)
                                         <option  value="{{ $sel->id }}">{{ $sel->nombre }}</option>
                                     @endforeach
                                 </select>
                             </div>
 
-
                             <div class="form-group col-md-4" style="margin-top: 10px">
-                                <label class="control-label" style="color: #686868">Número de Solicitud (Opcional): </label>
+                                <label class="control-label" style="color: #686868">Número de Solicitud (Opcional):</label>
                                 <div>
                                     <input type="text" id="numero-solicitud-nuevo" maxlength="300" autocomplete="off" class="form-control">
                                 </div>
@@ -82,7 +81,7 @@
 
                             <div class="row">
                                 <div class="form-group col-md-5" style="margin-top: 5px">
-                                    <label style="color: #686868">Observación: </label>
+                                    <label style="color: #686868">Observación: (Opcional)</label>
                                     <div>
                                         <input type="text" id="observacion" maxlength="300" autocomplete="off" class="form-control">
                                     </div>
@@ -100,8 +99,9 @@
                             <div class="container-fluid">
                                 <div class="row">
                                     <div class="form-group col-md-8" style="margin-top: 5px">
-                                        <h3 class="card-title" style="color: #005eab; font-weight: bold">Buscar Producto</h3>
+                                        <h3 class="card-title" style="color: #005eab; font-weight: bold">Buscar Producto <span style="color: red">*</span></h3>
                                         <div>
+                                            <p style="font-size: 14px"> Devuelve: LOTE - NOMBRE MATERIAL - UNIDAD MEDIDA</p>
                                         </div>
                                     </div>
                                 </div>
@@ -122,6 +122,7 @@
                             </div>
                         </section>
 
+                        <br>
                         <section class="content">
                             <div class="container-fluid">
 
@@ -327,7 +328,7 @@
                 "</td>" +
 
                 "<td>" +
-                "<button type='button' class='btn btn-block btn-danger' onclick='borrarFila(this)'>Borrar</button>" +
+                "<button type='button' class='btn btn-block btn-danger' style='width: 175px' onclick='borrarFila(this)'>Borrar</button>" +
                 "</td>" +
 
                 "</tr>";

@@ -32,7 +32,6 @@ class CreateUsuarioTable extends Migration
             // 2: BODEGA PROVEEDURIA
             $table->integer('tipo_bodega')->nullable();
 
-
         });
     }
 

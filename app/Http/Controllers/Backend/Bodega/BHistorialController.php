@@ -385,9 +385,19 @@ class BHistorialController extends Controller
 
         $listado = DB::table('bodega_entradas_detalle AS bo')
             ->join('bodega_materiales AS bm', 'bo.id_material', '=', 'bm.id')
-            ->select('bo.id', 'bo.cantidad', 'bo.precio', 'bm.nombre', 'bo.codigo_producto', 'bo.numero_item')
+            ->select('bo.id', 'bo.cantidad', 'bo.precio', 'bo.id_material', 'bm.nombre', 'bo.numero_item')
             ->where('bo.id_entrada', $id)
-            ->get();
+            ->get()
+            ->map(function($item){
+
+                // buscar codigo obj especifico
+                $infoMaterial = BodegaMateriales::where('id', $item->id_material)->first();
+                $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
+                $item->codigoobj = $infoObjeto->codigo;
+
+                return $item;
+            });
+
 
         return view('backend.admin.bodega.historial.entradas.detalle.tablaentradadetallebodega', compact('listado'));
     }

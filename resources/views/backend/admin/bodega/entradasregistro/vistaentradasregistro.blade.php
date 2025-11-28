@@ -35,31 +35,27 @@
                     <h3 class="card-title">INGRESO DE PRODUCTO A INVENTARIO</h3>
                 </div>
                 <div class="card-body">
-
                     <section class="content">
                         <div class="container-fluid">
-
                             <div class="row">
                                 <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Fecha: </label>
+                                    <label class="control-label" style="color: #686868">Fecha: <span style="color: red">*</span></label>
                                     <div>
                                         <input type="date" id="fecha" autocomplete="off" class="form-control">
                                     </div>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label style="color: #686868">Lote: </label>
+                                    <label style="color: #686868">Lote: (Opcional)</label>
                                     <div>
                                         <input type="text" id="lote" maxlength="50" autocomplete="off" class="form-control">
                                     </div>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="form-group col-md-5" style="margin-top: 5px">
-                                    <label style="color: #686868">Observación: </label>
+                                    <label style="color: #686868">Observación: (Opcional)</label>
                                     <div>
                                         <input type="text" id="observacion" maxlength="300" autocomplete="off" class="form-control">
                                     </div>
@@ -68,12 +64,9 @@
                         </div>
                     </section>
 
-
                     <br>
 
-
                     <div class="border-box" style="border: 1px solid #ccc; padding: 15px; border-radius: 5px;">
-
 
                     <section class="content">
                         <div class="container-fluid">
@@ -110,61 +103,47 @@
 
                     <section class="content">
                         <div class="container-fluid">
-
                             <div class="row">
-
                                 <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Código Producto: </label>
+                                    <label class="control-label" style="color: #686868">Código Producto: (Opcional)</label>
                                     <div>
                                         <input type="text" maxlength="100" autocomplete="off" class="form-control" id="codigo-producto" placeholder="">
                                     </div>
                                 </div>
-
-
                                 <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Cantidad: </label>
+                                    <label class="control-label" style="color: #686868">Cantidad: <span style="color: red">*</span></label>
                                     <div>
                                         <input type="text" autocomplete="off" class="form-control" id="cantidad" placeholder="0">
                                     </div>
                                 </div>
-
                                 <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868">Precio: </label>
+                                    <label class="control-label" style="color: #686868">Precio: <span style="color: red">*</span></label>
                                     <div>
                                         <input type="number" min="0" max="1000000" autocomplete="off" class="form-control" id="precio-producto" placeholder="0.00">
                                     </div>
                                 </div>
-
                                 <div class="form-group col-md-2" style="margin-top: 5px">
-                                    <label class="control-label" style="color: #686868"># de ITEM (opcional): </label>
+                                    <label class="control-label" style="color: #686868"># de ITEM (Opcional):</label>
                                     <div>
-                                        <input type="text" autocomplete="off" class="form-control" id="numeroItem" placeholder="0">
+                                        <input type="text" maxlength="100" autocomplete="off" class="form-control" id="numeroItem">
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </section>
-
                     </div>
-
                     <br>
-
                     <section class="content">
                         <div class="container-fluid">
-
                             <div style="margin-right: 30px">
                                 <button type="button" style="float: right" class="btn btn-success" onclick="agregarFila();">Agregar a Tabla</button>
-
                             </div>
-
                         </div>
                     </section>
                 </div>
             </div>
         </div>
     </section>
-
 
 
     <section class="content-header">
@@ -179,7 +158,7 @@
         <div class="container-fluid">
             <div class="card card-primary">
                 <div class="card-header">
-                    <h3 class="card-title">Información de Ingreso</h3>
+                    <h3 class="card-title">Información de Ingreso (Algunas Campos no se muestran pero si se Enviarán)</h3>
                 </div>
 
                 <table class="table" id="matriz" data-toggle="table" style="margin-right: 15px; margin-left: 15px;">
@@ -369,26 +348,6 @@
                 return;
             }
 
-
-
-            if(numeroItem !== ''){
-                if(!numeroItem.match(reglaNumeroEntero)) {
-                    toastr.error('numeroItem es requerido');
-                    return;
-                }
-
-                if(numeroItem < 0){
-                    toastr.error('numeroItem Mínima no debe tener negativos');
-                    return;
-                }
-
-                if(numeroItem > 9000000){
-                    toastr.error('numeroItem máximo debe ser 9 millones');
-                    return;
-                }
-            }
-
-
             //**************
 
             // Crear un objeto Date a partir del valor del input
@@ -514,19 +473,13 @@
         function registrarProductos(){
 
             var fecha = document.getElementById('fecha').value;
-            var lote = document.getElementById('lote').value;
-            var observacion = document.getElementById('observacion').value;
+            var lote = document.getElementById('lote').value; // opcional
+            var observacion = document.getElementById('observacion').value; // opcional
 
             if(fecha === ''){
                 toastr.error('Fecha es requerido');
                 return;
             }
-
-            if(lote === ''){
-                toastr.error('Lote es requerido');
-                return;
-            }
-
 
             var nRegistro = $('#matriz > tbody >tr').length;
 

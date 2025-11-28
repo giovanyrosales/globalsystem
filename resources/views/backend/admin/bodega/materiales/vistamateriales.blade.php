@@ -29,7 +29,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">Bodega</li>
-                    <li class="breadcrumb-item active">Materiales</li>
+                    <li class="breadcrumb-item active">Materiales Registrados</li>
                 </ol>
             </div>
         </div>
@@ -39,7 +39,7 @@
         <div class="container-fluid">
             <div class="card card-gray-dark">
                 <div class="card-header">
-                    <h3 class="card-title">Listado</h3>
+                    <h3 class="card-title">Listado de Materiales Registrados</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -69,12 +69,12 @@
                                 <div class="col-md-12">
 
                                     <div class="form-group">
-                                        <label>Nombre</label>
+                                        <label>Nombre <span style="color: red">*</span></label>
                                         <input type="text"  class="form-control" id="nombre-nuevo" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Unidad de medida</label>
+                                        <label>Unidad de medida <span style="color: red">*</span></label>
                                         <select id="select-unidadmedida" class="form-control">
                                             @foreach($unidadmedida as $item)
                                                 <option value="{{$item->id}}"> {{ $item->nombre }}</option>
@@ -83,7 +83,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Objeto Especifico</label>
+                                        <label>Objeto Especifico <span style="color: red">*</span></label>
                                         <select id="select-objespecifico" class="form-control">
                                             @foreach($objespecifico as $item)
                                                 <option value="{{$item->id}}">{{$item->codigo}} - {{ $item->nombre }}</option>
@@ -125,12 +125,12 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Nombre</label>
+                                        <label>Nombre <span style="color: red">*</span></label>
                                         <input type="text" class="form-control" id="nombre-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
-                                        <label style="color:#191818">Unidad Medida:</label>
+                                        <label style="color:#191818">Unidad Medida: <span style="color: red">*</span></label>
                                         <br>
                                         <div>
                                             <select class="form-control" id="unidadmedida-editar">
@@ -140,7 +140,7 @@
 
 
                                     <div class="form-group">
-                                        <label style="color:#191818">Objeto Especifico:</label>
+                                        <label style="color:#191818">Objeto Especifico: <span style="color: red">*</span></label>
                                         <br>
                                         <div>
                                             <select class="form-control" id="objespecifico-editar">
