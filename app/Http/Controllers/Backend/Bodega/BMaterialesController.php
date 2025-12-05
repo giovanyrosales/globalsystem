@@ -261,7 +261,7 @@ class BMaterialesController extends Controller
             'fecha' => 'required',
         );
 
-        // lote, observacion
+        // lote, observacion, aumento
 
         $validar = Validator::make($request->all(), $regla);
 
@@ -283,6 +283,7 @@ class BMaterialesController extends Controller
             $nuevoReg->fecha = $request->fecha;
             $nuevoReg->lote = $request->lote;
             $nuevoReg->observacion = $request->observacion;
+            $nuevoReg->incremento = $request->incremento;
             $nuevoReg->save();
 
             // infoIdProducto, infoCantidad, infoPrecio, infoCodigoProducto
@@ -300,6 +301,8 @@ class BMaterialesController extends Controller
                 $detalle->nombre_copia = $infoProducto->nombre;
                 $detalle->cantidad_entregada = 0;
                 $detalle->numero_item = $filaArray['infoNumeroItem'];
+                $detalle->precio_ordencompra = $filaArray['infoPrecioOrden']; // PRECIO DE LA ORDEN DE COMPRA
+
                 $detalle->save();
             }
 
@@ -346,6 +349,7 @@ class BMaterialesController extends Controller
                 $detalle->nombre_copia = $infoProducto->nombre;
                 $detalle->cantidad_entregada = 0;
                 $detalle->numero_item = $filaArray['infoNumeroItem'];
+                $detalle->precio_ordencompra = $filaArray['infoPrecioOrden'];
                 $detalle->save();
             }
 

@@ -97,25 +97,36 @@
                                     <div class="row">
 
                                         <div class="form-group col-md-2" style="margin-top: 5px">
-                                            <label class="control-label" style="color: #686868">Código Producto: </label>
+                                            <label class="control-label" style="color: #686868">Código Producto: (Opcional)</label>
                                             <div>
                                                 <input type="text" autocomplete="off" class="form-control" maxlength="100" id="codigo-producto">
                                             </div>
                                         </div>
 
                                         <div class="form-group col-md-2" style="margin-top: 5px">
-                                            <label class="control-label" style="color: #686868">Cantidad: </label>
+                                            <label class="control-label" style="color: #686868">Cantidad: <span style="color: red">*</span></label>
                                             <div>
                                                 <input type="text" autocomplete="off" class="form-control" id="cantidad" placeholder="0">
                                             </div>
                                         </div>
 
                                         <div class="form-group col-md-2" style="margin-top: 5px">
-                                            <label class="control-label" style="color: #686868">Precio: </label>
+                                            <label class="control-label" style="color: #686868">Precio SEGUN FACTURA: <span style="color: red">*</span></label>
                                             <div>
                                                 <input type="number" min="0" max="1000000" autocomplete="off" class="form-control" id="precio-producto" placeholder="0.00">
                                             </div>
                                         </div>
+
+
+                                        <div class="form-group col-md-3" style="margin-top: 5px">
+                                            <label class="control-label" style="color: #686868">Precio SEGUN ORDEN COMPRA: <span style="color: red">*</span></label>
+                                            <div>
+                                                <input type="number" min="0" max="1000000" autocomplete="off" class="form-control" id="precio-producto-orden" placeholder="0.00">
+                                            </div>
+                                        </div>
+
+
+
 
                                         <div class="form-group col-md-2" style="margin-top: 5px">
                                             <label class="control-label" style="color: #686868"># de ITEM (opcional): </label>
@@ -238,6 +249,19 @@
     </script>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const precioProducto = document.getElementById("precio-producto");
+            const precioOrden = document.getElementById("precio-producto-orden");
+
+            precioProducto.addEventListener("input", function () {
+                precioOrden.value = this.value; // Copia el valor en tiempo real
+            });
+
+        });
+    </script>
+
+    <script>
 
         function buscarMaterial(e){
 
@@ -289,12 +313,14 @@
         function agregarFila(){
             var codigo = document.getElementById('codigo-producto').value;
             var precioProducto = document.getElementById('precio-producto').value;
+            var precioProductoOrden = document.getElementById('precio-producto-orden').value;
+
+
             var cantidad = document.getElementById('cantidad').value;
             var inputBuscador = document.querySelector('#inputBuscador');
 
             var reglaNumeroEntero = /^[0-9]\d*$/;
             var reglaNumeroDiesDecimal = /^([0-9]+\.?[0-9]{0,10})$/;
-
 
             if(inputBuscador.dataset.idproducto == 0){
                 toastr.error("Producto es requerido");
@@ -353,6 +379,33 @@
             }
 
 
+            //*************
+
+            if(precioProductoOrden === ''){
+                toastr.error('Precio Orden Producto es requerido');
+                return;
+            }
+
+            if(!precioProductoOrden.match(reglaNumeroDiesDecimal)) {
+                toastr.error('Precio Orden Producto debe ser número Decimal (10 decimales)');
+                return;
+            }
+
+            if(precioProductoOrden < 0){
+                toastr.error('Precio Orden Producto no debe ser negativo');
+                return;
+            }
+
+            if(precioProductoOrden > 9000000){
+                toastr.error('Precio Orden Producto debe ser máximo 9 millones');
+                return;
+            }
+
+
+
+
+
+
             if(numeroItem !== ''){
                 if(!numeroItem.match(reglaNumeroEntero)) {
                     toastr.error('numeroItem es requerido');
@@ -400,6 +453,9 @@
 
                 "<td>" +
                 "<input name='arrayPrecio[]' data-precio='" + precioProducto + "' disabled value='$" + precioProducto + "' class='form-control' type='text'>" +
+                "<input name='arrayPrecioOrden[]' data-precioorden='" + precioProductoOrden + "' disabled value='$" + precioProductoOrden + "' class='form-control' type='text'>" +
+
+
                 "</td>" +
 
 
@@ -504,6 +560,10 @@
             var arrayIdProducto = $("input[name='arrayNombre[]']").map(function(){return $(this).attr("data-idproducto");}).get();
             var arrayCantidad = $("input[name='arrayCantidad[]']").map(function(){return $(this).val();}).get();
             var arrayPrecio = $("input[name='arrayPrecio[]']").map(function(){return $(this).attr("data-precio");}).get();
+            var arrayPrecioOrden = $("input[name='arrayPrecioOrden[]']").map(function(){return $(this).attr("data-precioorden");}).get();
+
+
+
             var arrayCodigo = $("input[name='arrayCodigo[]']").map(function(){return $(this).attr("data-codigo");}).get();
 
             var arrayNumeroItem = $("input[name='arrayNumeroItem[]']").map(function(){return $(this).val();}).get();
@@ -522,6 +582,7 @@
                 let idProducto = arrayIdProducto[a];
                 let cantidadProducto = arrayCantidad[a];
                 let precioProducto = arrayPrecio[a];
+                let precioProductoOrden = arrayPrecioOrden[a];
 
                 // identifica si el 0 es tipo number o texto
                 if(idProducto == 0){
@@ -584,6 +645,35 @@
                     return;
                 }
 
+
+
+
+                // **** VALIDAR PRECIO DE PRODUCTO ORDEN
+
+                if (precioProductoOrden === '') {
+                    colorRojoTabla(a);
+                    toastr.error('Fila #' + (a + 1) + ' Precio Orden de producto es requerida. Por favor borrar la Fila y buscar de nuevo el Producto');
+                    return;
+                }
+
+                if (!precioProductoOrden.match(reglaNumeroDiesDecimal)) {
+                    colorRojoTabla(a);
+                    toastr.error('Fila #' + (a + 1) + ' Precio Orden debe ser decimal (10 decimales) y no negativo. Por favor borrar la Fila y buscar de nuevo el Producto');
+                    return;
+                }
+
+                if (precioProductoOrden < 0) {
+                    colorRojoTabla(a);
+                    toastr.error('Fila #' + (a + 1) + ' Precio Orden no debe ser negativo. Por favor borrar la Fila y buscar de nuevo el Producto');
+                    return;
+                }
+
+                if (precioProductoOrden > 9000000) {
+                    colorRojoTabla(a);
+                    toastr.error('Fila #' + (a + 1) + ' Precio Orden máximo 9 millones. Por favor borrar la Fila y buscar de nuevo el Producto');
+                    return;
+                }
+
             }
 
             openLoading();
@@ -595,16 +685,15 @@
             const contenedorArray = [];
 
             for(var i = 0; i < arrayIdProducto.length; i++){
-
                 let infoIdProducto = arrayIdProducto[i];
                 let infoCantidad = arrayCantidad[i];
                 let infoPrecio = arrayPrecio[i];
+                let infoPrecioOrden = arrayPrecioOrden[i];
                 let infoCodigo = arrayCodigo[i];
-
                 let infoNumeroItem = arrayNumeroItem[i];
 
                 // ESTOS NOMBRES SE UTILIZAN EN CONTROLADOR
-                contenedorArray.push({ infoIdProducto, infoCantidad, infoPrecio, infoCodigo, infoNumeroItem });
+                contenedorArray.push({ infoIdProducto, infoCantidad, infoPrecio, infoCodigo, infoNumeroItem, infoPrecioOrden });
             }
 
             formData.append('contenedorArray', JSON.stringify(contenedorArray));

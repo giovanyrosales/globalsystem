@@ -20,6 +20,11 @@ class CreateBodegaEntradasTable extends Migration
             $table->string('observacion', 300)->nullable();
             $table->string('lote', 50)->nullable();
 
+
+            // Saber si es factura de Incremento
+            $table->boolean('incremento');
+
+
             $table->foreign('id_usuario')->references('id')->on('usuario');
         });
     }

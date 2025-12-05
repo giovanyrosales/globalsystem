@@ -1,4 +1,7 @@
 <section class="content">
+
+    <p>Total SUMAS: <strong>{{ $totalGeneral }}</strong></p>
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
@@ -9,8 +12,12 @@
                             <tr>
                                 <th style="width: 5%">Código Producto</th>
                                 <th style="width: 20%">Producto</th>
+                                <th style="width: 4%">Precio ORDEN COMPRA</th>
+
                                 <th style="width: 4%">Cantidad Ingresada</th>
-                                <th style="width: 4%">Precio</th>
+                                <th style="width: 4%">Precio FACTURA</th>
+
+                                <th style="width: 4%">Total</th>
                                 <th style="width: 4%">Número ITEM</th>
                                 <th style="width: 4%">Opciones</th>
                             </tr>
@@ -21,8 +28,11 @@
                                 <tr>
                                     <td>{{ $dato->codigoobj }}</td>
                                     <td>{{ $dato->nombre }}</td>
+                                    <td>{{ $dato->precio_ordencompra }}</td>
+
                                     <td>{{ $dato->cantidad }}</td>
                                     <td>{{ $dato->precio }}</td>
+                                    <td>{{ $dato->subtotal }}</td>
                                     <td>{{ $dato->numero_item }}</td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-xs"

@@ -79,8 +79,13 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Precio (Opcional)</label>
-                                        <input type="text" class="form-control" maxlength="100" id="precio-editar" autocomplete="off">
+                                        <label>Precio FACTURA<span style="color: red">*</span></label>
+                                        <input type="number" class="form-control" id="precio-editar" autocomplete="off">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Precio ORDEN COMPRA<span style="color: red">*</span></label>
+                                        <input type="number" class="form-control" id="precio-editar-orden" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
@@ -195,6 +200,9 @@
                         $('#id-editar').val(response.data.info.id);
                         $('#codigoproducto-editar').val(response.data.info.codigo_producto);
                         $('#precio-editar').val(response.data.info.precio);
+                        $('#precio-editar-orden').val(response.data.info.precio_ordencompra);
+
+
                         $('#numeroItem-editar').val(response.data.info.numero_item);
                     }
                     else {
@@ -213,6 +221,8 @@
             var id = document.getElementById('id-editar').value;
             var codigo = document.getElementById('codigoproducto-editar').value;
             var precio = document.getElementById('precio-editar').value;
+            var precioOrden = document.getElementById('precio-editar-orden').value;
+
             var numeroItem = document.getElementById('numeroItem-editar').value;
 
             if(precio === ''){
@@ -220,7 +230,14 @@
                 return;
             }
 
+
+            if(precioOrden === ''){
+                toastr.error('Precio Orden es requerido');
+                return;
+            }
+
             var reglaNumeroDiesDecimal = /^([0-9]+\.?[0-9]{0,10})$/;
+
 
             if (!precio.match(reglaNumeroDiesDecimal)) {
                 toastr.error('Precio debe ser decimal (10 decimales) y no negativo');
@@ -238,12 +255,28 @@
             }
 
 
+            if (!precioOrden.match(reglaNumeroDiesDecimal)) {
+                toastr.error('Precio Orden debe ser decimal (10 decimales) y no negativo');
+                return;
+            }
+
+            if (precioOrden < 0) {
+                toastr.error('Precio Orden no debe ser negativo');
+                return;
+            }
+
+            if (precioOrden > 9000000) {
+                toastr.error('Precio Orden máximo 9 millones');
+                return;
+            }
 
             openLoading();
             var formData = new FormData();
             formData.append('id', id);
             formData.append('codigo', codigo);
             formData.append('precio', precio);
+            formData.append('precioOrden', precioOrden);
+
             formData.append('numeroitem', numeroItem);
 
             axios.post(url+'/bodega/historial/entradadetalle/editar', formData, {

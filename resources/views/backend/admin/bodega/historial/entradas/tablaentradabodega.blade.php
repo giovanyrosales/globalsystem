@@ -12,7 +12,8 @@
                             <tr>
                                 <th style="width: 5%">Fecha Ingreso</th>
                                 <th style="width: 4%">Lote</th>
-                                <th style="width: 20%">Observación</th>
+                                <th style="width: 4%">Aumento</th>
+                                <th style="width: 15%">Observación</th>
                                 <th style="width: 6%">Opciones</th>
                             </tr>
                             </thead>
@@ -22,7 +23,12 @@
                                 <tr>
                                     <td style="width: 5%">{{ $dato->fecha }}</td>
                                     <td style="width: 4%">{{ $dato->lote }}</td>
-                                    <td style="width: 20%">{{ $dato->observacion }}</td>
+                                    <td style="width: 4%">
+                                        @if($dato->incremento == 1)
+                                            SI
+                                        @endif
+                                    </td>
+                                    <td style="width: 15%">{{ $dato->observacion }}</td>
                                     <td style="width: 6%">
                                         <button type="button" class="btn btn-success btn-xs"
                                                 onclick="vistaDetalle2({{ $dato->id }})">

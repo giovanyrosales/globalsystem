@@ -85,6 +85,19 @@
                                         <input type="text" maxlength="300" class="form-control" id="observacion-editar" autocomplete="off">
                                     </div>
 
+
+                                    <hr>
+
+                                    <!-- CHECKBOX -->
+                                    <div class="form-group">
+                                        <div class="d-flex align-items-center">
+                                            <div class="form-check">
+                                                <input type="checkbox" id="check-aumento">
+                                                <label style="margin-left: 4px;">Este Pedido es aumento de Contrato?</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -199,6 +212,8 @@
                         $('#lote-editar').val(response.data.info.lote);
                         $('#observacion-editar').val(response.data.info.observacion);
 
+                        document.getElementById('check-aumento').checked = response.data.info.incremento;
+
                     }else{
                         toastr.error('Información no encontrada');
                     }
@@ -216,6 +231,9 @@
             var lote = document.getElementById('lote-editar').value;
             var observacion = document.getElementById('observacion-editar').value;
 
+            var checkboxAumento = document.getElementById('check-aumento');
+            var valorCheckbox = checkboxAumento.checked ? 1 : 0;
+
             if(fecha === ''){
                 toastr.error('Fecha es requerido');
                 return;
@@ -227,6 +245,7 @@
             formData.append('fecha', fecha);
             formData.append('lote', lote);
             formData.append('observacion', observacion);
+            formData.append('incremento', valorCheckbox);
 
             axios.post(url+'/bodega/historial/entrada/guardarinformacion', formData, {
             })

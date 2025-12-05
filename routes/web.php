@@ -1435,6 +1435,7 @@ Route::post('/admin/bodega/historial/entrada/borrarlote', [BHistorialController:
 Route::post('/admin/bodega/historial/entradadetalle/borraritem', [BHistorialController::class, 'historialEntradaDetalleBorrarItem']);
 Route::post('/admin/bodega/historial/entradadetalle/informacion', [BHistorialController::class, 'informacionItemEntradaDetalle']);
 Route::post('/admin/bodega/historial/entradadetalle/editar', [BHistorialController::class, 'editarItemEntradaDetalle']);
+Route::post('/admin/bodega/historial/entradadetalle/editarprecios', [BHistorialController::class, 'editarItemEntradaDetalleSoloPrecios']);
 
 
 // ** SOLICITUDES PENDIENTES

@@ -52,7 +52,7 @@
 
 
     <div class="modal fade" id="modalEditar">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Editar Datos</h4>
@@ -61,7 +61,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="formulario-datos">
+                    <form id="formulario-editar">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12">
@@ -71,22 +71,14 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Fecha</label>
-                                        <input type="date" class="form-control" id="fecha-editar" autocomplete="off">
+                                        <label>Precio FACTURA<span style="color: red">*</span></label>
+                                        <input type="number" class="form-control" id="precio-editar" autocomplete="off">
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Lote</label>
-                                        <input type="text" maxlength="50" class="form-control" id="lote-editar" autocomplete="off">
+                                        <label>Precio ORDEN COMPRA<span style="color: red">*</span></label>
+                                        <input type="number" class="form-control" id="precio-editar-orden" autocomplete="off">
                                     </div>
-
-                                    <div class="form-group">
-                                        <label>Observación</label>
-                                        <input type="text" maxlength="300" class="form-control" id="observacion-editar" autocomplete="off">
-                                    </div>
-
-
-
 
                                 </div>
                             </div>
@@ -96,12 +88,11 @@
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                     <button type="button" style="font-weight: bold; background-color: #28a745; color: white !important;"
-                            class="button button-rounded button-pill button-small" onclick="editarDatos()">Guardar</button>
+                            class="button button-rounded button-pill button-small" onclick="editar()">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
-
 
 </div>
 
@@ -130,6 +121,117 @@
 
     <script>
 
+        function recargar(){
+            var ruta = "{{ URL::to('/admin/bodega/historial/entradatodos/tabla') }}";
+            $('#tablaDatatable').load(ruta);
+        }
+
+        function infoEditar(id){
+            openLoading();
+            document.getElementById("formulario-editar").reset();
+            var formData = new FormData();
+            formData.append('id', id);
+
+            axios.post(url+'/bodega/historial/entradadetalle/informacion', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+                    if(response.data.success === 1){
+
+                        $('#modalEditar').modal('show');
+                        $('#id-editar').val(response.data.info.id);
+                        $('#precio-editar').val(response.data.info.precio);
+                        $('#precio-editar-orden').val(response.data.info.precio_ordencompra);
+                    }
+                    else {
+                        toastr.error('Error al buscar');
+                    }
+                })
+                .catch((error) => {
+                    toastr.error('Error al buscar');
+                    closeLoading();
+                });
+        }
+
+
+        function editar(){
+
+            var id = document.getElementById('id-editar').value;
+            var precio = document.getElementById('precio-editar').value;
+            var precioOrden = document.getElementById('precio-editar-orden').value;
+
+
+            if(precio === ''){
+                toastr.error('Precio es requerido');
+                return;
+            }
+
+
+            if(precioOrden === ''){
+                toastr.error('Precio Orden es requerido');
+                return;
+            }
+
+            var reglaNumeroDiesDecimal = /^([0-9]+\.?[0-9]{0,10})$/;
+
+
+            if (!precio.match(reglaNumeroDiesDecimal)) {
+                toastr.error('Precio debe ser decimal (10 decimales) y no negativo');
+                return;
+            }
+
+            if (precio < 0) {
+                toastr.error('Precio no debe ser negativo');
+                return;
+            }
+
+            if (precio > 9000000) {
+                toastr.error('Precio máximo 9 millones');
+                return;
+            }
+
+
+            if (!precioOrden.match(reglaNumeroDiesDecimal)) {
+                toastr.error('Precio Orden debe ser decimal (10 decimales) y no negativo');
+                return;
+            }
+
+            if (precioOrden < 0) {
+                toastr.error('Precio Orden no debe ser negativo');
+                return;
+            }
+
+            if (precioOrden > 9000000) {
+                toastr.error('Precio Orden máximo 9 millones');
+                return;
+            }
+
+            openLoading();
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('precio', precio);
+            formData.append('precioOrden', precioOrden);
+
+            axios.post(url+'/bodega/historial/entradadetalle/editarprecios', formData, {
+            })
+                .then((response) => {
+                    closeLoading();
+
+                    if(response.data.success === 1){
+                        toastr.success('Actualizado correctamente');
+                        $('#modalEditar').modal('hide');
+                        recargar();
+                    }
+                    else {
+                        toastr.error('Error al actualizar');
+                    }
+
+                })
+                .catch((error) => {
+                    toastr.error('Error al actualizar');
+                    closeLoading();
+                });
+        }
 
 
     </script>

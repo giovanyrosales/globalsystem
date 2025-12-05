@@ -74,7 +74,7 @@ class BHistorialController extends Controller
             'fecha' => 'required',
         );
 
-        // observacion, lote
+        // observacion, lote, incremento
 
         $validar = Validator::make($request->all(), $regla);
 
@@ -84,7 +84,8 @@ class BHistorialController extends Controller
         BodegaEntradas::where('id', $request->id)->update([
             'fecha' => $request->fecha,
             'lote' => $request->lote,
-            'observacion' => $request->observacion
+            'observacion' => $request->observacion,
+            'incremento' => $request->incremento
         ]);
 
 
@@ -102,7 +103,6 @@ class BHistorialController extends Controller
 
     public function tablaHistorialEntradasMateriales()
     {
-
         $usuario = auth()->user();
         $arrayEntradas = BodegaEntradas::where('id_usuario', $usuario->id)
             ->orderBy('fecha', 'desc')
@@ -112,7 +112,6 @@ class BHistorialController extends Controller
             array_push($pilaIDEntradas, $fila->id);
         }
 
-
         $arrayEntradasDetalle = BodegaEntradasDetalle::whereIn('id_entrada', $pilaIDEntradas)->get();
 
         foreach ($arrayEntradasDetalle as $fila) {
@@ -121,13 +120,10 @@ class BHistorialController extends Controller
             $infoMaterial = BodegaMateriales::where('id', $fila->id_material)->first();
             $fila->fechaFormat = date("d-m-Y", strtotime($infoEntrada->fecha));
 
-
             $fila->lote = $infoEntrada->lote;
             $fila->observacion = $infoEntrada->observacion;
             $fila->nombreMaterial = $infoMaterial->nombre;
-
         }
-
 
         return view('backend.admin.bodega.historial.todosmaterial.tablatodomaterialentradas', compact('arrayEntradasDetalle'));
     }
@@ -342,6 +338,7 @@ class BHistorialController extends Controller
         $regla = array(
             'id' => 'required',
             'precio' => 'required',
+            'precioOrden' => 'required',
         );
 
         // codigo, numeroitem
@@ -352,6 +349,7 @@ class BHistorialController extends Controller
 
         BodegaEntradasDetalle::where('id', $request->id)->update([
             'precio' => $request->precio,
+            'precio_ordencompra' => $request->precioOrden,
             'codigo_producto' => $request->codigo,
             'numero_item' => $request->numeroitem
         ]);
@@ -361,12 +359,27 @@ class BHistorialController extends Controller
 
 
 
+    public function editarItemEntradaDetalleSoloPrecios(Request $request)
+    {
+        $regla = array(
+            'id' => 'required',
+            'precio' => 'required',
+            'precioOrden' => 'required',
+        );
 
+        // codigo, numeroitem
 
+        $validar = Validator::make($request->all(), $regla);
 
+        if ($validar->fails()){return ['success' => 0];}
 
+        BodegaEntradasDetalle::where('id', $request->id)->update([
+            'precio' => $request->precio,
+            'precio_ordencompra' => $request->precioOrden,
+        ]);
 
-
+        return ['success' => 1];
+    }
 
 
 
@@ -385,21 +398,31 @@ class BHistorialController extends Controller
 
         $listado = DB::table('bodega_entradas_detalle AS bo')
             ->join('bodega_materiales AS bm', 'bo.id_material', '=', 'bm.id')
-            ->select('bo.id', 'bo.cantidad', 'bo.precio', 'bo.id_material', 'bm.nombre', 'bo.numero_item')
+            ->select(
+                'bo.id',
+                'bo.cantidad',
+                'bo.precio',
+                'bo.precio_ordencompra',
+                'bo.id_material',
+                'bm.nombre',
+                'bo.numero_item',
+                DB::raw('(bo.cantidad * bo.precio) AS subtotal') // 👈 cantidad x precio
+            )
             ->where('bo.id_entrada', $id)
             ->get()
             ->map(function($item){
 
                 // buscar codigo obj especifico
                 $infoMaterial = BodegaMateriales::where('id', $item->id_material)->first();
-                $infoObjeto = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
+                $infoObjeto   = ObjEspecifico::where('id', $infoMaterial->id_objespecifico)->first();
                 $item->codigoobj = $infoObjeto->codigo;
 
                 return $item;
             });
 
+        $totalGeneral = '$' . number_format($listado->sum('subtotal'), 2, '.', ',');
 
-        return view('backend.admin.bodega.historial.entradas.detalle.tablaentradadetallebodega', compact('listado'));
+        return view('backend.admin.bodega.historial.entradas.detalle.tablaentradadetallebodega', compact('listado', 'totalGeneral'));
     }
 
     public function indexNuevoIngresoEntradaDetalle($id)
@@ -409,9 +432,6 @@ class BHistorialController extends Controller
 
         return view('backend.admin.bodega.historial.entradas.detalle.vistaingresoextra', compact('id', 'info'));
     }
-
-
-
 
 
 

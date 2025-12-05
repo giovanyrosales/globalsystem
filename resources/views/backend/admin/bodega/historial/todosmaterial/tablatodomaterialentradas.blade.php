@@ -13,10 +13,13 @@
                                 <th style="width: 10%">Fecha Ingreso</th>
                                 <th style="width: 8%">Lote</th>
                                 <th style="width: 20%">Descripción</th>
+                                <th style="width: 20%">Precio ORDEN COMPRA</th>
                                 <th style="width: 10%">Número ITEM</th>
                                 <th style="width: 10%">Cantidad Entro</th>
-                                <th style="width: 10%">Precio</th>
+                                <th style="width: 10%">Precio FACTURA</th>
                                 <th style="width: 10%">cantidad Entragada</th>
+
+                                <th style="width: 10%">Opciones</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -26,10 +29,19 @@
                                     <td style="width: 10%">{{ $dato->fechaFormat }}</td>
                                     <td style="width: 8%">{{ $dato->lote }}</td>
                                     <td style="width: 20%">{{ $dato->nombreMaterial }}</td>
+                                    <td style="width: 10%">${{ $dato->precio_ordencompra }}</td>
                                     <td style="width: 10%">{{ $dato->numero_item }}</td>
                                     <td style="width: 10%">{{ $dato->cantidad }}</td>
                                     <td style="width: 10%">${{ $dato->precio }}</td>
                                     <td style="width: 10%">{{ $dato->cantidad_entregada }}</td>
+
+                                    <td style="width: 6%">
+                                        <button type="button" class="btn btn-success btn-xs"
+                                                onclick="infoEditar({{ $dato->id }})">
+                                            <i class="fas fa-edit" title="Editar"></i>&nbsp; Editar
+                                        </button>
+                                    </td>
+
                                 </tr>
                             @endforeach
 

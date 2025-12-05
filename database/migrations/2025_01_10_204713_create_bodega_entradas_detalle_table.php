@@ -31,6 +31,13 @@ class CreateBodegaEntradasDetalleTable extends Migration
 
             $table->integer('numero_item')->nullable();
 
+
+            // PRECIO DE LA ORDEN DE COMPRA
+            $table->decimal('precio_ordencompra', 10, 4);
+
+
+
+
             $table->foreign('id_entrada')->references('id')->on('bodega_entradas');
             $table->foreign('id_material')->references('id')->on('bodega_materiales');
         });
