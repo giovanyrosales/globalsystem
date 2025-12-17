@@ -74,7 +74,7 @@ class LoginController extends Controller
     {
         // 🔹 ID que querés buscar (puede venir por request)
 
-        $path = storage_path('app/public/excel/base.xlsx');
+        $path = public_path('excel/base.xlsx');
         $data = Excel::toArray([], $path);
 
         $empleado = null;
