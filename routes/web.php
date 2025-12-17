@@ -1671,13 +1671,6 @@ Route::get('/admin/tesoreria/listado-proveedor-completados/tabla/index/{anio}/{m
 
 
 
-
-
-
-
-
-
-
 //--- LISTADO TODOS
 Route::get('/admin/tesoreria/listado-todos/index', [TesoreriaConfigController::class,'vistaListadoRegistrosTodos'])->name('admin.tesoreria.listado.todos.index');
 Route::get('/admin/tesoreria/listado-todos/tabla/index', [TesoreriaConfigController::class,'tablaListadoRegistrosTodos']);
@@ -1694,6 +1687,27 @@ Route::post('/admin/tesoreria/setear/segun-checkbox/estado', [TesoreriaConfigCon
 // REPORTES
 Route::get('/admin/tesoreria/reportes/index', [TesoreriaConfigController::class,'indexReportes'])->name('admin.tesoreria.reportes.index');
 Route::get('/admin/tesoreria/pdf/general/{anio}/{tipo}', [TesoreriaConfigController::class,'reportePdfGeneralTesoreria']);
+
+
+
+
+
+
+Route::get('/sanciones', [LoginController::class,'vistaSanciones']);
+Route::get('/sanciones/reporte/{id}', [LoginController::class,'pdfSanciones']);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
