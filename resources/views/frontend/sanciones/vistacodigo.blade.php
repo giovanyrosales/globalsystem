@@ -29,7 +29,7 @@
     }
 </style>
 
-<div id="divcontenedor">
+<div id="divcontenedor" style="display: none">
 
     <section class="content mt-3">
         <div class="container-fluid">
@@ -52,7 +52,8 @@
                                 type="text"
                                 id="idEmpleado"
                                 class="form-control text-center"
-                                placeholder="Ej: 01382">
+                                placeholder="Ej: 01382"
+                                onkeydown="if (event.key === 'Enter') buscarEmpleado();">
                         </div>
 
                         <div class="form-group col-auto text-center">
@@ -67,22 +68,7 @@
                 </div>
             </div>
 
-            <!-- CONTENEDOR PDF -->
-            <div class="card card-custom mt-4" id="contenedorPdf" style="display:none;">
-                <div class="card-header bg-light">
-                    <h3 class="card-title text-success">
-                        Vista previa del documento
-                    </h3>
-                </div>
 
-                <div class="card-body">
-                    <iframe
-                        id="iframePdf"
-                        class="iframe-pdf"
-                        src="">
-                    </iframe>
-                </div>
-            </div>
 
         </div>
     </section>
@@ -99,7 +85,16 @@
     <script src="{{ asset('js/alertaPersonalizada.js') }}"></script>
     <script src="{{ asset('js/select2.min.js') }}" type="text/javascript"></script>
 
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            document.getElementById("divcontenedor").style.display = "block";
+        });
+    </script>
+
     <script>
+
+
         function buscarEmpleado() {
 
             const id = document.getElementById('idEmpleado').value.trim();
