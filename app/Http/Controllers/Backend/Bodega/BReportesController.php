@@ -3711,6 +3711,32 @@ class BReportesController extends Controller
             )
             ->get();
 
+        $idUsuario = Auth::id();
+
+
+        $anio = Carbon::parse($request->hasta)->format('Y');
+
+        // obtener el último número de solicitud del usuario en ese año
+        $ultimo = DB::table('bodega_guardadopdf')
+            ->where('id_usuario', $idUsuario)
+            ->whereYear('fecha_hasta', $anio)
+            ->orderBy('id', 'desc')
+            ->value('numero_solicitud');
+
+        $correlativo = 1;
+
+        if ($ultimo) {
+            // extrae el número: 003-PYB2026 → 003
+            $correlativo = intval(substr($ultimo, 0, 3)) + 1;
+        }
+
+
+        // formatea 001, 002, 003...
+        $numeroFormateado = str_pad($correlativo, 3, '0', STR_PAD_LEFT);
+
+        // arma el número de solicitud final
+        $numeroSolicitud = $numeroFormateado . '-PYB' . $anio;
+
 
 
         // =========================
@@ -3813,7 +3839,7 @@ class BReportesController extends Controller
     </tr>
     <tr>
         <td class='bold'>N° DE SOLICITUD:</td>
-        <td></td>
+        <td>$numeroSolicitud</td>
     </tr>
 </table>
 
