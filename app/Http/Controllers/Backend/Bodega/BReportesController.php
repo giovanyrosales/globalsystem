@@ -2751,7 +2751,7 @@ class BReportesController extends Controller
         if($idusuario == 78){ // informatica
             $this->reportePDFInicialFinalInformatica($desde, $hasta);
         }
-        else if($idusuario == 77){ // proveeduria
+        else if($idusuario == 77){ // PROVEEDURIA Y BODEGA
             $this->reportePDFInicialFinalProveeduria($desde, $hasta);
         }
         else{
@@ -3436,7 +3436,7 @@ class BReportesController extends Controller
                     <table width='100%' style='font-size:10px;'>
                         <tr>
                             <td width='40%' style='border-right:0.8px solid #000; border-bottom:0.8px solid #000; padding:4px 6px;'><strong>Código:</strong></td>
-                            <td width='60%' style='border-bottom:0.8px solid #000; padding:4px 6px; text-align:center;'></td>
+                            <td width='60%' style='border-bottom:0.8px solid #000; padding:4px 6px; text-align:center;'>PROV-002-REPO</td>
                         </tr>
                         <tr>
                             <td style='border-right:0.8px solid #000; border-bottom:0.8px solid #000; padding:4px 6px;'><strong>Versión:</strong></td>
@@ -3444,7 +3444,7 @@ class BReportesController extends Controller
                         </tr>
                         <tr>
                             <td style='border-right:0.8px solid #000; padding:4px 6px;'><strong>Fecha de vigencia:</strong></td>
-                            <td style='padding:4px 6px; text-align:center;'></td>
+                            <td style='padding:4px 6px; text-align:center;'>22/12/2025</td>
                         </tr>
                     </table>
                 </td>
@@ -3586,9 +3586,9 @@ class BReportesController extends Controller
 
             $html .= "
     <br><br>
-    <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px'>
-        <thead style='background:#f2f4f8'>
-            <tr>
+    <table width='100%' border='1' cellspacing='0' cellpadding='4' style='border-collapse:collapse; font-size:11px; background: '>
+        <thead style='background:#ffffff'>
+              <tr style='background-color:#eef3ff; color:#ffffff;'>
                 <th style='width:4%'>#</th>
                 <th style='width:10%'>Código</th>
 
@@ -3638,8 +3638,8 @@ class BReportesController extends Controller
             // 👉 FILA TOTAL SOLO SUMA $ SALDO
             $html .= "
         <tr style='font-weight:bold; background:#f9fafb'>
-            <td colspan='9' style='text-align:right'>TOTAL</td>
-            <td style='text-align:right'>$".number_format($totalSaldoFinalCodigos, 2)."</td>
+            <td colspan='9' style='text-align:right; font-weight: bold'>TOTAL</td>
+            <td style='text-align:right; font-weight: bold'>$".number_format($totalSaldoFinalCodigos, 2)."</td>
         </tr>
     ";
 
