@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\BodegaEntradas;
 use App\Models\BodegaEntradasDetalle;
 use App\Models\BodegaExtras;
+use App\Models\BodegaGuardadoPDF;
+use App\Models\BodegaGuardadoPDFDetalle;
 use App\Models\BodegaMateriales;
 use App\Models\BodegaSalida;
 use App\Models\BodegaSalidaDetalle;
@@ -3663,6 +3665,637 @@ class BReportesController extends Controller
         $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
         $mpdf->Output(); // stream
     }
+
+
+
+
+
+    // ********************************** ENTREGAS ANUALES ****************************
+
+    public function vistaReporteEntregasAnuales()
+    {
+        $arrayUnidades = P_Departamento::orderBy('nombre', 'ASC')->get();
+
+        return view('backend.admin.bodega.reportes.anuales.vistareporteanual', compact('arrayUnidades'));
+    }
+
+
+    public function reportePDFAnualBodega(Request $request)
+    {
+        $infoDepartamento = P_Departamento::where('id', $request->unidad)->first();
+
+        $start = Carbon::parse($request->desde)->startOfDay();
+        $end   = Carbon::parse($request->hasta)->endOfDay();
+
+        $desdeFormat = Carbon::parse($request->desde)->format('d/m/Y');
+        $hastaFormat = Carbon::parse($request->hasta)->format('d/m/Y');
+
+        $fechaHoy = Carbon::now('America/El_Salvador')->format('d-m-Y');
+
+
+        $anioHastaFicha = Carbon::parse($request->hasta)->format('Y');
+
+
+        $detalleMateriales = DB::table('bodega_salidas as bs')
+            ->join('bodega_salidas_detalle as bsd', 'bsd.id_salida', '=', 'bs.id')
+            ->join('bodega_entradas_detalle as bed', 'bed.id', '=', 'bsd.id_entradadetalle')
+            ->where('bs.id_usuario', 77) // SOLO USUARIO PROVEEDURIA Y BODEGA
+            ->where('bs.id_unidad_manual', $request->unidad)
+            ->whereBetween('bs.fecha', [$start, $end])
+            ->select(
+                'bed.nombre_copia as descripcion',
+                DB::raw("'UND' as unidad_medida"),
+                'bsd.cantidad_salida as cantidad',
+                'bed.precio as precio_unitario',
+                DB::raw('(bsd.cantidad_salida * bed.precio) as total')
+            )
+            ->get();
+
+
+
+        // =========================
+        // mPDF
+        // =========================
+        $mpdf = new \Mpdf\Mpdf([
+            'tempDir' => sys_get_temp_dir(),
+            'format' => 'LETTER',
+            'orientation' => 'P'
+        ]);
+
+        $mpdf->SetTitle('Reporte Anual');
+
+        $logoalcaldia = public_path('images/gobiernologo.jpg');
+
+        // =========================
+        // HTML PDF
+        // =========================
+        $html = "
+            <style>
+                body { font-family: Arial, sans-serif; font-size: 11px; }
+                table { border-collapse: collapse; width: 100%; }
+                td, th { border: 0.8px solid #000; padding: 5px; }
+                .no-border { border: none; }
+                .center { text-align: center; }
+                .right { text-align: right; }
+                .bold { font-weight: bold; }
+                .small { font-size: 10px; }
+            </style>
+
+<!-- ================= ENCABEZADO ================= -->
+<table>
+    <tr>
+        <td width='25%'>
+            <table width='100%' class='no-border'>
+                <tr>
+                    <td width='30%' class='no-border'>
+                        <img src='{$logoalcaldia}' style='height:40px'>
+                    </td>
+                    <td width='70%' class='no-border bold' style='color:#104e8c;'>
+                        SANTA ANA NORTE<br>EL SALVADOR
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <td width='50%' class='center bold' style='font-size:14px;'>
+            FICHA POR UNIDAD
+        </td>
+
+        <td width='25%' class='no-border'>
+            <table width='100%'>
+                <tr>
+                    <td width='40%' class='bold'>Código:</td>
+                    <td width='60%' class='center'>PROV-001-FICH</td>
+                </tr>
+                <tr>
+                    <td class='bold'>Versión:</td>
+                    <td class='center'>000</td>
+                </tr>
+                <tr>
+                    <td class='bold'>Fecha de vigencia:</td>
+                    <td class='center'>22/10/2025</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<br>
+
+<!-- ================= SUBTITULO ================= -->
+<table>
+    <tr>
+        <td class='center bold' style='background:#e6eef6;'>
+            FICHA POR UNIDAD $anioHastaFicha
+        </td>
+    </tr>
+</table>
+
+<br>
+
+<!-- ================= DATOS GENERALES ================= -->
+<table>
+    <tr>
+        <td width='25%' class='bold'>NOMBRE DE LA UNIDAD:</td>
+        <td width='75%'>$infoDepartamento->nombre</td>
+    </tr>
+    <tr>
+        <td class='bold'>PERIODO:</td>
+        <td>$desdeFormat - $hastaFormat</td>
+    </tr>
+    <tr>
+        <td class='bold'>DESCRIPCIÓN GENERAL:</td>
+        <td>Materiales de oficina y/o papelería.</td>
+    </tr>
+    <tr>
+        <td class='bold'>FICHA GENERADA EL DÍA:</td>
+        <td>$fechaHoy</td>
+    </tr>
+    <tr>
+        <td class='bold'>N° DE SOLICITUD:</td>
+        <td></td>
+    </tr>
+</table>
+
+<br>
+
+<!-- ================= DETALLE DE MATERIALES ================= -->
+<table>
+    <tr class='center bold'>
+        <td width='5%' style='font-size: 12px'>N°</td>
+        <td width='35%' style='font-size: 12px'>DESCRIPCIÓN</td>
+        <td width='15%' style='font-size: 12px'>UNIDAD DE MEDIDA</td>
+        <td width='15%'>CANTIDAD SOLICITADA</td>
+        <td width='15%'>PRECIO UNITARIO</td>
+        <td width='15%'>TOTAL</td>
+    </tr>
+
+    ";
+
+
+        $contador = 1;
+        $montoTotal = 0;
+
+        foreach ($detalleMateriales as $item) {
+            $montoTotal += $item->total;
+
+            $html .= "
+        <tr>
+            <td class='center' style='font-size: 12px'>{$contador}</td>
+            <td style='font-size: 12px'>{$item->descripcion}</td>
+            <td class='center' style='font-size: 12px'>{$item->unidad_medida}</td>
+            <td class='center' style='font-size: 12px'>{$item->cantidad}</td>
+            <td class='right' style='font-size: 12px'>$ " . number_format($item->precio_unitario, 2) . "</td>
+            <td class='right' style='font-size: 12px'>$ " . number_format($item->total, 2) . "</td>
+        </tr>
+    ";
+
+            $contador++;
+        }
+
+
+    $html .= "
+<tr>
+    <td colspan='5' class='right bold'>MONTO TOTAL</td>
+    <td class='right bold'>$ " . number_format($montoTotal, 2) . "</td>
+</tr>
+";
+   $html .= "
+
+</table>
+
+<br>
+
+<!-- ================= OBSERVACIONES ================= -->
+<table class='font-13'>
+    <tr>
+        <td class='bold'>OBSERVACIONES:</td>
+    </tr>
+    <tr>
+        <td style='height:60px;'>$request->descripcion</td>
+    </tr>
+</table>
+
+<br><br>
+
+<style>
+    .font-13 {
+        font-size: 13px;
+    }
+</style>
+
+
+<!-- ================= FIRMA ================= -->
+<table class='no-border font-13'>
+    <tr>
+        <td class='no-border'>
+            Ficha generada por:<br><br>
+            <span class='bold'>Lcda. Marcela Alejandra González</span><br>
+            Jefa de la unidad de proveeduría y bodega
+        </td>
+    </tr>
+</table>
+";
+
+
+        // $mpdf->setFooter('Página {PAGENO} de {nb}');
+        $mpdf->WriteHTML($html);
+        $mpdf->Output();
+
+
+    }
+
+
+
+
+
+    public function guardarPDFEntregaAnual(Request $request)
+    {
+        $regla = [
+            'unidad' => 'required',
+            'desde' => 'required',
+            'hasta' => 'required',
+        ];
+
+        // descripcion
+
+        $validar = Validator::make($request->all(), $regla);
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        $idUsuario = Auth::id();
+
+        $start = Carbon::parse($request->desde)->startOfDay();
+        $end   = Carbon::parse($request->hasta)->endOfDay();
+
+        $detalleMateriales = DB::table('bodega_salidas as bs')
+            ->join('bodega_salidas_detalle as bsd', 'bsd.id_salida', '=', 'bs.id')
+            ->join('bodega_entradas_detalle as bed', 'bed.id', '=', 'bsd.id_entradadetalle')
+            ->where('bs.id_usuario', $idUsuario)
+            ->where('bs.id_unidad_manual', $request->unidad)
+            ->whereBetween('bs.fecha', [$start, $end])
+            ->select(
+                'bed.nombre_copia as descripcion',
+                DB::raw("'UND' as unidad_medida"),
+                'bsd.cantidad_salida as cantidad',
+                'bed.precio as precio_unitario',
+                DB::raw('(bsd.cantidad_salida * bed.precio) as total')
+            )
+            ->get();
+
+        if ($detalleMateriales->isEmpty()) {
+            return ['success' => 1, 'msg' => 'No hay datos para guardar'];
+        }
+
+
+        $anio = Carbon::parse($request->hasta)->format('Y');
+
+        // obtener el último número de solicitud del usuario en ese año
+        $ultimo = DB::table('bodega_guardadopdf')
+            ->where('id_usuario', $idUsuario)
+            ->whereYear('fecha_hasta', $anio)
+            ->orderBy('id', 'desc')
+            ->value('numero_solicitud');
+
+        $correlativo = 1;
+
+        if ($ultimo) {
+            // extrae el número: 003-PYB2026 → 003
+            $correlativo = intval(substr($ultimo, 0, 3)) + 1;
+        }
+
+
+        // formatea 001, 002, 003...
+        $numeroFormateado = str_pad($correlativo, 3, '0', STR_PAD_LEFT);
+
+        // arma el número de solicitud final
+        $numeroSolicitud = $numeroFormateado . '-PYB' . $anio;
+
+
+        DB::beginTransaction();
+
+        try {
+
+            // 🔹 TOTAL GENERAL
+            $montoTotal = $detalleMateriales->sum('total');
+
+            // 🔹 GUARDAR CABECERA
+            $idPDF = DB::table('bodega_guardadopdf')->insertGetId([
+                'id_usuario'        => $idUsuario,
+                'id_pdepartamento'  => $request->unidad,
+                'descripcion'       => $request->descripcion,
+                'numero_solicitud'  => $numeroSolicitud,
+                'fecha_desde'       => $request->desde,
+                'fecha_hasta'       => $request->hasta,
+                'fecha_generada'    => Carbon::now('America/El_Salvador')->toDateString(),
+                'monto_total'       => number_format($montoTotal, 2, '.', ''),
+            ]);
+
+            // 🔹 GUARDAR DETALLE
+            foreach ($detalleMateriales as $item) {
+                DB::table('bodega_guardadopdf_deta')->insert([
+                    'id_guardadopdf' => $idPDF,
+                    'nombre'           => $item->descripcion,
+                    'unidad'           => $item->unidad_medida,
+                    'cantidad'         => $item->cantidad,
+                    'precio_unitario'  => number_format($item->precio_unitario, 2, '.', ''),
+                    'total'            => number_format($item->total, 2, '.', ''),
+                ]);
+            }
+
+            DB::commit();
+
+            return [
+                'success' => 2,
+                'id_pdf' => $idPDF
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return [
+                'success' => 0,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+
+
+
+    public function vistaDeReporteGuardados()
+    {
+
+        return view('backend.admin.bodega.reportes.anuales.listado.vistapdfguardados');
+    }
+
+
+    public function tablaDeReporteGuardados()
+    {
+
+        $idusuario = Auth::id();
+        $infoUsuario = Usuario::where('id', $idusuario)->first();
+
+        $arrayPdf = BodegaGuardadoPDF::where('id_usuario', $idusuario)->get();
+
+        foreach ($arrayPdf as $item) {
+
+            $item->fechaDesde = date("d-m-Y", strtotime($item->fecha_desde));
+            $item->fechaHasta = date("d-m-Y", strtotime($item->fecha_hasta));
+
+        }
+
+
+        return view('backend.admin.bodega.reportes.anuales.listado.tablapdfguardados', compact('arrayPdf'));
+    }
+
+
+    public function borrarRegistroPdfGuardado(Request $request)
+    {
+        $regla = [
+            'id' => 'required',
+        ];
+
+        $validar = Validator::make($request->all(), $regla);
+        if ($validar->fails()) {
+            return ['success' => 0];
+        }
+
+        DB::beginTransaction();
+
+        try {
+
+            BodegaGuardadoPDFDetalle::where('id_guardadopdf', $request->id)->delete();
+            BodegaGuardadoPDF::where('id', $request->id)->delete();
+
+            DB::commit();
+            return ['success' => 1];
+        }catch(\Throwable $e){
+            DB::rollback();
+            return ['success' => 2];
+        }
+    }
+
+
+
+    public function generarReportePDFGuardadoAnual($idreporte)
+    {
+        $infoReporteGuardado = BodegaGuardadoPDF::where('id', $idreporte)->first();
+
+
+        $desdeFormat = Carbon::parse($infoReporteGuardado->fecha_desde)->format('d/m/Y');
+        $hastaFormat = Carbon::parse($infoReporteGuardado->fecha_hasta)->format('d/m/Y');
+
+        $fechaHoy = Carbon::now('America/El_Salvador')->format('d-m-Y');
+
+        $anioHastaFicha = Carbon::parse($infoReporteGuardado->fecha_hasta)->format('Y');
+
+
+        $detalleMateriales = BodegaGuardadoPDFDetalle::where('id_guardadopdf', $idreporte)
+            ->orderBy('nombre', 'ASC')
+            ->get();
+
+        $infoDepartamento = P_Departamento::where('id', $infoReporteGuardado->id_pdepartamento)->first();
+
+
+
+
+
+        // =========================
+        // mPDF
+        // =========================
+        $mpdf = new \Mpdf\Mpdf([
+            'tempDir' => sys_get_temp_dir(),
+            'format' => 'LETTER',
+            'orientation' => 'P'
+        ]);
+
+        $mpdf->SetTitle('Reporte Anual');
+
+        $logoalcaldia = public_path('images/gobiernologo.jpg');
+
+        // =========================
+        // HTML PDF
+        // =========================
+        $html = "
+            <style>
+                body { font-family: Arial, sans-serif; font-size: 11px; }
+                table { border-collapse: collapse; width: 100%; }
+                td, th { border: 0.8px solid #000; padding: 5px; }
+                .no-border { border: none; }
+                .center { text-align: center; }
+                .right { text-align: right; }
+                .bold { font-weight: bold; }
+                .small { font-size: 10px; }
+            </style>
+
+<!-- ================= ENCABEZADO ================= -->
+<table>
+    <tr>
+        <td width='25%'>
+            <table width='100%' class='no-border'>
+                <tr>
+                    <td width='30%' class='no-border'>
+                        <img src='{$logoalcaldia}' style='height:40px'>
+                    </td>
+                    <td width='70%' class='no-border bold' style='color:#104e8c;'>
+                        SANTA ANA NORTE<br>EL SALVADOR
+                    </td>
+                </tr>
+            </table>
+        </td>
+
+        <td width='50%' class='center bold' style='font-size:14px;'>
+            FICHA POR UNIDAD
+        </td>
+
+        <td width='25%' class='no-border'>
+            <table width='100%'>
+                <tr>
+                    <td width='40%' class='bold'>Código:</td>
+                    <td width='60%' class='center'>PROV-001-FICH</td>
+                </tr>
+                <tr>
+                    <td class='bold'>Versión:</td>
+                    <td class='center'>000</td>
+                </tr>
+                <tr>
+                    <td class='bold'>Fecha de vigencia:</td>
+                    <td class='center'>22/10/2025</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<br>
+
+<!-- ================= SUBTITULO ================= -->
+<table>
+    <tr>
+        <td class='center bold' style='background:#e6eef6;'>
+            FICHA POR UNIDAD $anioHastaFicha
+        </td>
+    </tr>
+</table>
+
+<br>
+
+<!-- ================= DATOS GENERALES ================= -->
+<table>
+    <tr>
+        <td width='25%' class='bold'>NOMBRE DE LA UNIDAD:</td>
+        <td width='75%'>$infoDepartamento->nombre</td>
+    </tr>
+    <tr>
+        <td class='bold'>PERIODO:</td>
+        <td>$desdeFormat - $hastaFormat</td>
+    </tr>
+    <tr>
+        <td class='bold'>DESCRIPCIÓN GENERAL:</td>
+        <td>Materiales de oficina y/o papelería.</td>
+    </tr>
+    <tr>
+        <td class='bold'>FICHA GENERADA EL DÍA:</td>
+        <td>$fechaHoy</td>
+    </tr>
+    <tr>
+        <td class='bold'>N° DE SOLICITUD:</td>
+        <td>$infoReporteGuardado->numero_solicitud</td>
+    </tr>
+</table>
+
+<br>
+
+<!-- ================= DETALLE DE MATERIALES ================= -->
+<table>
+    <tr class='center bold'>
+        <td width='5%' style='font-size: 12px'>N°</td>
+        <td width='35%' style='font-size: 12px'>DESCRIPCIÓN</td>
+        <td width='15%' style='font-size: 12px'>UNIDAD DE MEDIDA</td>
+        <td width='15%'>CANTIDAD SOLICITADA</td>
+        <td width='15%'>PRECIO UNITARIO</td>
+        <td width='15%'>TOTAL</td>
+    </tr>
+
+    ";
+
+
+        $contador = 1;
+
+
+        foreach ($detalleMateriales as $item) {
+
+            $html .= "
+                <tr>
+                    <td class='center' style='font-size: 12px'>{$contador}</td>
+                    <td style='font-size: 12px'>{$item->nombre}</td>
+                    <td class='center' style='font-size: 12px'>{$item->unidad}</td>
+                    <td class='center' style='font-size: 12px'>{$item->cantidad}</td>
+                    <td class='right' style='font-size: 12px'>$ " . $item->precio_unitario ."</td>
+                    <td class='right' style='font-size: 12px'>$ " . $item->total ."</td>
+                </tr>
+            ";
+
+            $contador++;
+        }
+
+
+        $html .= "
+<tr>
+    <td colspan='5' class='right bold'>MONTO TOTAL</td>
+    <td class='right bold'>$ " . $infoReporteGuardado->monto_total . "</td>
+</tr>
+";
+        $html .= "
+
+</table>
+
+<br>
+
+<!-- ================= OBSERVACIONES ================= -->
+<table class='font-13'>
+    <tr>
+        <td class='bold'>OBSERVACIONES:</td>
+    </tr>
+    <tr>
+        <td style='height:60px;'>$infoReporteGuardado->descripcion</td>
+    </tr>
+</table>
+
+<br><br>
+
+<style>
+    .font-13 {
+        font-size: 13px;
+    }
+</style>
+
+
+<!-- ================= FIRMA ================= -->
+<table class='no-border font-13'>
+    <tr>
+        <td class='no-border'>
+            Ficha generada por:<br><br>
+            <span class='bold'>Lcda. Marcela Alejandra González</span><br>
+            Jefa de la unidad de proveeduría y bodega
+        </td>
+    </tr>
+</table>
+";
+
+
+        // $mpdf->setFooter('Página {PAGENO} de {nb}');
+        $mpdf->WriteHTML($html);
+        $mpdf->Output();
+
+
+    }
+
+
+
+
+
 
 
 

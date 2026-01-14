@@ -1412,14 +1412,22 @@ Route::get('/admin/bodega/reportes/entregas/index', [BReportesController::class,
 Route::get('/admin/bodega/reportespdf/inicial/final/{desde}/{hasta}', [BReportesController::class,'reportePDFInicialFinalSegunBodega']);
 
 
+// ENTREGAS ANUALES DE MARCELA
+Route::get('/admin/bodega/reportes/entregasanuales/index', [BReportesController::class,'vistaReporteEntregasAnuales'])->name('sidebar.bodega.reportes.anuales.entregas');
+// Se manda id unidad, fecha desde y fecha hasta
+Route::post(
+    '/admin/bodega/reportespdf/entregaanual',
+    [BReportesController::class, 'reportePDFAnualBodega']
+)->name('bodega.reporte.entrega.anual');
 
+// GUARDAR REPORTE
+Route::post('/admin/bodega/guardarpdf/entregaanual', [BReportesController::class, 'guardarPDFEntregaAnual']);
 
-
-
-
-
-
-
+// LISTADO DE INFORMACION GUARDADA
+Route::get('/admin/bodega/reporteguardados/index', [BReportesController::class,'vistaDeReporteGuardados'])->name('sidebar.bodega.pdfguardados.listado');
+Route::get('/admin/bodega/reporteguardados/tabla', [BReportesController::class,'tablaDeReporteGuardados']);
+Route::post('/admin/bodega/reporteguardados/borrarregistro', [BReportesController::class,'borrarRegistroPdfGuardado']);
+Route::get('/admin/bodega/reporteguardados/generarpdf/{id}', [BReportesController::class,'generarReportePDFGuardadoAnual']);
 
 
 

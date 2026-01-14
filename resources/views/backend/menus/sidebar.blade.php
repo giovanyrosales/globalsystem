@@ -1016,6 +1016,28 @@
                                 </a>
                             </li>
 
+                            @if(Auth::check() && Auth::id() == 77)
+
+                                <hr>
+                                <li class="nav-item">
+                                    <a href="{{ route('sidebar.bodega.reportes.anuales.entregas') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Entregas Anual</p>
+                                    </a>
+                                </li>
+
+
+
+                                <li class="nav-item">
+                                    <a href="{{ route('sidebar.bodega.pdfguardados.listado') }}" target="frameprincipal" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>PDF Guardados</p>
+                                    </a>
+                                </li>
+
+                                <hr>
+                            @endif
+
 
                             <li class="nav-item">
                                 <a href="{{ route('sidebar.bodega.extras.reportenombre') }}" target="frameprincipal" class="nav-link">
