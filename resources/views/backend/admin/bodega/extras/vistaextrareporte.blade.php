@@ -39,6 +39,12 @@
                             </div>
 
 
+                            <div class="form-group">
+                                <label>Margen Superior para Firma</label>
+                                <input type="number" id="margen" class="form-control" value="{{ $info->margen }}">
+                            </div>
+
+
                         </div>
 
                         <div class="card-footer" style="float: right;">
@@ -73,11 +79,18 @@
         function actualizar(){
             var nombreGerente = document.getElementById('nombre-gerente').value;
             var nombreGerenteCargo = document.getElementById('nombre-gerentecargo').value;
+            var margen = document.getElementById('margen').value;
+
+            if(margen === ''){
+                toastr.error('Margen es requerido');
+                return
+            }
 
             openLoading()
             var formData = new FormData();
             formData.append('nombreGerente', nombreGerente);
             formData.append('nombreGerenteCargo', nombreGerenteCargo);
+            formData.append('margen', margen);
 
             axios.post(url+'/bodega/extras/actualizarDatos', formData, {
             })

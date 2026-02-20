@@ -1324,7 +1324,7 @@ Route::get('/admin/bodega/reportes/totalentrega/pdf/{desde}/{hasta}', [BReportes
 Route::get('/admin/bodega/reportes/pdf/codigopresupuestario/{desde}/{hasta}/{arraycodigos}', [BReportesController::class, 'generarPDFCodigosPresupuestarios']);
 
 
-// REPORTE PARA CONTABILIDAD DEL SISTEMA BODEGA
+// REPORTE PARA CONTABILIDAD DEL SISTEMA BODEGA - ENTREGAS MENSUAL
 Route::get('/admin/bodega/reportes/entregas/index', [BReportesController::class, 'vistaReporteEntregas'])->name('sidebar.bodega.reportes.entregas');
 Route::get('/admin/bodega/reportespdf/inicial/final/{desde}/{hasta}', [BReportesController::class, 'reportePDFInicialFinalSegunBodega']);
 

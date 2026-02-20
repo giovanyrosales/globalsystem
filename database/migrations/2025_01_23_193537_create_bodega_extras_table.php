@@ -18,6 +18,10 @@ class CreateBodegaExtrasTable extends Migration
 
             $table->string('nombre_gerente', 100)->nullable();
             $table->string('nombre_gerente_cargo', 100)->nullable();
+
+            // MARGEN PARA FIRMA - REPORTE ENTREGA MENSUAL
+            $table->integer('margen')->default(0);
+
         });
     }
 

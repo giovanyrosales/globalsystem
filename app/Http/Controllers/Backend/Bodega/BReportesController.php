@@ -258,6 +258,7 @@ class BReportesController extends Controller
         BodegaExtras::where('id', 1)->update([
             'nombre_gerente' => $request->nombreGerente,
             'nombre_gerente_cargo' => $request->nombreGerenteCargo,
+            'margen' => $request->margen,
         ]);
 
         return ['success' => 1];
@@ -2771,6 +2772,9 @@ class BReportesController extends Controller
 
         $tipoBodega = Auth::user()->tipo_bodega; // coincide con bodega_materiales.tipo_bodega
 
+        $infoGerencia = BodegaExtras::where('id', 1)->first();
+
+
         // ----- Consulta base (agrupado por producto, sin lotes separados) -----
         $rows = DB::select("
         WITH entradas AS (
@@ -3199,8 +3203,8 @@ class BReportesController extends Controller
 
         // ======= Línea de firma centrada =======
         $html .= "
-<br><br><br>
-<div style='text-align:center; font-size:13px; margin-top:40px;'>
+
+<div style='text-align:center; font-size:13px; margin-top: $infoGerencia->margen;'>
     F._____________________________<br>
     <span style='font-weight:bold; font-size:12px;'>Unidad de Tecnologías de la Información</span>
 </div>
