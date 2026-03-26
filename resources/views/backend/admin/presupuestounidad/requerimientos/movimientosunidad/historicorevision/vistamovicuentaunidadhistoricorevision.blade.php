@@ -163,9 +163,10 @@
                                     <hr style="height:1px;border:none;color:#333;background-color:#333;">
 
                                     <div class="form-group">
-                                        <label>Reforma</label>
+                                        <label>Captura de pantalla / documento (OPCIONAL)</label>
                                         <input type="file" id="documento-control" class="form-control" accept="image/jpeg, image/jpg, image/png, .pdf"/>
                                     </div>
+                                    <p class="field-hint">ℹ️ Si tienes una captura del código AnyDesk, adjúntala aquí.</p>
 
 
                                 </div>

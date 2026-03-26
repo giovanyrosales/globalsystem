@@ -82,8 +82,14 @@
                                 <label style="margin-top: 10px" class="font-500">Usuario</label>
                                 <input class="form-control form-control-lg mb-3" id="usuario" autocomplete="off" type="text">
                                 <label class="font-500">Contraseña</label>
-                                <input class="form-control form-control-lg" id="password" type="password">
-
+                                <div class="position-relative">
+                                    <input class="form-control form-control-lg" id="password" type="password" style="padding-right: 50px;">
+                                    <span id="togglePassword"
+                                          onclick="togglePass()"
+                                          style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #6c757d;">
+                                    <i id="eyeIcon" class="fas fa-eye"></i>
+                                </span>
+                                </div>
                                 <input type="button" value="ACCEDER" style="margin-top: 25px; width: 100%; font-weight: bold" onclick="login()" class="button button-uppercase button-primary button-pill">
                             </form>
                         </div>
@@ -111,6 +117,21 @@
             login();
         }
     });
+
+    function togglePass() {
+        var input = document.getElementById('password');
+        var icon = document.getElementById('eyeIcon');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
 
     // inicio de sesion
     function login() {
