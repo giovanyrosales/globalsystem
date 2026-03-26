@@ -17,7 +17,7 @@
 
     <!--  /comprasalcaldia.com/admin  -->
 
-    <script type="text/javascript"> var url = "/admin"; var url2 = "/comprasalcaldia.com/admin"; //url2 solo se utiliza para la vistacalendario</script>
+    <script type="text/javascript"> var url = "/comprasalcaldia.com/admin"; var url2 = "/comprasalcaldia.com/admin"; //url2 solo se utiliza para la vistacalendario</script>
 </head>
 <body class="hold-transition sidebar-mini">
 
