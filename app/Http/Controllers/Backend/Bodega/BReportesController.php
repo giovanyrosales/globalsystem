@@ -3505,21 +3505,21 @@ class BReportesController extends Controller
                 <td>{$i}</td>
                 <td>".e($r->codigo ?? '')."</td>
                 <td>".e($desc)."</td>
-                <td style='text-align:right'>$".number_format($r->precio ?? 0, 4)."</td>
+                <td style='text-align:right'>$".number_format($r->precio ?? 0, 6)."</td>
 
                 <!-- ORDEN NUEVO -->
 
                 <td style='text-align:right'>".number_format($r->saldo_inicial_cant ?? 0)."</td>
-                <td style='text-align:right'>$".number_format($r->saldo_inicial_money ?? 0, 2)."</td>
+                <td style='text-align:right'>$".number_format($r->saldo_inicial_money ?? 0, 6)."</td>
 
                 <td style='text-align:right'>".number_format($r->entradas_mes_cant ?? 0)."</td>
-                <td style='text-align:right'>$".number_format($r->entradas_mes_money ?? 0, 2)."</td>
+                <td style='text-align:right'>$".number_format($r->entradas_mes_money ?? 0, 6)."</td>
 
                 <td style='text-align:right'>".number_format($r->salidas_mes_cant ?? 0)."</td>
-                <td style='text-align:right'>$".number_format($r->salidas_mes_money ?? 0, 2)."</td>
+                <td style='text-align:right'>$".number_format($r->salidas_mes_money ?? 0, 6)."</td>
 
                 <td style='text-align:right'>".number_format($r->saldo_final_cant ?? 0)."</td>
-                <td style='text-align:right'>$".number_format($r->saldo_final_money ?? 0, 2)."</td>
+                <td style='text-align:right'>$".number_format($r->saldo_final_money ?? 0, 6)."</td>
             </tr>
         ";
             $i++;
@@ -3536,16 +3536,16 @@ class BReportesController extends Controller
                      <td colspan='4' style='text-align:right'>Totales:</td>
 
                     <td style='text-align:right'>".number_format($totales['inicial_cant'])."</td>
-                    <td style='text-align:right'>$".number_format($totales['inicial_money'], 2)."</td>
+                    <td style='text-align:right'>$".number_format($totales['inicial_money'], 6)."</td>
 
                     <td style='text-align:right'>".number_format($totales['entradas_cant'])."</td>
-                    <td style='text-align:right'>$".number_format($totales['entradas_money'], 2)."</td>
+                    <td style='text-align:right'>$".number_format($totales['entradas_money'], 6)."</td>
 
                     <td style='text-align:right'>".number_format($totales['salidas_cant'])."</td>
-                    <td style='text-align:right'>$".number_format($totales['salidas_money'], 2)."</td>
+                    <td style='text-align:right'>$".number_format($totales['salidas_money'], 6)."</td>
 
                     <td style='text-align:right'>".number_format($totales['final_cant'])."</td>
-                    <td style='text-align:right'>$".number_format($totales['final_money'], 2)."</td>
+                    <td style='text-align:right'>$".number_format($totales['final_money'], 6)."</td>
                 </tr>
             </tfoot>
         </table>
@@ -3566,17 +3566,17 @@ class BReportesController extends Controller
             <tr>
                 <td>Ingresó (Entradas del mes)</td>
                 <td style='text-align:right'>".number_format($totales['entradas_cant'])."</td>
-                <td style='text-align:right'>$".number_format($totales['entradas_money'], 2)."</td>
+                <td style='text-align:right'>$".number_format($totales['entradas_money'], 6)."</td>
             </tr>
             <tr>
                 <td>Salió (Salidas del mes)</td>
                 <td style='text-align:right'>".number_format($totales['salidas_cant'])."</td>
-                <td style='text-align:right'>$".number_format($totales['salidas_money'], 2)."</td>
+                <td style='text-align:right'>$".number_format($totales['salidas_money'], 6)."</td>
             </tr>
             <tr>
                 <td>Disponible al cierre (Saldo final)</td>
                 <td style='text-align:right'>".number_format($totales['final_cant'])."</td>
-                <td style='text-align:right'>$".number_format($totales['final_money'], 2)."</td>
+                <td style='text-align:right'>$".number_format($totales['final_money'], 6)."</td>
             </tr>
         </table>
     ";
@@ -3624,16 +3624,16 @@ class BReportesController extends Controller
             <td>".e($s['codigo'])."</td>
 
             <td style='text-align:right'>".number_format($s['inicial_cant'])."</td>
-            <td style='text-align:right'>$".number_format($s['inicial_money'], 2)."</td>
+            <td style='text-align:right'>$".number_format($s['inicial_money'], 6)."</td>
 
             <td style='text-align:right'>".number_format($s['entradas_cant'])."</td>
-            <td style='text-align:right'>$".number_format($s['entradas_money'], 2)."</td>
+            <td style='text-align:right'>$".number_format($s['entradas_money'], 6)."</td>
 
             <td style='text-align:right'>".number_format($s['salidas_cant'])."</td>
-            <td style='text-align:right'>$".number_format($s['salidas_money'], 2)."</td>
+            <td style='text-align:right'>$".number_format($s['salidas_money'], 6)."</td>
 
             <td style='text-align:right'>".number_format($s['final_cant'])."</td>
-            <td style='text-align:right'>$".number_format($s['final_money'], 2)."</td>
+            <td style='text-align:right'>$".number_format($s['final_money'], 6)."</td>
         </tr>
         ";
                 $j++;
@@ -3643,7 +3643,7 @@ class BReportesController extends Controller
             $html .= "
         <tr style='font-weight:bold; background:#f9fafb'>
             <td colspan='9' style='text-align:right; font-weight: bold'>TOTAL</td>
-            <td style='text-align:right; font-weight: bold'>$".number_format($totalSaldoFinalCodigos, 2)."</td>
+            <td style='text-align:right; font-weight: bold'>$".number_format($totalSaldoFinalCodigos, 6)."</td>
         </tr>
     ";
 

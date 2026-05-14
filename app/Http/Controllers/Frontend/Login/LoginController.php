@@ -74,7 +74,7 @@ class LoginController extends Controller
     {
         // 🔹 ID que querés buscar (puede venir por request)
 
-        $path = public_path('excel/base.xlsx');
+        $path = public_path('excel/base2.xlsx');
         $data = Excel::toArray([], $path);
 
         $empleado = null;
@@ -85,13 +85,13 @@ class LoginController extends Controller
             // Saltar encabezado
             if ($index == 0) continue;
 
-            if (trim($row[0]) == $idBuscado) {
+            if (trim($row[2]) == $idBuscado) {
                 $empleado = [
                     'id'     => $row[0],
                     'nombre' => $row[1],
-                    'dui'    => $row[2],
-                    'unidad' => $row[3],
-                    'cargo'  => $row[4],
+                    //'dui'    => $row[2],
+                   // 'unidad' => $row[3],
+                    //'cargo'  => $row[4],
                 ];
                 break;
             }
@@ -100,6 +100,9 @@ class LoginController extends Controller
         if (!$empleado) {
             return response()->json(['error' => 'Empleado no encontrado'], 404);
         }
+
+
+        return [$empleado];
 
         // ================= PDF ===================
 
