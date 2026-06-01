@@ -873,6 +873,52 @@
                         <p>Reportes</p>
                     </a>
 
+
+
+                    <li class="nav-item">
+
+                        <a href="#" class="nav-link">
+                            <i class="far fa-edit"></i>
+                            <p>
+                                Reservas
+                                <i class="fas fa-angle-left right"></i>
+                            </p>
+                        </a>
+
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.secretaria.reservas') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Crear Reserva</p>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.secretaria.lugar') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Lista de Lugares</p>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('sidebar.reportes.despacho') }}" target="frameprincipal" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Reportes</p>
+                                </a>
+                            </li>
+                        </ul>
+
+
+                    </li>
+
+
+
+
+
                 @endcan
 
 

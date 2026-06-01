@@ -1158,7 +1158,6 @@ Route::post('/admin/secretaria/calendario/nuevo', [ReferenciasController::class,
 //Transporte
 Route::get('/admin/secretaria/transporte/index', [ReferenciasController::class, 'indexSecreTransporte'])->name('sidebar.secretaria.transporte');
 Route::get('/admin/secretaria/transporte/tabla', [ReferenciasController::class, 'tablaSecreTransporte']);
-Route::post('/admin/secretaria/transporte/nuevo', [ReferenciasController::class, 'guardarSecreTransporte']);
 Route::post('/admin/secretaria/transporte/borrar', [ReferenciasController::class, 'borrarSecreTransporte']);
 Route::post('/admin/secretaria/transporte/informacion', [ReferenciasController::class, 'informacionSecreTransporte']);
 Route::post('/admin/secretaria/transporte/editar', [ReferenciasController::class, 'editarSecreTransporte']);
@@ -1183,6 +1182,46 @@ Route::get('/admin/rrhh/hojadatos/index', [ReferenciasController::class, 'indexR
 Route::get('/admin/rrhh/hojadatos/tabla', [ReferenciasController::class, 'tablaRRHHDatosHoja']);
 Route::get('/admin/rrhh/hojadatos/reporte/{id}', [ReferenciasController::class, 'RRHHDatosReporte']);
 Route::post('/admin/rrhh/hojadatos/borrarregistro', [ReferenciasController::class, 'RRHHDatosBorrar']);
+
+Route::get('/admin/secretaria/lugar/index', [ReferenciasController::class, 'indexLugar'])->name('sidebar.secretaria.lugar');
+Route::get('/admin/secretaria/lugar/tabla', [ReferenciasController::class, 'tablaLugar']);
+Route::post('/admin/secretaria/lugar/nuevo', [ReferenciasController::class, 'guardarLugar']);
+Route::post('/admin/secretaria/lugar/informacion', [ReferenciasController::class, 'informacionLugar']);
+Route::post('/admin/secretaria/lugar/editar', [ReferenciasController::class, 'editarLugar']);
+
+
+Route::get('/admin/secretaria/reservas/index', [ReferenciasController::class, 'indexReservas'])->name('sidebar.secretaria.reservas');
+Route::get('/admin/secretaria/reservas/tabla', [ReferenciasController::class, 'tablaReservas']);
+Route::post('/admin/secretaria/reservas/nuevo', [ReferenciasController::class, 'guardarReserva']);
+Route::post('/admin/secretaria/reservas/informacion', [ReferenciasController::class, 'informacionReserva']);
+Route::post('/admin/secretaria/reservas/editar', [ReferenciasController::class, 'editarReserva']);
+Route::post('/admin/secretaria/reservas/borrar', [ReferenciasController::class, 'borrarReserva']);
+
+Route::get('/admin/reporte/reservas/{desde}/{hasta}', [ReferenciasController::class, 'reporteReservas']);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // RECURSOS HUMANOS - PUBLICO

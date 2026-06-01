@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Backend\Configuracion\Referencias;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lugares;
 use App\Models\Referencias;
+use App\Models\Reserva;
 use App\Models\RRHHcargo;
 use App\Models\RRHHDatos;
 use App\Models\RRHHDatosTabla;
@@ -928,6 +930,319 @@ class ReferenciasController extends Controller
             return ['success' => 99];
         }
     }
+
+
+
+
+    // ************************************  RESERVAS *******************************************
+
+
+    public function indexLugar()
+    {
+        return view('backend.admin.secredespacho.lugares.vistalugares');    }
+
+    public function tablaLugar()
+    {
+        $lugares = Lugares::orderBy('id', 'desc')->get();
+
+        return view('backend.admin.secredespacho.lugares.tablalugares', compact('lugares'));
+    }
+    public function guardarLugar(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required'
+        ]);
+
+        $dato = new Lugares();
+        $dato->nombre = $request->nombre;
+        $dato->descripcion = $request->descripcion;
+        $dato->save();
+
+        return response()->json([
+            'success' => 1
+        ]);
+    }
+    //controlador lugar
+    public function informacionLugar(Request $request)
+    {
+        $info = Lugares::where('id', $request->id)->first();
+
+        if($info){
+            return response()->json([
+                'success' => 1,
+                'info' => $info
+            ]);
+        }
+
+        return response()->json([
+            'success' => 2
+        ]);
+    }
+
+
+    public function editarLugar(Request $request)
+    {
+        $editar = Lugares::where('id', $request->id)->first();
+
+        if(!$editar){
+            return response()->json([
+                'success' => 2
+            ]);
+        }
+
+        $editar->nombre = $request->nombre;
+        $editar->descripcion = $request->descripcion;
+        $editar->save();
+
+        return response()->json([
+            'success' => 1
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+    //reservas
+    public function indexReservas()
+    {
+        $arrayLugares = Lugares::orderBy('nombre')->get();
+
+        return view('backend.admin.secredespacho.reservas.vistareservas', compact('arrayLugares'));
+    }
+
+    public function tablaReservas()
+    {
+        $reservas = Reserva::with('lugar')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        foreach ($reservas as $reserva) {
+
+            // Fecha: d-m-Y
+            $reserva->fecha_formateada = Carbon::parse($reserva->fecha)
+                ->format('d-m-Y');
+
+            // Hora inicio: h:i A (AM/PM)
+            $reserva->hora_inicio_formateada = Carbon::parse($reserva->hora_inicio)
+                ->format('h:i A');
+
+            // Hora fin: h:i A (AM/PM)
+            $reserva->hora_fin_formateada = Carbon::parse($reserva->hora_fin)
+                ->format('h:i A');
+        }
+
+        return view(
+            'backend.admin.secredespacho.reservas.tablareservas',
+            compact('reservas')
+        );
+    }
+
+    public function guardarReserva(Request $request)
+    {
+        // VALIDAR SI YA EXISTE UNA RESERVA EN ESE HORARIO
+        $existe = Reserva::where('id_lugares', $request->lugar)
+            ->where('fecha', $request->fecha)
+            ->where(function ($query) use ($request) {
+
+                $query->where('hora_inicio', '<', $request->hora_fin)
+                    ->where('hora_fin', '>', $request->hora_inicio);
+
+            })
+            ->first();
+
+        // SI YA EXISTE
+        if($existe){
+
+            return response()->json([
+                'success' => 3,
+                'mensaje' => 'Ya existe una reserva para este lugar en ese horario'
+            ]);
+        }
+
+        // GUARDAR
+        $dato = new Reserva();
+
+        $dato->nombre = $request->nombre;
+        $dato->telefono = $request->telefono;
+        $dato->id_lugares = $request->lugar;
+        $dato->fecha = $request->fecha;
+        $dato->hora_inicio = $request->hora_inicio;
+        $dato->hora_fin = $request->hora_fin;
+        $dato->descripcion = $request->descripcion;
+
+        $dato->save();
+
+        return response()->json([
+            'success' => 1
+        ]);
+    }
+
+    public function informacionReserva(Request $request)
+    {
+        $info = Reserva::find($request->id);
+
+        if($info){
+
+            $arrayLugares = Lugares::orderBy('nombre')->get();
+
+            return response()->json([
+                'success' => 1,
+                'info' => $info,
+                'arrayLugares' => $arrayLugares
+            ]);
+        }
+
+        return response()->json([
+            'success' => 2
+        ]);
+    }
+
+    public function editarReserva(Request $request)
+    {
+        $editar = Reserva::find($request->id);
+
+        if(!$editar){
+            return response()->json([
+                'success' => 2
+            ]);
+        }
+
+        $existe = Reserva::where('id_lugares', $request->lugar)
+            ->where('fecha', $request->fecha)
+            ->where('id', '!=', $request->id)
+            ->where(function ($query) use ($request) {
+                $query->where('hora_inicio', '<', $request->hora_fin)
+                    ->where('hora_fin', '>', $request->hora_inicio);
+            })
+            ->first();
+
+        if($existe){
+            return response()->json([
+                'success' => 3,
+                'mensaje' => 'Ya existe otra reserva para este lugar en ese horario'
+            ]);
+        }
+
+        $editar->nombre = $request->nombre;
+        $editar->telefono = $request->telefono;
+        $editar->id_lugares = $request->lugar;
+        $editar->fecha = $request->fecha;
+        $editar->hora_inicio = $request->hora_inicio;
+        $editar->hora_fin = $request->hora_fin;
+        $editar->save();
+
+        return response()->json([
+            'success' => 1
+        ]);
+    }
+
+    public function borrarReserva(Request $request)
+    {
+        $borrar = Reserva::find($request->id);
+
+        if(!$borrar){
+            return response()->json([
+                'success' => 2
+            ]);
+        }
+
+        $borrar->delete();
+
+        return response()->json([
+            'success' => 1
+        ]);
+    }
+
+
+
+    public function reporteReservas($desde, $hasta)
+    {
+        $desdeFormat = date("d-m-Y", strtotime($desde));
+        $hastaFormat = date("d-m-Y", strtotime($hasta));
+
+        $reservas = Reserva::with('lugar')
+            ->whereBetween('fecha', [$desde, $hasta])
+            ->orderBy('fecha', 'ASC')
+            ->get();
+
+        $mpdf = new \Mpdf\Mpdf([
+            'format' => 'LETTER'
+        ]);
+
+        $mpdf->SetTitle('Reporte de Reservas');
+
+        $tabla = "
+    <h3 style='text-align:center;'>
+        Reporte de Reservas
+    </h3>
+
+    <p style='text-align:center;'>
+        Fecha: {$desdeFormat} - {$hastaFormat}
+    </p>";
+
+        $tabla .= "
+    <table width='100%' border='1' cellspacing='0' cellpadding='5' style='border-collapse: collapse; font-size: 11px;'>
+
+        <thead>
+            <tr style='background-color:#f2f2f2;'>
+                <th>Fecha</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Lugar</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+
+        <tbody>";
+
+        foreach ($reservas as $dato) {
+
+            // Fecha d-m-Y
+            $fecha = date('d-m-Y', strtotime($dato->fecha));
+
+            // Lugar desde tabla lugares
+            $lugar = $dato->lugar ? $dato->lugar->nombre : 'Sin lugar';
+
+            // Hora AM/PM
+            $horaInicio = date('h:i A', strtotime($dato->hora_inicio));
+            $horaFin = date('h:i A', strtotime($dato->hora_fin));
+
+            $descripcion = $dato->descripcion ?? '';
+
+            $tabla .= "
+        <tr>
+            <td>{$fecha}</td>
+            <td>{$dato->nombre}</td>
+            <td>{$dato->telefono}</td>
+            <td>{$lugar}</td>
+            <td>{$horaInicio}</td>
+            <td>{$horaFin}</td>
+            <td>{$descripcion}</td>
+        </tr>";
+        }
+
+        $tabla .= "
+        </tbody>
+    </table>";
+
+        $mpdf->WriteHTML($tabla);
+        $mpdf->Output('Reporte_Reservas.pdf', 'I');
+    }
+
+
+
+
+
+
+
+
 
 
 }

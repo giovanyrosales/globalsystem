@@ -121,6 +121,63 @@
                 </div>
             </div>
 
+
+            <!-- REPORTE RESERVAS -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="callout callout-success">
+
+                        <h5><i class="fas fa-info"></i> Generar Reporte de Reservas</h5>
+
+                        <div class="card">
+                            <form class="form-horizontal">
+                                <div class="card-body">
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-9 row">
+                                            <div class="info-box shadow">
+                                                <div class="info-box-content">
+
+                                                    <div class="row">
+                                                        <div class="form-group col-md-2">
+                                                            <label style="color: #686868">Desde:</label>
+                                                            <input type="date" class="form-control" id="fecha-reservas-desde">
+                                                        </div>
+
+                                                        <div class="form-group col-md-2">
+                                                            <label style="color: #686868">Hasta:</label>
+                                                            <input type="date" class="form-control" id="fecha-reservas-hasta">
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <button type="button" onclick="pdfReporteReservas()" class="btn" style="margin-left: 15px; border-color: black; border-radius: 0.1px;">
+                                            <img src="{{ asset('images/logopdf.png') }}" width="48px" height="55px">
+                                            Generar PDF
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
         </div>
     </section>
 
@@ -194,7 +251,36 @@
             }
 
             window.open("{{ URL::to('admin/reporte/despacho/transporte') }}/" + fechaDesde + "/" + fechaHasta);
+         }
+
+
+        function pdfReporteReservas(){
+
+            var fechadesde = document.getElementById('fecha-reservas-desde').value;
+            var fechahasta = document.getElementById('fecha-reservas-hasta').value;
+
+            if(fechadesde === ''){
+                toastr.error('Fecha desde es requerido');
+                return;
             }
+
+            if(fechahasta === ''){
+                toastr.error('Fecha hasta es requerido');
+                return;
+            }
+
+            if(new Date(fechahasta) < new Date(fechadesde)){
+                toastr.error('La Fecha Hasta no puede ser menor que la Fecha Desde');
+                return;
+            }
+
+            window.open(
+                "{{ url('/admin/reporte/reservas') }}/" + fechadesde + "/" + fechahasta,
+                '_blank'
+            );
+        }
+
+
 
     </script>
 
