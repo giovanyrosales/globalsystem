@@ -1175,9 +1175,7 @@ class ReferenciasController extends Controller
             ->orderBy('fecha', 'ASC')
             ->get();
 
-        $mpdf = new \Mpdf\Mpdf([
-            'format' => 'LETTER'
-        ]);
+        $mpdf = new \Mpdf\Mpdf(['tempDir' => sys_get_temp_dir(), 'format' => 'LETTER']);
 
         $mpdf->SetTitle('Reporte de Reservas');
 
