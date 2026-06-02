@@ -124,53 +124,58 @@ class ReferenciasController extends Controller
     }
 
      // Obtener registros agrupados por fecha para el calendario
-        public function getRegistrosPorDia()
+    public function getRegistrosPorDia()
     {
-        $registros = Viaje::selectRaw('fecha, COUNT(*) as total, SUM(acompanantes) as total_acompanantes')
+        $viajes = Viaje::selectRaw('fecha, COUNT(*) as total, SUM(acompanantes) as total_acompanantes')
             ->groupBy('fecha')
             ->get();
 
-        $eventos = $registros->map(function ($registro) {
-            // Calcula el total de personas (registros + acompañantes)
-            $totalPersonas = $registro->total + $registro->total_acompanantes;
+        $reservas = Reserva::selectRaw('fecha, COUNT(*) as total')
+            ->groupBy('fecha')
+            ->get();
+
+        $eventosViajes = $viajes->map(function ($registro) {
+            $acompanantes = $registro->total_acompanantes ?? 0;
+            $totalPersonas = $registro->total + $acompanantes;
 
             return [
-                'title' => $totalPersonas . ' Pasajeros',  // Muestra el total de personas
-                'start' => $registro->fecha,  // Fecha del evento
+                'title' => $totalPersonas . ' Pasajeros',
+                'start' => $registro->fecha,
             ];
         });
 
-        return response()->json($eventos);
+        $eventosReservas = $reservas->map(function ($registro) {
+            return [
+                'title' => $registro->total . ' Reserva' . ($registro->total > 1 ? 's' : ''),
+                'start' => $registro->fecha,
+            ];
+        });
+
+        return response()->json($eventosViajes->merge($eventosReservas));
     }
 
-        /**
+    /**
          * Guardar un nuevo registro desde el modal.
          */
-        public function guardarRegistro(Request $request)
+    public function guardarRegistro(Request $request)
     {
-        // Validar los datos recibidos
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'fecha' => 'required|date',
-            'acompanantes' => 'required|integer|min:0',
-            'lugar' => 'required|string|max:255',
-            'subida' => 'string|max:500',
-            'telefono' => 'required|integer'
-        ]);
-
         // Crear un nuevo registro
         Viaje::create([
-            'nombre' => $validated['nombre'],
-            'fecha' => $validated['fecha'],
-            'acompanantes' => $validated['acompanantes'],
-            'lugar' => $validated['lugar'],
-            'subida' => $validated['subida'],
-            'telefono' => $validated['telefono']
+            'nombre' => $request->nombre,
+            'fecha' => $request->fecha,
+            'acompanantes' => $request->acompanantes,
+            'lugar' => $request->lugar,
+            'subida' => $request->subida,
+            'telefono' => $request->telefono
         ]);
 
         // Responder con éxito
-        return response()->json(['message' => 'Registro guardado con éxito'], 200);
+        return response()->json([
+            'success' => 1,
+            'message' => 'Registro guardado con éxito'
+        ]);
     }
+
     //Carga la tabla de registros de transporte
     public function tablaSecreTransporte(){
 

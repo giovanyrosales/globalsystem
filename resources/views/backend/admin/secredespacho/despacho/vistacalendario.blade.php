@@ -50,7 +50,7 @@
                 </div>
             </div>
         </div>
-    </section>  
+    </section>
 
 
 <!-- Modal -->
@@ -133,28 +133,49 @@
         }
 
     // Guardar el formulario
-        $(document).ready(function () {
-        $('#registroForm').on('submit', function (e) {
-            e.preventDefault(); // Evita el envío del formulario por defecto
+         $(document).ready(function () {
+             $('#registroForm').on('submit', function (e) {
+                 e.preventDefault();
 
-            $.ajax({
-                url: url2+'/secretaria/calendario/nuevo', // Ruta para guardar el registro
-                method: 'POST',
-                data: $(this).serialize(), // Serializa los datos del formulario
-                success: function (response) {
-                    toastr.success('Registro guardado con éxito', '', {
-                    onHidden: function () {
-                        // Recarga la página para actualizar el calendario
-                        location.reload();
-                    } }); // Muestra un mensaje de éxito
-                    $('#registroModal').modal('hide'); // Cierra el modal
-                    },
-                error: function (xhr) {
-                    toastr.error('Hubo un error al guardar el registro'); // Muestra un mensaje de error
-                    //console.error('Error al guardar:', xhr.responseText); // Log del error en la consola
-                }
-            });
-        });
+                 openLoading();
+
+                 let formData = new FormData();
+
+                 formData.append('nombre', $('#nombre').val());
+                 formData.append('fecha', $('#fecha').val());
+                 formData.append('acompanantes', $('#acompanantes').val());
+                 formData.append('lugar', $('#lugar').val());
+                 formData.append('subida', $('#subida').val());
+                 formData.append('telefono', $('#telefono').val());
+
+
+                 axios.post(url2 + '/secretaria/calendario/nuevo', formData)
+                     .then((response) => {
+                         closeLoading();
+
+                         if(response.data.success === 1){
+                             toastr.success('Registrado');
+
+                             $('#registroModal').modal('hide');
+                             location.reload();
+                         } else {
+                             toastr.error('Error al registrar');
+                         }
+                     })
+                     .catch((error) => {
+                         closeLoading();
+
+                         console.log(error.response.data); // ver error real
+
+                         if(error.response.status === 422){
+                             console.log(error.response.data.errors);
+                             toastr.error('Validación fallida');
+                         } else {
+                             toastr.error('Error al registrar');
+                         }
+                     });
+             });
+
     });
     </script>
 @endsection
