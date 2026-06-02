@@ -157,7 +157,7 @@
 
         ///comprasalcaldia.com/admin/login
 
-        axios.post('/admin/login', formData, {
+        axios.post('/comprasalcaldia.com/admin/login', formData, {
         })
             .then((response) => {
                 closeLoading();
